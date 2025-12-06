@@ -172,7 +172,7 @@ function roleSatisfiesPermissions(
             return true;
         }
 
-        const allowed = statements[resource as keyof typeof statements] ?? [];
+        const allowed = (statements as Record<string, string[]>)[resource] ?? [];
         return actions.every((action) => allowed.includes(action as never));
     });
 }

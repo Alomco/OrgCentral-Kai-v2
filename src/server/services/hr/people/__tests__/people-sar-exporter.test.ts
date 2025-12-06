@@ -9,26 +9,27 @@ import type { RepositoryAuthorizationContext } from '@/server/repositories/secur
 
 function buildProfileRepo(profiles: EmployeeProfileDTO[]): IEmployeeProfileRepository {
   return {
-    createEmployeeProfile: async () => {},
-    updateEmployeeProfile: async () => {},
+    createEmployeeProfile: async () => { },
+    updateEmployeeProfile: async () => { },
     getEmployeeProfile: async () => null,
     getEmployeeProfileByUser: async () => null,
     getEmployeeProfilesByOrganization: async () => profiles,
     findByEmployeeNumber: async () => null,
     findByEmail: async () => null,
-    updateComplianceStatus: async () => {},
-    deleteEmployeeProfile: async () => {},
+    updateComplianceStatus: async () => { },
+    deleteEmployeeProfile: async () => { },
+    linkProfileToUser: async () => { },
   };
 }
 
 function buildContractRepo(contracts: EmploymentContractDTO[]): IEmploymentContractRepository {
   return {
-    createEmploymentContract: async () => {},
-    updateEmploymentContract: async () => {},
+    createEmploymentContract: async () => { },
+    updateEmploymentContract: async () => { },
     getEmploymentContract: async () => null,
     getEmploymentContractByEmployee: async () => null,
     getEmploymentContractsByOrganization: async () => contracts,
-    deleteEmploymentContract: async () => {},
+    deleteEmploymentContract: async () => { },
   };
 }
 

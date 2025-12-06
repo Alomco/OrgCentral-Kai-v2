@@ -3,11 +3,7 @@ import type {
     EmployeeProfileDTO,
     EmploymentTypeCode,
     EmploymentStatusCode,
-    HealthStatusCode,
-    PayScheduleCode,
     PeopleListFilters,
-    SalaryBasisCode,
-    SalaryFrequencyCode,
 } from '@/server/types/hr/people';
 import {
     buildDomainProfileFields,
@@ -18,8 +14,15 @@ import {
     toDateValue,
     toJsonInput,
     toJsonValue,
+    toEmergencyContactValue,
     validateEmployeeProfileDto,
+    cloneEmployeeProfileMetadata,
+    type EmployeeProfileMetadata,
 } from './employee-profile-mapper.helpers';
+
+export const normalizeEmployeeProfileMetadata = (
+    metadata: Prisma.JsonValue | null | undefined,
+): EmployeeProfileMetadata => cloneEmployeeProfileMetadata(metadata);
 
 export type EmployeeProfileFilters = PeopleListFilters & {
     orgId?: string;
@@ -45,8 +48,8 @@ export function mapPrismaEmployeeProfileToDomain(record: PrismaEmployeeProfile):
         ...mergedFields,
         employeeNumber: extendedRecord.employeeNumber,
         jobTitle: extendedRecord.jobTitle ?? null,
-        employmentType: extendedRecord.employmentType as EmploymentTypeCode,
-        employmentStatus: extendedRecord.employmentStatus as EmploymentStatusCode,
+        employmentType: extendedRecord.employmentType,
+        employmentStatus: extendedRecord.employmentStatus,
         departmentId: extendedRecord.departmentId ?? null,
         startDate: extendedRecord.startDate ?? null,
         endDate: extendedRecord.endDate ?? null,
@@ -56,23 +59,23 @@ export function mapPrismaEmployeeProfileToDomain(record: PrismaEmployeeProfile):
         hourlyRate: decimalToNumber(extendedRecord.hourlyRate),
         salaryAmount: decimalToNumber(extendedRecord.salaryAmount),
         salaryCurrency: extendedRecord.salaryCurrency ?? null,
-        salaryFrequency: extendedRecord.salaryFrequency as SalaryFrequencyCode | null,
-        salaryBasis: extendedRecord.salaryBasis as SalaryBasisCode | null,
-        paySchedule: extendedRecord.paySchedule as PayScheduleCode | null,
+        salaryFrequency: extendedRecord.salaryFrequency,
+        salaryBasis: extendedRecord.salaryBasis,
+        paySchedule: extendedRecord.paySchedule,
         costCenter: extendedRecord.costCenter ?? null,
-        location: toJsonValue(extendedRecord.location) as EmployeeProfileDTO['location'],
+        location: toJsonValue(extendedRecord.location),
         niNumber: extendedRecord.niNumber ?? null,
-        emergencyContact: toJsonValue(extendedRecord.emergencyContact) as EmployeeProfileDTO['emergencyContact'],
-        nextOfKin: toJsonValue(extendedRecord.nextOfKin) as EmployeeProfileDTO['nextOfKin'],
-        healthStatus: extendedRecord.healthStatus as HealthStatusCode,
-        workPermit: toJsonValue(extendedRecord.workPermit) as EmployeeProfileDTO['workPermit'],
-        bankDetails: toJsonValue(extendedRecord.bankDetails) as EmployeeProfileDTO['bankDetails'],
-        metadata: (toJsonValue(extendedRecord.metadata) ?? null) as EmployeeProfileDTO['metadata'],
+        emergencyContact: toEmergencyContactValue(extendedRecord.emergencyContact),
+        nextOfKin: toEmergencyContactValue(extendedRecord.nextOfKin),
+        healthStatus: extendedRecord.healthStatus,
+        workPermit: toJsonValue(extendedRecord.workPermit),
+        bankDetails: toJsonValue(extendedRecord.bankDetails),
+        metadata: toJsonValue(extendedRecord.metadata),
         dataClassification: extendedRecord.dataClassification,
         dataResidency: extendedRecord.dataResidency,
         auditSource: extendedRecord.auditSource ?? null,
         correlationId: extendedRecord.correlationId ?? null,
-        schemaVersion: extendedRecord.schemaVersion ?? undefined,
+        schemaVersion: extendedRecord.schemaVersion,
         createdBy: extendedRecord.createdBy ?? null,
         updatedBy: extendedRecord.updatedBy ?? null,
         retentionPolicy: extendedRecord.retentionPolicy ?? null,
@@ -91,7 +94,7 @@ export function mapPrismaEmployeeProfileToDomain(record: PrismaEmployeeProfile):
 
 export function mapDomainEmployeeProfileToPrisma(input: EmployeeProfileDTO): Prisma.EmployeeProfileUncheckedCreateInput {
     const mergedMetadata = mergeLegacyMetadata(input.metadata as Prisma.JsonValue | null | undefined, input);
-    const employmentStatus = input.employmentStatus ?? 'ACTIVE';
+    const employmentStatus = input.employmentStatus;
 
     const data: Record<string, unknown> = {
         orgId: input.orgId,

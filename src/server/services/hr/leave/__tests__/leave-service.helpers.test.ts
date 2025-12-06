@@ -105,6 +105,7 @@ function createProfileRepoMock(profile: EmployeeProfileDTO | null): IEmployeePro
         getEmployeeProfilesByOrganization: vi.fn(async () => []),
         deleteEmployeeProfile: vi.fn(async () => undefined),
         updateComplianceStatus: vi.fn(async () => undefined),
+        linkProfileToUser: vi.fn(async () => undefined),
     };
 }
 

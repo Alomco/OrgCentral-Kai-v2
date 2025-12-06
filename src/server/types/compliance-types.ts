@@ -29,13 +29,16 @@ export interface ComplianceTemplate {
     metadata?: Prisma.JsonValue;
 }
 
-export type ComplianceItemStatus =
-    | 'PENDING'
-    | 'COMPLETE'
-    | 'MISSING'
-    | 'PENDING_REVIEW'
-    | 'NOT_APPLICABLE'
-    | 'EXPIRED';
+export const COMPLIANCE_ITEM_STATUSES = [
+    'PENDING',
+    'COMPLETE',
+    'MISSING',
+    'PENDING_REVIEW',
+    'NOT_APPLICABLE',
+    'EXPIRED',
+] as const;
+
+export type ComplianceItemStatus = (typeof COMPLIANCE_ITEM_STATUSES)[number];
 
 export interface ComplianceLogItem {
     id: string;

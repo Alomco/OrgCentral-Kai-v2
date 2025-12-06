@@ -2,6 +2,7 @@ import type { GetSessionDependencies } from '@/server/use-cases/auth/sessions/ge
 import { PrismaAbsenceSettingsRepository } from '@/server/repositories/prisma/hr/absences';
 import type { IAbsenceSettingsRepository } from '@/server/repositories/contracts/hr/absences/absence-settings-repository-contract';
 import { defaultLeaveServiceProvider, type LeaveServiceContract } from '@/server/services/hr/leave/leave-service.provider';
+import { readJson } from '@/server/api-adapters/http/request-utils';
 
 export interface ResolvedLeaveControllerDependencies {
     session: GetSessionDependencies;
@@ -34,10 +35,4 @@ export function resolveLeaveControllerDependencies(
     };
 }
 
-export async function readJson<T = unknown>(request: Request): Promise<T | Record<string, never>> {
-    try {
-        return (await request.json()) as T;
-    } catch {
-        return {};
-    }
-}
+export { readJson };

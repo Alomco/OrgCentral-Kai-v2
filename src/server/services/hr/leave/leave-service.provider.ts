@@ -8,7 +8,7 @@ import { getHrNotificationService } from '@/server/services/hr/notifications/hr-
 const leaveRequestRepository = new PrismaLeaveRequestRepository();
 const leaveBalanceRepository = new PrismaLeaveBalanceRepository();
 const leavePolicyRepository = new PrismaLeavePolicyRepository();
-const organizationRepository = new PrismaOrganizationRepository(prisma);
+const organizationRepository = new PrismaOrganizationRepository({ prisma });
 const profileRepository = new PrismaEmployeeProfileRepository();
 const defaultLeaveServiceDependencies: LeaveServiceDependencies = {
     leaveRequestRepository,

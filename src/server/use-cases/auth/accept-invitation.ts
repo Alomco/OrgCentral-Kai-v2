@@ -1,12 +1,10 @@
-import { MembershipStatus } from '@prisma/client';
-import { EntityNotFoundError, ValidationError } from '@/server/errors';
+import { EntityNotFoundError } from '@/server/errors';
 import type { IInvitationRepository } from '@/server/repositories/contracts/auth/invitations/invitation-repository-contract';
 import type { InvitationRecord } from '@/server/repositories/contracts/auth/invitations/invitation-repository.types';
-import type {
-    IMembershipRepository,
-    EmployeeProfilePayload,
-    UserActivationPayload,
-} from '@/server/repositories/contracts/org/membership';
+import type { IEmployeeProfileRepository } from '@/server/repositories/contracts/hr/people/employee-profile-repository-contract';
+import type { IChecklistTemplateRepository } from '@/server/repositories/contracts/hr/onboarding/checklist-template-repository-contract';
+import type { IChecklistInstanceRepository } from '@/server/repositories/contracts/hr/onboarding/checklist-instance-repository-contract';
+import type { IMembershipRepository } from '@/server/repositories/contracts/org/membership';
 import type { IOrganizationRepository } from '@/server/repositories/contracts/org/organization/organization-repository-contract';
 import type { IUserRepository } from '@/server/repositories/contracts/org/users/user-repository-contract';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
@@ -16,22 +14,29 @@ import {
     normalizeActor,
     normalizeToken,
     normalizeRoles,
-    normalizeEmploymentType,
     assertEmailMatch,
     assertNotExpired,
     assertStatus,
-    parseDate,
     buildAuthorizationContext,
-    generateEmployeeNumber as defaultGenerateEmployeeNumber,
     type NormalizedActor,
-    type EmploymentType,
 } from '@/server/use-cases/shared';
+import {
+    buildEmployeeProfilePayload,
+    buildUserActivationPayload,
+    defaultEmployeeNumberGenerator,
+    resolvePreboardingProfilePayload,
+    maybeInstantiateChecklistInstance,
+    extractEmployeeNumber,
+} from '@/server/use-cases/auth/accept-invitation.helpers';
 
 export interface AcceptInvitationDependencies {
     invitationRepository: IInvitationRepository;
     userRepository: IUserRepository;
     membershipRepository?: IMembershipRepository;
     organizationRepository?: IOrganizationRepository;
+    employeeProfileRepository?: IEmployeeProfileRepository;
+    checklistTemplateRepository?: IChecklistTemplateRepository;
+    checklistInstanceRepository?: IChecklistInstanceRepository;
     generateEmployeeNumber?: () => string;
 }
 
@@ -111,7 +116,7 @@ async function ensureMembershipAndOnboarding(
     roles: string[],
 ): Promise<MembershipOutcome> {
     const existingUser = await deps.userRepository.getUser(record.organizationId, actor.userId);
-    const alreadyMember = Boolean(existingUser?.memberOf?.includes(record.organizationId));
+    const alreadyMember = existingUser?.memberOf.includes(record.organizationId) ?? false;
 
     if (alreadyMember) {
         return { alreadyMember: true };
@@ -123,11 +128,18 @@ async function ensureMembershipAndOnboarding(
             record.organizationId,
             actor.userId,
         );
-        const profilePayload = buildEmployeeProfilePayload(
+        const preboardingProfile = await resolvePreboardingProfilePayload(
+            deps.employeeProfileRepository,
             record,
             actor.userId,
-            deps.generateEmployeeNumber ?? defaultEmployeeNumberGenerator,
         );
+        const profilePayload =
+            preboardingProfile ??
+            buildEmployeeProfilePayload(
+                record,
+                actor.userId,
+                deps.generateEmployeeNumber ?? defaultEmployeeNumberGenerator,
+            );
         const userUpdate = buildUserActivationPayload(record);
 
         await deps.membershipRepository.createMembershipWithProfile(context, {
@@ -136,6 +148,13 @@ async function ensureMembershipAndOnboarding(
             roles,
             profile: profilePayload,
             userUpdate,
+        });
+
+        await maybeInstantiateChecklistInstance({
+            record,
+            employeeNumber: profilePayload.employeeNumber,
+            templateRepository: deps.checklistTemplateRepository,
+            instanceRepository: deps.checklistInstanceRepository,
         });
 
         return { alreadyMember: false, employeeNumber: profilePayload.employeeNumber };
@@ -149,7 +168,15 @@ async function ensureMembershipAndOnboarding(
         roles,
     );
 
-    return { alreadyMember: false, employeeNumber: record.onboardingData.employeeId };
+    const fallbackEmployeeNumber = extractEmployeeNumber(record);
+    await maybeInstantiateChecklistInstance({
+        record,
+        employeeNumber: fallbackEmployeeNumber,
+        templateRepository: deps.checklistTemplateRepository,
+        instanceRepository: deps.checklistInstanceRepository,
+    });
+
+    return { alreadyMember: false, employeeNumber: fallbackEmployeeNumber };
 }
 
 async function buildMembershipContext(
@@ -177,39 +204,4 @@ function mapOrganizationToContext(
         auditSource: 'accept-invitation',
         tenantScope,
     });
-}
-
-type EmployeeNumberGenerator = () => string;
-
-function buildEmployeeProfilePayload(
-    record: InvitationRecord,
-    userId: string,
-    generateEmployeeNumber: EmployeeNumberGenerator,
-): EmployeeProfilePayload {
-    const employmentTypeValue = normalizeEmploymentType(record.onboardingData.employmentType);
-    return {
-        orgId: record.organizationId,
-        userId,
-        employeeNumber: record.onboardingData.employeeId?.trim() || generateEmployeeNumber(),
-        jobTitle: record.onboardingData.position ?? null,
-        employmentType: employmentTypeValue as EmployeeProfilePayload['employmentType'],
-        startDate: parseDate(record.onboardingData.startDate),
-        metadata: {
-            source: 'invitation-onboarding',
-            templateId: record.onboardingData.onboardingTemplateId ?? null,
-            payload: JSON.parse(JSON.stringify(record.onboardingData)),
-        },
-    };
-}
-
-function buildUserActivationPayload(record: InvitationRecord): UserActivationPayload {
-    return {
-        displayName: record.onboardingData.displayName ?? record.onboardingData.email,
-        email: record.onboardingData.email ?? record.targetEmail,
-        status: MembershipStatus.ACTIVE,
-    };
-}
-
-function defaultEmployeeNumberGenerator(): string {
-    return defaultGenerateEmployeeNumber();
 }

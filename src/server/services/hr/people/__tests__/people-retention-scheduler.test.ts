@@ -24,26 +24,27 @@ const authorization: RepositoryAuthorizationContext = {
 
 function profileRepoWithData(data: EmployeeProfileDTO[]): IEmployeeProfileRepository {
   return {
-    createEmployeeProfile: async () => {},
+    createEmployeeProfile: async () => { },
     updateEmployeeProfile: vi.fn().mockResolvedValue(undefined),
     getEmployeeProfile: async () => null,
     getEmployeeProfileByUser: async () => null,
     getEmployeeProfilesByOrganization: async () => data,
     findByEmployeeNumber: async () => null,
     findByEmail: async () => null,
-    updateComplianceStatus: async () => {},
-    deleteEmployeeProfile: async () => {},
+    updateComplianceStatus: async () => { },
+    deleteEmployeeProfile: async () => { },
+    linkProfileToUser: async () => { },
   };
 }
 
 function contractRepoWithData(data: EmploymentContractDTO[]): IEmploymentContractRepository {
   return {
-    createEmploymentContract: async () => {},
+    createEmploymentContract: async () => { },
     updateEmploymentContract: vi.fn().mockResolvedValue(undefined),
     getEmploymentContract: async () => null,
     getEmploymentContractByEmployee: async () => null,
     getEmploymentContractsByOrganization: async () => data,
-    deleteEmploymentContract: async () => {},
+    deleteEmploymentContract: async () => { },
   };
 }
 

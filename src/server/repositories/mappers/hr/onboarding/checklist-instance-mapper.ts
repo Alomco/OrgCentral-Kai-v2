@@ -16,7 +16,7 @@ export interface ChecklistInstanceRecord {
     templateId: string;
     templateName?: string | null;
     status: ChecklistInstanceStatus;
-    items: ChecklistItemProgress[] | unknown;
+    items: ChecklistItemProgress[] | JsonValue | null | undefined;
     startedAt: Date | string;
     completedAt?: Date | string | null;
     metadata?: JsonValue | null;

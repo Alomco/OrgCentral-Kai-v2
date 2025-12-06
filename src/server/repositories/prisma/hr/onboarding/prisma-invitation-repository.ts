@@ -129,7 +129,7 @@ export class PrismaOnboardingInvitationRepository
 
   private async assertOrgScope(orgId: string, token: string): Promise<PrismaInvitation> {
     const record = await this.invitation.findUnique({ where: { token } });
-    if (!record || record.orgId !== orgId) {
+    if (record?.orgId !== orgId) {
       throw new RepositoryAuthorizationError('Invitation not found for this organization.');
     }
     return record;

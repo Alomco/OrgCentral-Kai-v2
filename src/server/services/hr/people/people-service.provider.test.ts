@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import type { PeopleServiceDependencies } from './people-service.types';
 
 const peopleServiceFactory = vi.fn((deps: unknown) => ({ deps }));
 
@@ -27,7 +28,10 @@ describe('people-service.provider', () => {
   });
 
   it('creates a new PeopleService when overrides are provided', () => {
-    const overrideDeps: any = { profileRepo: { custom: true }, contractRepo: { custom: true } };
+    const overrideDeps: Partial<PeopleServiceDependencies> = {
+      profileRepo: { custom: true } as unknown as PeopleServiceDependencies['profileRepo'],
+      contractRepo: { custom: true } as unknown as PeopleServiceDependencies['contractRepo'],
+    };
     const custom = getPeopleService(overrideDeps);
 
     expect(custom).not.toBe(getPeopleService());

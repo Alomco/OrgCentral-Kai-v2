@@ -33,9 +33,13 @@ function satisfiesPermissions(
     granted: OrgPermissionMap,
     required: OrgPermissionMap,
 ): boolean {
-    for (const [resource, actions] of Object.entries(required)) {
-        const allowedActions = granted[resource as keyof OrgPermissionMap] ?? [];
-        for (const action of actions ?? []) {
+    for (const resource of Object.keys(required) as (keyof OrgPermissionMap)[]) {
+        const actions = required[resource];
+        if (!actions?.length) {
+            continue;
+        }
+        const allowedActions = granted[resource] ?? [];
+        for (const action of actions) {
             if (!allowedActions.includes(action)) {
                 return false;
             }

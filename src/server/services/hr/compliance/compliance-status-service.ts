@@ -3,7 +3,7 @@ import type { RepositoryAuthorizationContext } from '@/server/repositories/secur
 import type { ServiceExecutionContext } from '@/server/services/abstract-base-service';
 import { getComplianceStatus, type GetComplianceStatusDependencies } from '@/server/use-cases/hr/compliance/get-compliance-status';
 
-export interface ComplianceStatusServiceDependencies extends GetComplianceStatusDependencies {}
+export type ComplianceStatusServiceDependencies = GetComplianceStatusDependencies;
 
 export class ComplianceStatusService extends AbstractHrService {
   constructor(private readonly dependencies: ComplianceStatusServiceDependencies) {

@@ -1,0 +1,58 @@
+// Notification center models with compliance metadata and retention controls
+
+enum NotificationTopic {
+  LEAVE_APPROVAL       @map("leave-approval")
+  LEAVE_REJECTION      @map("leave-rejection")
+  DOCUMENT_EXPIRY      @map("document-expiry")
+  POLICY_UPDATE        @map("policy-update")
+  PERFORMANCE_REVIEW   @map("performance-review")
+  SYSTEM_ANNOUNCEMENT  @map("system-announcement")
+  COMPLIANCE_REMINDER  @map("compliance-reminder")
+  BROADCAST            @map("broadcast")
+  OTHER                @map("other")
+  @@schema("org")
+}
+
+enum NotificationUrgency {
+  LOW    @map("low")
+  MEDIUM @map("medium")
+  HIGH   @map("high")
+  URGENT @map("urgent")
+  @@schema("org")
+}
+
+model NotificationMessage {
+  id                 String                 @id @default(uuid()) @db.Uuid
+  orgId              String                 @db.Uuid
+  userId             String                 @db.Uuid
+  title              String
+  body               String
+  topic              NotificationTopic      @default(OTHER)
+  priority           NotificationUrgency    @default(MEDIUM)
+  isRead             Boolean                @default(false)
+  readAt             DateTime?
+  actionUrl          String?
+  actionLabel        String?
+  scheduledFor       DateTime?
+  expiresAt          DateTime?
+  retentionPolicyId  String
+  dataClassification DataClassificationLevel @default(OFFICIAL)
+  residencyTag       DataResidencyZone       @default(UK_ONLY)
+  schemaVersion      Int                    @default(1)
+  correlationId      String?
+  createdByUserId    String?                @db.Uuid
+  auditSource        String                 @default("notification-service")
+  metadata           Json?                  @db.JsonB
+  auditTrail         Json?                  @db.JsonB
+  createdAt          DateTime               @default(now())
+  updatedAt          DateTime               @updatedAt
+
+  org        Organization @relation("OrgNotificationMessages", fields: [orgId], references: [id], onDelete: Cascade)
+  membership Membership   @relation("MembershipNotificationMessages", fields: [orgId, userId], references: [orgId, userId], onDelete: Cascade)
+
+  @@index([orgId, userId, isRead])
+  @@index([orgId, retentionPolicyId])
+  @@index([orgId, dataClassification, residencyTag])
+  @@map("notification_messages")
+  @@schema("org")
+}

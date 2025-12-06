@@ -5,7 +5,7 @@ async function main() {
     try {
         const count = await prisma.organization.count();
         stdout.write(`organizations: ${String(count)}\n`);
-    } catch (error) {
+    } catch (error: unknown) {
         const message = error instanceof Error ? error.stack ?? error.message : String(error);
         stderr.write(`DB test error: ${message}\n`);
     } finally {
@@ -13,7 +13,7 @@ async function main() {
     }
 }
 
-main().catch((error) => {
+main().catch((error: unknown) => {
     const message = error instanceof Error ? error.stack ?? error.message : String(error);
     stderr.write(`DB test error: ${message}\n`);
     process.exitCode = 1;

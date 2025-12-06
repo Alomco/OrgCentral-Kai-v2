@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client';
 import type { EmployeeProfile as PrismaEmployeeProfile } from '@prisma/client';
-import type { EmployeeProfileDTO } from '@/server/types/hr/people';
+import type { EmployeeProfileDTO, EmergencyContact, JsonValue as DomainJsonValue } from '@/server/types/hr/people';
 import { employeeProfileSchema } from '@/server/types/hr-people-schemas';
 
 export function decimalToNumber(value: Prisma.Decimal | number | null | undefined): number | null {
@@ -26,8 +26,21 @@ export function toJsonInput(value?: Prisma.JsonValue | null): Prisma.InputJsonVa
     return value as Prisma.InputJsonValue;
 }
 
-function isJsonObject(value: unknown): value is Record<string, unknown> {
+export type EmployeeProfileMetadata = Prisma.JsonObject & {
+    complianceStatus?: string;
+    legacyProfile?: Record<string, unknown>;
+};
+
+export function isJsonObject(value: unknown): value is Prisma.JsonObject {
     return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+export function cloneEmployeeProfileMetadata(value: Prisma.JsonValue | null | undefined): EmployeeProfileMetadata {
+    if (isJsonObject(value)) {
+        const metadata: EmployeeProfileMetadata = { ...value };
+        return metadata;
+    }
+    return {};
 }
 
 export function toStringArray(value: unknown): string[] {
@@ -44,14 +57,52 @@ export function toNullableString(value: unknown): string | null {
     return typeof value === 'string' ? value : null;
 }
 
-export function toJsonValue(value: unknown): Prisma.JsonValue | null | undefined {
-    if (value === null || value === undefined) {
-        return value === null ? null : undefined;
+const toOptionalString = (value: unknown): string | undefined => {
+    const result = toNullableString(value);
+    return result ?? undefined;
+};
+
+export function toJsonValue(value: unknown): DomainJsonValue | null | undefined {
+    if (value === null) {
+        return null;
     }
-    if (typeof value === 'object' || typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
-        return value as Prisma.JsonValue;
+    if (value === undefined) {
+        return undefined;
     }
+
+    if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+        return value;
+    }
+
+    if (Array.isArray(value)) {
+        return value.map((item) => toJsonValue(item) ?? null) as DomainJsonValue;
+    }
+
+    if (isJsonObject(value)) {
+        const normalized: Record<string, DomainJsonValue> = {};
+        for (const [key, entry] of Object.entries(value)) {
+            const transformed = toJsonValue(entry);
+            if (transformed !== undefined) {
+                normalized[key] = transformed;
+            }
+        }
+        return normalized;
+    }
+
     return undefined;
+}
+
+export function toEmergencyContactValue(value: Prisma.JsonValue | null | undefined): EmergencyContact | null {
+    if (!isJsonObject(value)) {
+        return null;
+    }
+
+    return {
+        name: toOptionalString(value.name),
+        relationship: toOptionalString(value.relationship),
+        phone: toOptionalString(value.phone),
+        email: value.email === null ? null : toNullableString(value.email),
+    };
 }
 
 export function extractLegacyProfileFields(metadata: Prisma.JsonValue | null): Partial<EmployeeProfileDTO> {
@@ -137,7 +188,7 @@ export function buildDomainProfileFields(
     'email' | 'personalEmail' | 'firstName' | 'lastName' | 'displayName' |
     'photoUrl' | 'phone' | 'address' | 'roles' | 'eligibleLeaveTypes' |
     'employmentPeriods' | 'salaryDetails' | 'skills' | 'certifications'> {
-    const extendedRecord = record as PrismaEmployeeProfile & Partial<EmployeeProfileDTO>;
+    const extendedRecord = record;
     const roles = toStringArray(extendedRecord.roles as unknown);
     const eligible = toStringArray(extendedRecord.eligibleLeaveTypes as unknown);
     const phone = toJsonValue(extendedRecord.phone) as EmployeeProfileDTO['phone'];

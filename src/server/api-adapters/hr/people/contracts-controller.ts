@@ -33,11 +33,11 @@ interface DeleteContractResult {
   success: true;
 }
 
-async function readJson<T>(request: Request, fallback: T): Promise<unknown> {
+async function readJson<T = unknown>(request: Request, fallback: T): Promise<T> {
   try {
-    return await request.json();
+    return await request.json() as T;
   } catch {
-    return fallback as unknown;
+    return fallback;
   }
 }
 
@@ -126,9 +126,8 @@ export async function updateContractController(
   request: Request,
   contractId: string,
 ): Promise<UpdateContractResult> {
-  const raw = await readJson(request, {});
-  const parsedBody = typeof raw === 'object' && raw !== null ? raw : {};
-  const parsed = updateEmploymentContractInputSchema.parse({ ...parsedBody, contractId });
+  const raw = await readJson<Record<string, unknown>>(request, {});
+  const parsed = updateEmploymentContractInputSchema.parse({ ...raw, contractId });
 
   const { authorization } = await getSessionContext({}, {
     headers: request.headers,

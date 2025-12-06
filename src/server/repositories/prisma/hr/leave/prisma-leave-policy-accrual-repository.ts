@@ -1,4 +1,4 @@
-import { Prisma, type LeavePolicyAccrual as PrismaLeavePolicyAccrual } from '@prisma/client';
+import type { Prisma, LeavePolicyAccrual as PrismaLeavePolicyAccrual } from '@prisma/client';
 import { BasePrismaRepository } from '@/server/repositories/prisma/base-prisma-repository';
 import type { ILeavePolicyAccrualRepository } from '@/server/repositories/contracts/hr/leave/leave-policy-accrual-repository-contract';
 import type { LeavePolicyAccrual } from '@/server/types/leave-types';
@@ -12,7 +12,7 @@ export class PrismaLeavePolicyAccrualRepository extends BasePrismaRepository imp
     const rec = await this.prisma.leavePolicyAccrual.findUnique({
       where: { id },
     });
-    if (!rec) {return null;}
+    if (!rec) { return null; }
     return map(rec);
   }
 
@@ -25,7 +25,7 @@ export class PrismaLeavePolicyAccrualRepository extends BasePrismaRepository imp
         }
       }
     });
-    if (!rec) {return null;}
+    if (!rec) { return null; }
     return map(rec);
   }
 
@@ -95,7 +95,7 @@ export class PrismaLeavePolicyAccrualRepository extends BasePrismaRepository imp
   async updateLeavePolicyAccrual(_tenantId: string, accrualId: string, updates: Partial<Omit<LeavePolicyAccrual, 'id' | 'orgId' | 'createdAt'>>): Promise<void> {
     void _tenantId;
     const existing = await this.findById(accrualId);
-    if (!existing) {throw new EntityNotFoundError('Leave policy accrual', { accrualId });}
+    if (!existing) { throw new EntityNotFoundError('Leave policy accrual', { accrualId }); }
     const data: Prisma.LeavePolicyAccrualUpdateInput = {};
     if (updates.tenureMonths !== undefined) { data.tenureMonths = updates.tenureMonths; }
     if (updates.accrualPerPeriod !== undefined) { data.accrualPerPeriod = updates.accrualPerPeriod; }
@@ -106,7 +106,7 @@ export class PrismaLeavePolicyAccrualRepository extends BasePrismaRepository imp
   async getLeavePolicyAccrual(_tenantId: string, accrualId: string): Promise<LeavePolicyAccrual | null> {
     void _tenantId;
     const rec = await this.findById(accrualId);
-    if (!rec) {return null;}
+    if (!rec) { return null; }
     return rec;
   }
 
@@ -129,14 +129,30 @@ export class PrismaLeavePolicyAccrualRepository extends BasePrismaRepository imp
   }
 }
 
+function decimalToNumber(value: Prisma.Decimal | number | null | undefined): number | null {
+  if (value === null || typeof value === 'undefined') { return null; }
+  if (typeof value === 'number') { return value; }
+  // Prisma Decimal-like value exposes toNumber()
+  const candidate = value as unknown;
+  if (candidate && typeof (candidate as { toNumber?: unknown }).toNumber === 'function') {
+    return (candidate as { toNumber(): number }).toNumber();
+  }
+  if (typeof candidate === 'string') { return Number(candidate); }
+  if (typeof candidate === 'number') { return candidate; }
+  return Number(String(candidate));
+}
+
 function map(rec: PrismaLeavePolicyAccrual): LeavePolicyAccrual {
+  const createdAtIso: string | undefined = undefined;
+  const updatedAtIso: string | undefined = undefined;
+
   return {
     id: rec.id,
     policyId: rec.policyId,
     tenureMonths: rec.tenureMonths,
-    accrualPerPeriod: rec.accrualPerPeriod instanceof Prisma.Decimal ? rec.accrualPerPeriod.toNumber() : Number(rec.accrualPerPeriod),
+    accrualPerPeriod: decimalToNumber(rec.accrualPerPeriod) ?? 0,
     carryOverLimit: rec.carryOverLimit ?? null,
-    createdAt: undefined,
-    updatedAt: undefined,
+    createdAt: createdAtIso,
+    updatedAt: updatedAtIso,
   };
 }

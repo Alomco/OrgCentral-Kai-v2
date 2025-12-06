@@ -1,9 +1,6 @@
 import type { Prisma, Membership as PrismaMembership, Organization } from '@prisma/client';
 import { MembershipStatus } from '@prisma/client';
-import {
-  OrgScopedPrismaRepository,
-  type OrgScopedRepositoryOptions,
-} from '@/server/repositories/prisma/org/org-scoped-prisma-repository';
+import { OrgScopedPrismaRepository } from '@/server/repositories/prisma/org/org-scoped-prisma-repository';
 import { getModelDelegate } from '@/server/repositories/prisma/helpers/prisma-utils';
 import type { IUserRepository } from '@/server/repositories/contracts/org/users/user-repository-contract';
 import { mapPrismaUserToDomain } from '@/server/repositories/mappers/org/users/user-mapper';
@@ -14,9 +11,6 @@ import type { Membership } from '@/server/types/membership';
 import type { UserFilters, UserCreationData, UserUpdateData } from './prisma-user-repository.types';
 
 export class PrismaUserRepository extends OrgScopedPrismaRepository implements IUserRepository {
-  constructor(options?: OrgScopedRepositoryOptions) {
-    super(options);
-  }
 
   async findById(id: string): Promise<User | null> {
     const rec = await getModelDelegate(this.prisma, 'user').findUnique({ where: { id } });

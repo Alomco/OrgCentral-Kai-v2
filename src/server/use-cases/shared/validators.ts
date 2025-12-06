@@ -8,7 +8,7 @@ import { ValidationError, AuthorizationError } from '@/server/errors';
 /**
  * Validates that a value is not empty after trimming.
  */
-export function assertNonEmpty(value: string | undefined, fieldName: string): void {
+export function assertNonEmpty(value: string | undefined, fieldName: string): asserts value is string {
     const trimmed = value?.trim();
     if (!trimmed || trimmed.length === 0) {
         throw new ValidationError(`${fieldName} is required.`);

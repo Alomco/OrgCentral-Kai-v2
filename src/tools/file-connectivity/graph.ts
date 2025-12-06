@@ -146,6 +146,10 @@ function normalize(path: string): string {
     return path.replace(/\\/g, '/');
 }
 
+function assertUnreachable(value: never): never {
+    throw new Error(`Unhandled impact level: ${String(value)}`);
+}
+
 function impactRank(level: ImpactLevel): number {
     switch (level) {
         case 'high':
@@ -155,6 +159,6 @@ function impactRank(level: ImpactLevel): number {
         case 'low':
             return 1;
         default:
-            throw new Error(`Unhandled ImpactLevel: ${level}`);
+            return assertUnreachable(level);
     }
 }

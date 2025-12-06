@@ -59,6 +59,6 @@ function extractStatus(metadata: Record<string, unknown> | null | undefined): st
         return undefined;
     }
 
-    const value = (metadata as Record<string, unknown>).status;
+    const value = metadata.status;
     return typeof value === 'string' ? value : undefined;
 }

@@ -1,4 +1,5 @@
 import type { Prisma } from '@prisma/client';
+import type { DataClassificationLevel, DataResidencyZone } from '@/server/types/tenant';
 
 export type AbsenceMetadata = Record<string, unknown> & {
     acknowledgements?: AbsenceAcknowledgementEntry[];
@@ -27,6 +28,13 @@ export interface AbsenceAiValidationMetadata {
     checkedAt: string;
     attachmentId?: string;
     model?: string;
+    orgId?: string;
+    residencyTag?: DataResidencyZone;
+    dataClassification?: DataClassificationLevel;
+    retentionPolicyId?: string;
+    auditSource?: string;
+    correlationId?: string;
+    processedAt?: string;
 }
 
 export interface LeaveBalanceAdjustment {

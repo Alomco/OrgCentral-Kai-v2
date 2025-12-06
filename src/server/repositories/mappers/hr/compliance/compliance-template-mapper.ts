@@ -12,7 +12,7 @@ export interface ComplianceTemplateRecord {
     name: string;
     categoryKey?: string | null;
     version?: string | null;
-    items: ComplianceTemplateItem[] | unknown;
+    items: ComplianceTemplateItem[] | JsonValue | null | undefined;
     createdAt: Date | string;
     updatedAt: Date | string;
     metadata?: JsonValue | null;

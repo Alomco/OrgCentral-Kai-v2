@@ -27,22 +27,22 @@ function buildDependencies(
     };
 
     const attachmentDownloader: AbsenceAttachmentDownloader = {
-        async download(request) {
-            return {
-                buffer: Buffer.from([]),
-                contentType: request.attachment.contentType ?? 'application/octet-stream',
-                fileName: request.attachment.fileName ?? 'attachment',
-            };
+        download(request) {
+            return Promise.resolve({
+                buffer: Buffer.alloc(0),
+                contentType: request.attachment.contentType,
+                fileName: request.attachment.fileName,
+            });
         },
     };
 
     const aiValidator: AbsenceDocumentAiValidator = {
-        async analyze() {
-            return {
+        analyze() {
+            return Promise.resolve({
                 status: 'ERROR',
                 summary: 'AI validation is not configured.',
                 issues: [],
-            };
+            });
         },
     };
 

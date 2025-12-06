@@ -1,7 +1,7 @@
 import type { EmployeeProfile as PrismaEmployeeProfile, Prisma } from '@prisma/client';
 import { BasePrismaRepository, type BasePrismaRepositoryOptions } from '@/server/repositories/prisma/base-prisma-repository';
 import type { IEmployeeProfileRepository } from '@/server/repositories/contracts/hr/people/employee-profile-repository-contract';
-import { mapPrismaEmployeeProfileToDomain, buildPrismaCreateFromDomain, buildPrismaUpdateFromDomain, buildPrismaWhereFromFilters } from '@/server/repositories/mappers/hr/people/employee-profile-mapper';
+import { mapPrismaEmployeeProfileToDomain, buildPrismaCreateFromDomain, buildPrismaUpdateFromDomain, buildPrismaWhereFromFilters, normalizeEmployeeProfileMetadata } from '@/server/repositories/mappers/hr/people/employee-profile-mapper';
 import type { EmployeeProfileDTO, PeopleListFilters } from '@/server/types/hr/people';
 import type { EmployeeProfileFilters } from '@/server/repositories/mappers/hr/people/employee-profile-mapper';
 import { EntityNotFoundError } from '@/server/errors';
@@ -101,18 +101,45 @@ export class PrismaEmployeeProfileRepository extends BasePrismaRepository implem
     return rec ? mapPrismaEmployeeProfileToDomain(rec) : null;
   }
 
+  async linkProfileToUser(tenantId: string, employeeNumber: string, userId: string): Promise<void> {
+    const existing = await this.prisma.employeeProfile.findUnique({
+      where: {
+        orgId_employeeNumber: {
+          orgId: tenantId,
+          employeeNumber,
+        },
+      },
+    });
+
+    if (!existing) {
+      throw new EntityNotFoundError('Employee profile', { employeeNumber, orgId: tenantId });
+    }
+
+    if (existing.userId === userId) {
+      return;
+    }
+
+    await this.prisma.employeeProfile.update({
+      where: {
+        orgId_employeeNumber: {
+          orgId: tenantId,
+          employeeNumber,
+        },
+      },
+      data: {
+        userId,
+        updatedAt: new Date(),
+      },
+    });
+
+    await this.invalidateAfterWrite(tenantId, [HR_PEOPLE_CACHE_SCOPES.profiles]);
+  }
+
   async updateComplianceStatus(tenantId: string, profileId: string, complianceStatus: string): Promise<void> {
     const existing = await this.getProfileByIdEnsuringTenant(profileId, tenantId);
 
-    const normalizedMetadata =
-      existing.metadata && typeof existing.metadata === 'object' && !Array.isArray(existing.metadata)
-        ? { ...(existing.metadata as Record<string, unknown>) }
-        : {};
-
-    const nextMetadata = {
-      ...normalizedMetadata,
-      complianceStatus,
-    };
+    const nextMetadata = normalizeEmployeeProfileMetadata(existing.metadata);
+    nextMetadata.complianceStatus = complianceStatus;
 
     await this.prisma.employeeProfile.update({
       where: { orgId_userId: { orgId: existing.orgId, userId: existing.userId } },

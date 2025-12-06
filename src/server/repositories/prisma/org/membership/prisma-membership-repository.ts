@@ -1,8 +1,5 @@
 import type { Prisma, MembershipStatus } from '@prisma/client';
-import {
-    OrgScopedPrismaRepository,
-    type OrgScopedRepositoryOptions,
-} from '@/server/repositories/prisma/org/org-scoped-prisma-repository';
+import { OrgScopedPrismaRepository } from '@/server/repositories/prisma/org/org-scoped-prisma-repository';
 import type {
     EmployeeProfilePayload,
     IMembershipRepository,
@@ -31,9 +28,6 @@ import {
 import { resolveIdentityCacheScopes } from '@/server/lib/cache-tags/identity';
 
 export class PrismaMembershipRepository extends OrgScopedPrismaRepository implements IMembershipRepository {
-    constructor(options?: OrgScopedRepositoryOptions) {
-        super(options);
-    }
 
     async findMembership(context: RepositoryAuthorizationContext, userId: string): Promise<Membership | null> {
         const membership = await getModelDelegate(this.prisma, 'membership').findUnique({

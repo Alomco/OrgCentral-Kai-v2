@@ -57,7 +57,7 @@ import {
   updateEmployeeProfilePayloadSchema,
   updateEmploymentContractPayloadSchema,
 } from './people-service.schemas';
-import { z } from 'zod';
+import type { ZodType } from 'zod';
 
 type ProfileOperations = ReturnType<typeof createPeopleProfileOperations>;
 type ContractOperations = ReturnType<typeof createPeopleContractOperations>;
@@ -77,7 +77,8 @@ export class PeopleService extends AbstractHrService {
       registerProfiles: dependencies.cache?.registerProfiles ?? registerProfilesCache,
       registerContracts: dependencies.cache?.registerContracts ?? registerContractsCache,
     };
-    this.adapters = createPeoplePlatformAdapters(dependencies.adapters);
+    const adapterOverrides = dependencies.adapters;
+    this.adapters = createPeoplePlatformAdapters(adapterOverrides);
 
     this.notifications = {
       profileCreated: dependencies.notifications?.profileCreated ?? emitProfileCreatedEvent,
@@ -234,11 +235,11 @@ export class PeopleService extends AbstractHrService {
     return this.contractOperations.deleteEmploymentContract({ ...input, payload });
   }
 
-  private parsePayload<T>(schema: z.ZodTypeAny, payload: unknown): T {
+  private parsePayload<TPayload>(schema: ZodType<TPayload>, payload: unknown): TPayload {
     const result = schema.safeParse(payload);
     if (!result.success) {
       throw new Error(result.error.message);
     }
-    return result.data as T;
+    return result.data;
   }
 }

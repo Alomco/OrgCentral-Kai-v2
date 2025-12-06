@@ -67,8 +67,8 @@ const baseRecord = {
 };
 
 function createRepository() {
-  const findUnique = vi.fn(async (args: unknown) => {
-    const where = (args as { where?: Record<string, unknown> })?.where ?? {};
+  const findUnique = vi.fn((args: unknown) => {
+    const where = (args as { where?: Record<string, unknown> }).where ?? {};
     if ('id' in where && (where as { id?: string }).id === baseRecord.id) {
       return { ...baseRecord };
     }
@@ -88,8 +88,8 @@ function createRepository() {
     return null;
   });
 
-  const findFirst = vi.fn(async (args: unknown) => {
-    const where = (args as { where?: Record<string, unknown> })?.where ?? {};
+  const findFirst = vi.fn((args: unknown) => {
+    const where = (args as { where?: Record<string, unknown> }).where ?? {};
     if (where.orgId !== baseRecord.orgId) {
       return null;
     }
@@ -103,7 +103,7 @@ function createRepository() {
     return null;
   });
 
-  const update = vi.fn(async (args: { data: Record<string, unknown> }) => {
+  const update = vi.fn((args: { data: Record<string, unknown> }) => {
     return { ...baseRecord, ...args.data };
   });
 
@@ -158,11 +158,11 @@ describe('PrismaEmployeeProfileRepository', () => {
     await repo.updateComplianceStatus(baseRecord.orgId, baseRecord.id, 'EXPIRED');
 
     expect(update).toHaveBeenCalledTimes(1);
-    const updateArgs = update.mock.calls[0]?.[0];
-    expect(updateArgs).toMatchObject({
+    const updateArguments = update.mock.calls[0][0];
+    expect(updateArguments).toMatchObject({
       where: { orgId_userId: { orgId: baseRecord.orgId, userId: baseRecord.userId } },
     });
-    expect(updateArgs.data.metadata).toMatchObject({
+    expect(updateArguments.data.metadata).toMatchObject({
       existing: true,
       complianceStatus: 'EXPIRED',
     });

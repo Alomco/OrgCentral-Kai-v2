@@ -1,6 +1,5 @@
 import type { IOrganizationRepository } from '@/server/repositories/contracts/org/organization/organization-repository-contract';
 import type { OrganizationData } from '@/server/types/leave-types';
-import type { PrismaClient } from '@prisma/client';
 import { OrgScopedPrismaRepository } from '@/server/repositories/prisma/org/org-scoped-prisma-repository';
 
 const ORGANIZATION_NOT_FOUND_MESSAGE = 'Organization not found';
@@ -8,9 +7,6 @@ const ORGANIZATION_NOT_FOUND_MESSAGE = 'Organization not found';
 export class PrismaOrganizationRepository
     extends OrgScopedPrismaRepository
     implements IOrganizationRepository {
-    constructor(prisma: PrismaClient) {
-        super({ prisma });
-    }
 
     async getOrganization(orgId: string): Promise<OrganizationData | null> {
         const organization = await this.prisma.organization.findUnique({ where: { id: orgId } });

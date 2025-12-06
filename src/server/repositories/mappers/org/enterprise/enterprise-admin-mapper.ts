@@ -11,7 +11,7 @@ export interface ManagedOrganizationRecord {
     orgName: string;
     ownerEmail: string;
     planId: string;
-    moduleAccess: Record<string, boolean> | unknown;
+    moduleAccess: Record<string, boolean> | JsonValue | null | undefined;
     metadata?: JsonValue | null;
     createdAt: Date | string;
     updatedAt: Date | string;

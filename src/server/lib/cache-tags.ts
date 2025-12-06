@@ -17,21 +17,28 @@ export interface CacheTagPayload {
 
 type RevalidateTagFunction = (tag: string) => Promise<void>;
 
-let revalidateTagReference: RevalidateTagFunction | null = null;
+const DEFAULT_REVALIDATE: RevalidateTagFunction = async () => { /* noop fallback */ };
+let revalidateTagReference: RevalidateTagFunction = DEFAULT_REVALIDATE;
+let revalidateTagInitialized = false;
 
 async function getRevalidateTag(): Promise<RevalidateTagFunction> {
-    if (!revalidateTagReference) {
+    if (!revalidateTagInitialized) {
         try {
             const cacheModule = await import('next/cache');
-            const revalidate = cacheModule.revalidateTag;
-            revalidateTagReference = async (tag: string) => {
-                revalidate(tag, 'seconds');
-            };
+            type RevalidateTagRaw = (tag: string, option?: unknown) => unknown;
+            const revalidate = (cacheModule as { revalidateTag?: RevalidateTagRaw }).revalidateTag;
+            if (typeof revalidate === 'function') {
+                revalidateTagReference = async (tag: string) => {
+                    // Wrap the underlying revalidate call so callers always get a Promise<void>
+                    await Promise.resolve(revalidate(tag, 'seconds'));
+                };
+            } else {
+                revalidateTagReference = DEFAULT_REVALIDATE;
+            }
         } catch {
-            revalidateTagReference = async () => {
-                await Promise.resolve();
-            };
+            revalidateTagReference = DEFAULT_REVALIDATE;
         }
+        revalidateTagInitialized = true;
     }
 
     return revalidateTagReference;

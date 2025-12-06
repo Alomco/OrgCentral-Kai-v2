@@ -1,6 +1,7 @@
-import { Prisma, SessionStatus, type SessionStatus as PrismaSessionStatus } from '@prisma/client';
+import type { Prisma } from '@prisma/client';
+import { SessionStatus, type SessionStatus as PrismaSessionStatus } from '@prisma/client';
 import type { UserSession as DomainUserSession } from '@/server/types/hr-types';
-import { mapPrismaUserSessionToDomain, mapDomainUserSessionToPrisma } from '@/server/repositories/mappers/auth/sessions/user-session-mapper';
+import { mapPrismaUserSessionToDomain, mapDomainUserSessionToPrisma, toUserSessionMetadataInput } from '@/server/repositories/mappers/auth/sessions/user-session-mapper';
 import { BasePrismaRepository } from '@/server/repositories/prisma/base-prisma-repository';
 import type { IUserSessionRepository } from '@/server/repositories/contracts/auth/sessions/user-session-repository-contract';
 import type { UserSessionFilters } from './prisma-user-session-repository.types';
@@ -8,13 +9,13 @@ import type { UserSessionFilters } from './prisma-user-session-repository.types'
 export class PrismaUserSessionRepository extends BasePrismaRepository implements IUserSessionRepository {
   async findById(id: string): Promise<DomainUserSession | null> {
     const record = await this.prisma.userSession.findUnique({ where: { id } });
-    if (!record) {return null;}
+    if (!record) { return null; }
     return mapPrismaUserSessionToDomain(record);
   }
 
   async findBySessionId(sessionId: string): Promise<DomainUserSession | null> {
     const record = await this.prisma.userSession.findFirst({ where: { sessionId } });
-    if (!record) {return null;}
+    if (!record) { return null; }
     return mapPrismaUserSessionToDomain(record);
   }
 
@@ -51,9 +52,10 @@ export class PrismaUserSessionRepository extends BasePrismaRepository implements
     const dateFrom = filters?.dateFrom;
     const dateTo = filters?.dateTo;
     if (dateFrom || dateTo) {
-      whereClause.startedAt = {} as Prisma.DateTimeFilter;
-      if (dateFrom) {whereClause.startedAt.gte = dateFrom;}
-      if (dateTo) {whereClause.startedAt.lte = dateTo;}
+      const startedAt: Prisma.DateTimeFilter = {};
+      if (dateFrom) { startedAt.gte = dateFrom; }
+      if (dateTo) { startedAt.lte = dateTo; }
+      whereClause.startedAt = startedAt;
     }
 
     const records = await this.prisma.userSession.findMany({ where: whereClause, orderBy: { startedAt: 'desc' } });
@@ -65,7 +67,7 @@ export class PrismaUserSessionRepository extends BasePrismaRepository implements
       ...data,
       status: data.status ?? SessionStatus.active,
       startedAt: data.startedAt ?? new Date(),
-      metadata: data.metadata ?? undefined,
+      metadata: toUserSessionMetadataInput(data.metadata),
     };
     const record = await this.prisma.userSession.create({ data: createPayload });
     return mapPrismaUserSessionToDomain(record);
@@ -74,7 +76,7 @@ export class PrismaUserSessionRepository extends BasePrismaRepository implements
   async update(id: string, data: Prisma.UserSessionUncheckedUpdateInput): Promise<DomainUserSession> {
     const updatePayload: Prisma.UserSessionUncheckedUpdateInput = {
       ...data,
-      metadata: data.metadata ?? undefined,
+      metadata: toUserSessionMetadataInput(data.metadata),
     };
     const record = await this.prisma.userSession.update({ where: { id }, data: updatePayload });
     return mapPrismaUserSessionToDomain(record);
@@ -119,22 +121,22 @@ export class PrismaUserSessionRepository extends BasePrismaRepository implements
 
   // --- Contract-facing methods ---
   async createUserSession(tenantId: string, session: Omit<DomainUserSession, 'id'>): Promise<void> {
-    await this.create(mapDomainUserSessionToPrisma(session as DomainUserSession));
+    await this.create(mapDomainUserSessionToPrisma(session));
   }
 
   async updateUserSession(tenantId: string, sessionId: string, updates: Partial<Omit<DomainUserSession, 'id' | 'userId' | 'sessionId'>>): Promise<void> {
     const existing = await this.findBySessionId(sessionId);
-    if (!existing) {throw new Error('Session not found');}
+    if (!existing) { throw new Error('Session not found'); }
     const prismaUpdates: Prisma.UserSessionUncheckedUpdateInput = {};
     const partial = updates;
-    if (partial.status !== undefined) {prismaUpdates.status = partial.status;}
-    if (partial.ipAddress !== undefined) {prismaUpdates.ipAddress = partial.ipAddress ?? null;}
-    if (partial.userAgent !== undefined) {prismaUpdates.userAgent = partial.userAgent ?? null;}
-    if (partial.startedAt !== undefined) {prismaUpdates.startedAt = partial.startedAt;}
-    if (partial.expiresAt !== undefined) {prismaUpdates.expiresAt = partial.expiresAt;}
-    if (partial.lastAccess !== undefined) {prismaUpdates.lastAccess = partial.lastAccess;}
-    if (partial.revokedAt !== undefined) {prismaUpdates.revokedAt = partial.revokedAt;}
-    if (partial.metadata !== undefined) {prismaUpdates.metadata = partial.metadata === null ? Prisma.JsonNull : (partial.metadata as Prisma.InputJsonValue | undefined);}
+    if (partial.status !== undefined) { prismaUpdates.status = partial.status; }
+    if (partial.ipAddress !== undefined) { prismaUpdates.ipAddress = partial.ipAddress ?? null; }
+    if (partial.userAgent !== undefined) { prismaUpdates.userAgent = partial.userAgent ?? null; }
+    if (partial.startedAt !== undefined) { prismaUpdates.startedAt = partial.startedAt; }
+    if (partial.expiresAt !== undefined) { prismaUpdates.expiresAt = partial.expiresAt; }
+    if (partial.lastAccess !== undefined) { prismaUpdates.lastAccess = partial.lastAccess; }
+    if (partial.revokedAt !== undefined) { prismaUpdates.revokedAt = partial.revokedAt; }
+    if (partial.metadata !== undefined) { prismaUpdates.metadata = toUserSessionMetadataInput(partial.metadata); }
     await this.update(existing.id, prismaUpdates);
   }
 
@@ -164,7 +166,7 @@ export class PrismaUserSessionRepository extends BasePrismaRepository implements
 
   async invalidateUserSession(tenantId: string, sessionId: string): Promise<void> {
     const session = await this.findBySessionId(sessionId);
-    if (!session) {return;}
+    if (!session) { return; }
     await this.revokeSession(session.id);
   }
 

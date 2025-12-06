@@ -53,6 +53,9 @@ export class MembershipService extends AbstractBaseService {
             membershipRepository: this.dependencies.membershipRepository,
             organizationRepository: this.dependencies.organizationRepository,
             generateEmployeeNumber: this.dependencies.generateEmployeeNumber,
+            employeeProfileRepository: this.dependencies.employeeProfileRepository,
+            checklistTemplateRepository: this.dependencies.checklistTemplateRepository,
+            checklistInstanceRepository: this.dependencies.checklistInstanceRepository,
         };
 
         return this.executeInServiceContext(context, 'identity.accept-invitation', () =>

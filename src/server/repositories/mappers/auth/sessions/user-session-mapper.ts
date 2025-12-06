@@ -1,6 +1,14 @@
 import type { UserSession } from '@/server/types/hr-types';
 import { Prisma, type UserSession as PrismaUserSession } from '@prisma/client';
 
+type JsonLike = Prisma.JsonValue | Prisma.InputJsonValue | typeof Prisma.DbNull | typeof Prisma.JsonNull | null | undefined;
+
+const toMetadataInput = (value: JsonLike): Prisma.InputJsonValue | typeof Prisma.DbNull | typeof Prisma.JsonNull | undefined => (
+    value === null ? (Prisma.JsonNull as unknown as Prisma.InputJsonValue) : value ?? undefined
+);
+
+type DomainUserSessionInput = Omit<UserSession, 'id'> & Partial<Pick<UserSession, 'id'>>;
+
 export function mapPrismaUserSessionToDomain(record: PrismaUserSession): UserSession {
     return {
         id: record.id,
@@ -17,8 +25,9 @@ export function mapPrismaUserSessionToDomain(record: PrismaUserSession): UserSes
     };
 }
 
-export function mapDomainUserSessionToPrisma(input: UserSession): Prisma.UserSessionUncheckedCreateInput {
+export function mapDomainUserSessionToPrisma(input: DomainUserSessionInput): Prisma.UserSessionUncheckedCreateInput {
     return {
+        id: input.id,
         userId: input.userId,
         sessionId: input.sessionId,
         status: input.status,
@@ -28,6 +37,8 @@ export function mapDomainUserSessionToPrisma(input: UserSession): Prisma.UserSes
         expiresAt: input.expiresAt,
         lastAccess: input.lastAccess,
         revokedAt: input.revokedAt ?? null,
-        metadata: input.metadata === null ? Prisma.JsonNull : (input.metadata as Prisma.InputJsonValue | undefined),
+        metadata: toMetadataInput(input.metadata),
     };
 }
+
+export const toUserSessionMetadataInput = toMetadataInput;

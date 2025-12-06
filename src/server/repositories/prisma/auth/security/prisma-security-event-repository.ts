@@ -1,4 +1,4 @@
-import { Prisma, type SecurityEvent as PrismaSecurityEvent } from '@prisma/client';
+import type { SecurityEvent as PrismaSecurityEvent } from '@prisma/client';
 import { BasePrismaRepository } from '@/server/repositories/prisma/base-prisma-repository';
 import { invalidateOrgCache, registerOrgCacheTag } from '@/server/lib/cache-tags';
 import { CACHE_SCOPE_SECURITY_EVENTS } from '@/server/repositories/cache-scopes';
@@ -14,6 +14,8 @@ import {
   buildWhereClause,
   toCreationData,
   buildUpdatePayload,
+  toSecurityEventJson,
+  upsertResolutionNotes,
 } from '@/server/repositories/mappers/auth/security/security-event-mapper';
 
 export class PrismaSecurityEventRepository
@@ -175,11 +177,8 @@ export class PrismaSecurityEventRepository
         resolvedAt: new Date(),
         resolvedBy,
         additionalInfo: resolutionNotes
-          ? ({
-            ...(record.additionalInfo as Record<string, unknown> | null ?? {}),
-            resolutionNotes,
-          } as Prisma.InputJsonValue)
-          : (record.additionalInfo === null ? Prisma.JsonNull : (record.additionalInfo as Prisma.InputJsonValue | undefined)),
+          ? upsertResolutionNotes(record.additionalInfo, resolutionNotes)
+          : toSecurityEventJson(record.additionalInfo),
       },
     });
 

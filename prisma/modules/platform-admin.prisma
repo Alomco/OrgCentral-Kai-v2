@@ -1,0 +1,48 @@
+// Platform and enterprise admin models extracted for size limits
+
+model PlatformSetting {
+  id        String   @id
+  branding  Json?    @db.JsonB
+  metadata  Json?    @db.JsonB
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("settings")
+  @@schema("platform")
+}
+
+model AppPermission {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String
+  description String?
+  category    String
+  isGlobal    Boolean  @default(false)
+  metadata    Json?    @db.JsonB
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([category])
+  @@map("app_permissions")
+  @@schema("platform")
+}
+
+model ManagedOrganization {
+  id           String   @id @default(uuid()) @db.Uuid
+  adminUserId  String   @db.Uuid
+  orgId        String   @db.Uuid
+  orgName      String
+  ownerEmail   String
+  planId       String
+  moduleAccess Json     @db.JsonB
+  metadata     Json?    @db.JsonB
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  admin        User          @relation("ManagedAdmin", fields: [adminUserId], references: [id], onDelete: Cascade)
+  organization Organization @relation("ManagedOrgOrganization", fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@index([adminUserId])
+  @@index([orgId])
+  @@map("managed_organizations")
+  @@schema("org")
+}

@@ -1,7 +1,10 @@
 import { PrismaInvitationRepository } from '@/server/repositories/prisma/auth/invitations/prisma-invitation-repository';
 import { PrismaMembershipRepository } from '@/server/repositories/prisma/org/membership/prisma-membership-repository';
-import { PrismaOrganizationRepository } from '@/server/repositories/prisma/org/prisma-organization-repository';
+import { PrismaOrganizationRepository } from '@/server/repositories/prisma/org/organization/prisma-organization-repository';
 import { PrismaUserRepository } from '@/server/repositories/prisma/org/users/prisma-user-repository';
+import { PrismaEmployeeProfileRepository } from '@/server/repositories/prisma/hr/people/prisma-employee-profile-repository';
+import { PrismaChecklistTemplateRepository } from '@/server/repositories/prisma/hr/onboarding/prisma-checklist-template-repository';
+import { PrismaChecklistInstanceRepository } from '@/server/repositories/prisma/hr/onboarding/prisma-checklist-instance-repository';
 import { invalidateCache } from '@/server/lib/cache-tags';
 import { resolveIdentityCacheScopes } from '@/server/lib/cache-tags/identity';
 import type { BasePrismaRepositoryOptions } from '@/server/repositories/prisma/base-prisma-repository';
@@ -36,6 +39,12 @@ export class MembershipServiceProvider {
             membershipRepository: overrides.membershipRepository ?? deps.membershipRepository,
             userRepository: overrides.userRepository ?? deps.userRepository,
             organizationRepository: overrides.organizationRepository ?? deps.organizationRepository,
+            employeeProfileRepository:
+                overrides.employeeProfileRepository ?? deps.employeeProfileRepository,
+            checklistTemplateRepository:
+                overrides.checklistTemplateRepository ?? deps.checklistTemplateRepository,
+            checklistInstanceRepository:
+                overrides.checklistInstanceRepository ?? deps.checklistInstanceRepository,
             generateEmployeeNumber: overrides.generateEmployeeNumber ?? this.defaultDependencies.generateEmployeeNumber,
         });
     }
@@ -57,6 +66,9 @@ export class MembershipServiceProvider {
             membershipRepository: new PrismaMembershipRepository(repoOptions),
             userRepository: new PrismaUserRepository(repoOptions),
             organizationRepository: organizationRepo,
+            employeeProfileRepository: new PrismaEmployeeProfileRepository(repoOptions),
+            checklistTemplateRepository: new PrismaChecklistTemplateRepository(repoOptions),
+            checklistInstanceRepository: new PrismaChecklistInstanceRepository(repoOptions),
         };
     }
 

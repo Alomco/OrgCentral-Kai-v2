@@ -2,7 +2,7 @@ import type { RepositoryAuthorizationContext } from '@/server/repositories/secur
 import type { IEmployeeProfileRepository } from '@/server/repositories/contracts/hr/people/employee-profile-repository-contract';
 import type { IOnboardingInvitationRepository } from '@/server/repositories/contracts/hr/onboarding/invitation-repository-contract';
 import { registerOrgCacheTag } from '@/server/lib/cache-tags';
-import { CACHE_SCOPE_ONBOARDING_INVITATIONS, CACHE_SCOPE_PEOPLE_PROFILES } from '@/server/repositories/cache-scopes';
+import { CACHE_SCOPE_ONBOARDING_INVITATIONS } from '@/server/repositories/cache-scopes';
 import { registerPeopleProfilesTag } from '@/server/lib/cache-tags/hr-people';
 
 export interface CheckExistingOnboardingTargetInput {

@@ -2,7 +2,7 @@ import { Prisma } from '@prisma/client';
 // No constructor required; use DI via BasePrismaRepository
 import type { ILeaveBalanceRepository, LeaveBalanceCreateInput } from '@/server/repositories/contracts/hr/leave/leave-balance-repository-contract';
 import { BasePrismaRepository } from '@/server/repositories/prisma/base-prisma-repository';
-import { buildLeaveBalanceMetadata, mapPrismaLeaveBalanceToDomain } from '@/server/repositories/mappers/hr/leave/leave-mapper';
+import { buildLeaveBalanceMetadata, mapPrismaLeaveBalanceToDomain, normalizeLeaveBalanceMetadata } from '@/server/repositories/mappers/hr/leave/leave-mapper';
 import { invalidateOrgCache, registerOrgCacheTag } from '@/server/lib/cache-tags';
 import { CACHE_SCOPE_LEAVE_BALANCES } from '@/server/repositories/cache-scopes';
 import { EntityNotFoundError } from '@/server/errors';
@@ -24,7 +24,7 @@ export class PrismaLeaveBalanceRepository extends BasePrismaRepository implement
                 accruedHours: new Prisma.Decimal(balanceData.totalEntitlement),
                 usedHours: new Prisma.Decimal(balanceData.used),
                 carriedHours: new Prisma.Decimal(balanceData.pending),
-                metadata: buildLeaveBalanceMetadata(balanceData) as unknown as Prisma.InputJsonValue,
+                metadata: buildLeaveBalanceMetadata(balanceData),
             },
         });
 
@@ -41,20 +41,25 @@ export class PrismaLeaveBalanceRepository extends BasePrismaRepository implement
             throw new EntityNotFoundError('Leave balance', { id: balanceId, orgId: tenantId });
         }
 
-        const metadata: Record<string, unknown> = {
-            ...(existing.metadata as Record<string, unknown> | null),
-        };
+        const metadata = normalizeLeaveBalanceMetadata(existing.metadata);
 
-        if (updates.used !== undefined) { metadata.used = updates.used; }
-        if (updates.pending !== undefined) { metadata.pending = updates.pending; }
-        if (updates.available !== undefined) { metadata.available = updates.available; }
+        if (updates.used !== undefined) {
+            metadata.used = updates.used;
+        }
+        if (updates.pending !== undefined) {
+            metadata.pending = updates.pending;
+        }
+        if (updates.available !== undefined) {
+            metadata.available = updates.available;
+        }
 
         await this.prisma.leaveBalance.update({
             where: { id: balanceId },
             data: {
                 usedHours: updates.used !== undefined ? new Prisma.Decimal(updates.used) : undefined,
                 carriedHours: updates.pending !== undefined ? new Prisma.Decimal(updates.pending) : undefined,
-                metadata: metadata as unknown as Prisma.InputJsonValue,
+                metadata,
+                updatedAt: updates.updatedAt,
             },
         });
 

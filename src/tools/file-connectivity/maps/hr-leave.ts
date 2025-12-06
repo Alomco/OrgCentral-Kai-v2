@@ -29,6 +29,8 @@ const useCaseDirectory = 'src/server/use-cases/hr/leave';
 const apiDirectory = 'src/server/api-adapters/hr/leave';
 const routeBase = 'src/app/api/hr/leave';
 
+const getFileName = (path: string): string => path.split('/').pop() ?? path;
+
 const LEAVE_USE_CASE_FILES = [
     'submit-leave-request.ts',
     'approve-leave-request.ts',
@@ -78,21 +80,21 @@ const coreEntries: CoreEntry[] = [
     ...Object.values(repositoryContracts).map((path) => ({
         path,
         kind: 'repository-contract',
-        summary: `Leave repository contract ${path.split('/').pop()}`,
+        summary: `Leave repository contract ${getFileName(path)}`,
         tags: ['contract', 'repository', 'leave'],
         volatility: 'medium' as Volatility,
     })),
     ...Object.values(repositoryImplementations).map((path) => ({
         path,
         kind: 'repository',
-        summary: `Prisma implementation ${path.split('/').pop()}`,
+        summary: `Prisma implementation ${getFileName(path)}`,
         tags: ['prisma', 'repository', 'leave'],
         volatility: 'medium' as Volatility,
     })),
     ...mapperPaths.map((path) => ({
         path,
         kind: 'mapper',
-        summary: `Mapper for ${path.split('/').pop()}`,
+        summary: `Mapper for ${getFileName(path)}`,
         tags: ['mapper', 'leave'],
         volatility: 'medium' as Volatility,
     })),

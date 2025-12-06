@@ -42,13 +42,13 @@ export type OrgRoleKey = keyof typeof orgRoles;
 export type OrgPermissionMap = Partial<Record<AccessResource, string[]>>;
 
 export function combineRoleStatements(roleKeys: OrgRoleKey[]): OrgPermissionMap {
-    return roleKeys.reduce<OrgPermissionMap>((acc, key) => {
+    return roleKeys.reduce<OrgPermissionMap>((accumulator, key) => {
         const statements = orgRoles[key].statements as Record<AccessResource, string[]>;
         for (const resource of Object.keys(statements) as AccessResource[]) {
-            const existing = acc[resource] ?? [];
+            const existing = accumulator[resource] ?? [];
             const merged = new Set([...existing, ...statements[resource]]);
-            acc[resource] = Array.from(merged);
+            accumulator[resource] = Array.from(merged);
         }
-        return acc;
+        return accumulator;
     }, {});
 }

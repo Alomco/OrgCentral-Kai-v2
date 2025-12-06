@@ -36,7 +36,7 @@ export interface IEmployeeProfileRepository {
   getEmployeeProfileByUser(
     tenantId: string,
     userId: string
- ): Promise<EmployeeProfileDTO | null>;
+  ): Promise<EmployeeProfileDTO | null>;
 
   /**
    * Get all employee profiles for an organization
@@ -61,6 +61,15 @@ export interface IEmployeeProfileRepository {
     tenantId: string,
     email: string
   ): Promise<EmployeeProfileDTO | null>;
+
+  /**
+   * Link a pre-boarding profile to a confirmed user account without recreating the record.
+   */
+  linkProfileToUser(
+    tenantId: string,
+    employeeNumber: string,
+    userId: string
+  ): Promise<void>;
 
   /**
    * Update compliance status tag for an employee profile (metadata-only until schema adds a column)

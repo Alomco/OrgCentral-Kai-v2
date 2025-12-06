@@ -18,6 +18,8 @@ export interface PensionEligibilityResult {
     reviewAfter?: Date;
 }
 
+const formatNumber = (value: number): string => value.toLocaleString('en-GB');
+
 const defaultConfig: PensionEligibilityConfig = {
     minAge: 22,
     maxAge: 66,
@@ -56,19 +58,19 @@ export function evaluatePensionEligibility(
     if (input.age < config.minAge) {
         return {
             eligible: false,
-            reason: `Age below auto-enrolment minimum (${config.minAge}).`,
+            reason: `Age below auto-enrolment minimum (${formatNumber(config.minAge)}).`,
         };
     }
     if (input.age > config.maxAge) {
         return {
             eligible: false,
-            reason: `Age above auto-enrolment maximum (${config.maxAge}).`,
+            reason: `Age above auto-enrolment maximum (${formatNumber(config.maxAge)}).`,
         };
     }
     if (input.annualEarnings < config.earningsThreshold) {
         return {
             eligible: false,
-            reason: `Annual earnings below threshold (${config.earningsThreshold}).`,
+            reason: `Annual earnings below threshold (${formatNumber(config.earningsThreshold)}).`,
         };
     }
 

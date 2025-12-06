@@ -124,3 +124,19 @@ model FileMetadata {
   virusScanned   Boolean  @default(false) // For security scanning
   virusStatus    String?  // "clean", "infected", "quarantined", "scan_failed"
 }
+
+model NotificationEnvelope {
+  id                 String   @id @default(auto()) @map("_id") @db.ObjectId
+  notificationId     String
+  orgId              String
+  userId             String
+  schemaVersion      Int      @default(1)
+  retentionPolicyId  String
+  dataClassification String
+  residencyTag       String
+  payload            Json
+  auditMetadata      Json?
+  csfleMetadata      Json?
+  createdAt          DateTime @default(now())
+  expiresAt          DateTime?
+}

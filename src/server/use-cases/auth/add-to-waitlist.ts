@@ -33,9 +33,9 @@ function normalizeEntry(entry: AddToWaitlistInput): WaitlistEntryInput {
     assertNonEmpty(industry, 'Industry description');
 
     return {
-        name: name!,
-        email: email!,
-        industry: industry!,
+        name,
+        email,
+        industry,
         metadata: entry.metadata,
     } satisfies WaitlistEntryInput;
 }

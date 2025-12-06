@@ -13,9 +13,7 @@ vi.mock('@/server/use-cases/auth/sessions/get-session', () => ({
   })),
 }));
 
-const createEmployeeProfile = vi.fn(
-  async (_input: { authorization: unknown; payload: unknown }) => ({ profileId: 'profile-123' }),
-);
+const createEmployeeProfile = vi.fn((_input: { authorization: unknown; payload: unknown }) => ({ profileId: 'profile-123' }));
 
 vi.mock('@/server/services/hr/people/people-service.provider', () => ({
   getPeopleService: vi.fn(() => ({
@@ -68,7 +66,7 @@ describe('people API adapters', () => {
 
     await createEmployeeProfileAdapter(req as NextApiRequest, res as NextApiResponse);
 
-    const call = createEmployeeProfile.mock.calls[0]?.[0] as Record<string, unknown>;
+    const call = createEmployeeProfile.mock.calls[0][0] as Record<string, unknown>;
     expect(call).toMatchObject({
       authorization: { orgId: 'org-1', userId: 'actor-1' },
       payload: {

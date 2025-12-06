@@ -8,7 +8,7 @@ import type { AbsenceService } from '@/server/services/hr/absences/absence-servi
 import { PeopleOrchestrationService } from './people-orchestration.service';
 import type { PeopleOrchestrationDependencies } from './people-orchestration.deps';
 import { PrismaOnboardingInvitationRepository } from '@/server/repositories/prisma/hr/onboarding';
-import { PrismaOrganizationRepository } from '@/server/repositories/prisma/org/prisma-organization-repository';
+import { PrismaOrganizationRepository } from '@/server/repositories/prisma/org/organization/prisma-organization-repository';
 import type { BasePrismaRepositoryOptions } from '@/server/repositories/prisma/base-prisma-repository';
 
 export interface PeopleOrchestrationProviderOptions {

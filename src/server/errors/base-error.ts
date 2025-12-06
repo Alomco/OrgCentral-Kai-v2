@@ -9,9 +9,8 @@ export class BaseTypedError extends Error {
         this.name = new.target.name;
         this.code = code;
         this.details = details;
-        const captureStackTrace = Error.captureStackTrace;
-        if (typeof captureStackTrace === 'function') {
-            captureStackTrace(this, new.target);
+        if (typeof Error.captureStackTrace === 'function') {
+            Error.captureStackTrace(this, new.target);
         }
     }
 }

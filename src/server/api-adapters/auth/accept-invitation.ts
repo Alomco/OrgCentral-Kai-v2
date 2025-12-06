@@ -3,6 +3,9 @@ import { PrismaInvitationRepository } from '@/server/repositories/prisma/auth/in
 import { PrismaUserRepository } from '@/server/repositories/prisma/org/users';
 import { PrismaMembershipRepository } from '@/server/repositories/prisma/org/membership';
 import { PrismaOrganizationRepository } from '@/server/repositories/prisma/org/organization';
+import { PrismaEmployeeProfileRepository } from '@/server/repositories/prisma/hr/people/prisma-employee-profile-repository';
+import { PrismaChecklistTemplateRepository } from '@/server/repositories/prisma/hr/onboarding/prisma-checklist-template-repository';
+import { PrismaChecklistInstanceRepository } from '@/server/repositories/prisma/hr/onboarding/prisma-checklist-instance-repository';
 import { prisma } from '@/server/lib/prisma';
 import {
     acceptInvitation,
@@ -13,7 +16,10 @@ import {
 const invitationRepository = new PrismaInvitationRepository();
 const userRepository = new PrismaUserRepository();
 const membershipRepository = new PrismaMembershipRepository();
-const organizationRepository = new PrismaOrganizationRepository(prisma);
+const organizationRepository = new PrismaOrganizationRepository({ prisma });
+const employeeProfileRepository = new PrismaEmployeeProfileRepository();
+const checklistTemplateRepository = new PrismaChecklistTemplateRepository();
+const checklistInstanceRepository = new PrismaChecklistInstanceRepository();
 
 const AcceptInvitationPayloadSchema = z.object({
     token: z.string().min(1, 'An invitation token is required'),
@@ -29,6 +35,9 @@ const defaultDependencies: AcceptInvitationDependencies = {
     userRepository,
     membershipRepository,
     organizationRepository,
+    employeeProfileRepository,
+    checklistTemplateRepository,
+    checklistInstanceRepository,
 };
 
 export type AcceptInvitationPayload = z.infer<typeof AcceptInvitationPayloadSchema>;

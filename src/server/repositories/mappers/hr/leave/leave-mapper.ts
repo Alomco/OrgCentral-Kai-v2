@@ -1,9 +1,26 @@
 
 import type { LeaveBalance, LeaveRequest } from '@/server/types/leave-types';
 import { calculateTotalDaysFromHours } from '@/server/domain/leave/leave-calculator';
-import type { LeaveBalance as PrismaLeaveBalance, LeaveRequest as PrismaLeaveRequest } from '@prisma/client';
+import type { Prisma, LeaveBalance as PrismaLeaveBalance, LeaveRequest as PrismaLeaveRequest } from '@prisma/client';
 
-interface LeaveRequestMetadata {
+type JsonLike = Prisma.JsonValue | null | undefined;
+
+const isJsonObject = (value: JsonLike): value is Prisma.JsonObject =>
+    typeof value === 'object' && value !== null && !Array.isArray(value);
+
+const cloneJsonObject = (value: JsonLike): Prisma.JsonObject => (
+    isJsonObject(value) ? { ...value } : {}
+);
+
+const cloneLeaveRequestMetadata = (value: JsonLike): LeaveRequestMetadata => (
+    cloneJsonObject(value) as LeaveRequestMetadata
+);
+
+const cloneLeaveBalanceMetadata = (value: JsonLike): LeaveBalanceMetadata => (
+    cloneJsonObject(value) as LeaveBalanceMetadata
+);
+
+export type LeaveRequestMetadata = Prisma.JsonObject & {
     employeeId?: string;
     employeeName?: string;
     leaveType?: string;
@@ -11,9 +28,9 @@ interface LeaveRequestMetadata {
     totalDays?: number;
     isHalfDay?: boolean;
     managerComments?: string | null;
-}
+};
 
-interface LeaveBalanceMetadata {
+export type LeaveBalanceMetadata = Prisma.JsonObject & {
     employeeId?: string;
     leaveType?: string;
     year?: number;
@@ -26,7 +43,10 @@ interface LeaveBalanceMetadata {
     residencyRegion?: string;
     createdBy?: string;
     updatedBy?: string;
-}
+};
+
+export const normalizeLeaveBalanceMetadata = (value: Prisma.JsonValue | null): LeaveBalanceMetadata =>
+    cloneLeaveBalanceMetadata(value);
 
 const STATUS_FROM_DOMAIN: Record<LeaveRequest['status'], PrismaLeaveRequest['status']> = {
     submitted: 'SUBMITTED',
@@ -53,7 +73,7 @@ export function mapPrismaLeaveRequestToDomain(
     record: PrismaLeaveRequest,
     config?: LeaveMapperConfig,
 ): LeaveRequest {
-    const metadata = (record.metadata as LeaveRequestMetadata | null) ?? {};
+    const metadata = cloneLeaveRequestMetadata(record.metadata);
 
     return {
         id: record.id,
@@ -86,7 +106,7 @@ export function mapPrismaLeaveRequestToDomain(
 }
 
 export function mapPrismaLeaveBalanceToDomain(record: PrismaLeaveBalance): LeaveBalance {
-    const metadata = (record.metadata as LeaveBalanceMetadata | null) ?? {};
+    const metadata = cloneLeaveBalanceMetadata(record.metadata);
 
     return {
         id: record.id,
@@ -120,7 +140,7 @@ export function buildLeaveRequestMetadata(input: {
         totalDays: input.totalDays,
         isHalfDay: input.isHalfDay,
         managerComments: input.managerComments,
-    };
+    } satisfies LeaveRequestMetadata & { leaveType: string };
 }
 
 export function buildLeaveBalanceMetadata(
@@ -139,7 +159,7 @@ export function buildLeaveBalanceMetadata(
         informationClass: auditContext?.informationClass ?? 'OFFICIAL_SENSITIVE',
         residencyRegion: auditContext?.residencyRegion ?? 'UK',
         createdBy: auditContext?.createdBy,
-    };
+    } satisfies LeaveBalanceMetadata;
 }
 
 export function mapDomainStatusToPrisma(status: LeaveRequest['status']): PrismaLeaveRequest['status'] {

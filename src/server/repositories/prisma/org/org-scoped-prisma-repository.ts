@@ -12,7 +12,7 @@ export interface OrgScopedRepositoryOptions extends BasePrismaRepositoryOptions 
 export abstract class OrgScopedPrismaRepository extends BasePrismaRepository {
     protected readonly repositoryAuthorizer: RepositoryAuthorizer;
 
-    protected constructor(options?: OrgScopedRepositoryOptions) {
+    public constructor(options?: OrgScopedRepositoryOptions) {
         super(options ?? {});
         this.repositoryAuthorizer = options?.authorizer ?? RepositoryAuthorizer.default();
     }

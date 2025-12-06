@@ -1,0 +1,8 @@
+# HR Absences AI Validation Worker
+
+- **Queue/Worker**: `hr-absences-ai-validation` (`hr.absence.ai.validate` job) backed by BullMQ. Processor lives in `src/server/workers/hr/absences/ai-validation.worker.ts` and delegates to `AbsenceAiValidationService`.
+- **Payload (zod-validated)**: `orgId`, `absenceId`, optional `attachmentId`, `force`; `authorization` (`userId`, optional `auditSource`, `correlationId`, `requiredRoles`); `storage` metadata (`storageKey`, `fileName`, `contentType`, `fileSize`, `checksum?`, `dataResidency`, `dataClassification`, `retentionPolicyId?`). Better Auth guards enforce org access and expected residency/classification.
+- **Processing flow**: downloads attachment via secure storage client, runs AI adapter (Gemini by default; Vertex-capable via `AbsenceDocumentAiValidator`), and persists `metadata.aiValidation` with `orgId`, `residencyTag`, `dataClassification`, `retentionPolicyId`, `auditSource`, `correlationId`, and `processedAt` timestamps using `ResultAsync` for all steps.
+- **Audit + cache**: emits `hr.absence.ai_validation` audit events (storage key + retention metadata) and invalidates `org:{orgId}:hr-absences:{residency}:{classification}` plus standard absence scopes to avoid stale AI badges.
+- **SAR/retention hooks**: captured `retentionPolicyId`, residency/classification, and audit trail allow SAR exports/retention sweeps to include or redact AI validation artifacts per `docs/hr-people-sar-exporter.md` guidance. Attachments that exceed limits are rejected before AI processing, preserving DSPT constraints.
+- **Tests/lint**: Vitest coverage with mocked AI/storage clients lives under `src/server/workers/hr/absences/__tests__`. Lint targeted with `pnpm lint src/server/workers/hr/absences`.

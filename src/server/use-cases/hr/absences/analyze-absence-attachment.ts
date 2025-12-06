@@ -32,6 +32,7 @@ export interface AnalyzeAbsenceAttachmentInput {
     authorization: RepositoryAuthorizationContext;
     absenceId: string;
     payload: AnalyzeAbsenceAttachmentPayload;
+    retentionPolicyId?: string;
 }
 
 export async function analyzeAbsenceAttachment(
@@ -88,6 +89,13 @@ export async function analyzeAbsenceAttachment(
             checkedAt: new Date().toISOString(),
             attachmentId: attachment.id,
             model: aiResult.model,
+            orgId: input.authorization.orgId,
+            residencyTag: input.authorization.dataResidency,
+            dataClassification: input.authorization.dataClassification,
+            retentionPolicyId: input.retentionPolicyId,
+            auditSource: input.authorization.auditSource,
+            correlationId: input.authorization.correlationId,
+            processedAt: new Date().toISOString(),
         };
         mergeMetadata(store, aiResult.metadata);
     });

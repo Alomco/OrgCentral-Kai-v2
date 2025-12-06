@@ -11,9 +11,9 @@ import type { PeopleServiceOperationRunner } from './people-service-runner';
 import {
   emitProfileSideEffects,
   invalidateProfileCaches,
-  registerProfileReadCaches,
   unwrapOrThrow,
 } from './people-service.operation-helpers';
+import { registerProfilesCache } from '@/server/use-cases/hr/people/shared/cache-helpers';
 import type {
   CreateEmployeeProfilePayload,
   CreateEmployeeProfileResult,
@@ -44,6 +44,19 @@ type EnsureEntitiesAccessFunction = <TRecord extends TenantScopedRecord>(
   records: TRecord[],
 ) => TRecord[];
 
+const sanitizeCorrelationId = (value: unknown): string | undefined =>
+  (typeof value === 'string' && value.length > 0 ? value : undefined);
+
+const registerProfileCaches = (
+  authorization: RepositoryAuthorizationContext,
+  profile?: EmployeeProfile,
+): void => {
+  registerProfilesCache(authorization, {
+    classification: profile?.dataClassification,
+    residency: profile?.dataResidency,
+  });
+};
+
 export interface PeopleProfileOperationsContext {
   dependencies: PeopleServiceDependencies;
   notifications: PeopleServiceNotifications;
@@ -68,18 +81,22 @@ export function createPeopleProfileOperations(context: PeopleProfileOperationsCo
       input: PeopleServiceInput<GetEmployeeProfilePayload>,
     ): Promise<GetEmployeeProfileResult> {
       const { profileId } = input.payload;
+      const correlationId = sanitizeCorrelationId(input.correlationId);
 
       return runner.runProfileReadOperation(
         'hr.people.profiles.get',
         input.authorization,
         { profileId },
-        input.correlationId,
+        correlationId,
         async (authorization: RepositoryAuthorizationContext): Promise<GetEmployeeProfileResult> => {
-          const { profile } = unwrapOrThrow<{ profile: EmployeeProfile | null }>(await getEmployeeProfile({
-            authorization,
-            profileId,
-            repositories: { profileRepo: dependencies.profileRepo },
-          }));
+          const profileResult: { profile: EmployeeProfile | null } = unwrapOrThrow(
+            await getEmployeeProfile({
+              authorization,
+              profileId,
+              repositories: { profileRepo: dependencies.profileRepo },
+            }),
+          );
+          const { profile } = profileResult;
 
           return { profile: profile ? ensureEntityAccess(authorization, profile) : null };
         },
@@ -90,25 +107,30 @@ export function createPeopleProfileOperations(context: PeopleProfileOperationsCo
       input: PeopleServiceInput<GetEmployeeProfileByUserPayload>,
     ): Promise<GetEmployeeProfileByUserResult> {
       const { userId } = input.payload;
+      const correlationId = sanitizeCorrelationId(input.correlationId);
 
       return runner.runProfileReadOperation(
         'hr.people.profiles.getByUser',
         input.authorization,
         { targetUserId: userId },
-        input.correlationId,
+        correlationId,
         async (authorization: RepositoryAuthorizationContext): Promise<GetEmployeeProfileByUserResult> => {
-          const { profile } = unwrapOrThrow<{ profile: EmployeeProfile | null }>(await getEmployeeProfileByUser({
-            authorization,
-            userId,
-            repositories: { profileRepo: dependencies.profileRepo },
-          }));
+          const profileResult: { profile: EmployeeProfile | null } = unwrapOrThrow(
+            await getEmployeeProfileByUser({
+              authorization,
+              userId,
+              repositories: { profileRepo: dependencies.profileRepo },
+            }),
+          );
+          const { profile } = profileResult;
 
           if (!profile) {
             return { profile: null };
           }
 
-          registerProfileReadCaches(authorization, profile);
-          return { profile: ensureEntityAccess(authorization, profile) };
+          const scopedProfile = ensureEntityAccess(authorization, profile);
+          registerProfileCaches(authorization, scopedProfile);
+          return { profile: scopedProfile };
         },
       );
     },
@@ -117,21 +139,26 @@ export function createPeopleProfileOperations(context: PeopleProfileOperationsCo
       input: PeopleServiceInput<ListEmployeeProfilesPayload>,
     ): Promise<ListEmployeeProfilesResult> {
       const filters = input.payload.filters;
+      const correlationId = sanitizeCorrelationId(input.correlationId);
 
       return runner.runProfileReadOperation(
         'hr.people.profiles.list',
         input.authorization,
         { filterCount: Object.keys(filters ?? {}).length, filters },
-        input.correlationId,
+        correlationId,
         async (authorization: RepositoryAuthorizationContext): Promise<ListEmployeeProfilesResult> => {
-          const { profiles } = unwrapOrThrow<{ profiles: EmployeeProfile[] }>(await listEmployeeProfiles({
-            authorization,
-            filters,
-            repositories: { profileRepo: dependencies.profileRepo },
-          }));
+          const listResult: { profiles: EmployeeProfile[] } = unwrapOrThrow(
+            await listEmployeeProfiles({
+              authorization,
+              filters,
+              repositories: { profileRepo: dependencies.profileRepo },
+            }),
+          );
+          const { profiles } = listResult;
 
-          profiles.forEach((profile) => registerProfileReadCaches(authorization, profile));
-          return { profiles: ensureEntitiesAccess(authorization, profiles) };
+          const scopedProfiles = ensureEntitiesAccess(authorization, profiles);
+          scopedProfiles.forEach((profile) => registerProfileCaches(authorization, profile));
+          return { profiles: scopedProfiles };
         },
       );
     },
@@ -140,18 +167,22 @@ export function createPeopleProfileOperations(context: PeopleProfileOperationsCo
       input: PeopleServiceInput<CreateEmployeeProfilePayload>,
     ): Promise<CreateEmployeeProfileResult> {
       const { profileData } = input.payload;
+      const correlationId = sanitizeCorrelationId(input.correlationId);
 
       return runner.runProfileWriteOperation(
         'hr.people.profiles.create',
         input.authorization,
         { targetUserId: profileData.userId, jobTitle: profileData.jobTitle },
-        input.correlationId,
+        correlationId,
         async (authorization: RepositoryAuthorizationContext): Promise<CreateEmployeeProfileResult> => {
-          const { profileId, profile } = unwrapOrThrow<{ profileId: string; profile?: EmployeeProfile }>(await createEmployeeProfile({
-            authorization,
-            payload: profileData,
-            repositories: { profileRepo: dependencies.profileRepo },
-          }));
+          const creationResult: { profileId: string; profile?: EmployeeProfile } = unwrapOrThrow(
+            await createEmployeeProfile({
+              authorization,
+              payload: profileData,
+              repositories: { profileRepo: dependencies.profileRepo },
+            }),
+          );
+          const { profileId, profile } = creationResult;
 
           await invalidateProfileCaches(authorization, profile ?? undefined);
           if (profile) {
@@ -162,7 +193,7 @@ export function createPeopleProfileOperations(context: PeopleProfileOperationsCo
               notifications,
               adapters,
               action: 'created',
-              correlationId: input.correlationId,
+              correlationId,
             });
             return { profileId: scopedProfile.id };
           }
@@ -176,19 +207,23 @@ export function createPeopleProfileOperations(context: PeopleProfileOperationsCo
       input: PeopleServiceInput<UpdateEmployeeProfilePayload>,
     ): Promise<UpdateEmployeeProfileResult> {
       const { profileId, profileUpdates } = input.payload;
+      const correlationId = sanitizeCorrelationId(input.correlationId);
 
       return runner.runProfileWriteOperation(
         'hr.people.profiles.update',
         input.authorization,
         { profileId, updateKeys: Object.keys(profileUpdates) },
-        input.correlationId,
+        correlationId,
         async (authorization: RepositoryAuthorizationContext): Promise<UpdateEmployeeProfileResult> => {
-          const { profile } = unwrapOrThrow<{ profile: EmployeeProfile | null }>(await updateEmployeeProfile({
-            authorization,
-            profileId,
-            updates: profileUpdates,
-            repositories: { profileRepo: dependencies.profileRepo },
-          }));
+          const updateResult: { profile: EmployeeProfile | null } = unwrapOrThrow(
+            await updateEmployeeProfile({
+              authorization,
+              profileId,
+              updates: profileUpdates,
+              repositories: { profileRepo: dependencies.profileRepo },
+            }),
+          );
+          const { profile } = updateResult;
 
           if (!profile) {
             throw new Error('Employee profile not found after update.');
@@ -206,7 +241,7 @@ export function createPeopleProfileOperations(context: PeopleProfileOperationsCo
             adapters,
             action: 'updated',
             updatedFields,
-            correlationId: input.correlationId,
+            correlationId,
           });
 
           return { profileId: scopedProfile.id };
@@ -218,18 +253,22 @@ export function createPeopleProfileOperations(context: PeopleProfileOperationsCo
       input: PeopleServiceInput<DeleteEmployeeProfilePayload>,
     ): Promise<DeleteEmployeeProfileResult> {
       const { profileId } = input.payload;
+      const correlationId = sanitizeCorrelationId(input.correlationId);
 
       return runner.runProfileWriteOperation(
         'hr.people.profiles.delete',
         input.authorization,
         { profileId },
-        input.correlationId,
+        correlationId,
         async (authorization: RepositoryAuthorizationContext): Promise<DeleteEmployeeProfileResult> => {
-          const { profile } = unwrapOrThrow<{ profile: EmployeeProfile | null }>(await getEmployeeProfile({
-            authorization,
-            profileId,
-            repositories: { profileRepo: dependencies.profileRepo },
-          }));
+          const profileResult: { profile: EmployeeProfile | null } = unwrapOrThrow(
+            await getEmployeeProfile({
+              authorization,
+              profileId,
+              repositories: { profileRepo: dependencies.profileRepo },
+            }),
+          );
+          const { profile } = profileResult;
 
           if (!profile) {
             throw new Error('Employee profile not found.');
@@ -249,7 +288,7 @@ export function createPeopleProfileOperations(context: PeopleProfileOperationsCo
             notifications,
             adapters,
             action: 'deleted',
-            correlationId: input.correlationId,
+            correlationId,
           });
 
           return { success: true };

@@ -84,13 +84,23 @@ function toIso(value: string | Date | null | undefined): string | null {
   return Number.isNaN(date.getTime()) ? null : date.toISOString();
 }
 
+function escapeCsvValue(raw: string, quote: string): string {
+  const escaped = raw.replace(new RegExp(quote, 'g'), `${quote}${quote}`);
+  return /[",\n\r]/.test(raw) ? `${quote}${escaped}${quote}` : escaped;
+}
+
 function formatCsvValue(value: unknown, quote: string): string {
   if (value === undefined || value === null) {
     return '';
   }
-  const raw = typeof value === 'object' ? JSON.stringify(value) ?? '' : String(value);
-  const escaped = raw.replace(new RegExp(quote, 'g'), `${quote}${quote}`);
-  return /[",\n\r]/.test(raw) ? `${quote}${escaped}${quote}` : escaped;
+  if (typeof value === 'object') {
+    const serialized = JSON.stringify(value);
+    return serialized ? escapeCsvValue(serialized, quote) : '';
+  }
+  if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean' || typeof value === 'bigint') {
+    return escapeCsvValue(String(value), quote);
+  }
+  return '';
 }
 
 function buildCsv(rows: RedactedExportRow[], options?: SarCsvOptions): Readable {

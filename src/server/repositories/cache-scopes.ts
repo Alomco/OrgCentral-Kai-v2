@@ -13,5 +13,6 @@ export const CACHE_SCOPE_SECURITY_EVENTS = 'security-events';
 export const CACHE_SCOPE_PEOPLE_PROFILES = 'hr-people-profiles';
 export const CACHE_SCOPE_PEOPLE_CONTRACTS = 'hr-people-contracts';
 export const CACHE_SCOPE_HR_NOTIFICATIONS = 'hr-notifications';
+export const CACHE_SCOPE_NOTIFICATION_PREFERENCES = 'notification-preferences';
 export const CACHE_SCOPE_ONBOARDING_INVITATIONS = 'hr-onboarding-invitations';
 export const CACHE_SCOPE_COMPLIANCE_STATUS = 'compliance-status';

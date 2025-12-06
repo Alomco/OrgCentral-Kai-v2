@@ -6,6 +6,30 @@ import type {
     SecurityEventUpdateData,
 } from '../../../prisma/auth/security/security-event-repository.types';
 
+type JsonLike = Prisma.JsonValue | null | undefined;
+
+const isJsonObject = (value: JsonLike): value is Prisma.JsonObject =>
+    typeof value === 'object' && value !== null && !Array.isArray(value);
+
+const cloneJsonObject = <TMetadata extends Prisma.JsonObject>(
+    value: JsonLike,
+    fallback?: TMetadata,
+): TMetadata => (
+    isJsonObject(value) ? { ...(value as TMetadata) } : (fallback ?? ({} as TMetadata))
+);
+
+export const toSecurityEventJson = (value: JsonLike): Prisma.InputJsonValue | Prisma.NullableJsonNullValueInput | undefined => (
+    value === null ? (Prisma.JsonNull as Prisma.NullableJsonNullValueInput) : value ?? undefined
+);
+
+type ResolutionMetadata = Prisma.JsonObject & { resolutionNotes?: string };
+
+export const upsertResolutionNotes = (value: JsonLike, resolutionNotes: string): Prisma.InputJsonValue | Prisma.NullableJsonNullValueInput => {
+    const metadata = cloneJsonObject<ResolutionMetadata>(value);
+    metadata.resolutionNotes = resolutionNotes;
+    return metadata;
+};
+
 export function mapToDomain(record: PrismaSecurityEvent): SecurityEvent {
     return {
         id: record.id,
@@ -73,9 +97,7 @@ export function toCreationData(
         description: event.description,
         ipAddress: event.ipAddress ?? null,
         userAgent: event.userAgent ?? null,
-        additionalInfo: event.additionalInfo === null
-            ? Prisma.JsonNull
-            : (event.additionalInfo as Prisma.InputJsonValue | undefined),
+        additionalInfo: toSecurityEventJson(event.additionalInfo),
         resolved: event.resolved,
         resolvedAt: event.resolvedAt ?? null,
         resolvedBy: event.resolvedBy ?? null,
@@ -100,9 +122,7 @@ export function buildUpdatePayload(
     }
 
     if (updates.additionalInfo !== undefined) {
-        payload.additionalInfo = updates.additionalInfo === null
-            ? Prisma.JsonNull
-            : (updates.additionalInfo as Prisma.InputJsonValue | undefined);
+        payload.additionalInfo = toSecurityEventJson(updates.additionalInfo);
     }
 
     if (updates.resolved !== undefined) {

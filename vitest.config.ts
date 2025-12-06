@@ -1,3 +1,4 @@
+/* eslint import/no-extraneous-dependencies: ["error", { devDependencies: true }] */
 import path from 'node:path';
 import { defineConfig } from 'vitest/config';
 

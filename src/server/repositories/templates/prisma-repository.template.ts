@@ -2,7 +2,6 @@
  * Prisma Repository implementation template.
  * Copy and rename to the appropriate domain (prisma/<domain>/...) and adapt to your model.
  */
-import type { PrismaClient } from '@prisma/client';
 import { BasePrismaRepository } from '@/server/repositories/prisma/base-prisma-repository';
 import { getCustomDelegate } from '@/server/repositories/prisma/helpers/prisma-utils';
 // Replace with your contract and mapper imports
@@ -16,17 +15,15 @@ export interface IExampleRepository {
     delete(id: string): Promise<void>;
 }
 
-type ExampleDelegate = {
+interface ExampleDelegate {
     findUnique(args: { where: { id: string } }): Promise<ExamplePrismaModel | null>;
     findMany(args: { where?: { orgId?: string } }): Promise<ExamplePrismaModel[]>;
     create(args: { data: Record<string, unknown> }): Promise<ExamplePrismaModel>;
     update(args: { where: { id: string }; data: Record<string, unknown> }): Promise<ExamplePrismaModel>;
     delete(args: { where: { id: string } }): Promise<void>;
-};
+}
 
 export class PrismaExampleRepository extends BasePrismaRepository implements IExampleRepository {
-    constructor(prisma: PrismaClient) { super(prisma); }
-
     private delegate(): ExampleDelegate {
         return getCustomDelegate<ExampleDelegate>(this.prisma as unknown as Record<string, ExampleDelegate>, 'example');
     }

@@ -3,13 +3,14 @@ import type {
     ChecklistTemplateUpdateInput,
 } from '@/server/repositories/contracts/hr/onboarding/checklist-template-repository-contract';
 import type { ChecklistTemplate, ChecklistTemplateItem, ChecklistTemplateType } from '@/server/types/onboarding-types';
+import type { JsonValue } from '@/server/repositories/prisma/helpers/prisma-utils';
 
 export interface ChecklistTemplateRecord {
     id: string;
     orgId: string;
     name: string;
     type: ChecklistTemplateType;
-    items: ChecklistTemplateItem[] | unknown;
+    items: ChecklistTemplateItem[] | JsonValue | null | undefined;
     createdAt: Date | string;
     updatedAt: Date | string;
 }
