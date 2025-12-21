@@ -26,7 +26,7 @@ function LeaveRequestsSkeleton() {
 
 export default async function HrLeavePage() {
     const headerStore = await nextHeaders();
-    const { authorization, session } = await getSessionContextOrRedirect({}, {
+    const { authorization } = await getSessionContextOrRedirect({}, {
         headers: headerStore,
         requiredPermissions: { organization: ['read'] },
         auditSource: 'ui:hr:leave',
