@@ -1,13 +1,9 @@
-import { randomUUID } from 'node:crypto';
 import { ValidationError } from '@/server/errors';
 import { EntityNotFoundError } from '@/server/errors';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
 import type { AcceptInvitationResult } from '@/server/use-cases/auth/accept-invitation';
 import { acceptInvitation, type AcceptInvitationDependencies } from '@/server/use-cases/auth/accept-invitation';
-import type { DataClassificationLevel, DataResidencyZone } from '@/server/types/tenant';
 import type { ServiceExecutionContext } from '@/server/services/abstract-base-service';
-import { resolveIdentityCacheScopes } from '@/server/lib/cache-tags/identity';
-import { invalidateCache } from '@/server/lib/cache-tags';
 import type { MembershipStatus } from '@prisma/client';
 import { MembershipStatus as PrismaMembershipStatus } from '@prisma/client';
 import type { Membership } from '@/server/types/membership';
@@ -17,6 +13,7 @@ import { updateMembershipRoles as updateMembershipRolesUseCase } from '@/server/
 import { updateMembershipStatus as updateMembershipStatusUseCase } from '@/server/use-cases/org/membership/update-membership-status';
 import { normalizeRoles } from '@/server/use-cases/shared';
 import type { AbacSubjectAttributes } from '@/server/types/abac-subject-attributes';
+import { buildAuthorizationContext, invalidateIdentityCache } from './membership-service.helpers';
 
 export type MembershipServiceDependencies = AcceptInvitationDependencies;
 
@@ -45,11 +42,12 @@ export class MembershipService extends AbstractOrgService {
             throw new EntityNotFoundError('Invitation', { token: input.token });
         }
 
-        const authorization = await this.buildAuthorizationContext(
-            invitation.organizationId,
-            input.actor.userId,
-            input.correlationId,
-        );
+        const authorization = await buildAuthorizationContext({
+            organizationRepository: this.dependencies.organizationRepository,
+            orgId: invitation.organizationId,
+            userId: input.actor.userId,
+            correlationId: input.correlationId,
+        });
 
         const context: ServiceExecutionContext = this.buildContext(authorization, {
             correlationId: authorization.correlationId,
@@ -99,7 +97,7 @@ export class MembershipService extends AbstractOrgService {
                     roles: input.roles,
                 },
             );
-            await this.invalidateIdentityCache(input.authorization);
+            await invalidateIdentityCache(input.authorization);
             return membership;
         });
     }
@@ -200,38 +198,6 @@ export class MembershipService extends AbstractOrgService {
         );
     }
 
-    private async buildAuthorizationContext(
-        orgId: string,
-        userId: string,
-        correlationId?: string,
-    ): Promise<RepositoryAuthorizationContext> {
-        const organization = await this.dependencies.organizationRepository?.getOrganization(orgId);
-        const dataClassification: DataClassificationLevel =
-            organization?.dataClassification ?? 'OFFICIAL';
-        const dataResidency: DataResidencyZone = organization?.dataResidency ?? 'UK_ONLY';
-        const auditSource = 'identity.accept-invitation';
-        const correlation = correlationId ?? randomUUID();
-
-        return {
-            orgId,
-            userId,
-            roleKey: 'custom',
-            permissions: {},
-            dataResidency,
-            dataClassification,
-            auditSource,
-            auditBatchId: undefined,
-            correlationId: correlation,
-            tenantScope: {
-                orgId,
-                dataResidency,
-                dataClassification,
-                auditSource,
-                auditBatchId: undefined,
-            },
-        };
-    }
-
     private async updateMembershipStatus(params: {
         authorization: RepositoryAuthorizationContext;
         targetUserId: string;
@@ -251,21 +217,7 @@ export class MembershipService extends AbstractOrgService {
                 { membershipRepository },
                 { authorization, targetUserId, status },
             );
-            await this.invalidateIdentityCache(authorization);
+            await invalidateIdentityCache(authorization);
         });
-    }
-
-    private async invalidateIdentityCache(authorization: RepositoryAuthorizationContext): Promise<void> {
-        const scopes = resolveIdentityCacheScopes();
-        await Promise.all(
-            scopes.map((scope) =>
-                invalidateCache({
-                    orgId: authorization.orgId,
-                    scope,
-                    classification: authorization.dataClassification,
-                    residency: authorization.dataResidency,
-                }),
-            ),
-        );
     }
 }

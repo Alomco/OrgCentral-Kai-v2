@@ -1,8 +1,18 @@
 import { headers as nextHeaders } from 'next/headers';
 import { Suspense } from 'react';
+import Link from 'next/link';
+import { Settings } from 'lucide-react';
 
 import { HrPageHeader } from '../_components/hr-page-header';
 import { Badge } from '@/components/ui/badge';
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbList,
+    BreadcrumbLink,
+    BreadcrumbPage,
+    BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { getSessionContextOrRedirect } from '@/server/ui/auth/session-redirect';
 import { HrSettingsPanel } from './_components/hr-settings-panel';
@@ -50,9 +60,24 @@ export default async function HrSettingsPage() {
 
     return (
         <div className="space-y-6">
+            <Breadcrumb>
+                <BreadcrumbList>
+                    <BreadcrumbItem>
+                        <BreadcrumbLink asChild>
+                            <Link href="/hr">HR</Link>
+                        </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                        <BreadcrumbPage>Settings</BreadcrumbPage>
+                    </BreadcrumbItem>
+                </BreadcrumbList>
+            </Breadcrumb>
+
             <HrPageHeader
                 title="HR Settings"
                 description={`Configure HR defaults for org ${authorization.orgId}.`}
+                icon={<Settings className="h-5 w-5" />}
             />
 
             <Card>

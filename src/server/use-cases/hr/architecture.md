@@ -9,6 +9,49 @@ This guide tells AI agents how to explore and extend the HR domain without dupli
 - Surface unfinished legacy behavior from `old/` and ensure parity before shipping new HR modules.
 - Bake in SOLID, zero-trust, and UK gov (DSPT/Cabinet Office) controls so every HR feature remains auditable and multi-tenant safe.
 
+## HR Completion Scope (Definition of Done)
+
+“HR complete” is defined as shipping a coherent set of HR capabilities with: (1) end-user + admin UI routes, (2) service/use-case + repository coverage, (3) auditable + tenant-scoped authorization at every boundary, and (4) background jobs where required.
+
+### Phase A — Core HR Operations ("v1 complete")
+
+**In scope (must-have)**
+- **People directory**: list/search employees, view profile (tenant-scoped), basic profile data parity with legacy.
+- **Onboarding**: invite/accept flow wired end-to-end (accept endpoint + wizard/checklist surface).
+- **Leave**: request/approve/reject/cancel, leave balance settings parity, notifications.
+- **Absences**: unplanned absence/report/return-to-work parity where already modeled.
+- **Policies**: publish/list/view + acknowledgements with tenant-scoped caching + notifications.
+- **Compliance**: templates (seed + list), assignment, user item updates (attachments/notes), admin review queue (approve/reject), reminders (template-driven reminder/expiry rules).
+
+**Acceptance criteria (Phase A)**
+- No HR placeholder routes remain for the Phase A modules (pages exist under `src/app/(app)/hr/**`).
+- Every mutation path is via service/use-case + Zod boundary validation; no `any`/`unknown` parsing leaks past controllers/actions.
+- Authorization is enforced with org-scoped context + explicit HR resource/action metadata.
+- Cache tags are org-scoped; sensitive paths bypass caching when required.
+- Quality gates: `pnpm lint` + `pnpm lint:hr-loc` pass.
+
+### Phase B — Workforce Development
+
+**In scope (next)**
+- **Training**: enroll/complete/records UI + API + services aligned with legacy docs.
+- **Performance**: review cycles + feedback (contracts/repos/services + basic UI + notifications).
+
+**Acceptance criteria (Phase B)**
+- Same boundary/authorization/caching/quality gates as Phase A.
+- At least one happy-path integration flow per module (create → update → notify).
+
+### Phase C — Time & Attendance
+
+**In scope (later)**
+- **Time tracking**: time entry CRUD + approvals + reporting basics + UI parity with legacy where applicable.
+
+### Out of scope (explicitly not required for “HR complete”)
+
+- Payroll processing, payslips, tax filings, benefits administration.
+- Recruiting/ATS, candidate pipelines.
+- E-signature provider integrations beyond storing attachments/links.
+- Deep analytics dashboards beyond a minimal HR dashboard summary.
+
 ## Centralization Guardrails
 
 - **Single Source of Truth** – Services own orchestration, repositories own persistence, domain helpers own calculations. Extend these layers instead of duplicating logic in controllers or actions.
@@ -53,6 +96,202 @@ This guide tells AI agents how to explore and extend the HR domain without dupli
 | Time Tracking | `use-cases/hr/time-tracking` | Partial (reporting + return-to-work) | Confirm `time entry` domain models line up with `old/firebase/time` data before extending. |
 
 Keep this table up-to-date whenever a module gains a service, repository, or API surface so future contributors can see what is safe to reuse.
+
+## HR Module Gap Register (TODOs)
+
+### Unimplemented UI
+- TODO: Replace HrPlaceholder routes (`/hr/admin`, `/hr/employees`, `/hr/absences`, `/hr/compliance`, `/hr/performance`) with server-component pages, cacheLife/cacheTag, PPR + nested Suspense, and typed server actions.
+- TODO: Add UI routes and navigation for training and time tracking (no `/hr/training` or `/hr/time-tracking` pages yet).
+- TODO: Build the multi-step onboarding wizard UI and employee profile checklist surface called out in `docs/hr-onboarding-parity.md`.
+
+### API/workflow gaps
+- TODO: Wire `/api/hr/onboarding/accept` to the `complete-onboarding-invite` controller in `src/server/api-adapters/hr/onboarding/complete-onboarding-invite.ts`.
+- TODO: Add checklist instance endpoints (get active, update items, complete/cancel) plus a check-existing onboarding target endpoint for the wizard.
+- TODO: Handle pre-boarding profiles on invitation acceptance to avoid `employeeNumber` collisions (see `src/server/use-cases/hr/onboarding/complete-onboarding-invite.ts` and `src/server/services/hr/people/operations/onboard.ts`).
+- TODO: Compliance parity gaps (remaining): expand default seed dataset, and add a first-class grouped/category API contract for UI (see `src/server/use-cases/hr/compliance/README.md`).
+- TODO: Modernize the People Directory service + UI to reach parity with `old/src/lib/people` (profiles, contracts, ABAC guard coverage, and cached server components).
+- TODO: Implement the Performance module end-to-end (contracts/repositories, services, API adapters, UI, review cycles, and notifications).
+- TODO: Implement Training module services + API + UI (enroll/complete/records) aligned with `old/docs/qwen_cp_mix/training`.
+- TODO: Expand HR settings beyond absence settings (approval workflows, working hours, overtime policy, telemetry toggles) using Zod schemas and Prisma metadata columns.
+- TODO: Add automated leave accrual + backfill jobs and service-level reconciliation tests (see leave module “Next Steps” in the coverage table).
+- TODO: Complete time tracking workflows (CRUD + approvals + UI) and align metadata with legacy `old/firebase/time`.
+
+### Rule violations to fix
+- ✅ Done: Add a CI guard (lint/script) to enforce the 250 LOC cap for HR folders (`src/server/use-cases/hr`, `src/server/services/hr`, `src/server/actions/hr`, `src/app/(app)/hr`).
+- TODO: Remove `any`/`unknown` in HR boundaries (actions, adapters, and UI pages). Targets include `src/server/actions/hr/time-tracking.ts`, `src/server/actions/hr/performance/actions.ts`, `src/server/actions/hr/notifications.ts`, `src/server/api-adapters/hr/**`, `src/app/(app)/hr/dashboard/page.tsx`, `src/app/(app)/hr/policies/[policyId]/acknowledgments/page.tsx`.
+- TODO: Enforce Zod validation at HR boundaries (server actions + API adapters) instead of manual `unknown` parsing; align `src/server/actions/hr/**` and `src/server/api-adapters/hr/**` to parse typed DTOs. (Started: `src/server/actions/hr/notifications.ts` now parses via Zod at the boundary.)
+- ✅ Done: Adopt `useActionState` + typed action state for HR form actions (`/hr/onboarding`, `/hr/leave`, `/hr/settings`).
+- ✅ Done: Add cacheLife/cacheTag + PPR nested Suspense for HR server components (dashboard, policies, profile, leave).
+- ✅ Done: Audit HR UI for server-components-first + minimal `use client` islands; keep client usage hook-driven only.
+- ✅ Done: Add tenant theme SSR for HR app routes using `TenantThemeRegistry`.
+- ✅ Done: Standardize HR UI styling on Tailwind tokens + existing primitives.
+- ✅ Done: Add CSS-first motion tokens + `motion-reduce` safeguards to key HR interactions.
+- TODO: Audit HR endpoints for zero-trust tenant scoping (orgId/residency/classification) and ensure RBAC/ABAC guard metadata is enforced at every boundary.
+- TODO: Document Open/Closed extension points and Liskov-safe interfaces for HR services (policies, performance, training) so new flows can be added without modifying core orchestration logic.
+
+## HR Frontend UI/UX Review (December 2025)
+
+Comprehensive audit of `src/app/(app)/hr/**` against architectural constraints.
+
+### Tenant Theme & SSR
+
+| Issue | File(s) | Severity | Recommendation |
+| --- | --- | --- | --- |
+| HR layout does not wrap children with `TenantThemeRegistry` | `src/app/(app)/hr/layout.tsx` | ✅ Done | Wrapped HR subtree with `TenantThemeRegistry` using org id from session context. |
+| No x-org-id header propagation in HR-specific fetch calls | All HR pages calling controllers directly | Medium | Ensure `listHrPoliciesController` and similar calls receive headers with `x-org-id` so downstream cache/theme lookups remain org-scoped. |
+| Badge showing raw `Org {id}` instead of branded org name | `hr-navigation.tsx`, `hr-settings/page.tsx` | Low | Use `getOrgBranding()` or context to display the tenant's display name instead of the UUID. |
+
+### Server Components & Cache Components
+
+| Issue | File(s) | Severity | Recommendation |
+| --- | --- | --- | --- |
+| No `cacheLife` / `cacheTag` usage in HR pages | `dashboard/page.tsx`, `policies/page.tsx`, `policies/[policyId]/page.tsx`, `profile/page.tsx` | ✅ Done | Added Cache Components wrappers + org-scoped tags around key HR read paths; sensitive classifications bypass caching. |
+| No PPR (Partial Pre-Rendering) boundaries | Most HR pages | ✅ Done | Added nested `<Suspense>` boundaries + skeleton fallbacks for key HR routes. |
+| Inline error handling with `catch (error: unknown)` | `dashboard/page.tsx:36`, `acknowledgments/page.tsx:24` | Medium | Extract to typed error boundary or use `error.tsx` segment. Avoid inline try/catch that swallows types. |
+
+### Client Islands & useActionState
+
+| Issue | File(s) | Severity | Recommendation |
+| --- | --- | --- | --- |
+| Forms without `useActionState` use bare `<form action={...}>` | `checklist-templates-manager.tsx` (create, update, delete forms), `policies/[policyId]/page.tsx` (acknowledge form), `onboarding-invitations-panel.tsx` (revoke form) | ✅ Done | Converted to `useActionState` with typed form state + boundary validation. |
+| Non-interactive server components marked `use client` | None found (good!) | — | Current client boundaries are appropriate. |
+| `useMemo`/`useState` used only for derived booleans | `leave-request-form.tsx`, `invite-employee-form.tsx` | Low | Acceptable pattern. Consider extracting repeated switch-controlled hidden input logic into a reusable `<SwitchField>` primitive. |
+
+### Strict TypeScript (no any/unknown)
+
+| Issue | File(s) | Severity | Recommendation |
+| --- | --- | --- | --- |
+| `booleanFromFormValue(value: unknown): unknown` | `leave/schema.ts:3`, `onboarding/schema.ts:3` | ✅ Done | Updated preprocess helpers to return `boolean | undefined` and handle common FormData encodings. |
+| `catch (error: unknown)` without narrowing | `dashboard/page.tsx`, `acknowledgments/page.tsx` | Medium | Create a typed `HrPageError` union or use `instanceof` guards; expose structured error codes for UI. |
+| Actions in `src/server/actions/hr/**` accept `data: unknown` | `time-tracking.ts`, `leave-policies.ts`, `settings.ts`, `notifications.ts` | High | Replace with Zod schema `.parse()` at the boundary so the rest of the function is fully typed. |
+
+### Zod Validation at Boundaries
+
+| Issue | File(s) | Severity | Recommendation |
+| --- | --- | --- | --- |
+| Manual object checks instead of Zod | `leave/actions.ts`, `onboarding/actions.ts` do use Zod; server actions in `src/server/actions/hr/**` do not consistently | High | Standardize: every server action should `schema.parse(formData)` immediately and return typed `FormState<T>`. |
+| No client-side validation feedback | Core HR forms | ✅ Done | Implemented inline field errors via `useActionState` + typed `fieldErrors` maps (onboarding, leave request, HR settings, checklist templates). |
+
+### Tailwind v4 Tokens & CVA
+
+| Issue | File(s) | Severity | Recommendation |
+| --- | --- | --- | --- |
+| No `class-variance-authority` usage in HR components | All `_components/*.tsx` | Medium | Prefer CVA for shared UI patterns. Status badge variants are now centralized and typed from `badgeVariants`. |
+| Hard-coded color classes instead of semantic tokens | Inline `text-muted-foreground`, `bg-muted/50`, etc. are fine; no non-semantic colors found | — | Current usage is compliant. |
+| No custom HR-specific design tokens | — | Low | Consider adding `--hr-accent`, `--hr-danger` tokens in `globals.css` if HR branding diverges from app-wide theme. |
+
+### CSS-First Motion & Reduced-Motion
+
+| Issue | File(s) | Severity | Recommendation |
+| --- | --- | --- | --- |
+| Only one `transition-*` class in all HR pages | `dashboard/page.tsx:77` (`transition-colors hover:bg-muted`) | Low | Add subtle entrance animations (fade/slide) for cards, tables, and panels using `@/lib/animation/tokens`. |
+| No `motion-reduce` safeguards | All HR components | ✅ Done | Added `motion-reduce:transition-none` on HR nav links and dashboard policy cards; apply the same pattern to new interactions. |
+| No Framer Motion primitives used | — | — | Acceptable; CSS-first is preferred. If complex sequencing is needed, import from `@/components/animation/motion-primitives`. |
+
+### 250 LOC Cap Compliance
+
+| File | Lines | Status | Action |
+| --- | --- | --- | --- |
+| `hr-settings-form.tsx` | 168 | ✅ OK | — |
+| `checklist-templates-manager.tsx` | 150 | ✅ OK | — |
+| `invite-employee-form.tsx` | 151 | ✅ OK | — |
+| `leave-request-form.tsx` | ~120 | ✅ OK | — |
+| `profile/page.tsx` | 146 | ✅ OK | — |
+| `policies/[policyId]/page.tsx` | ~130 | ✅ OK | — |
+| All other HR files | <100 | ✅ OK | — |
+
+No LOC violations found. Continue splitting early as modules grow.
+
+### UI/UX Improvements
+
+#### Navigation & Layout
+- ✅ Done: Active-route highlighting added to `HrNavigation` links.
+- TODO: Add breadcrumb component for nested routes (`/hr/policies/[policyId]/acknowledgments`).
+- TODO: Add mobile hamburger menu for HR nav items (currently horizontal overflow).
+- TODO: Consider sticky header for long scrolling pages (policies list, acknowledgments table).
+
+#### Forms & Feedback
+- ✅ Done: Loading spinners inside form submit buttons (`leave-request-form.tsx`, `invite-employee-form.tsx`).
+- TODO: Add toast notifications for successful form submissions (use `sonner` or existing toast system).
+- ✅ Done: Confirmation dialogs for destructive actions (revoke invitation, delete template).
+- ✅ Done: Add inline field validation errors via typed `fieldErrors` returned from server actions.
+- TODO: Add character count for textarea fields (`reason`, `adminNotes`, `approvalWorkflowsJson`).
+
+#### Tables & Data Display
+- TODO: Add pagination for tables with many rows (invitations, acknowledgments, policies).
+- TODO: Add sorting controls to table headers (policies by date, status, category).
+- TODO: Add empty state illustrations instead of plain text messages.
+- TODO: Add row selection + bulk actions for admin tables (bulk revoke invitations).
+- TODO: Add column visibility toggles for wide tables.
+
+#### Accessibility
+- TODO: Add `aria-label` to icon-only buttons and badge elements.
+- ✅ Done: Add `aria-live="polite"` regions for dynamic content updates (form success/error).
+- ✅ Done: Ensure focus management after form submission (focus error/success regions).
+- ✅ Done: Skip-to-content link in HR layout.
+- TODO: Verify color contrast ratios for badge variants against backgrounds.
+
+#### Visual Hierarchy & Polish
+- TODO: Add subtle card hover effects (shadow elevation) to policy cards in dashboard.
+- TODO: Add status indicator dots/icons alongside text badges (visual redundancy for colorblind users).
+- TODO: Add section dividers or grouped headings for long forms (`hr-settings-form.tsx`).
+- TODO: Add date range picker component for leave request date selection (replace two separate date inputs).
+- TODO: Add avatar/initials display for user badges in acknowledgments table.
+
+### Component Extraction Candidates
+
+| Pattern | Current Location | Proposed Component |
+| --- | --- | --- |
+| Status badge variant logic | `leave-requests-panel.tsx`, `onboarding-invitations-panel.tsx` | `<HrStatusBadge status={...} />` with CVA |
+| Date formatting helpers | `_components/format-date.ts` (exists) | ✅ Already extracted |
+| Switch + hidden input combo | `leave-request-form.tsx`, `invite-employee-form.tsx`, `hr-settings-form.tsx` | `<FormSwitch name={...} label={...} />` |
+| Data table with overflow | Multiple panels | `<HrDataTable columns={...} data={...} />` wrapper |
+| Page header with actions | `hr-page-header.tsx` (exists) | ✅ Already extracted |
+| Skeleton card loading state | `hr-settings/page.tsx`, `leave/page.tsx`, `onboarding/page.tsx` | `<HrCardSkeleton variant="form" \| "table" />` |
+
+### File-Specific TODOs
+
+#### `src/app/(app)/hr/layout.tsx`
+- TODO: Verify `TenantThemeRegistry` inheritance from parent layout; if HR-specific overrides are needed, wrap here.
+- TODO: Add HR-specific metadata (title template, description) via `generateMetadata`.
+
+#### `src/app/(app)/hr/dashboard/page.tsx`
+- TODO: Add `cacheLife('hours')` and `cacheTag('hr-dashboard', orgId)` for policies summary.
+- TODO: Replace inline `try/catch` with error boundary or typed result pattern.
+- TODO: Add more dashboard widgets (leave balance summary, pending approvals count, compliance alerts).
+
+#### `src/app/(app)/hr/policies/page.tsx`
+- TODO: Add `cacheLife` + `cacheTag` for policy list.
+- TODO: Add search/filter UI for policies by category, status, or title.
+- TODO: Add "New Policy" button for admins with permission.
+
+#### `src/app/(app)/hr/policies/[policyId]/page.tsx`
+- ✅ Done: Acknowledge form now uses `useActionState` with pending/error feedback.
+- TODO: Add print-friendly styles for policy content.
+- TODO: Add policy version history sidebar for admins.
+
+#### `src/app/(app)/hr/leave/page.tsx`
+- TODO: Add leave balance display above the form.
+- TODO: Add calendar view option for existing requests.
+- TODO: Add manager approval queue panel for admins.
+
+#### `src/app/(app)/hr/onboarding/page.tsx`
+- TODO: Add progress indicators for active onboarding workflows.
+- TODO: Add checklist completion percentage badges.
+
+#### `src/app/(app)/hr/settings/page.tsx`
+- TODO: Add settings categories/tabs as the form grows.
+- TODO: Add settings change audit log display.
+
+#### `src/app/(app)/hr/_components/hr-navigation.tsx`
+- ✅ Done: Active state styling based on current route.
+- TODO: Add dropdown menu for overflow items on mobile.
+- TODO: Add notification badges for pending items (e.g., "3 pending approvals").
+
+#### `src/app/(app)/hr/profile/page.tsx`
+- TODO: Add `cacheLife` + `cacheTag` for profile data.
+- TODO: Add edit profile button linking to settings or inline edit mode.
+- TODO: Add profile photo upload placeholder.
 
 ## Current Absence Use-Cases Snapshot
 

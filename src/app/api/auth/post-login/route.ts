@@ -5,17 +5,32 @@ import { MembershipStatus } from '@prisma/client';
 import { createAuth } from '@/server/lib/auth';
 import { prisma } from '@/server/lib/prisma';
 import { appendSetCookieHeaders } from '@/server/api-adapters/http/set-cookie-headers';
+import {
+    getMembershipRoleSnapshot,
+    resolveRoleDashboard,
+    resolveRoleRedirectPath,
+    ROLE_DASHBOARD_PATHS,
+} from '@/server/ui/auth/role-redirect';
 
 const DEFAULT_NEXT_PATH = '/dashboard';
 const LOGIN_PATH = '/login';
 const NOT_INVITED_PATH = '/not-invited';
 
-function resolveSafeNextPath(request: NextRequest): string {
-    const candidate = request.nextUrl.searchParams.get('next') ?? DEFAULT_NEXT_PATH;
-    if (!candidate.startsWith('/') || candidate.startsWith('//') || candidate.includes('://')) {
-        return DEFAULT_NEXT_PATH;
+interface SafeNextPath {
+    path: string;
+    isExplicit: boolean;
+}
+
+function resolveSafeNextPath(request: NextRequest): SafeNextPath {
+    const candidate = request.nextUrl.searchParams.get('next');
+    if (typeof candidate === 'string') {
+        const safeNextPath = sanitizeNextPath(candidate);
+        if (safeNextPath) {
+            return { path: safeNextPath, isExplicit: true };
+        }
     }
-    return candidate;
+
+    return { path: DEFAULT_NEXT_PATH, isExplicit: false };
 }
 
 function resolveOptionalOrgSlug(request: NextRequest): string | null {
@@ -51,7 +66,7 @@ async function resolveOrganizationId(userId: string, orgSlug: string | null): Pr
 async function handlePostLogin(request: NextRequest): Promise<NextResponse> {
     const auth = createAuth(request.nextUrl.origin);
     const session = await auth.api.getSession({ headers: request.headers });
-    const nextPath = resolveSafeNextPath(request);
+    const { path: nextPath, isExplicit } = resolveSafeNextPath(request);
 
     if (!session?.session) {
         return buildLoginRedirect(request, nextPath);
@@ -66,17 +81,32 @@ async function handlePostLogin(request: NextRequest): Promise<NextResponse> {
         desiredOrgId = await resolveOrganizationId(session.user.id, desiredOrgSlug);
     }
 
-    desiredOrgId ??= currentActiveOrgId ?? await resolveOrganizationId(session.user.id, null);
+    desiredOrgId ??= currentActiveOrgId;
+    desiredOrgId ??= await resolveOrganizationId(session.user.id, null);
 
     if (!desiredOrgId) {
         return buildNotInvitedRedirect(request, nextPath);
     }
 
-    if (currentActiveOrgId === desiredOrgId) {
-        return NextResponse.redirect(new URL(nextPath, request.nextUrl.origin));
+    const membershipSnapshot = await getMembershipRoleSnapshot(desiredOrgId, session.user.id);
+    if (!membershipSnapshot) {
+        return buildNotInvitedRedirect(request, nextPath);
     }
 
-    await ensureAuthOrganizationBridge(desiredOrgId, session.user.id);
+    const dashboardRole = resolveRoleDashboard(membershipSnapshot);
+    const redirectPath = isExplicit
+        ? resolveRoleRedirectPath(dashboardRole, nextPath)
+        : ROLE_DASHBOARD_PATHS[dashboardRole];
+
+    if (currentActiveOrgId === desiredOrgId) {
+        return NextResponse.redirect(new URL(redirectPath, request.nextUrl.origin));
+    }
+
+    await ensureAuthOrganizationBridge(
+        desiredOrgId,
+        session.user.id,
+        membershipSnapshot.roleName,
+    );
 
     const { headers: setActiveHeaders } = await auth.api.setActiveOrganization({
         headers: request.headers,
@@ -84,7 +114,7 @@ async function handlePostLogin(request: NextRequest): Promise<NextResponse> {
         returnHeaders: true,
     });
 
-    const response = NextResponse.redirect(new URL(nextPath, request.nextUrl.origin));
+    const response = NextResponse.redirect(new URL(redirectPath, request.nextUrl.origin));
     appendSetCookieHeaders(setActiveHeaders, response.headers);
     return response;
 }
@@ -99,7 +129,18 @@ function buildNotInvitedRedirect(request: NextRequest, nextPath: string): NextRe
     return NextResponse.redirect(url);
 }
 
-async function ensureAuthOrganizationBridge(orgId: string, userId: string): Promise<void> {
+function sanitizeNextPath(candidate: string): string | null {
+    if (!candidate.startsWith('/') || candidate.startsWith('//') || candidate.includes('://')) {
+        return null;
+    }
+    return candidate;
+}
+
+async function ensureAuthOrganizationBridge(
+    orgId: string,
+    userId: string,
+    roleNameOverride: string | null,
+): Promise<void> {
     const organization = await prisma.organization.findUnique({
         where: { id: orgId },
         select: { id: true, name: true, slug: true },
@@ -120,12 +161,7 @@ async function ensureAuthOrganizationBridge(orgId: string, userId: string): Prom
         },
     });
 
-    const membership = await prisma.membership.findUnique({
-        where: { orgId_userId: { orgId, userId } },
-        select: { role: { select: { name: true } } },
-    });
-
-    const roleName = membership?.role?.name ?? 'member';
+    const roleName = roleNameOverride ?? 'member';
 
     const authMember = await prisma.authOrgMember.findFirst({
         where: { organizationId: organization.id, userId },

@@ -1,4 +1,4 @@
-import { Prisma, type PrismaClient } from '@prisma/client';
+import type { Prisma, PrismaClient } from '@prisma/client';
 import { BasePrismaRepository, type BasePrismaRepositoryOptions } from '@/server/repositories/prisma/base-prisma-repository';
 import type {
     CreateGoalDTO,
@@ -13,6 +13,7 @@ import { toPrismaInputJson } from '@/server/repositories/prisma/helpers/prisma-u
 import { EntityNotFoundError } from '@/server/errors';
 import { registerOrgCacheTag } from '@/server/lib/cache-tags';
 import { CACHE_SCOPE_PERFORMANCE_GOALS, CACHE_SCOPE_PERFORMANCE_REVIEWS } from '@/server/repositories/cache-scopes';
+import { buildGoalUpdateData, buildReviewUpdateData } from './prisma-performance-repository.helpers';
 
 type ReviewDelegate = PrismaClient['performanceReview'];
 type GoalDelegate = PrismaClient['performanceGoal'];
@@ -119,50 +120,7 @@ export class PrismaPerformanceRepository extends BasePrismaRepository implements
             throw new EntityNotFoundError(PERFORMANCE_REVIEW_ENTITY, { id, orgId: this.orgId });
         }
 
-        const updateData: Prisma.PerformanceReviewUncheckedUpdateInput = {};
-
-        if (data.periodStartDate !== undefined) {
-            updateData.periodStartDate = data.periodStartDate;
-        }
-        if (data.periodEndDate !== undefined) {
-            updateData.periodEndDate = data.periodEndDate;
-        }
-        if (data.scheduledDate !== undefined) {
-            updateData.scheduledDate = data.scheduledDate;
-        }
-        if (data.completedDate !== undefined) {
-            updateData.completedDate = data.completedDate ?? null;
-        }
-        if (data.status !== undefined) {
-            updateData.status = data.status;
-        }
-        if (data.overallRating !== undefined) {
-            updateData.overallRating = data.overallRating ?? null;
-        }
-        if (data.strengths !== undefined) {
-            updateData.strengths = data.strengths ?? null;
-        }
-        if (data.areasForImprovement !== undefined) {
-            updateData.areasForImprovement = data.areasForImprovement ?? null;
-        }
-        if (data.developmentPlan !== undefined) {
-            updateData.developmentPlan =
-                toPrismaInputJson(
-                    data.developmentPlan as Prisma.InputJsonValue | Prisma.JsonValue | null | undefined,
-                ) ?? Prisma.JsonNull;
-        }
-        if (data.reviewerNotes !== undefined) {
-            updateData.reviewerNotes = data.reviewerNotes ?? null;
-        }
-        if (data.employeeResponse !== undefined) {
-            updateData.employeeResponse = data.employeeResponse ?? null;
-        }
-        if (data.metadata !== undefined) {
-            updateData.metadata =
-                toPrismaInputJson(
-                    data.metadata as Prisma.InputJsonValue | Prisma.JsonValue | null | undefined,
-                ) ?? Prisma.JsonNull;
-        }
+        const updateData = buildReviewUpdateData(data);
 
         const updated = await this.reviews.update({ where: { id }, data: updateData });
 
@@ -210,22 +168,7 @@ export class PrismaPerformanceRepository extends BasePrismaRepository implements
             throw new EntityNotFoundError('Performance goal', { id: goalId, orgId: this.orgId });
         }
 
-        const updateData: Prisma.PerformanceGoalUncheckedUpdateInput = {};
-        if (data.description !== undefined) {
-            updateData.description = data.description;
-        }
-        if (data.targetDate !== undefined) {
-            updateData.targetDate = data.targetDate;
-        }
-        if (data.status !== undefined) {
-            updateData.status = data.status as Prisma.PerformanceGoalUncheckedUpdateInput['status'];
-        }
-        if (data.rating !== undefined) {
-            updateData.rating = data.rating ?? null;
-        }
-        if (data.comments !== undefined) {
-            updateData.comments = data.comments ?? null;
-        }
+        const updateData = buildGoalUpdateData(data);
 
         const updated = await this.goals.update({ where: { id: goalId }, data: updateData });
 

@@ -51,6 +51,23 @@ export class PrismaOnboardingInvitationRepository
     return this.mapToDomain(record);
   }
 
+  async listInvitationsByOrg(
+    orgId: string,
+    options?: { status?: OnboardingInvitation['status']; limit?: number },
+  ): Promise<OnboardingInvitation[]> {
+    const limit = options?.limit ?? 25;
+    const records = await this.invitation.findMany({
+      where: {
+        orgId,
+        status: options?.status,
+      },
+      orderBy: { createdAt: 'desc' },
+      take: limit,
+    });
+
+    return records.map((record) => this.mapToDomain(record));
+  }
+
   async getActiveInvitationByEmail(orgId: string, email: string): Promise<OnboardingInvitation | null> {
     const record = await this.invitation.findFirst({
       where: {

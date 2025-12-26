@@ -44,6 +44,7 @@ export type ThemeTokenMap = Record<ThemeTokenKey, HslValue>;
 
 export interface TenantTheme {
     orgId: string;
+    presetId?: string;
     tokens: ThemeTokenMap;
     updatedAt: Date;
 }

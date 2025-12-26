@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useMemo, useState } from 'react';
+import { useActionState, useEffect, useMemo, useRef, useState } from 'react';
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -8,10 +8,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Spinner } from '@/components/ui/spinner';
 import { Switch } from '@/components/ui/switch';
 
 import type { ChecklistTemplate } from '@/server/types/onboarding-types';
 
+import { FieldError } from '../../_components/field-error';
 import { inviteEmployeeAction } from '../actions';
 import type { OnboardingInviteFormState } from '../form-state';
 
@@ -23,6 +25,22 @@ export interface InviteEmployeeFormProps {
 
 export function InviteEmployeeForm({ initialState, templates, canManageTemplates }: InviteEmployeeFormProps) {
     const [state, action, pending] = useActionState(inviteEmployeeAction, initialState);
+
+    const emailError = state.fieldErrors?.email;
+    const displayNameError = state.fieldErrors?.displayName;
+    const employeeNumberError = state.fieldErrors?.employeeNumber;
+    const jobTitleError = state.fieldErrors?.jobTitle;
+    const onboardingTemplateError = state.fieldErrors?.onboardingTemplateId;
+
+    const feedbackReference = useRef<HTMLDivElement | null>(null);
+    const previousStatus = useRef(state.status);
+
+    useEffect(() => {
+        if (!pending && state.status !== 'idle' && previousStatus.current !== state.status) {
+            feedbackReference.current?.focus();
+        }
+        previousStatus.current = state.status;
+    }, [pending, state.status]);
 
     const initialIncludeTemplate = useMemo(
         () => state.values.includeTemplate ?? Boolean(state.values.onboardingTemplateId),
@@ -42,107 +60,135 @@ export function InviteEmployeeForm({ initialState, templates, canManageTemplates
             </CardHeader>
             <CardContent className="space-y-4">
                 {state.status !== 'idle' ? (
-                    <Alert variant={state.status === 'success' ? 'default' : 'destructive'}>
-                        <AlertTitle>{state.status === 'success' ? 'Success' : 'Error'}</AlertTitle>
-                        <AlertDescription>
-                            {state.message ?? 'Something went wrong.'}
-                            {state.status === 'success' && state.token ? (
-                                <div className="mt-2 space-y-2">
-                                    <div className="text-xs font-medium text-muted-foreground">Invitation token</div>
-                                    <Input readOnly value={state.token} />
-                                </div>
-                            ) : null}
-                        </AlertDescription>
-                    </Alert>
+                    <div ref={feedbackReference} tabIndex={-1} role="status" aria-live="polite" aria-atomic="true">
+                        <Alert variant={state.status === 'success' ? 'default' : 'destructive'}>
+                            <AlertTitle>{state.status === 'success' ? 'Success' : 'Error'}</AlertTitle>
+                            <AlertDescription>
+                                {state.message ?? 'Something went wrong.'}
+                                {state.status === 'success' && state.token ? (
+                                    <div className="mt-2 space-y-2">
+                                        <div className="text-xs font-medium text-muted-foreground">Invitation token</div>
+                                        <Input readOnly value={state.token} aria-label="Invitation token" />
+                                    </div>
+                                ) : null}
+                            </AlertDescription>
+                        </Alert>
+                    </div>
                 ) : null}
 
-                <form action={action} className="space-y-4">
-                    <div className="grid gap-3 sm:grid-cols-2">
-                        <div className="space-y-1.5">
-                            <Label htmlFor="email">Email</Label>
-                            <Input
-                                id="email"
-                                name="email"
-                                type="email"
-                                autoComplete="email"
-                                defaultValue={state.values.email}
-                                required
-                            />
-                        </div>
-                        <div className="space-y-1.5">
-                            <Label htmlFor="displayName">Display name</Label>
-                            <Input
-                                id="displayName"
-                                name="displayName"
-                                autoComplete="name"
-                                defaultValue={state.values.displayName}
-                                required
-                            />
-                        </div>
-                        <div className="space-y-1.5">
-                            <Label htmlFor="employeeNumber">Employee number</Label>
-                            <Input
-                                id="employeeNumber"
-                                name="employeeNumber"
-                                autoComplete="off"
-                                defaultValue={state.values.employeeNumber}
-                                required
-                            />
-                        </div>
-                        <div className="space-y-1.5">
-                            <Label htmlFor="jobTitle">Job title (optional)</Label>
-                            <Input
-                                id="jobTitle"
-                                name="jobTitle"
-                                autoComplete="organization-title"
-                                defaultValue={state.values.jobTitle ?? ''}
-                            />
-                        </div>
-                    </div>
-
-                    <div className="space-y-3 rounded-lg border p-3">
-                        <div className="flex items-center justify-between gap-3">
-                            <div className="space-y-0.5">
-                                <div className="text-sm font-medium">Attach checklist template</div>
-                                <div className="text-xs text-muted-foreground">
-                                    {canManageTemplates
-                                        ? 'Optionally select a checklist template for the invite.'
-                                        : 'You do not have permission to manage templates.'}
-                                </div>
-                            </div>
-                            <input type="hidden" name="includeTemplate" value={String(includeTemplate)} />
-                            <Switch checked={includeTemplate} onCheckedChange={setIncludeTemplate} />
-                        </div>
-
-                        {includeTemplate ? (
+                <form action={action} className="space-y-4" aria-busy={pending}>
+                    <fieldset disabled={pending} className="space-y-4">
+                        <div className="grid gap-3 sm:grid-cols-2">
                             <div className="space-y-1.5">
-                                <Label>Template</Label>
-                                <Select
-                                    name="onboardingTemplateId"
-                                    defaultValue={state.values.onboardingTemplateId ?? undefined}
-                                    disabled={!canManageTemplates || templateOptions.length === 0}
-                                >
-                                    <SelectTrigger>
-                                        <SelectValue placeholder={templateOptions.length === 0 ? 'No templates available' : 'Select a template'} />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {templateOptions.map((template) => (
-                                            <SelectItem key={template.id} value={template.id}>
-                                                {template.name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
+                                <Label htmlFor="email">Email</Label>
+                                <Input
+                                    id="email"
+                                    name="email"
+                                    type="email"
+                                    autoComplete="email"
+                                    defaultValue={state.values.email}
+                                    aria-invalid={Boolean(emailError)}
+                                    aria-describedby={emailError ? 'email-error' : undefined}
+                                    required
+                                />
+                                <FieldError id="email-error" message={emailError} />
                             </div>
-                        ) : null}
-                    </div>
+                            <div className="space-y-1.5">
+                                <Label htmlFor="displayName">Display name</Label>
+                                <Input
+                                    id="displayName"
+                                    name="displayName"
+                                    autoComplete="name"
+                                    defaultValue={state.values.displayName}
+                                    aria-invalid={Boolean(displayNameError)}
+                                    aria-describedby={displayNameError ? 'displayName-error' : undefined}
+                                    required
+                                />
+                                <FieldError id="displayName-error" message={displayNameError} />
+                            </div>
+                            <div className="space-y-1.5">
+                                <Label htmlFor="employeeNumber">Employee number</Label>
+                                <Input
+                                    id="employeeNumber"
+                                    name="employeeNumber"
+                                    autoComplete="off"
+                                    defaultValue={state.values.employeeNumber}
+                                    aria-invalid={Boolean(employeeNumberError)}
+                                    aria-describedby={employeeNumberError ? 'employeeNumber-error' : undefined}
+                                    required
+                                />
+                                <FieldError id="employeeNumber-error" message={employeeNumberError} />
+                            </div>
+                            <div className="space-y-1.5">
+                                <Label htmlFor="jobTitle">Job title (optional)</Label>
+                                <Input
+                                    id="jobTitle"
+                                    name="jobTitle"
+                                    autoComplete="organization-title"
+                                    defaultValue={state.values.jobTitle ?? ''}
+                                    aria-invalid={Boolean(jobTitleError)}
+                                    aria-describedby={jobTitleError ? 'jobTitle-error' : undefined}
+                                />
+                                <FieldError id="jobTitle-error" message={jobTitleError} />
+                            </div>
+                        </div>
 
-                    <div className="flex items-center gap-3">
-                        <Button type="submit" disabled={pending}>
-                            {pending ? 'Creating…' : 'Create invite'}
-                        </Button>
-                        <div className="text-xs text-muted-foreground">Invitation creation is never cached.</div>
-                    </div>
+                        <div className="space-y-3 rounded-lg border p-3">
+                            <div className="flex items-center justify-between gap-3">
+                                <div className="space-y-0.5">
+                                    <div className="text-sm font-medium">Attach checklist template</div>
+                                    <div id="includeTemplate-help" className="text-xs text-muted-foreground">
+                                        {canManageTemplates
+                                            ? 'Optionally select a checklist template for the invite.'
+                                            : 'You do not have permission to manage templates.'}
+                                    </div>
+                                </div>
+                                <input type="hidden" name="includeTemplate" value={String(includeTemplate)} />
+                                <Switch
+                                    checked={includeTemplate}
+                                    onCheckedChange={setIncludeTemplate}
+                                    aria-label="Attach checklist template"
+                                    aria-describedby="includeTemplate-help"
+                                    disabled={pending}
+                                />
+                            </div>
+
+                            {includeTemplate ? (
+                                <div className="space-y-1.5">
+                                    <Label htmlFor="onboardingTemplateId">Template</Label>
+                                    <Select
+                                        name="onboardingTemplateId"
+                                        defaultValue={state.values.onboardingTemplateId ?? undefined}
+                                        disabled={pending || !canManageTemplates || templateOptions.length === 0}
+                                    >
+                                        <SelectTrigger
+                                            id="onboardingTemplateId"
+                                            aria-invalid={Boolean(onboardingTemplateError)}
+                                            aria-describedby={onboardingTemplateError ? 'onboardingTemplateId-error' : undefined}
+                                        >
+                                            <SelectValue placeholder={templateOptions.length === 0 ? 'No templates available' : 'Select a template'} />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {templateOptions.map((template) => (
+                                                <SelectItem key={template.id} value={template.id}>
+                                                    {template.name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                    <FieldError id="onboardingTemplateId-error" message={onboardingTemplateError} />
+                                </div>
+                            ) : null}
+                        </div>
+
+                        <div className="flex items-center gap-3">
+                            <Button type="submit" disabled={pending}>
+                                {pending ? <Spinner className="mr-2" /> : null}
+                                {pending ? 'Creating…' : 'Create invite'}
+                            </Button>
+                            <div className="text-xs text-muted-foreground">Invitation creation is never cached.</div>
+                        </div>
+                    </fieldset>
                 </form>
             </CardContent>
         </Card>

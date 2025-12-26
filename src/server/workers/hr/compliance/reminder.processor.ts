@@ -1,6 +1,7 @@
 import { differenceInCalendarDays } from 'date-fns';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
 import type { IComplianceItemRepository } from '@/server/repositories/contracts/hr/compliance/compliance-item-repository-contract';
+import type { IComplianceTemplateRepository } from '@/server/repositories/contracts/hr/compliance/compliance-template-repository-contract';
 import type { ComplianceLogItem } from '@/server/types/compliance-types';
 import type { HrNotificationServiceContract } from '@/server/services/hr/notifications/hr-notification-service.provider';
 import type { NotificationDispatchContract } from '@/server/services/notifications/notification-service.provider';
@@ -9,6 +10,7 @@ import { complianceReminderPayloadSchema, type ComplianceReminderPayload } from 
 
 interface ComplianceReminderProcessorDeps {
     complianceItemRepository: IComplianceItemRepository;
+    complianceTemplateRepository?: IComplianceTemplateRepository;
     notificationService?: HrNotificationServiceContract;
     notificationDispatcher?: NotificationDispatchContract;
 }
@@ -20,11 +22,13 @@ interface ReminderStats {
 
 export class ComplianceReminderProcessor {
     private readonly complianceItemRepository: IComplianceItemRepository;
+    private readonly complianceTemplateRepository?: IComplianceTemplateRepository;
     private readonly notificationService?: HrNotificationServiceContract;
     private readonly notificationDispatcher?: NotificationDispatchContract;
 
     constructor(deps: ComplianceReminderProcessorDeps) {
         this.complianceItemRepository = deps.complianceItemRepository;
+        this.complianceTemplateRepository = deps.complianceTemplateRepository;
         this.notificationService = deps.notificationService;
         this.notificationDispatcher = deps.notificationDispatcher;
     }
@@ -35,19 +39,28 @@ export class ComplianceReminderProcessor {
     ): Promise<ReminderStats> {
         const parsedPayload = complianceReminderPayloadSchema.parse(payload);
         const referenceDate = parsedPayload.referenceDate ?? new Date();
-        const daysUntilExpiry = parsedPayload.daysUntilExpiry;
+        const fallbackWindowDays = parsedPayload.daysUntilExpiry;
+
+        const templateRules = await this.loadTemplateRules(authorization.orgId);
+        const configuredMaxReminderDays = Math.max(
+            0,
+            ...Array.from(templateRules.values()).map((rule) => rule.reminderDaysBeforeExpiry ?? 0),
+        );
+        const effectiveWindowDays = Math.max(fallbackWindowDays, configuredMaxReminderDays);
+
         const allItems = await this.complianceItemRepository.findExpiringItemsForOrg(
             authorization.orgId,
             referenceDate,
-            daysUntilExpiry,
+            effectiveWindowDays,
         );
 
         const scopedItems = this.filterTargetUsers(allItems, parsedPayload.targetUserIds);
-        if (!scopedItems.length) {
+        const filtered = this.filterByTemplateRules(scopedItems, templateRules, referenceDate, fallbackWindowDays);
+        if (!filtered.length) {
             return { remindersSent: 0, usersTargeted: 0 };
         }
 
-        const grouped = this.groupByUser(scopedItems);
+        const grouped = this.groupByUser(filtered);
         let remindersSent = 0;
         for (const [userId, items] of grouped) {
             await this.emitReminder(userId, items, referenceDate, authorization);
@@ -72,6 +85,53 @@ export class ComplianceReminderProcessor {
             accumulator.set(item.userId, existing);
             return accumulator;
         }, new Map());
+    }
+
+    private async loadTemplateRules(
+        orgId: string,
+    ): Promise<Map<string, { reminderDaysBeforeExpiry?: number | null }>> {
+        if (!this.complianceTemplateRepository) {
+            return new Map();
+        }
+
+        const templates = await this.complianceTemplateRepository.listTemplates(orgId);
+        const rules = new Map<string, { reminderDaysBeforeExpiry?: number | null }>();
+        for (const template of templates) {
+            for (const item of template.items) {
+                rules.set(item.id, {
+                    reminderDaysBeforeExpiry: item.reminderDaysBeforeExpiry ?? null,
+                });
+            }
+        }
+        return rules;
+    }
+
+    private filterByTemplateRules(
+        items: ComplianceLogItem[],
+        templateRules: Map<string, { reminderDaysBeforeExpiry?: number | null }>,
+        referenceDate: Date,
+        fallbackWindowDays: number,
+    ): ComplianceLogItem[] {
+        return items.filter((item) => {
+            const dueDate = item.dueDate;
+            if (!dueDate) {
+                return false;
+            }
+
+            const daysUntilDue = differenceInCalendarDays(dueDate, referenceDate);
+            if (daysUntilDue <= 0) {
+                return true;
+            }
+
+            const rule = templateRules.get(item.templateItemId);
+            const reminderDays = rule?.reminderDaysBeforeExpiry;
+
+            if (typeof reminderDays === 'number' && Number.isFinite(reminderDays) && reminderDays > 0) {
+                return daysUntilDue === reminderDays;
+            }
+
+            return daysUntilDue <= fallbackWindowDays;
+        });
     }
 
     private async emitReminder(

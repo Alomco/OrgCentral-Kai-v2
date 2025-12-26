@@ -1,5 +1,6 @@
 import { cacheLife, unstable_noStore as noStore } from 'next/cache';
 
+import { toCacheSafeAuthorizationContext } from '@/server/repositories/security/cache-authorization';
 import { AuthorizationError } from '@/server/errors';
 import type { IChecklistTemplateRepository } from '@/server/repositories/contracts/hr/onboarding/checklist-template-repository-contract';
 import { PrismaChecklistTemplateRepository } from '@/server/repositories/prisma/hr/onboarding';
@@ -68,5 +69,8 @@ export async function getChecklistTemplatesForUi(
         return loadChecklistTemplates(input);
     }
 
-    return getChecklistTemplatesCached(input);
+    return getChecklistTemplatesCached({
+        ...input,
+        authorization: toCacheSafeAuthorizationContext(input.authorization),
+    });
 }

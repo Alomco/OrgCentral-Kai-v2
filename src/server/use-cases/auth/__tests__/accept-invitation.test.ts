@@ -1,98 +1,21 @@
 import { describe, it, expect, vi } from 'vitest';
 import { acceptInvitation, type AcceptInvitationDependencies } from '../accept-invitation';
-import type { InvitationRecord } from '@/server/repositories/contracts/auth/invitations/invitation-repository.types';
-import type { IInvitationRepository } from '@/server/repositories/contracts/auth/invitations';
-import type { IUserRepository } from '@/server/repositories/contracts/org/users/user-repository-contract';
-import type { IMembershipRepository } from '@/server/repositories/contracts/org/membership';
-import type { IOrganizationRepository } from '@/server/repositories/contracts/org/organization/organization-repository-contract';
 import type { IEmployeeProfileRepository } from '@/server/repositories/contracts/hr/people/employee-profile-repository-contract';
 import type { IChecklistTemplateRepository } from '@/server/repositories/contracts/hr/onboarding/checklist-template-repository-contract';
 import type { IChecklistInstanceRepository } from '@/server/repositories/contracts/hr/onboarding/checklist-instance-repository-contract';
 import type { EmployeeProfileDTO } from '@/server/types/hr/people';
-import type { OrganizationData, UserData, Membership } from '@/server/types/leave-types';
 import type { ChecklistTemplate } from '@/server/types/onboarding-types';
-import { normalizeLeaveYearStartDate } from '@/server/types/org/leave-year-start-date';
+import type { InvitationRecord } from '@/server/repositories/contracts/auth/invitations/invitation-repository.types';
+import {
+    actor,
+    baseInvitation,
+    buildInvitationRepository,
+    buildMembershipRepository,
+    buildOrganizationRepository,
+    buildUserRepository,
+} from './accept-invitation.fixtures';
 
 describe('acceptInvitation onboarding integration', () => {
-    const actor = { userId: 'user-123', email: 'invitee@example.com' };
-
-    const baseInvitation: InvitationRecord = {
-        token: 'token-123',
-        status: 'pending',
-        targetEmail: actor.email,
-        organizationId: 'org-1',
-        organizationName: 'Org One',
-        invitedByUid: 'user-admin',
-        onboardingData: {
-            email: actor.email,
-            displayName: 'Invitee Example',
-            roles: ['employee'],
-        },
-    };
-
-    const organization: OrganizationData = {
-        id: 'org-1',
-        name: 'Org One',
-        slug: 'org-one',
-        regionCode: 'UK-LON',
-        dataResidency: 'UK_ONLY',
-        dataClassification: 'OFFICIAL',
-        auditSource: 'test',
-        auditBatchId: undefined,
-        leaveEntitlements: { annual: 25 },
-        primaryLeaveType: 'annual',
-        leaveYearStartDate: normalizeLeaveYearStartDate('2025-01-01'),
-        leaveRoundingRule: 'full_day',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-    };
-
-    const user: UserData = {
-        id: actor.userId,
-        email: actor.email,
-        displayName: 'Invitee Example',
-        roles: [],
-        memberships: [] as Membership[],
-        memberOf: [],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-    };
-
-    const buildInvitationRepository = (record: InvitationRecord): IInvitationRepository =>
-    ({
-        findByToken: vi.fn(async () => record),
-        updateStatus: vi.fn(async () => undefined),
-    } as unknown as IInvitationRepository);
-
-    const buildUserRepository = (): IUserRepository =>
-    ({
-        getUser: vi.fn(async () => user),
-        findById: vi.fn(async () => null),
-        findByEmail: vi.fn(async () => null),
-        userExistsByEmail: vi.fn(async () => false),
-        updateUserMemberships: vi.fn(async () => undefined),
-        addUserToOrganization: vi.fn(async () => undefined),
-        removeUserFromOrganization: vi.fn(async () => undefined),
-        getUsersInOrganization: vi.fn(async () => []),
-    } as unknown as IUserRepository);
-
-    const buildMembershipRepository = (): IMembershipRepository =>
-    ({
-        findMembership: vi.fn(async () => null),
-        createMembershipWithProfile: vi.fn(async () => ({ organizationId: 'org-1', roles: ['employee'] })),
-        updateMembershipStatus: vi.fn(async () => undefined),
-    } as unknown as IMembershipRepository);
-
-    const buildOrganizationRepository = (): IOrganizationRepository =>
-    ({
-        getOrganization: vi.fn(async () => organization),
-        getOrganizationBySlug: vi.fn(async () => organization),
-        getLeaveEntitlements: vi.fn(async () => ({})),
-        updateLeaveSettings: vi.fn(async () => undefined),
-        addCustomLeaveType: vi.fn(async () => undefined),
-        removeLeaveType: vi.fn(async () => undefined),
-    } as unknown as IOrganizationRepository);
-
     it('links an existing pre-boarding profile to the accepted user', async () => {
         const profile: EmployeeProfileDTO = {
             id: 'profile-1',

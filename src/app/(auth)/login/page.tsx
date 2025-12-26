@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { headers as nextHeaders } from 'next/headers';
+import { redirect } from 'next/navigation';
 import { cacheLife } from "next/cache";
 import { Suspense } from "react";
 
@@ -7,6 +9,12 @@ import AuthLayout from "@/components/auth/AuthLayout";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { Button } from "@/components/ui/button";
 import { registerCacheTag } from "@/server/lib/cache-tags";
+import { getSessionContext } from '@/server/use-cases/auth/sessions/get-session';
+import {
+    getMembershipRoleSnapshot,
+    resolveRoleDashboard,
+    ROLE_DASHBOARD_PATHS,
+} from '@/server/ui/auth/role-redirect';
 
 export const metadata: Metadata = {
     title: "Login • OrgCentral",
@@ -14,9 +22,7 @@ export const metadata: Metadata = {
 };
 
 interface LoginPageProps {
-    searchParams: Promise<{
-        org?: string;
-    }>;
+    searchParams?: Record<string, string | string[] | undefined>;
 }
 
 interface LoginPageCopy {
@@ -61,14 +67,37 @@ async function LoginPageContent({ initialOrgSlug }: LoginPageContentProps) {
 export default function LoginPage({ searchParams }: LoginPageProps) {
     return (
         <Suspense fallback={<LoginPageFallback />}>
-            <LoginPageRuntime searchParams={searchParams} />
+            <LoginGate searchParams={searchParams} />
         </Suspense>
     );
 }
 
-async function LoginPageRuntime({ searchParams }: LoginPageProps) {
-    const params = await searchParams;
-    const initialOrgSlug = params.org;
+async function LoginGate({ searchParams }: LoginPageProps) {
+    const headerStore = await nextHeaders();
+    const sessionResult = await getSessionContext(
+        {},
+        {
+            headers: headerStore,
+            requiredPermissions: { organization: ['read'] },
+            auditSource: 'ui:login-redirect',
+        },
+    ).catch(() => null);
+
+    if (sessionResult) {
+        const { authorization } = sessionResult;
+        const membershipSnapshot = await getMembershipRoleSnapshot(
+            authorization.orgId,
+            authorization.userId,
+        );
+        const dashboardRole = membershipSnapshot
+            ? resolveRoleDashboard(membershipSnapshot)
+            : 'employee';
+
+        redirect(ROLE_DASHBOARD_PATHS[dashboardRole]);
+    }
+
+    const initialOrgSlugValue = searchParams?.org;
+    const initialOrgSlug = typeof initialOrgSlugValue === 'string' ? initialOrgSlugValue : undefined;
     return <LoginPageContent initialOrgSlug={initialOrgSlug} />;
 }
 

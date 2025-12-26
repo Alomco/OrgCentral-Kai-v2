@@ -1,5 +1,7 @@
 'use server';
 
+import { z } from 'zod';
+
 import { toActionState, type ActionState } from '@/server/actions/action-state';
 import { authAction } from '@/server/actions/auth-action';
 import { emitHrNotification } from '@/server/use-cases/hr/notifications/notification-emitter';
@@ -8,19 +10,35 @@ import { HR_NOTIFICATION_PRIORITY_VALUES, HR_NOTIFICATION_TYPE_VALUES } from '@/
 const AUDIT_PREFIX = 'action:hr:notifications:emit';
 const RESOURCE_TYPE = 'hr.notifications';
 
-export interface EmitNotificationInput {
-    userId: string;
-    title: string;
-    message: string;
-    type?: (typeof HR_NOTIFICATION_TYPE_VALUES)[number];
-    priority?: (typeof HR_NOTIFICATION_PRIORITY_VALUES)[number];
-    actionUrl?: string | null;
-    metadata?: Record<string, unknown>;
-}
+const emitNotificationInputSchema = z
+    .object({
+        userId: z.string().min(1, { message: 'userId is required' }),
+        title: z.string().min(1, { message: 'title is required' }),
+        message: z.string().min(1, { message: 'message is required' }),
+        type: z
+            .enum(HR_NOTIFICATION_TYPE_VALUES as unknown as [
+                (typeof HR_NOTIFICATION_TYPE_VALUES)[number],
+                ...(typeof HR_NOTIFICATION_TYPE_VALUES)[number][],
+            ])
+            .optional(),
+        priority: z
+            .enum(HR_NOTIFICATION_PRIORITY_VALUES as unknown as [
+                (typeof HR_NOTIFICATION_PRIORITY_VALUES)[number],
+                ...(typeof HR_NOTIFICATION_PRIORITY_VALUES)[number][],
+            ])
+            .optional(),
+        actionUrl: z.string().optional().nullable(),
+        metadata: z.record(z.unknown()).optional(),
+    })
+    .strict();
+
+export type EmitNotificationInput = z.infer<typeof emitNotificationInputSchema>;
 
 export async function emitHrNotificationAction(
     input: unknown,
 ): Promise<ActionState<{ success: true }>> {
+    const parsedForAudit = emitNotificationInputSchema.safeParse(input);
+
     return toActionState(() =>
         authAction(
             {
@@ -29,12 +47,12 @@ export async function emitHrNotificationAction(
                 action: 'create',
                 resourceType: RESOURCE_TYPE,
                 resourceAttributes: {
-                    targetUserId: isRecord(input) ? input.userId : undefined,
-                    type: isRecord(input) ? input.type : undefined,
+                    targetUserId: parsedForAudit.success ? parsedForAudit.data.userId : undefined,
+                    type: parsedForAudit.success ? parsedForAudit.data.type : undefined,
                 },
             },
             async ({ authorization }) => {
-                const shaped = parseInput(input);
+                const shaped = emitNotificationInputSchema.parse(input);
 
                 await emitHrNotification(
                     {},
@@ -56,44 +74,4 @@ export async function emitHrNotificationAction(
             },
         ),
     );
-}
-
-function parseInput(input: unknown): EmitNotificationInput {
-    if (!isRecord(input)) {
-        throw new Error('Invalid notification payload');
-    }
-
-    if (typeof input.userId !== 'string' || input.userId.length === 0) {
-        throw new Error('userId is required');
-    }
-    if (typeof input.title !== 'string' || input.title.length === 0) {
-        throw new Error('title is required');
-    }
-    if (typeof input.message !== 'string' || input.message.length === 0) {
-        throw new Error('message is required');
-    }
-
-    const type = typeof input.type === 'string' ? input.type : undefined;
-    const priority = typeof input.priority === 'string' ? input.priority : undefined;
-
-    if (type && !HR_NOTIFICATION_TYPE_VALUES.includes(type as (typeof HR_NOTIFICATION_TYPE_VALUES)[number])) {
-        throw new Error('Invalid notification type');
-    }
-    if (priority && !HR_NOTIFICATION_PRIORITY_VALUES.includes(priority as (typeof HR_NOTIFICATION_PRIORITY_VALUES)[number])) {
-        throw new Error('Invalid notification priority');
-    }
-
-    return {
-        userId: input.userId,
-        title: input.title,
-        message: input.message,
-        type: type as (typeof HR_NOTIFICATION_TYPE_VALUES)[number] | undefined,
-        priority: priority as (typeof HR_NOTIFICATION_PRIORITY_VALUES)[number] | undefined,
-        actionUrl: typeof input.actionUrl === 'string' ? input.actionUrl : null,
-        metadata: isRecord(input.metadata) ? input.metadata : undefined,
-    };
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-    return typeof value === 'object' && value !== null && !Array.isArray(value);
 }

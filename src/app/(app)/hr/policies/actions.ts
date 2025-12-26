@@ -1,32 +1,54 @@
-import { headers as nextHeaders } from 'next/headers';
-import { redirect } from 'next/navigation';
-import { revalidatePath } from 'next/cache';
+'use server';
 
-import { ValidationError } from '@/server/errors';
+import { headers as nextHeaders } from 'next/headers';
+import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
+
 import { acknowledgeHrPolicyController } from '@/server/api-adapters/hr/policies/acknowledge-hr-policy';
 
-function readRequiredString(formData: FormData, key: string): string {
+import { buildInitialAcknowledgePolicyFormState, type AcknowledgePolicyFormState } from './form-state';
+import { acknowledgePolicyFormValuesSchema } from './schema';
+
+function readFormString(formData: FormData, key: string): string {
     const value = formData.get(key);
-    if (typeof value !== 'string' || value.trim().length === 0) {
-        throw new ValidationError(`${key} is required.`);
-    }
-    return value;
+    return typeof value === 'string' ? value : '';
 }
 
-export async function acknowledgePolicyAction(formData: FormData): Promise<void> {
-    'use server';
+export async function acknowledgePolicyAction(
+    previous: AcknowledgePolicyFormState,
+    formData: FormData,
+): Promise<AcknowledgePolicyFormState> {
     const headerStore = await nextHeaders();
 
-    const policyId = readRequiredString(formData, 'policyId');
-    const version = readRequiredString(formData, 'version');
+    const candidate = {
+        policyId: readFormString(formData, 'policyId'),
+        version: readFormString(formData, 'version'),
+    };
 
-    await acknowledgeHrPolicyController({
-        headers: headerStore,
-        input: { policyId, version },
-        auditSource: 'ui:hr:policies:acknowledge',
-    });
+    const parsed = acknowledgePolicyFormValuesSchema.safeParse(candidate);
+    if (!parsed.success) {
+        return {
+            status: 'error',
+            message: 'Invalid form data.',
+            values: previous.values,
+        };
+    }
 
-    revalidatePath(`/hr/policies/${policyId}`);
-    redirect(`/hr/policies/${policyId}`);
+    try {
+        await acknowledgeHrPolicyController({
+            headers: headerStore,
+            input: { policyId: parsed.data.policyId, version: parsed.data.version },
+            auditSource: 'ui:hr:policies:acknowledge',
+        });
+
+        revalidatePath(`/hr/policies/${parsed.data.policyId}`);
+        redirect(`/hr/policies/${parsed.data.policyId}`);
+    } catch (error) {
+        return {
+            status: 'error',
+            message: error instanceof Error ? error.message : 'Unable to acknowledge policy.',
+            values: buildInitialAcknowledgePolicyFormState(parsed.data).values,
+        };
+    }
 }
 

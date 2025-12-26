@@ -1,7 +1,17 @@
 import { Suspense } from 'react';
 import { headers as nextHeaders } from 'next/headers';
+import Link from 'next/link';
+import { CalendarDays } from 'lucide-react';
 
 import { Skeleton } from '@/components/ui/skeleton';
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbList,
+    BreadcrumbLink,
+    BreadcrumbPage,
+    BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
 import { getPeopleService } from '@/server/services/hr/people/people-service.provider';
 import { getSessionContextOrRedirect } from '@/server/ui/auth/session-redirect';
 
@@ -28,7 +38,7 @@ export default async function HrLeavePage() {
     const headerStore = await nextHeaders();
     const { authorization } = await getSessionContextOrRedirect({}, {
         headers: headerStore,
-        requiredPermissions: { organization: ['read'] },
+        requiredPermissions: { employeeProfile: ['read'] },
         auditSource: 'ui:hr:leave',
     });
 
@@ -52,11 +62,26 @@ export default async function HrLeavePage() {
 
     return (
         <div className="space-y-6">
+            <Breadcrumb>
+                <BreadcrumbList>
+                    <BreadcrumbItem>
+                        <BreadcrumbLink asChild>
+                            <Link href="/hr">HR</Link>
+                        </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                        <BreadcrumbPage>Leave</BreadcrumbPage>
+                    </BreadcrumbItem>
+                </BreadcrumbList>
+            </Breadcrumb>
+
             <HrPageHeader
                 title="Leave"
                 description={profile?.displayName
                     ? `Request leave for ${profile.displayName}.`
                     : 'Request leave and view recent submissions.'}
+                icon={<CalendarDays className="h-5 w-5" />}
             />
 
             <div className="grid gap-6 lg:grid-cols-2">
@@ -69,4 +94,3 @@ export default async function HrLeavePage() {
         </div>
     );
 }
-

@@ -39,3 +39,31 @@ export const listComplianceItemsQuerySchema = z.object({
 });
 
 export type ListComplianceItemsQuery = z.infer<typeof listComplianceItemsQuerySchema>;
+
+export const listComplianceItemsGroupedQuerySchema = listComplianceItemsQuerySchema;
+
+export type ListComplianceItemsGroupedQuery = z.infer<typeof listComplianceItemsGroupedQuerySchema>;
+
+export const listPendingReviewComplianceItemsQuerySchema = z.object({
+    take: z.coerce.number().int().min(1).max(500).optional(),
+});
+
+export type ListPendingReviewComplianceItemsQuery = z.infer<typeof listPendingReviewComplianceItemsQuerySchema>;
+
+export const seedComplianceTemplatesQuerySchema = z.object({
+    force: z
+        .union([z.literal('1'), z.literal('true'), z.literal('0'), z.literal('false')])
+        .optional()
+        .transform((value) => (value ? value === '1' || value === 'true' : undefined)),
+});
+
+export type SeedComplianceTemplatesQuery = z.infer<typeof seedComplianceTemplatesQuerySchema>;
+
+export const upsertComplianceCategorySchema = z.object({
+    key: z.string().min(1).max(64),
+    label: z.string().min(1).max(80),
+    sortOrder: z.coerce.number().int().min(0).max(10000).optional(),
+    metadata: z.unknown().optional(),
+});
+
+export type UpsertComplianceCategoryPayload = z.infer<typeof upsertComplianceCategorySchema>;

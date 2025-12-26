@@ -1,28 +1,19 @@
 import type { ReactNode } from 'react';
 
-import { getTenantTheme } from '@/server/theme/get-tenant-theme';
-import type { ThemeTokenKey, ThemeTokenMap } from '@/server/theme/tokens';
+import { getTenantTheme, getTenantThemeWithContext, type TenantThemeCacheContext } from '@/server/theme/get-tenant-theme';
+import { themeTokenKeys, type ThemeTokenKey, type ThemeTokenMap } from '@/server/theme/tokens';
 
 export interface TenantThemeRegistryProps {
     orgId?: string | null;
+    cacheContext?: TenantThemeCacheContext;
     children?: ReactNode;
 }
 
-const tenantOverrideKeys = [
-    'primary',
-    'primary-foreground',
-    'accent',
-    'accent-foreground',
-    'sidebar',
-    'sidebar-background',
-    'sidebar-foreground',
-    'sidebar-primary',
-    'sidebar-primary-foreground',
-    'sidebar-accent',
-    'sidebar-accent-foreground',
-    'sidebar-border',
-    'sidebar-ring',
-] as const satisfies readonly ThemeTokenKey[];
+/**
+ * All theme tokens that can be customized per tenant.
+ * Using the full list from themeTokenKeys for complete customization.
+ */
+const tenantOverrideKeys = themeTokenKeys;
 
 function buildCssVariables(tokens: ThemeTokenMap, keys: readonly ThemeTokenKey[]): string {
     return keys
@@ -30,8 +21,20 @@ function buildCssVariables(tokens: ThemeTokenMap, keys: readonly ThemeTokenKey[]
         .join(' ');
 }
 
-export async function TenantThemeRegistry({ orgId, children }: TenantThemeRegistryProps) {
-    const theme = await getTenantTheme(orgId);
+/**
+ * Server Component that injects tenant-specific theme CSS variables.
+ * This enables per-organization color theming throughout the app.
+ */
+export async function TenantThemeRegistry({
+    orgId,
+    cacheContext,
+    children,
+}: TenantThemeRegistryProps) {
+    const theme = cacheContext
+        ? await getTenantThemeWithContext(orgId, cacheContext)
+        : await getTenantTheme(orgId);
+
+    const resolvedOrgId = orgId ?? 'default';
 
     const cssVariables = buildCssVariables(theme.tokens, tenantOverrideKeys);
 
@@ -39,9 +42,21 @@ export async function TenantThemeRegistry({ orgId, children }: TenantThemeRegist
         <>
             <style
                 suppressHydrationWarning
-                dangerouslySetInnerHTML={{ __html: `:root { ${cssVariables} } .dark { ${cssVariables} }` }}
+                dangerouslySetInnerHTML={{
+                    __html: `:root { ${cssVariables} } .dark { ${cssVariables} }`,
+                }}
+            />
+            <script
+                suppressHydrationWarning
+                // Expose the resolved org scope to client code (e.g., local preview overrides).
+                dangerouslySetInnerHTML={{
+                    __html: `(() => { try { const root = document.documentElement; const nextOrgId = ${JSON.stringify(
+                        resolvedOrgId,
+                    )}; if (root.dataset.orgId !== nextOrgId) { root.dataset.orgId = nextOrgId; window.dispatchEvent(new Event('orgcentral-org-scope-change')); } } catch {} })();`,
+                }}
             />
             {children}
         </>
     );
 }
+

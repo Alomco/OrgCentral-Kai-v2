@@ -1,66 +1,73 @@
 import Link from 'next/link';
+import { Briefcase } from 'lucide-react';
 
-import { Badge } from '@/components/ui/badge';
 import type { OrgPermissionMap } from '@/server/security/access-control';
 import { hasPermission } from '@/lib/security/permission-check';
 
+import { HrNavigationLinks, HrUserInfo } from './hr-navigation-links';
+
 const HR_NAVIGATION_ITEMS = [
     { href: '/hr/dashboard', label: 'Dashboard', audience: 'member' },
-    { href: '/hr/profile', label: 'My profile', audience: 'member' },
-    { href: '/hr/policies', label: 'Policies', audience: 'member' },
+    { href: '/hr/profile', label: 'My Profile', audience: 'member' },
     { href: '/hr/leave', label: 'Leave', audience: 'member' },
     { href: '/hr/absences', label: 'Absences', audience: 'member' },
+    { href: '/hr/time-tracking', label: 'Time', audience: 'member' },
+    { href: '/hr/training', label: 'Training', audience: 'member' },
+    { href: '/hr/performance', label: 'Performance', audience: 'member' },
+    { href: '/hr/policies', label: 'Policies', audience: 'member' },
     { href: '/hr/compliance', label: 'Compliance', audience: 'compliance' },
     { href: '/hr/employees', label: 'Employees', audience: 'admin' },
-    { href: '/hr/onboarding', label: 'Onboarding', audience: 'admin' },
+    { href: '/hr/onboarding', label: 'Onboarding', audience: 'onboarding' },
     { href: '/hr/settings', label: 'Settings', audience: 'admin' },
-    { href: '/hr/admin', label: 'Admin', audience: 'admin' },
 ] as const;
 
 type HrNavigationAudience = (typeof HR_NAVIGATION_ITEMS)[number]['audience'];
 
 function canAccessNavItem(permissions: OrgPermissionMap, audience: HrNavigationAudience): boolean {
     if (audience === 'member') {
-        return hasPermission(permissions, 'organization', 'read');
+        return hasPermission(permissions, 'employeeProfile', 'read') || hasPermission(permissions, 'organization', 'update');
     }
     if (audience === 'compliance') {
         return hasPermission(permissions, 'audit', 'read') || hasPermission(permissions, 'residency', 'enforce');
+    }
+    if (audience === 'onboarding') {
+        return hasPermission(permissions, 'member', 'invite') || hasPermission(permissions, 'organization', 'update');
     }
     return hasPermission(permissions, 'organization', 'update');
 }
 
 export function HrNavigation(props: {
     organizationId: string;
+    organizationLabel: string | null;
     userEmail: string | null;
     roleKey: string;
     permissions: OrgPermissionMap;
 }) {
+    const items = HR_NAVIGATION_ITEMS
+        .filter((item) => canAccessNavItem(props.permissions, item.audience))
+        .map((item) => ({ href: item.href, label: item.label }));
+
     return (
-        <header className="border-b bg-background">
-            <div className="mx-auto flex w-full max-w-6xl flex-col gap-3 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex items-center gap-4">
-                    <Link className="text-base font-semibold" href="/hr/dashboard">
-                        HR
+        <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+            <div className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between gap-4 px-6">
+                {/* Left: Logo and Nav */}
+                <div className="flex items-center gap-6">
+                    <Link
+                        href="/hr/dashboard"
+                        className="flex items-center gap-2 font-semibold text-foreground hover:text-primary transition-colors"
+                    >
+                        <Briefcase className="h-5 w-5" />
+                        <span className="hidden sm:inline">HR</span>
                     </Link>
-                    <nav className="flex items-center gap-3">
-                        {HR_NAVIGATION_ITEMS.filter((item) => canAccessNavItem(props.permissions, item.audience)).map(
-                            (item) => (
-                                <Link
-                                    key={item.href}
-                                    href={item.href}
-                                    className="text-sm font-medium text-muted-foreground hover:text-foreground"
-                                >
-                                    {item.label}
-                                </Link>
-                            ),
-                        )}
-                    </nav>
+                    <HrNavigationLinks items={items} />
                 </div>
-                <div className="flex flex-wrap items-center gap-2">
-                    <Badge variant="secondary">Org {props.organizationId}</Badge>
-                    <Badge variant="outline">{props.roleKey}</Badge>
-                    {props.userEmail ? <Badge variant="outline">{props.userEmail}</Badge> : null}
-                </div>
+
+                {/* Right: User Info */}
+                <HrUserInfo
+                    organizationLabel={props.organizationLabel}
+                    userEmail={props.userEmail}
+                    roleKey={props.roleKey}
+                />
             </div>
         </header>
     );

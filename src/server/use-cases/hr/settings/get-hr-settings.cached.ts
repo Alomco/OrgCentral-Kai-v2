@@ -1,5 +1,6 @@
 import { cacheLife, unstable_noStore as noStore } from 'next/cache';
 
+import { toCacheSafeAuthorizationContext } from '@/server/repositories/security/cache-authorization';
 import type { IHRSettingsRepository } from '@/server/repositories/contracts/hr/settings/hr-settings-repository-contract';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
 import type { HRSettings } from '@/server/types/hr-ops-types';
@@ -46,5 +47,8 @@ export async function getHrSettingsForUi(input: GetHrSettingsCachedInput): Promi
         return { settings: result.settings };
     }
 
-    return getHrSettingsCached(input);
+    return getHrSettingsCached({
+        ...input,
+        authorization: toCacheSafeAuthorizationContext(input.authorization),
+    });
 }

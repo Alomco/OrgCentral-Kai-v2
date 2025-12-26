@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 
 import { DevelopmentSecurityWidget } from "@/components/dev/DevelopmentSecurityWidget";
 import { TenantThemeRegistry } from "@/components/theme/tenant-theme-registry";
+import { ThemeProvider } from "@/components/theme/theme-provider";
 import { Providers } from "./providers";
 import "./globals.css";
 
@@ -30,8 +31,10 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <Providers>
-          {process.env.NODE_ENV === "development" ? <DevelopmentSecurityWidget /> : null}
-          <TenantThemeRegistry orgId={null}>{children}</TenantThemeRegistry>
+          <ThemeProvider>
+            {process.env.NODE_ENV === "development" ? <DevelopmentSecurityWidget /> : null}
+            <TenantThemeRegistry orgId={null}>{children}</TenantThemeRegistry>
+          </ThemeProvider>
         </Providers>
       </body>
     </html>

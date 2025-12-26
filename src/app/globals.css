@@ -637,4 +637,65 @@
       0 12px 24px -4px hsl(262, 50%, 15%),
       0 20px 40px -8px hsl(262, 40%, 10%);
   }
+
+  /* 🌈 Theme-aware Gradient Text - Uses CSS variables for tenant theming */
+  .text-gradient-theme {
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* ✨ Animated Gradient Shift - For dynamic headers */
+  @keyframes gradient-shift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  /* 🔮 Theme-aware Glow Effects */
+  .glow-theme {
+    box-shadow: 0 0 20px hsl(var(--primary) / 0.4);
+  }
+
+  .glow-theme-accent {
+    box-shadow: 0 0 20px hsl(var(--accent) / 0.4);
+  }
+
+  /* 🌟 Futuristic Border Glow */
+  .border-glow {
+    position: relative;
+    border: 1px solid transparent;
+    background: linear-gradient(hsl(var(--card)), hsl(var(--card))) padding-box,
+                linear-gradient(135deg, hsl(var(--primary) / 0.5), hsl(var(--accent) / 0.5)) border-box;
+  }
+
+  /* 💫 Pulse Animation for Interactive Elements */
+  @keyframes pulse-theme {
+    0%, 100% { 
+      box-shadow: 0 0 0 0 hsl(var(--primary) / 0.4);
+    }
+    50% { 
+      box-shadow: 0 0 0 8px hsl(var(--primary) / 0);
+    }
+  }
+
+  .animate-pulse-theme {
+    animation: pulse-theme 2s ease-in-out infinite;
+  }
+
+  /* 🎯 Theme-aware Focus Ring */
+  .focus-ring-theme:focus-visible {
+    outline: 2px solid hsl(var(--primary));
+    outline-offset: 2px;
+  }
+
+  /* 🌊 Gradient Background - Theme-aware */
+  .bg-gradient-theme {
+    background: linear-gradient(135deg, hsl(var(--primary) / 0.1) 0%, hsl(var(--accent) / 0.1) 100%);
+  }
+
+  .bg-gradient-theme-solid {
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%);
+  }
 }

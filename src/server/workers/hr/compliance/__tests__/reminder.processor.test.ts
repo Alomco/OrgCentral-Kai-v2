@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { randomUUID } from 'node:crypto';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
 import type { IComplianceItemRepository } from '@/server/repositories/contracts/hr/compliance/compliance-item-repository-contract';
+import type { IComplianceTemplateRepository } from '@/server/repositories/contracts/hr/compliance/compliance-template-repository-contract';
 import type { HrNotificationServiceContract } from '@/server/services/hr/notifications/hr-notification-service.provider';
 import type { NotificationDispatchContract } from '@/server/services/notifications/notification-service.provider';
 import { ComplianceReminderProcessor } from '../reminder.processor';
@@ -30,6 +31,7 @@ function createAuthorization(): RepositoryAuthorizationContext {
 
 describe('ComplianceReminderProcessor', () => {
     let complianceRepository: Pick<IComplianceItemRepository, 'findExpiringItemsForOrg'>;
+    let templateRepository: Pick<IComplianceTemplateRepository, 'listTemplates'>;
     let notificationService: HrNotificationServiceContract;
     let notificationDispatcher: NotificationDispatchContract;
     let processor: ComplianceReminderProcessor;
@@ -37,6 +39,9 @@ describe('ComplianceReminderProcessor', () => {
     beforeEach(() => {
         complianceRepository = {
             findExpiringItemsForOrg: vi.fn(),
+        };
+        templateRepository = {
+            listTemplates: vi.fn().mockResolvedValue([]),
         };
         notificationService = {
             createNotification: vi.fn().mockResolvedValue({ notification: { id: 'notif-1' } }) as never,
@@ -50,6 +55,7 @@ describe('ComplianceReminderProcessor', () => {
         };
         processor = new ComplianceReminderProcessor({
             complianceItemRepository: complianceRepository as IComplianceItemRepository,
+            complianceTemplateRepository: templateRepository as IComplianceTemplateRepository,
             notificationService,
             notificationDispatcher,
         });
@@ -118,5 +124,86 @@ describe('ComplianceReminderProcessor', () => {
         expect(notificationDispatcher.dispatchNotification).toHaveBeenCalledTimes(1);
         const call = (notificationService.createNotification as ReturnType<typeof vi.fn>).mock.calls[0]?.[0];
         expect(call?.notification.userId).toBe(userTwoId);
+    });
+
+    it('uses template reminderDaysBeforeExpiry to expand scan window and filter items', async () => {
+        const referenceDate = new Date('2025-01-01T00:00:00Z');
+        const userId = randomUUID();
+        const templateItemId = 'doc-right-to-work';
+
+        (templateRepository.listTemplates as ReturnType<typeof vi.fn>).mockResolvedValueOnce([
+            {
+                id: 'template-1',
+                orgId: 'org-123',
+                name: 'Pack',
+                items: [
+                    {
+                        id: templateItemId,
+                        name: 'Right to work',
+                        type: 'DOCUMENT',
+                        isMandatory: true,
+                        reminderDaysBeforeExpiry: 10,
+                    },
+                ],
+                createdAt: referenceDate,
+                updatedAt: referenceDate,
+            },
+        ]);
+
+        const itemDueInTen = createComplianceItem({
+            userId,
+            templateItemId,
+            dueDate: new Date('2025-01-11T00:00:00Z'),
+        });
+
+        (complianceRepository.findExpiringItemsForOrg as ReturnType<typeof vi.fn>).mockResolvedValueOnce([itemDueInTen]);
+
+        const authorization = createAuthorization();
+        const result = await processor.process({ daysUntilExpiry: 7, referenceDate }, authorization);
+
+        expect(result).toEqual({ remindersSent: 1, usersTargeted: 1 });
+        expect(complianceRepository.findExpiringItemsForOrg).toHaveBeenCalledWith(
+            authorization.orgId,
+            referenceDate,
+            10,
+        );
+    });
+
+    it('does not notify items without template rules beyond fallback window', async () => {
+        const referenceDate = new Date('2025-01-01T00:00:00Z');
+        const userId = randomUUID();
+
+        (templateRepository.listTemplates as ReturnType<typeof vi.fn>).mockResolvedValueOnce([
+            {
+                id: 'template-1',
+                orgId: 'org-123',
+                name: 'Pack',
+                items: [
+                    {
+                        id: 'some-other-item',
+                        name: 'Other',
+                        type: 'DOCUMENT',
+                        isMandatory: true,
+                        reminderDaysBeforeExpiry: 30,
+                    },
+                ],
+                createdAt: referenceDate,
+                updatedAt: referenceDate,
+            },
+        ]);
+
+        const noRuleItem = createComplianceItem({
+            userId,
+            templateItemId: 'no-rule-item',
+            dueDate: new Date('2025-01-10T00:00:00Z'), // 9 days out
+        });
+
+        (complianceRepository.findExpiringItemsForOrg as ReturnType<typeof vi.fn>).mockResolvedValueOnce([noRuleItem]);
+
+        const authorization = createAuthorization();
+        const result = await processor.process({ daysUntilExpiry: 7, referenceDate }, authorization);
+
+        expect(result).toEqual({ remindersSent: 0, usersTargeted: 0 });
+        expect(notificationService.createNotification).not.toHaveBeenCalled();
     });
 });

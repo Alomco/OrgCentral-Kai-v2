@@ -2,6 +2,7 @@ import type { WorkerOptions } from 'bullmq';
 import { AbstractOrgWorker } from '@/server/workers/abstract-org-worker';
 import { WORKER_QUEUE_NAMES } from '@/server/workers/constants';
 import { PrismaComplianceItemRepository } from '@/server/repositories/prisma/hr/compliance/prisma-compliance-item-repository';
+import { PrismaComplianceTemplateRepository } from '@/server/repositories/prisma/hr/compliance/prisma-compliance-template-repository';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
 import {
     complianceReminderEnvelopeSchema,
@@ -28,6 +29,7 @@ export class ComplianceReminderWorker extends AbstractOrgWorker<ComplianceRemind
         this.processor = options?.processor ??
             new ComplianceReminderProcessor({
                 complianceItemRepository: new PrismaComplianceItemRepository(),
+                complianceTemplateRepository: new PrismaComplianceTemplateRepository(),
                 notificationDispatcher: getNotificationService(),
             });
     }

@@ -1,78 +1,33 @@
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
 import type { ServiceExecutionContext } from '@/server/services/abstract-base-service';
 import { AbstractHrService } from '@/server/services/hr/abstract-hr-service';
+import type { AcknowledgeUnplannedAbsenceDependencies, AcknowledgeUnplannedAbsenceInput, AcknowledgeUnplannedAbsenceResult } from '@/server/use-cases/hr/absences/acknowledge-unplanned-absence';
+import type { AddAbsenceAttachmentsDependencies, AddAbsenceAttachmentsInput, AddAbsenceAttachmentsResult } from '@/server/use-cases/hr/absences/add-absence-attachments';
+import type { CancelUnplannedAbsenceDependencies, CancelUnplannedAbsenceInput, CancelUnplannedAbsenceResult } from '@/server/use-cases/hr/absences/cancel-unplanned-absence';
+import type { RemoveAbsenceAttachmentDependencies, RemoveAbsenceAttachmentInput, RemoveAbsenceAttachmentResult } from '@/server/use-cases/hr/absences/remove-absence-attachment';
+import type { ReportUnplannedAbsenceDependencies, ReportUnplannedAbsenceInput, ReportUnplannedAbsenceResult } from '@/server/use-cases/hr/absences/report-unplanned-absence';
+import type { ApproveUnplannedAbsenceDependencies, ApproveUnplannedAbsenceInput, ApproveUnplannedAbsenceResult } from '@/server/use-cases/hr/absences/approve-unplanned-absence';
+import type { UpdateUnplannedAbsenceDependencies, UpdateUnplannedAbsenceInput, UpdateUnplannedAbsenceResult } from '@/server/use-cases/hr/absences/update-unplanned-absence';
+import type { RecordReturnToWorkDependencies, RecordReturnToWorkInput, RecordReturnToWorkResult } from '@/server/use-cases/hr/absences/record-return-to-work';
+import type { DeleteUnplannedAbsenceDependencies, DeleteUnplannedAbsenceInput, DeleteUnplannedAbsenceResult } from '@/server/use-cases/hr/absences/delete-unplanned-absence';
+import type { GetAbsencesDependencies, GetAbsencesInput, GetAbsencesResult } from '@/server/use-cases/hr/absences/get-absences';
+import type { UpdateAbsenceSettingsDependencies, UpdateAbsenceSettingsInput, UpdateAbsenceSettingsResult } from '@/server/use-cases/hr/absences/update-absence-settings';
+import type { AnalyzeAbsenceAttachmentDependencies, AnalyzeAbsenceAttachmentInput } from '@/server/use-cases/hr/absences/analyze-absence-attachment';
 import {
-    acknowledgeUnplannedAbsence,
-    type AcknowledgeUnplannedAbsenceDependencies,
-    type AcknowledgeUnplannedAbsenceInput,
-    type AcknowledgeUnplannedAbsenceResult,
-} from '@/server/use-cases/hr/absences/acknowledge-unplanned-absence';
-import {
-    addAbsenceAttachments,
-    type AddAbsenceAttachmentsDependencies,
-    type AddAbsenceAttachmentsInput,
-    type AddAbsenceAttachmentsResult,
-} from '@/server/use-cases/hr/absences/add-absence-attachments';
-import {
-    cancelUnplannedAbsence,
-    type CancelUnplannedAbsenceDependencies,
-    type CancelUnplannedAbsenceInput,
-    type CancelUnplannedAbsenceResult,
-} from '@/server/use-cases/hr/absences/cancel-unplanned-absence';
-import {
-    removeAbsenceAttachment,
-    type RemoveAbsenceAttachmentDependencies,
-    type RemoveAbsenceAttachmentInput,
-    type RemoveAbsenceAttachmentResult,
-} from '@/server/use-cases/hr/absences/remove-absence-attachment';
-import {
-    reportUnplannedAbsence,
-    type ReportUnplannedAbsenceDependencies,
-    type ReportUnplannedAbsenceInput,
-    type ReportUnplannedAbsenceResult,
-} from '@/server/use-cases/hr/absences/report-unplanned-absence';
-import {
-    approveUnplannedAbsence,
-    type ApproveUnplannedAbsenceDependencies,
-    type ApproveUnplannedAbsenceInput,
-    type ApproveUnplannedAbsenceResult,
-} from '@/server/use-cases/hr/absences/approve-unplanned-absence';
-import {
-    updateUnplannedAbsence,
-    type UpdateUnplannedAbsenceDependencies,
-    type UpdateUnplannedAbsenceInput,
-    type UpdateUnplannedAbsenceResult,
-} from '@/server/use-cases/hr/absences/update-unplanned-absence';
-import {
-    recordReturnToWork,
-    type RecordReturnToWorkDependencies,
-    type RecordReturnToWorkInput,
-    type RecordReturnToWorkResult,
-} from '@/server/use-cases/hr/absences/record-return-to-work';
-import {
-    deleteUnplannedAbsence,
-    type DeleteUnplannedAbsenceDependencies,
-    type DeleteUnplannedAbsenceInput,
-    type DeleteUnplannedAbsenceResult,
-} from '@/server/use-cases/hr/absences/delete-unplanned-absence';
-import {
-    getAbsences,
-    type GetAbsencesDependencies,
-    type GetAbsencesInput,
-    type GetAbsencesResult,
-} from '@/server/use-cases/hr/absences/get-absences';
-import {
-    updateAbsenceSettings,
-    type UpdateAbsenceSettingsDependencies,
-    type UpdateAbsenceSettingsInput,
-    type UpdateAbsenceSettingsResult,
-} from '@/server/use-cases/hr/absences/update-absence-settings';
-import {
-    analyzeAbsenceAttachment,
-    type AnalyzeAbsenceAttachmentDependencies,
-    type AnalyzeAbsenceAttachmentInput,
-} from '@/server/use-cases/hr/absences/analyze-absence-attachment';
-import { HR_ACTION, HR_RESOURCE } from '@/server/security/authorization/hr-resource-registry';
+    handleAcknowledgeAbsence,
+    handleAddAttachments,
+    handleAnalyzeAttachment,
+    handleApproveAbsence,
+    handleCancelAbsence,
+    handleDeleteAbsence,
+    handleListAbsences,
+    handleRecordReturnToWork,
+    handleRemoveAttachment,
+    handleReportAbsence,
+    handleUpdateAbsence,
+    handleUpdateSettings,
+    type AbsenceServiceRuntime,
+} from './absence-service.operations';
 
 export type AbsenceServiceDependencies = AcknowledgeUnplannedAbsenceDependencies &
     AddAbsenceAttachmentsDependencies &
@@ -88,186 +43,65 @@ export type AbsenceServiceDependencies = AcknowledgeUnplannedAbsenceDependencies
     AnalyzeAbsenceAttachmentDependencies;
 
 export class AbsenceService extends AbstractHrService {
+    private readonly runtime: AbsenceServiceRuntime;
+
     constructor(private readonly dependencies: AbsenceServiceDependencies) {
         super();
+        this.runtime = {
+            dependencies: this.dependencies,
+            ensureOrgAccess: this.ensureOrgAccess.bind(this),
+            runOperation: this.runOperation.bind(this),
+        };
     }
 
     async listAbsences(input: GetAbsencesInput): Promise<GetAbsencesResult> {
-        await this.ensureOrgAccess(input.authorization, {
-            action: HR_ACTION.READ,
-            resourceType: HR_RESOURCE.HR_ABSENCE,
-            resourceAttributes: { filters: input.filters },
-        });
-        const filtersMetadata = input.filters
-            ? {
-                ...input.filters,
-                from: input.filters.from?.toISOString(),
-                to: input.filters.to?.toISOString(),
-            }
-            : undefined;
-
-        return this.runOperation(
-            'hr.absences.list',
-            input.authorization,
-            filtersMetadata ? { filters: filtersMetadata } : undefined,
-            () => getAbsences(this.dependencies, input),
-        );
+        return handleListAbsences(this.runtime, input);
     }
 
     async reportAbsence(input: ReportUnplannedAbsenceInput): Promise<ReportUnplannedAbsenceResult> {
-        await this.ensureOrgAccess(input.authorization, {
-            action: HR_ACTION.CREATE,
-            resourceType: HR_RESOURCE.HR_ABSENCE,
-            resourceAttributes: { targetUserId: input.payload.userId, reason: input.payload.reason ?? null },
-        });
-        return this.runOperation(
-            'hr.absences.report',
-            input.authorization,
-            { targetUserId: input.payload.userId },
-            () => reportUnplannedAbsence(this.dependencies, input),
-        );
+        return handleReportAbsence(this.runtime, input);
     }
 
     async approveAbsence(input: ApproveUnplannedAbsenceInput): Promise<ApproveUnplannedAbsenceResult> {
-        await this.ensureOrgAccess(input.authorization, {
-            action: HR_ACTION.APPROVE,
-            resourceType: HR_RESOURCE.HR_ABSENCE,
-            resourceAttributes: { absenceId: input.absenceId, decision: input.payload.status ?? 'APPROVED' },
-        });
-        const decision = input.payload.status ?? 'APPROVED';
-        return this.runOperation(
-            'hr.absences.approve',
-            input.authorization,
-            {
-                absenceId: input.absenceId,
-                decision,
-            },
-            () => approveUnplannedAbsence(this.dependencies, input),
-        );
+        return handleApproveAbsence(this.runtime, input);
     }
 
     async updateAbsence(input: UpdateUnplannedAbsenceInput): Promise<UpdateUnplannedAbsenceResult> {
-        await this.ensureOrgAccess(input.authorization, {
-            action: HR_ACTION.UPDATE,
-            resourceType: HR_RESOURCE.HR_ABSENCE,
-            resourceAttributes: { absenceId: input.absenceId },
-        });
-        return this.runOperation(
-            'hr.absences.update',
-            input.authorization,
-            { absenceId: input.absenceId },
-            () => updateUnplannedAbsence(this.dependencies, input),
-        );
+        return handleUpdateAbsence(this.runtime, input);
     }
 
     async addAttachments(input: AddAbsenceAttachmentsInput): Promise<AddAbsenceAttachmentsResult> {
-        await this.ensureOrgAccess(input.authorization, {
-            action: HR_ACTION.UPDATE,
-            resourceType: HR_RESOURCE.HR_ABSENCE,
-            resourceAttributes: { absenceId: input.absenceId, attachmentCount: input.payload.attachments.length },
-        });
-        return this.runOperation(
-            'hr.absences.attachments.add',
-            input.authorization,
-            {
-                absenceId: input.absenceId,
-                attachmentCount: input.payload.attachments.length,
-            },
-            () => addAbsenceAttachments(this.dependencies, input),
-        );
+        return handleAddAttachments(this.runtime, input);
     }
 
     async removeAttachment(
         input: RemoveAbsenceAttachmentInput,
     ): Promise<RemoveAbsenceAttachmentResult> {
-        await this.ensureOrgAccess(input.authorization, {
-            action: HR_ACTION.UPDATE,
-            resourceType: HR_RESOURCE.HR_ABSENCE,
-            resourceAttributes: { absenceId: input.absenceId, attachmentId: input.payload.attachmentId },
-        });
-        return this.runOperation(
-            'hr.absences.attachments.remove',
-            input.authorization,
-            {
-                absenceId: input.absenceId,
-                attachmentId: input.payload.attachmentId,
-            },
-            () => removeAbsenceAttachment(this.dependencies, input),
-        );
+        return handleRemoveAttachment(this.runtime, input);
     }
 
     async recordReturnToWork(input: RecordReturnToWorkInput): Promise<RecordReturnToWorkResult> {
-        await this.ensureOrgAccess(input.authorization, {
-            action: HR_ACTION.UPDATE,
-            resourceType: HR_RESOURCE.HR_ABSENCE,
-            resourceAttributes: { absenceId: input.absenceId, returnDate: input.payload.returnDate },
-        });
-        return this.runOperation(
-            'hr.absences.return-to-work.record',
-            input.authorization,
-            {
-                absenceId: input.absenceId,
-                returnDate: input.payload.returnDate.toISOString(),
-            },
-            () => recordReturnToWork(this.dependencies, input),
-        );
+        return handleRecordReturnToWork(this.runtime, input);
     }
 
     async deleteAbsence(input: DeleteUnplannedAbsenceInput): Promise<DeleteUnplannedAbsenceResult> {
-        await this.ensureOrgAccess(input.authorization, {
-            action: HR_ACTION.DELETE,
-            resourceType: HR_RESOURCE.HR_ABSENCE,
-            resourceAttributes: { absenceId: input.absenceId },
-        });
-        return this.runOperation(
-            'hr.absences.delete',
-            input.authorization,
-            { absenceId: input.absenceId },
-            () => deleteUnplannedAbsence(this.dependencies, input),
-        );
+        return handleDeleteAbsence(this.runtime, input);
     }
 
     async acknowledgeAbsence(input: AcknowledgeUnplannedAbsenceInput): Promise<AcknowledgeUnplannedAbsenceResult> {
-        await this.ensureOrgAccess(input.authorization, {
-            action: HR_ACTION.ACKNOWLEDGE,
-            resourceType: HR_RESOURCE.HR_ABSENCE,
-            resourceAttributes: { absenceId: input.absenceId },
-        });
-        return this.runOperation('hr.absences.acknowledge', input.authorization, { absenceId: input.absenceId }, () =>
-            acknowledgeUnplannedAbsence(this.dependencies, input),
-        );
+        return handleAcknowledgeAbsence(this.runtime, input);
     }
 
     async cancelAbsence(input: CancelUnplannedAbsenceInput): Promise<CancelUnplannedAbsenceResult> {
-        await this.ensureOrgAccess(input.authorization, {
-            action: HR_ACTION.CANCEL,
-            resourceType: HR_RESOURCE.HR_ABSENCE,
-            resourceAttributes: { absenceId: input.absenceId },
-        });
-        return this.runOperation('hr.absences.cancel', input.authorization, { absenceId: input.absenceId }, () =>
-            cancelUnplannedAbsence(this.dependencies, input),
-        );
+        return handleCancelAbsence(this.runtime, input);
     }
 
     async updateSettings(input: UpdateAbsenceSettingsInput): Promise<UpdateAbsenceSettingsResult> {
-        await this.ensureOrgAccess(input.authorization, {
-            action: HR_ACTION.UPDATE,
-            resourceType: HR_RESOURCE.HR_ABSENCE_SETTINGS,
-        });
-        return this.runOperation('hr.absences.settings.update', input.authorization, undefined, () =>
-            updateAbsenceSettings(this.dependencies, input),
-        );
+        return handleUpdateSettings(this.runtime, input);
     }
 
     async analyzeAttachment(input: AnalyzeAbsenceAttachmentInput) {
-        await this.ensureOrgAccess(input.authorization, {
-            action: HR_ACTION.READ,
-            resourceType: HR_RESOURCE.HR_ABSENCE_AI_VALIDATION,
-            resourceAttributes: { absenceId: input.absenceId },
-        });
-        return this.runOperation('hr.absences.attachments.analyze', input.authorization, { absenceId: input.absenceId }, () =>
-            analyzeAbsenceAttachment(this.dependencies, input),
-        );
+        return handleAnalyzeAttachment(this.runtime, input);
     }
 
     private runOperation<TResult>(

@@ -12,7 +12,7 @@ const AUDIT_SOURCE = 'api:org:roles';
 const ORG_ID_REQUIRED_MESSAGE = 'Organization id is required.';
 const ROLE_ID_REQUIRED_MESSAGE = 'Role id is required.';
 
-const permissionsSchema = z.record(z.string(), z.any()).optional();
+const permissionsSchema = z.record(z.string(), z.array(z.string().min(1))).optional();
 
 const createRoleSchema = z.object({
   name: z.string().min(1),
@@ -126,6 +126,7 @@ export async function updateRoleController(request: Request, orgId: string, role
 
   const body = await readJson(request);
   const input = updateRoleSchema.parse(body);
+  const updateKeys = Object.keys(input);
 
   const { authorization } = await getSessionContext(
     {},
@@ -136,7 +137,7 @@ export async function updateRoleController(request: Request, orgId: string, role
       auditSource: AUDIT_SOURCE,
       action: 'org.role.update',
       resourceType: ROLE_RESOURCE_TYPE,
-      resourceAttributes: { roleId: normalizedRoleId, updateKeys: Object.keys(body ?? {}) },
+      resourceAttributes: { roleId: normalizedRoleId, updateKeys },
     },
   );
 

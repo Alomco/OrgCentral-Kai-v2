@@ -1,0 +1,41 @@
+import { z } from 'zod';
+import { CONTRACT_TYPE_VALUES } from './hr/people';
+import { DATA_CLASSIFICATION_LEVELS, DATA_RESIDENCY_ZONES } from './tenant';
+import { dateInputSchema, jsonValueSchema } from './hr-people-schemas.shared';
+
+export const employmentContractSchema = z.object({
+  id: z.uuid(),
+  orgId: z.uuid(),
+  userId: z.uuid(),
+  contractType: z.enum(CONTRACT_TYPE_VALUES),
+  startDate: dateInputSchema,
+  endDate: dateInputSchema.nullable().optional(),
+  jobTitle: z.string(),
+  departmentId: z.uuid().nullable().optional(),
+  location: z.string().nullable().optional(),
+  probationEndDate: dateInputSchema.nullable().optional(),
+  furloughStartDate: dateInputSchema.nullable().optional(),
+  furloughEndDate: dateInputSchema.nullable().optional(),
+  workingPattern: jsonValueSchema.optional(),
+  benefits: jsonValueSchema.optional(),
+  terminationReason: z.string().nullable().optional(),
+  terminationNotes: z.string().nullable().optional(),
+  archivedAt: dateInputSchema.nullable().optional(),
+  deletedAt: dateInputSchema.nullable().optional(),
+  dataResidency: z.enum(DATA_RESIDENCY_ZONES).optional(),
+  dataClassification: z.enum(DATA_CLASSIFICATION_LEVELS).optional(),
+  auditSource: z.string().nullable().optional(),
+  correlationId: z.string().nullable().optional(),
+  schemaVersion: z.number().optional(),
+  createdBy: z.uuid().nullable().optional(),
+  updatedBy: z.uuid().nullable().optional(),
+  retentionPolicy: z.string().nullable().optional(),
+  retentionExpiresAt: dateInputSchema.nullable().optional(),
+  erasureRequestedAt: dateInputSchema.nullable().optional(),
+  erasureCompletedAt: dateInputSchema.nullable().optional(),
+  erasureReason: z.string().nullable().optional(),
+  erasureActorOrgId: z.uuid().nullable().optional(),
+  erasureActorUserId: z.uuid().nullable().optional(),
+  createdAt: dateInputSchema,
+  updatedAt: dateInputSchema,
+});

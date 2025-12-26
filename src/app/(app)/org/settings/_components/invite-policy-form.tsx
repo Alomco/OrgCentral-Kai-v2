@@ -42,8 +42,8 @@ export function InvitePolicyForm({
                         aria-label="Allow invite links"
                         className="peer sr-only"
                     />
-                    <div className="h-6 w-11 rounded-full bg-[hsl(var(--muted))] transition peer-checked:bg-[hsl(var(--primary))]" />
-                    <div className="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white transition peer-checked:translate-x-5" />
+                    <div className="h-6 w-11 rounded-full bg-[hsl(var(--muted))] transition motion-reduce:transition-none peer-checked:bg-[hsl(var(--primary))]" />
+                    <div className="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white transition motion-reduce:transition-none peer-checked:translate-x-5" />
                 </label>
             </div>
             <div className="flex items-center gap-2 text-xs text-[hsl(var(--muted-foreground))]">

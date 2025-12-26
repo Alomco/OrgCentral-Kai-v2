@@ -1,21 +1,17 @@
-import { randomUUID } from 'node:crypto';
-import { APIError } from 'better-auth';
-
-import type {
-    LoginActionResult,
-    LoginFieldErrors,
-} from '@/features/auth/login/login-contracts';
+import type { LoginActionResult } from '@/features/auth/login/login-contracts';
 import type { auth } from '@/server/lib/auth';
-import { AbstractBaseService, type ServiceExecutionContext } from '@/server/services/abstract-base-service';
-import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
+import { AbstractBaseService } from '@/server/services/abstract-base-service';
 import type { IOrganizationRepository } from '@/server/repositories/contracts/org/organization/organization-repository-contract';
-import { organizationToTenantScope } from '@/server/security/guards';
 import type { OrganizationData } from '@/server/types/leave-types';
+import {
+    buildPostLoginCallbackUrl,
+    buildServiceContext,
+    isOrganizationData,
+    normalizeAuthError,
+} from './login-service.helpers';
 
 const LOGIN_OPERATION = 'auth.login.signInEmail';
 const LOGIN_ACTION = 'auth.login' as const;
-
-type LoginServiceFailureResult = Extract<LoginActionResult, { ok: false }>;
 
 type AuthSignInEmailFunction = (typeof auth)['api']['signInEmail'];
 
@@ -108,6 +104,7 @@ export class LoginService extends AbstractBaseService {
             organization,
             requestHeaders: input.request.headers,
         });
+        const callbackURL = buildPostLoginCallbackUrl(input.request.headers, orgSlug);
 
         return this.executeInServiceContext(serviceContext, LOGIN_OPERATION, async () => {
             try {
@@ -118,6 +115,7 @@ export class LoginService extends AbstractBaseService {
                         email: input.credentials.email,
                         password: input.credentials.password,
                         rememberMe: input.credentials.rememberMe ?? true,
+                        callbackURL,
                     },
                 })) as BetterAuthHeadersResponse;
 
@@ -174,105 +172,3 @@ export class LoginService extends AbstractBaseService {
     }
 }
 
-interface ServiceContextInput {
-    organization: OrganizationData;
-    requestHeaders: Headers;
-}
-
-function buildServiceContext(input: ServiceContextInput): ServiceExecutionContext {
-    const tenantScope = organizationToTenantScope(input.organization);
-
-    const correlationId = input.requestHeaders.get('x-correlation-id') ?? randomUUID();
-
-    const authorization: RepositoryAuthorizationContext = {
-        orgId: tenantScope.orgId,
-        userId: 'anonymous',
-        roleKey: 'custom',
-        permissions: {},
-        dataResidency: tenantScope.dataResidency,
-        dataClassification: tenantScope.dataClassification,
-        auditSource: tenantScope.auditSource,
-        auditBatchId: tenantScope.auditBatchId,
-        correlationId,
-        tenantScope,
-    };
-
-    return {
-        authorization,
-        correlationId,
-        metadata: {
-            orgSlug: input.organization.slug,
-            residency: tenantScope.dataResidency,
-            classification: tenantScope.dataClassification,
-        },
-    } satisfies ServiceExecutionContext;
-}
-
-function normalizeAuthError(error: unknown): LoginServiceFailureResult {
-    if (error instanceof APIError) {
-        const message = error.body?.message ?? 'We could not sign you in with those credentials.';
-        const fieldErrors = coerceFieldErrors(error.body?.errors);
-        return {
-            ok: false,
-            code: error.body?.code ?? 'AUTH_ERROR',
-            message,
-            fieldErrors,
-        } satisfies LoginActionResult;
-    }
-
-    return {
-        ok: false,
-        code: 'UNKNOWN',
-        message: 'An unexpected error occurred while signing you in.',
-    } satisfies LoginActionResult;
-}
-
-function coerceFieldErrors(value: unknown): LoginFieldErrors | undefined {
-    if (!value || typeof value !== 'object') {
-        return undefined;
-    }
-
-    const entries = Object.entries(value as Record<string, unknown>);
-    const normalized = entries.reduce<LoginFieldErrors>((accumulator, [field, entry]) => {
-        if (typeof entry === 'string') {
-            accumulator[field] = entry;
-            return accumulator;
-        }
-
-        if (Array.isArray(entry)) {
-            const firstMessage = entry.find((item): item is string => typeof item === 'string');
-            if (firstMessage) {
-                accumulator[field] = firstMessage;
-            }
-            return accumulator;
-        }
-
-        if (entry && typeof entry === 'object') {
-            const nested = (entry as { _errors?: unknown[] })._errors;
-            if (Array.isArray(nested)) {
-                const nestedMessage = nested.find((item): item is string => typeof item === 'string');
-                if (nestedMessage) {
-                    accumulator[field] = nestedMessage;
-                }
-            }
-        }
-
-        return accumulator;
-    }, {});
-
-    return Object.keys(normalized).length > 0 ? normalized : undefined;
-}
-
-function isOrganizationData(value: unknown): value is OrganizationData {
-    if (!value || typeof value !== 'object') {
-        return false;
-    }
-
-    const candidate = value as Partial<OrganizationData>;
-    return (
-        typeof candidate.id === 'string' &&
-        typeof candidate.slug === 'string' &&
-        typeof candidate.dataResidency === 'string' &&
-        typeof candidate.dataClassification === 'string'
-    );
-}

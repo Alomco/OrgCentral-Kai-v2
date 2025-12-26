@@ -1,4 +1,4 @@
-import type { RepositoryAuthorizationContext, TenantScopedRecord } from '@/server/repositories/security';
+import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
 import {
   createEmploymentContract,
   deleteEmploymentContract,
@@ -7,7 +7,6 @@ import {
   listEmploymentContracts,
   updateEmploymentContract,
 } from '@/server/services/hr/people/helpers/contract-handlers';
-import type { PeopleServiceOperationRunner } from './people-service-runner';
 import {
   emitContractSideEffects,
   invalidateContractCaches,
@@ -25,32 +24,11 @@ import type {
   GetEmploymentContractResult,
   ListEmploymentContractsPayload,
   ListEmploymentContractsResult,
-  PeopleServiceDependencies,
   PeopleServiceInput,
-  PeopleServiceNotifications,
   UpdateEmploymentContractPayload,
   UpdateEmploymentContractResult,
 } from './people-service.types';
-import type { PeoplePlatformAdapters } from './people-service.adapters';
-
-type EnsureEntityAccessFunction = <TRecord extends TenantScopedRecord>(
-  authorization: RepositoryAuthorizationContext,
-  record: TRecord | null | undefined,
-) => TRecord;
-
-type EnsureEntitiesAccessFunction = <TRecord extends TenantScopedRecord>(
-  authorization: RepositoryAuthorizationContext,
-  records: TRecord[],
-) => TRecord[];
-
-export interface PeopleContractOperationsContext {
-  dependencies: PeopleServiceDependencies;
-  notifications: PeopleServiceNotifications;
-  runner: PeopleServiceOperationRunner;
-  ensureEntityAccess: EnsureEntityAccessFunction;
-  ensureEntitiesAccess: EnsureEntitiesAccessFunction;
-  adapters: PeoplePlatformAdapters;
-}
+import type { PeopleContractOperationsContext } from './people-service.contract-operations.types';
 
 export function createPeopleContractOperations(context: PeopleContractOperationsContext) {
   const {

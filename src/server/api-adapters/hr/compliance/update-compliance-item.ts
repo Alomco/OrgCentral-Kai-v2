@@ -17,7 +17,7 @@ export async function updateComplianceItemController(
     dependencies?: ComplianceControllerDependencies,
 ): Promise<UpdateComplianceItemControllerResult> {
     const payload = updateComplianceItemSchema.parse(await readJson(request));
-    const { session, complianceItemRepository } = resolveComplianceControllerDependencies(dependencies);
+    const { session, complianceItemRepository, complianceTemplateRepository } = resolveComplianceControllerDependencies(dependencies);
 
     const baseAccess = await getSessionContext(session, {
         headers: request.headers,
@@ -59,7 +59,7 @@ export async function updateComplianceItemController(
         updates.reviewedAt = new Date();
     }
 
-    const useCaseDeps: UpdateComplianceItemDependencies = { complianceItemRepository };
+    const useCaseDeps: UpdateComplianceItemDependencies = { complianceItemRepository, complianceTemplateRepository };
     await updateComplianceItem(useCaseDeps, {
         authorization,
         userId: payload.userId,

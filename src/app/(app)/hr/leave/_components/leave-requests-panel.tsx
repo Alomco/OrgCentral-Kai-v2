@@ -2,10 +2,10 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
-import type { LeaveRequest } from '@/server/types/leave-types';
 import { getLeaveRequestsForUi } from '@/server/use-cases/hr/leave/get-leave-requests.cached';
 
 import { formatHumanDate } from '../../_components/format-date';
+import { leaveRequestStatusBadgeVariant } from '../../_components/hr-badge-variants';
 
 export interface LeaveRequestsPanelProps {
     authorization: RepositoryAuthorizationContext;
@@ -19,19 +19,6 @@ function formatDate(value: string): string {
     }
 
     return formatHumanDate(parsed);
-}
-
-function statusBadgeVariant(status: LeaveRequest['status']): 'default' | 'secondary' | 'destructive' | 'outline' {
-    switch (status) {
-        case 'submitted':
-            return 'default';
-        case 'approved':
-            return 'secondary';
-        case 'rejected':
-            return 'destructive';
-        case 'cancelled':
-            return 'outline';
-    }
 }
 
 export async function LeaveRequestsPanel({ authorization, employeeId }: LeaveRequestsPanelProps) {
@@ -81,7 +68,7 @@ export async function LeaveRequestsPanel({ authorization, employeeId }: LeaveReq
                                         </TableCell>
                                         <TableCell className="text-right">{request.totalDays}</TableCell>
                                         <TableCell>
-                                            <Badge variant={statusBadgeVariant(request.status)}>
+                                            <Badge variant={leaveRequestStatusBadgeVariant(request.status)}>
                                                 {request.status}
                                             </Badge>
                                         </TableCell>

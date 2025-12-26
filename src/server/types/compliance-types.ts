@@ -29,6 +29,17 @@ export interface ComplianceTemplate {
     metadata?: Prisma.JsonValue;
 }
 
+export interface ComplianceCategory {
+    id: string;
+    orgId: string;
+    key: string;
+    label: string;
+    sortOrder: number;
+    metadata?: Prisma.JsonValue;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
 export const COMPLIANCE_ITEM_STATUSES = [
     'PENDING',
     'COMPLETE',

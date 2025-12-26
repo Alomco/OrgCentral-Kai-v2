@@ -111,6 +111,7 @@ model Organization {
   checklistTemplates     ChecklistTemplate[] @relation("OrgChecklistTemplates")
   checklistInstances     ChecklistInstance[] @relation("OrgChecklistInstances")
   complianceTemplates    ComplianceTemplate[] @relation("OrgComplianceTemplates")
+  complianceCategories   ComplianceCategory[] @relation("OrgComplianceCategories")
   complianceLogItems     ComplianceLogItem[] @relation("OrgComplianceLogItems")
   managedOrganizations   ManagedOrganization[] @relation("ManagedOrgOrganization")
   @@index([tenantId]) // For tenant isolation

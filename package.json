@@ -12,9 +12,11 @@
     "db:generate": "pnpm db:compose && prisma generate",
     "db:migrate": "pnpm db:compose && prisma migrate dev",
     "db:deploy": "pnpm db:compose && prisma migrate deploy",
-    "telemetry:init": "tsx src/server/telemetry/otel-config.ts"
+    "telemetry:init": "tsx src/server/telemetry/otel-config.ts",
+    "lint:hr-loc": "tsx scripts/check-hr-loc.ts"
   },
   "dependencies": {
+    "@faker-js/faker": "^10.1.0",
     "@casl/ability": "^6.7.3",
     "@casl/react": "^5.0.0",
     "@dnd-kit/core": "^6.3.1",

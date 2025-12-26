@@ -60,10 +60,9 @@ import {
   updateEmployeeProfilePayloadSchema,
   updateEmploymentContractPayloadSchema,
 } from './people-service.schemas';
-import type { ZodType } from 'zod';
+import { parsePeopleServicePayload } from './people-service.payload';
 
-type ProfileOperations = ReturnType<typeof createPeopleProfileOperations>;
-type ContractOperations = ReturnType<typeof createPeopleContractOperations>;
+type ProfileOperations = ReturnType<typeof createPeopleProfileOperations>; type ContractOperations = ReturnType<typeof createPeopleContractOperations>;
 
 export class PeopleService extends AbstractHrService {
   private readonly dependencies: PeopleServiceDependencies;
@@ -121,7 +120,7 @@ export class PeopleService extends AbstractHrService {
   getEmployeeProfile(
     input: PeopleServiceInput<GetEmployeeProfilePayload>,
   ): Promise<GetEmployeeProfileResult> {
-    const payload = this.parsePayload<GetEmployeeProfilePayload>(
+    const payload = parsePeopleServicePayload<GetEmployeeProfilePayload>(
       getEmployeeProfilePayloadSchema,
       input.payload,
     );
@@ -131,7 +130,7 @@ export class PeopleService extends AbstractHrService {
   getEmployeeProfileByUser(
     input: PeopleServiceInput<GetEmployeeProfileByUserPayload>,
   ): Promise<GetEmployeeProfileByUserResult> {
-    const payload = this.parsePayload<GetEmployeeProfileByUserPayload>(
+    const payload = parsePeopleServicePayload<GetEmployeeProfileByUserPayload>(
       getEmployeeProfileByUserPayloadSchema,
       input.payload,
     );
@@ -141,7 +140,7 @@ export class PeopleService extends AbstractHrService {
   listEmployeeProfiles(
     input: PeopleServiceInput<ListEmployeeProfilesPayload>,
   ): Promise<ListEmployeeProfilesResult> {
-    const payload = this.parsePayload<ListEmployeeProfilesPayload>(
+    const payload = parsePeopleServicePayload<ListEmployeeProfilesPayload>(
       listEmployeeProfilesPayloadSchema,
       input.payload,
     );
@@ -151,7 +150,7 @@ export class PeopleService extends AbstractHrService {
   countEmployeeProfiles(
     input: PeopleServiceInput<CountEmployeeProfilesPayload>,
   ): Promise<CountEmployeeProfilesResult> {
-    const payload = this.parsePayload<CountEmployeeProfilesPayload>(
+    const payload = parsePeopleServicePayload<CountEmployeeProfilesPayload>(
       countEmployeeProfilesPayloadSchema,
       input.payload,
     );
@@ -161,7 +160,7 @@ export class PeopleService extends AbstractHrService {
   createEmployeeProfile(
     input: PeopleServiceInput<CreateEmployeeProfilePayload>,
   ): Promise<CreateEmployeeProfileResult> {
-    const payload = this.parsePayload<CreateEmployeeProfilePayload>(
+    const payload = parsePeopleServicePayload<CreateEmployeeProfilePayload>(
       createEmployeeProfilePayloadSchema,
       input.payload,
     );
@@ -171,7 +170,7 @@ export class PeopleService extends AbstractHrService {
   updateEmployeeProfile(
     input: PeopleServiceInput<UpdateEmployeeProfilePayload>,
   ): Promise<UpdateEmployeeProfileResult> {
-    const payload = this.parsePayload<UpdateEmployeeProfilePayload>(
+    const payload = parsePeopleServicePayload<UpdateEmployeeProfilePayload>(
       updateEmployeeProfilePayloadSchema,
       input.payload,
     );
@@ -181,7 +180,7 @@ export class PeopleService extends AbstractHrService {
   deleteEmployeeProfile(
     input: PeopleServiceInput<DeleteEmployeeProfilePayload>,
   ): Promise<DeleteEmployeeProfileResult> {
-    const payload = this.parsePayload<DeleteEmployeeProfilePayload>(
+    const payload = parsePeopleServicePayload<DeleteEmployeeProfilePayload>(
       deleteEmployeeProfilePayloadSchema,
       input.payload,
     );
@@ -191,7 +190,7 @@ export class PeopleService extends AbstractHrService {
   getEmploymentContract(
     input: PeopleServiceInput<GetEmploymentContractPayload>,
   ): Promise<GetEmploymentContractResult> {
-    const payload = this.parsePayload<GetEmploymentContractPayload>(
+    const payload = parsePeopleServicePayload<GetEmploymentContractPayload>(
       getEmploymentContractPayloadSchema,
       input.payload,
     );
@@ -201,7 +200,7 @@ export class PeopleService extends AbstractHrService {
   getEmploymentContractByEmployee(
     input: PeopleServiceInput<GetEmploymentContractByEmployeePayload>,
   ): Promise<GetEmploymentContractByEmployeeResult> {
-    const payload = this.parsePayload<GetEmploymentContractByEmployeePayload>(
+    const payload = parsePeopleServicePayload<GetEmploymentContractByEmployeePayload>(
       getEmploymentContractByEmployeePayloadSchema,
       input.payload,
     );
@@ -211,7 +210,7 @@ export class PeopleService extends AbstractHrService {
   listEmploymentContracts(
     input: PeopleServiceInput<ListEmploymentContractsPayload>,
   ): Promise<ListEmploymentContractsResult> {
-    const payload = this.parsePayload<ListEmploymentContractsPayload>(
+    const payload = parsePeopleServicePayload<ListEmploymentContractsPayload>(
       listEmploymentContractsPayloadSchema,
       input.payload,
     );
@@ -221,7 +220,7 @@ export class PeopleService extends AbstractHrService {
   createEmploymentContract(
     input: PeopleServiceInput<CreateEmploymentContractPayload>,
   ): Promise<CreateEmploymentContractResult> {
-    const payload = this.parsePayload<CreateEmploymentContractPayload>(
+    const payload = parsePeopleServicePayload<CreateEmploymentContractPayload>(
       createEmploymentContractPayloadSchema,
       input.payload,
     );
@@ -231,7 +230,7 @@ export class PeopleService extends AbstractHrService {
   updateEmploymentContract(
     input: PeopleServiceInput<UpdateEmploymentContractPayload>,
   ): Promise<UpdateEmploymentContractResult> {
-    const payload = this.parsePayload<UpdateEmploymentContractPayload>(
+    const payload = parsePeopleServicePayload<UpdateEmploymentContractPayload>(
       updateEmploymentContractPayloadSchema,
       input.payload,
     );
@@ -241,18 +240,10 @@ export class PeopleService extends AbstractHrService {
   deleteEmploymentContract(
     input: PeopleServiceInput<DeleteEmploymentContractPayload>,
   ): Promise<DeleteEmploymentContractResult> {
-    const payload = this.parsePayload<DeleteEmploymentContractPayload>(
+    const payload = parsePeopleServicePayload<DeleteEmploymentContractPayload>(
       deleteEmploymentContractPayloadSchema,
       input.payload,
     );
     return this.contractOperations.deleteEmploymentContract({ ...input, payload });
-  }
-
-  private parsePayload<TPayload>(schema: ZodType<TPayload>, payload: unknown): TPayload {
-    const result = schema.safeParse(payload);
-    if (!result.success) {
-      throw new Error(result.error.message);
-    }
-    return result.data;
   }
 }

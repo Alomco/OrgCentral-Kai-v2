@@ -2,8 +2,7 @@ import { Suspense } from 'react';
 
 import { resolveOrgContext } from '@/server/org/org-context';
 import { getOrgProfile, type OrgProfile } from '@/server/org/get-org-profile';
-
-export const revalidate = 60;
+import { OrgProfileForm } from './_components/org-profile-form';
 
 export default async function OrgProfilePage() {
     const orgContext = await resolveOrgContext();
@@ -17,6 +16,9 @@ export default async function OrgProfilePage() {
             <Suspense fallback={<CardSkeleton />}>
                 <ProfileDetails profilePromise={profilePromise} />
             </Suspense>
+            <Suspense fallback={<FormSkeleton />}>
+                <ProfileEditor profilePromise={profilePromise} />
+            </Suspense>
         </div>
     );
 }
@@ -29,10 +31,7 @@ async function ProfileHeader({ profilePromise }: { profilePromise: Promise<OrgPr
                 Organization
             </p>
             <h1 className="text-3xl font-semibold text-[hsl(var(--foreground))]">{organization.name}</h1>
-            <p className="text-sm text-[hsl(var(--muted-foreground))]">
-                Region {organization.regionCode} · Residency {organization.dataResidency} · Classification{' '}
-                {organization.dataClassification}
-            </p>
+            <p className="text-sm text-[hsl(var(--muted-foreground))]">Region {organization.regionCode} / Residency {organization.dataResidency} / Classification {organization.dataClassification}</p>
         </div>
     );
 }
@@ -49,6 +48,11 @@ async function ProfileDetails({ profilePromise }: { profilePromise: Promise<OrgP
             </div>
         </div>
     );
+}
+
+async function ProfileEditor({ profilePromise }: { profilePromise: Promise<OrgProfile> }) {
+    const { organization } = await profilePromise;
+    return <OrgProfileForm organization={organization} />;
 }
 
 function Detail({ label, value }: { label: string; value: string }) {
@@ -73,3 +77,9 @@ function ProfileSkeleton() {
 function CardSkeleton() {
     return <div className="h-40 w-full animate-pulse rounded-2xl bg-[hsl(var(--muted))]" />;
 }
+
+function FormSkeleton() {
+    return <div className="h-80 w-full animate-pulse rounded-2xl bg-[hsl(var(--muted))]" />;
+}
+
+

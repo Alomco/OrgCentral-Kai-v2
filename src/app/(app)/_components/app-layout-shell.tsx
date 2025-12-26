@@ -38,7 +38,13 @@ export async function AppLayoutShell({ children }: { children: ReactNode }) {
         process.env.NODE_ENV === 'development' && authorization.developmentSuperAdmin === true;
 
     return (
-        <TenantThemeRegistry orgId={authorization.orgId}>
+        <TenantThemeRegistry
+            orgId={authorization.orgId}
+            cacheContext={{
+                classification: authorization.dataClassification,
+                residency: authorization.dataResidency,
+            }}
+        >
             <AppSidebar session={session} authorization={authorization} />
             <SidebarInset className="flex flex-col">
                 <AppHeader session={session} authorization={authorization} branding={branding} />

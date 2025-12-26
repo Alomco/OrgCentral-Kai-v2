@@ -1,10 +1,16 @@
 import type { Metadata } from 'next';
 import { headers as nextHeaders } from 'next/headers';
+import { redirect } from 'next/navigation';
 import { Suspense } from 'react';
 import { Activity, Briefcase, Receipt } from 'lucide-react';
 
 import { Skeleton } from '@/components/ui/skeleton';
 import { getSessionContextOrRedirect } from '@/server/ui/auth/session-redirect';
+import {
+    getMembershipRoleSnapshot,
+    resolveRoleDashboard,
+    ROLE_DASHBOARD_PATHS,
+} from '@/server/ui/auth/role-redirect';
 
 import { DashboardPageHeader } from './_components/dashboard-page-header';
 import { DashboardWidgetCard } from './_components/dashboard-widget-card';
@@ -49,6 +55,13 @@ async function DashboardPageContent() {
         requiredPermissions: { organization: ['read'] },
         auditSource: 'ui:dashboard',
     });
+
+    const membershipSnapshot = await getMembershipRoleSnapshot(authorization.orgId, authorization.userId);
+    const dashboardRole = membershipSnapshot ? resolveRoleDashboard(membershipSnapshot) : 'employee';
+
+    if (dashboardRole === 'globalAdmin') {
+        redirect(ROLE_DASHBOARD_PATHS.globalAdmin);
+    }
 
     const isAdmin = hasPermission(authorization.permissions, 'organization', 'update');
     const isAuditor = hasPermission(authorization.permissions, 'audit', 'read');

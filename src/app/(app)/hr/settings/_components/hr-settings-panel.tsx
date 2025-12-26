@@ -3,7 +3,6 @@ import { getHrSettingsForUi } from '@/server/use-cases/hr/settings/get-hr-settin
 
 import { deriveHrSettingsFormDefaults } from '../schema';
 import { HrSettingsForm } from './hr-settings-form';
-import { updateHrSettingsAction } from '../actions';
 
 export async function HrSettingsPanel(props: { authorization: RepositoryAuthorizationContext }) {
     const { settings } = await getHrSettingsForUi({
@@ -13,5 +12,5 @@ export async function HrSettingsPanel(props: { authorization: RepositoryAuthoriz
 
     const defaults = deriveHrSettingsFormDefaults(settings);
 
-    return <HrSettingsForm action={updateHrSettingsAction} defaults={defaults} />;
+    return <HrSettingsForm defaults={defaults} />;
 }

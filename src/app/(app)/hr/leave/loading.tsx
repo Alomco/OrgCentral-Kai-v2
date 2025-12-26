@@ -1,3 +1,12 @@
+import Link from 'next/link';
+
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbList,
+    BreadcrumbLink,
+    BreadcrumbPage,
+} from '@/components/ui/breadcrumb';
 import { Skeleton } from '@/components/ui/skeleton';
 
 import { HrPageHeader } from '../_components/hr-page-header';
@@ -5,6 +14,19 @@ import { HrPageHeader } from '../_components/hr-page-header';
 export default function HrLeaveLoading() {
     return (
         <div className="space-y-6">
+            <Breadcrumb>
+                <BreadcrumbList>
+                    <BreadcrumbItem>
+                        <BreadcrumbLink asChild>
+                            <Link href="/hr">HR</Link>
+                        </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbItem>
+                        <BreadcrumbPage>Leave</BreadcrumbPage>
+                    </BreadcrumbItem>
+                </BreadcrumbList>
+            </Breadcrumb>
+
             <HrPageHeader title="Leave" description="Loading leave requests…" />
 
             <div className="grid gap-6 lg:grid-cols-2">

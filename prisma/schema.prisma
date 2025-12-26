@@ -1165,6 +1165,24 @@ model ComplianceTemplate {
   @@schema("hr")
 }
 
+model ComplianceCategory {
+  id        String   @id @default(uuid()) @db.Uuid
+  orgId     String   @db.Uuid
+  key       String
+  label     String
+  sortOrder Int      @default(100)
+  metadata  Json?    @db.JsonB
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  org Organization @relation("OrgComplianceCategories", fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@unique([orgId, key])
+  @@index([orgId, sortOrder])
+  @@map("compliance_categories")
+  @@schema("hr")
+}
+
 model ComplianceLogItem {
   id            String                @id @default(uuid()) @db.Uuid
   orgId         String                @db.Uuid
@@ -1641,6 +1659,7 @@ model Organization {
   checklistTemplates     ChecklistTemplate[] @relation("OrgChecklistTemplates")
   checklistInstances     ChecklistInstance[] @relation("OrgChecklistInstances")
   complianceTemplates    ComplianceTemplate[] @relation("OrgComplianceTemplates")
+  complianceCategories   ComplianceCategory[] @relation("OrgComplianceCategories")
   complianceLogItems     ComplianceLogItem[] @relation("OrgComplianceLogItems")
   managedOrganizations   ManagedOrganization[] @relation("ManagedOrgOrganization")
   @@index([tenantId]) // For tenant isolation

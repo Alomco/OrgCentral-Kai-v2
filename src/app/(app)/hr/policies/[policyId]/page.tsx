@@ -1,16 +1,27 @@
+import { Suspense } from 'react';
 import Link from 'next/link';
 import { headers as nextHeaders } from 'next/headers';
 import { notFound } from 'next/navigation';
 
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbPage,
+    BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { getHrPolicyController } from '@/server/api-adapters/hr/policies/get-hr-policy';
-import { getPolicyAcknowledgmentController } from '@/server/api-adapters/hr/policies/get-policy-acknowledgment';
+import { Skeleton } from '@/components/ui/skeleton';
+import { getHrPolicyForUi } from '@/server/use-cases/hr/policies/get-hr-policy.cached';
+import { getPolicyAcknowledgmentForUi } from '@/server/use-cases/hr/policies/get-policy-acknowledgment.cached';
 import type { PolicyAcknowledgment } from '@/server/types/hr-ops-types';
+import { getSessionContextOrRedirect } from '@/server/ui/auth/session-redirect';
+import { hasPermission } from '@/lib/security/permission-check';
 
 import { formatHumanDate, formatHumanDateTime } from '../../_components/format-date';
-import { acknowledgePolicyAction } from '../actions';
+import { AcknowledgePolicyForm } from '../_components/acknowledge-policy-form';
 
 function getAcknowledgmentDisplay(policyVersion: string, acknowledgment: PolicyAcknowledgment | null): {
     isAcknowledged: boolean;
@@ -33,20 +44,25 @@ function getAcknowledgmentDisplay(policyVersion: string, acknowledgment: PolicyA
     };
 }
 
-export default async function HrPolicyPage({ params }: { params: { policyId: string } }) {
+export default function HrPolicyPage({ params }: { params: { policyId: string } }) {
+    return (
+        <Suspense fallback={<PolicyPageSkeleton />}>
+            <PolicyPageContent policyId={params.policyId} />
+        </Suspense>
+    );
+}
+
+async function PolicyPageContent({ policyId }: { policyId: string }) {
     const headerStore = await nextHeaders();
+    const { authorization } = await getSessionContextOrRedirect({}, {
+        headers: headerStore,
+        requiredPermissions: { employeeProfile: ['read'] },
+        auditSource: 'ui:hr:policies:get',
+    });
 
     const [{ policy }, { acknowledgment }] = await Promise.all([
-        getHrPolicyController({
-            headers: headerStore,
-            input: { policyId: params.policyId },
-            auditSource: 'ui:hr:policies:get',
-        }),
-        getPolicyAcknowledgmentController({
-            headers: headerStore,
-            input: { policyId: params.policyId },
-            auditSource: 'ui:hr:policies:acknowledgment:get',
-        }),
+        getHrPolicyForUi({ authorization, policyId }),
+        getPolicyAcknowledgmentForUi({ authorization, policyId, userId: authorization.userId }),
     ]);
 
     if (!policy) {
@@ -54,9 +70,30 @@ export default async function HrPolicyPage({ params }: { params: { policyId: str
     }
 
     const acknowledgmentDisplay = getAcknowledgmentDisplay(policy.version, acknowledgment);
+    const canViewAcknowledgments = hasPermission(authorization.permissions, 'organization', 'update');
 
     return (
         <div className="space-y-6">
+            <Breadcrumb>
+                <BreadcrumbList>
+                    <BreadcrumbItem>
+                        <BreadcrumbLink asChild>
+                            <Link href="/hr">HR</Link>
+                        </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                        <BreadcrumbLink asChild>
+                            <Link href="/hr/policies">Policies</Link>
+                        </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                        <BreadcrumbPage>{policy.title}</BreadcrumbPage>
+                    </BreadcrumbItem>
+                </BreadcrumbList>
+            </Breadcrumb>
+
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div className="space-y-2">
                     <div className="flex flex-wrap items-center gap-2">
@@ -75,12 +112,14 @@ export default async function HrPolicyPage({ params }: { params: { policyId: str
                     <Link className="text-sm font-semibold underline underline-offset-4" href="/hr/policies">
                         Back to policies
                     </Link>
-                    <Link
-                        className="text-sm font-semibold underline underline-offset-4"
-                        href={`/hr/policies/${policy.id}/acknowledgments`}
-                    >
-                        Admin acknowledgments
-                    </Link>
+                    {canViewAcknowledgments ? (
+                        <Link
+                            className="text-sm font-semibold underline underline-offset-4"
+                            href={`/hr/policies/${policy.id}/acknowledgments`}
+                        >
+                            Admin acknowledgments
+                        </Link>
+                    ) : null}
                 </div>
             </div>
 
@@ -94,14 +133,7 @@ export default async function HrPolicyPage({ params }: { params: { policyId: str
                         {acknowledgmentDisplay.isAcknowledged ? (
                             <Badge variant="secondary">Acknowledged</Badge>
                         ) : (
-                            <form action={acknowledgePolicyAction} className="flex flex-wrap items-center gap-3">
-                                <input type="hidden" name="policyId" value={policy.id} />
-                                <input type="hidden" name="version" value={policy.version} />
-                                <Button type="submit">Acknowledge policy</Button>
-                                <div className="text-sm text-muted-foreground">
-                                    Confirms you have read and understood this policy.
-                                </div>
-                            </form>
+                            <AcknowledgePolicyForm policyId={policy.id} version={policy.version} />
                         )}
                     </CardContent>
                 </Card>
@@ -130,3 +162,20 @@ export default async function HrPolicyPage({ params }: { params: { policyId: str
     );
 }
 
+function PolicyPageSkeleton() {
+    return (
+        <div className="space-y-6">
+            <div className="space-y-3">
+                <div className="flex flex-wrap items-center gap-2">
+                    <Skeleton className="h-5 w-24" />
+                    <Skeleton className="h-5 w-14" />
+                    <Skeleton className="h-5 w-16" />
+                </div>
+                <Skeleton className="h-8 w-64" />
+                <Skeleton className="h-4 w-72" />
+            </div>
+            <Skeleton className="h-40 w-full" />
+            <Skeleton className="h-64 w-full" />
+        </div>
+    );
+}

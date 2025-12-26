@@ -1,106 +1,283 @@
+import { Suspense } from 'react';
 import Link from 'next/link';
 import { headers as nextHeaders } from 'next/headers';
+import {
+    Calendar,
+    FileText,
+    User,
+    Users,
+    Settings,
+    ArrowRight,
+    AlertCircle,
+} from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbList,
+    BreadcrumbLink,
+    BreadcrumbPage,
+    BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { listHrPoliciesController } from '@/server/api-adapters/hr/policies/list-hr-policies';
+import { Skeleton } from '@/components/ui/skeleton';
+import { listHrPoliciesForUi } from '@/server/use-cases/hr/policies/list-hr-policies.cached';
+import { getSessionContextOrRedirect } from '@/server/ui/auth/session-redirect';
+import { getPeopleService } from '@/server/services/hr/people/people-service.provider';
 import { formatHumanDate } from '../_components/format-date';
+import { hasPermission } from '@/lib/security/permission-check';
 
-export default async function HrDashboardPage() {
-    const headerStore = await nextHeaders();
+type DashboardAuthorization = Parameters<typeof listHrPoliciesForUi>[0]['authorization'];
 
-    let policySummary:
-        | { kind: 'ready'; total: number; recent: { id: string; title: string; effectiveDate: Date }[] }
-        | { kind: 'error'; message: string } = { kind: 'ready', total: 0, recent: [] };
+// Quick actions for employees
+const EMPLOYEE_ACTIONS = [
+    { href: '/hr/leave', label: 'Request Leave', icon: Calendar, description: 'Submit a leave request' },
+    { href: '/hr/profile', label: 'My Profile', icon: User, description: 'View and update your details' },
+    { href: '/hr/policies', label: 'View Policies', icon: FileText, description: 'Read company policies' },
+    { href: '/hr/absences', label: 'Report Absence', icon: AlertCircle, description: 'Log unplanned absence' },
+];
+
+// Admin-only actions
+const ADMIN_ACTIONS = [
+    { href: '/hr/employees', label: 'Employees', icon: Users, description: 'Manage employee records' },
+    { href: '/hr/settings', label: 'Settings', icon: Settings, description: 'Configure HR settings' },
+];
+
+async function WelcomeCard({ authorization }: { authorization: DashboardAuthorization }) {
+    let displayName = 'there';
+    let jobTitle = 'Employee';
 
     try {
-        const { policies } = await listHrPoliciesController({
-            headers: headerStore,
-            input: {},
-            auditSource: 'ui:hr:dashboard:policies',
+        const peopleService = getPeopleService();
+        const { profile } = await peopleService.getEmployeeProfileByUser({
+            authorization,
+            payload: { userId: authorization.userId },
         });
 
-        const sorted = policies
-            .slice()
-            .sort((left, right) => right.effectiveDate.getTime() - left.effectiveDate.getTime());
-
-        policySummary = {
-            kind: 'ready',
-            total: policies.length,
-            recent: sorted.slice(0, 5).map((policy) => ({
-                id: policy.id,
-                title: policy.title,
-                effectiveDate: policy.effectiveDate,
-            })),
-        };
-    } catch (error: unknown) {
-        policySummary = {
-            kind: 'error',
-            message: error instanceof Error ? error.message : 'Unable to load HR dashboard data.',
-        };
+        if (profile) {
+            displayName = profile.displayName ?? profile.firstName ?? 'there';
+            jobTitle = profile.jobTitle ?? 'Employee';
+        }
+    } catch {
+        // Gracefully handle ABAC or other permission errors
     }
 
     return (
-        <div className="space-y-6">
-            <div>
-                <h1 className="text-2xl font-semibold">HR Dashboard</h1>
-                <p className="mt-1 text-sm text-muted-foreground">
-                    Early HR migration surface (policies first).
+        <Card className="bg-linear-to-br from-primary/5 via-background to-background border-primary/20">
+            <CardHeader>
+                <CardDescription>Welcome back</CardDescription>
+                <CardTitle className="text-2xl">Hello, {displayName}! 👋</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <p className="text-sm text-muted-foreground">
+                    {jobTitle} • Use this dashboard to manage your HR tasks.
                 </p>
-            </div>
+            </CardContent>
+        </Card>
+    );
+}
 
-            <Card>
-                <CardHeader>
-                    <CardTitle>Policies</CardTitle>
-                    <CardDescription>Read and acknowledge HR policies for this organization.</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    {policySummary.kind === 'error' ? (
-                        <div className="text-sm text-destructive">{policySummary.message}</div>
-                    ) : (
-                        <>
-                            <div className="flex flex-wrap items-center gap-2">
-                                <Badge variant="secondary">{policySummary.total} total</Badge>
-                                <Link
-                                    className="text-sm font-semibold underline underline-offset-4"
-                                    href="/hr/policies"
-                                >
-                                    View all policies
-                                </Link>
+function WelcomeSkeleton() {
+    return (
+        <Card>
+            <CardHeader>
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-7 w-48" />
+            </CardHeader>
+            <CardContent>
+                <Skeleton className="h-4 w-64" />
+            </CardContent>
+        </Card>
+    );
+}
+
+async function PoliciesSummaryCard({ authorization }: { authorization: DashboardAuthorization }) {
+    const { policies } = await listHrPoliciesForUi({ authorization });
+    const sorted = policies
+        .slice()
+        .sort((left, right) => right.effectiveDate.getTime() - left.effectiveDate.getTime());
+
+    const recent = sorted.slice(0, 3).map((policy) => ({
+        id: policy.id,
+        title: policy.title,
+        effectiveDate: policy.effectiveDate,
+    }));
+
+    return (
+        <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                    <CardTitle className="text-base">Policies</CardTitle>
+                    <CardDescription>Company policies to review</CardDescription>
+                </div>
+                <Badge variant="secondary">{policies.length}</Badge>
+            </CardHeader>
+            <CardContent className="space-y-2">
+                {recent.length > 0 ? (
+                    <>
+                        {recent.map((policy) => (
+                            <Link
+                                key={policy.id}
+                                href={`/hr/policies/${policy.id}`}
+                                className="flex items-center justify-between rounded-lg border px-3 py-2 text-sm transition-colors hover:bg-muted"
+                            >
+                                <span className="font-medium truncate">{policy.title}</span>
+                                <span className="text-xs text-muted-foreground shrink-0 ml-2">
+                                    {formatHumanDate(policy.effectiveDate)}
+                                </span>
+                            </Link>
+                        ))}
+                        <Link
+                            href="/hr/policies"
+                            className="flex items-center justify-center gap-1 text-sm text-primary hover:underline pt-2"
+                        >
+                            View all policies
+                            <ArrowRight className="h-3 w-3" />
+                        </Link>
+                    </>
+                ) : (
+                    <p className="text-sm text-muted-foreground">No policies published yet.</p>
+                )}
+            </CardContent>
+        </Card>
+    );
+}
+
+function PoliciesSummarySkeleton() {
+    return (
+        <Card>
+            <CardHeader>
+                <Skeleton className="h-5 w-20" />
+                <Skeleton className="h-4 w-40" />
+            </CardHeader>
+            <CardContent className="space-y-2">
+                <Skeleton className="h-12 w-full" />
+                <Skeleton className="h-12 w-full" />
+            </CardContent>
+        </Card>
+    );
+}
+
+function QuickActionsCard({
+    actions,
+    title,
+    description
+}: {
+    actions: typeof EMPLOYEE_ACTIONS;
+    title: string;
+    description: string;
+}) {
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle className="text-base">{title}</CardTitle>
+                <CardDescription>{description}</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <div className="grid gap-2 sm:grid-cols-2">
+                    {actions.map((action) => (
+                        <Link
+                            key={action.href}
+                            href={action.href}
+                            className="flex items-start gap-3 rounded-lg border p-3 transition-colors hover:bg-muted"
+                        >
+                            <action.icon className="h-5 w-5 shrink-0 text-muted-foreground" />
+                            <div>
+                                <div className="font-medium text-sm">{action.label}</div>
+                                <div className="text-xs text-muted-foreground">{action.description}</div>
                             </div>
-                            {policySummary.recent.length > 0 ? (
-                                <div className="space-y-2">
-                                    {policySummary.recent.map((policy) => (
-                                        <Link
-                                            key={policy.id}
-                                            href={`/hr/policies/${policy.id}`}
-                                            className="block rounded-lg border px-4 py-3 transition-colors hover:bg-muted"
-                                        >
-                                            <div className="text-sm font-medium">{policy.title}</div>
-                                            <div className="mt-1 text-xs text-muted-foreground">
-                                                Effective {formatHumanDate(policy.effectiveDate)}
-                                            </div>
-                                        </Link>
-                                    ))}
-                                </div>
-                            ) : (
-                                <div className="text-sm text-muted-foreground">No policies have been published yet.</div>
-                            )}
-                        </>
-                    )}
-                </CardContent>
-            </Card>
+                        </Link>
+                    ))}
+                </div>
+            </CardContent>
+        </Card>
+    );
+}
 
+export default function HrDashboardPage() {
+    return (
+        <Suspense fallback={<DashboardSkeleton />}>
+            <DashboardContent />
+        </Suspense>
+    );
+}
+
+async function DashboardContent() {
+    const headerStore = await nextHeaders();
+    const { authorization } = await getSessionContextOrRedirect({}, {
+        headers: headerStore,
+        requiredPermissions: { employeeProfile: ['read'] },
+        auditSource: 'ui:hr:dashboard',
+    });
+
+    const isAdmin = hasPermission(authorization.permissions, 'organization', 'update');
+
+    return (
+        <div className="space-y-6">
+            <Breadcrumb>
+                <BreadcrumbList>
+                    <BreadcrumbItem>
+                        <BreadcrumbLink asChild>
+                            <Link href="/hr">HR</Link>
+                        </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                        <BreadcrumbPage>Dashboard</BreadcrumbPage>
+                    </BreadcrumbItem>
+                </BreadcrumbList>
+            </Breadcrumb>
+
+            {/* Welcome Card */}
+            <Suspense fallback={<WelcomeSkeleton />}>
+                <WelcomeCard authorization={authorization} />
+            </Suspense>
+
+            {/* Quick Actions */}
+            <QuickActionsCard
+                actions={EMPLOYEE_ACTIONS}
+                title="Quick Actions"
+                description="Common HR tasks at your fingertips"
+            />
+
+            {/* Admin Actions (conditional) */}
+            {isAdmin && (
+                <QuickActionsCard
+                    actions={ADMIN_ACTIONS}
+                    title="Admin Tools"
+                    description="Manage employees and settings"
+                />
+            )}
+
+            {/* Policies Summary */}
+            <Suspense fallback={<PoliciesSummarySkeleton />}>
+                <PoliciesSummaryCard authorization={authorization} />
+            </Suspense>
+        </div>
+    );
+}
+
+function DashboardSkeleton() {
+    return (
+        <div className="space-y-6">
+            <Skeleton className="h-5 w-56" />
+            <WelcomeSkeleton />
             <Card>
                 <CardHeader>
-                    <CardTitle>Next migrations</CardTitle>
-                    <CardDescription>Leave, absences, compliance, onboarding, and employee records.</CardDescription>
+                    <Skeleton className="h-5 w-32" />
+                    <Skeleton className="h-4 w-48" />
                 </CardHeader>
-                <CardContent className="text-sm text-muted-foreground">
-                    HR pages from the legacy app will be rebuilt here using Next.js server components and the new
-                    `/api/hr/*` routes.
+                <CardContent>
+                    <div className="grid gap-2 sm:grid-cols-2">
+                        <Skeleton className="h-16" />
+                        <Skeleton className="h-16" />
+                        <Skeleton className="h-16" />
+                        <Skeleton className="h-16" />
+                    </div>
                 </CardContent>
             </Card>
+            <PoliciesSummarySkeleton />
         </div>
     );
 }

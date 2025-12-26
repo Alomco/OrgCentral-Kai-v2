@@ -1,10 +1,33 @@
+import Link from 'next/link';
+
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbList,
+    BreadcrumbLink,
+    BreadcrumbPage,
+} from '@/components/ui/breadcrumb';
+
+import { HrPageHeader } from '../_components/hr-page-header';
+
 export default function Loading() {
     return (
         <div className="space-y-6">
-            <div className="space-y-2">
-                <div className="h-7 w-40 rounded bg-muted" />
-                <div className="h-4 w-72 rounded bg-muted" />
-            </div>
+            <Breadcrumb>
+                <BreadcrumbList>
+                    <BreadcrumbItem>
+                        <BreadcrumbLink asChild>
+                            <Link href="/hr">HR</Link>
+                        </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbItem>
+                        <BreadcrumbPage>Settings</BreadcrumbPage>
+                    </BreadcrumbItem>
+                </BreadcrumbList>
+            </Breadcrumb>
+
+            <HrPageHeader title="HR Settings" description="Loading settings…" />
+
             <div className="bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm">
                 <div className="px-6">
                     <div className="h-4 w-40 rounded bg-muted" />

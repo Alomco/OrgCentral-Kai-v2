@@ -38,6 +38,10 @@ export interface OnboardingInvitation {
 
 export interface IOnboardingInvitationRepository {
   createInvitation(payload: OnboardingInvitationCreateInput): Promise<OnboardingInvitation>;
+  listInvitationsByOrg(
+    orgId: string,
+    options?: { status?: OnboardingInvitationStatus; limit?: number },
+  ): Promise<OnboardingInvitation[]>;
   getActiveInvitationByEmail(orgId: string, email: string): Promise<OnboardingInvitation | null>;
   getInvitationByToken(token: string): Promise<OnboardingInvitation | null>;
   markAccepted(orgId: string, token: string, acceptedByUserId: string): Promise<void>;

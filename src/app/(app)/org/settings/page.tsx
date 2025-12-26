@@ -1,3 +1,5 @@
+import { Suspense } from 'react';
+import { cacheLife, unstable_noStore as noStore } from 'next/cache';
 import { headers } from 'next/headers';
 import { z } from 'zod';
 import type { Prisma } from '@prisma/client';
@@ -5,6 +7,7 @@ import type { Prisma } from '@prisma/client';
 import { InvitePolicyForm, initialInvitePolicyState, type InvitePolicyState } from './_components/invite-policy-form';
 import { resolveOrgContext } from '@/server/org/org-context';
 import { invalidateOrgCache, registerOrgCacheTag } from '@/server/lib/cache-tags';
+import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
 import { getSessionContext } from '@/server/use-cases/auth/sessions/get-session';
 import { getSessionContextOrRedirect } from '@/server/ui/auth/session-redirect';
 import { prisma } from '@/server/lib/prisma';
@@ -23,7 +26,7 @@ export default async function OrgSettingsPage() {
     const orgContext = await resolveOrgContext();
     const headerStore = await headers();
 
-    const session = await getSessionContextOrRedirect(
+    const { authorization } = await getSessionContextOrRedirect(
         {},
         {
             headers: headerStore,
@@ -33,33 +36,66 @@ export default async function OrgSettingsPage() {
         },
     );
 
-    registerOrgCacheTag(
-        session.authorization.orgId,
-        INVITE_POLICY_CACHE_SCOPE,
-        session.authorization.dataClassification,
-        session.authorization.dataResidency,
-    );
-
-    const org = await prisma.organization.findUnique({
-        where: { id: orgContext.orgId },
-        select: { settings: true },
-    });
-
-    const parsedSettings = organizationSettingsSchema.safeParse(org?.settings ?? {});
-    const initialOpen = parsedSettings.success ? (parsedSettings.data.invites?.open ?? false) : false;
-
     return (
         <div className="space-y-6 p-6">
             <div>
                 <p className="text-xs uppercase tracking-[0.18em] text-[hsl(var(--muted-foreground))]">Settings</p>
                 <h1 className="text-2xl font-semibold text-[hsl(var(--foreground))]">Access & invites</h1>
                 <p className="text-sm text-[hsl(var(--muted-foreground))]">
-                    Control how people can join your organization ({orgContext.orgId}).
+                    Control how people can join your organization ({authorization.orgId}).
                 </p>
             </div>
-            <InvitePolicyForm action={updateInvitePolicy} defaultOpen={initialOpen} />
+            <Suspense fallback={<InvitePolicySkeleton />}>
+                <InvitePolicyPanel authorization={authorization} />
+            </Suspense>
         </div>
     );
+}
+
+async function InvitePolicyPanel({
+    authorization,
+}: {
+    authorization: RepositoryAuthorizationContext;
+}) {
+    const initialOpen = await getInvitePolicyForUi(authorization);
+    return <InvitePolicyForm action={updateInvitePolicy} defaultOpen={initialOpen} />;
+}
+
+function InvitePolicySkeleton() {
+    return <div className="h-28 w-full animate-pulse rounded-2xl bg-[hsl(var(--muted))]" />;
+}
+
+async function getInvitePolicyForUi(authorization: RepositoryAuthorizationContext): Promise<boolean> {
+    async function loadCached(input: RepositoryAuthorizationContext): Promise<boolean> {
+        'use cache';
+        cacheLife('minutes');
+
+        registerOrgCacheTag(
+            input.orgId,
+            INVITE_POLICY_CACHE_SCOPE,
+            input.dataClassification,
+            input.dataResidency,
+        );
+
+        return loadInvitePolicy(input.orgId);
+    }
+
+    if (authorization.dataClassification !== 'OFFICIAL') {
+        noStore();
+        return loadInvitePolicy(authorization.orgId);
+    }
+
+    return loadCached(authorization);
+}
+
+async function loadInvitePolicy(orgId: string): Promise<boolean> {
+    const org = await prisma.organization.findUnique({
+        where: { id: orgId },
+        select: { settings: true },
+    });
+
+    const parsedSettings = organizationSettingsSchema.safeParse(org?.settings ?? {});
+    return parsedSettings.success ? (parsedSettings.data.invites?.open ?? false) : false;
 }
 
 export async function updateInvitePolicy(
@@ -79,7 +115,7 @@ export async function updateInvitePolicy(
         return { status: 'error', message: 'Invalid form data', open: _previous.open };
     }
 
-    const session = await getSessionContext(
+    const { authorization } = await getSessionContext(
         {},
         {
             headers: headerStore,
@@ -90,7 +126,7 @@ export async function updateInvitePolicy(
     );
 
     const org = await prisma.organization.findUnique({
-        where: { id: orgContext.orgId },
+        where: { id: authorization.orgId },
         select: { settings: true },
     });
 
@@ -101,15 +137,15 @@ export async function updateInvitePolicy(
     };
 
     await prisma.organization.update({
-        where: { id: orgContext.orgId },
+        where: { id: authorization.orgId },
         data: { settings: nextSettings },
     });
 
     await invalidateOrgCache(
-        session.authorization.orgId,
+        authorization.orgId,
         INVITE_POLICY_CACHE_SCOPE,
-        session.authorization.dataClassification,
-        session.authorization.dataResidency,
+        authorization.dataClassification,
+        authorization.dataResidency,
     );
 
     return {

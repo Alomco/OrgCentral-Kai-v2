@@ -1,34 +1,52 @@
 'use client';
 
-import { useEffect } from 'react';
-
-import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbList,
+    BreadcrumbLink,
+    BreadcrumbPage,
+} from '@/components/ui/breadcrumb';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { ErrorRetryButton } from '@/components/error';
 
-export default function ErrorPage(props: {
+interface ErrorPageProps {
     error: Error & { digest?: string };
     reset: () => void;
-}) {
-    useEffect(() => {
-        // Intentionally no logging here to avoid leaking sensitive context.
-    }, [props.error]);
+}
 
+export default function ErrorPage({ reset }: ErrorPageProps) {
     return (
         <div className="space-y-6">
-            <Card>
+            <Breadcrumb>
+                <BreadcrumbList>
+                    <BreadcrumbItem>
+                        <BreadcrumbLink asChild>
+                            <Link href="/hr">HR</Link>
+                        </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbItem>
+                        <BreadcrumbPage>Settings</BreadcrumbPage>
+                    </BreadcrumbItem>
+                </BreadcrumbList>
+            </Breadcrumb>
+
+            <Card className="relative overflow-hidden shadow-[0_15px_50px_-20px_hsl(var(--destructive)/0.25)]">
+                <div className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-[hsl(var(--destructive)/0.1)] blur-2xl" />
                 <CardHeader>
-                    <CardTitle>Unable to load HR settings</CardTitle>
-                    <CardDescription>
+                    <CardTitle className="bg-gradient-to-r from-[hsl(var(--destructive))] to-[hsl(var(--accent))] bg-clip-text text-transparent">
+                        Unable to load HR settings
+                    </CardTitle>
+                    <CardDescription role="alert" aria-live="polite" aria-atomic="true">
                         Something went wrong while rendering this page. Try again.
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="text-sm text-muted-foreground">
                     If the problem persists, contact your administrator.
                 </CardContent>
-                <CardFooter className="border-t justify-end">
-                    <Button type="button" onClick={props.reset}>
-                        Retry
-                    </Button>
+                <CardFooter className="justify-end border-t">
+                    <ErrorRetryButton reset={reset} label="Retry" />
                 </CardFooter>
             </Card>
         </div>

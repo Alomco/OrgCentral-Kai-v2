@@ -14,7 +14,7 @@ export interface SetAbacPoliciesDependencies {
 
 export interface SetAbacPoliciesInput {
     authorization: RepositoryAuthorizationContext;
-    policies: AbacPolicy[] | unknown[];
+    policies: AbacPolicy[];
 }
 
 export interface SetAbacPoliciesResult {
@@ -25,13 +25,11 @@ export async function setAbacPolicies(
     deps: SetAbacPoliciesDependencies,
     input: SetAbacPoliciesInput,
 ): Promise<SetAbacPoliciesResult> {
-    const candidatePolicies = Array.isArray(input.policies) ? input.policies : [];
-
-    if (candidatePolicies.length > MAX_POLICIES) {
+    if (input.policies.length > MAX_POLICIES) {
         throw new ValidationError(`Policy set exceeds maximum of ${String(MAX_POLICIES)} entries.`);
     }
 
-    const normalized = normalizeAbacPolicies(candidatePolicies, { failOnInvalid: true });
+    const normalized = normalizeAbacPolicies(input.policies, { assumeValidated: true });
 
     await deps.policyRepository.setPoliciesForOrg(input.authorization.orgId, normalized);
 

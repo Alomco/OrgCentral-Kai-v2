@@ -3,28 +3,54 @@
 import { cacheLife } from 'next/cache';
 
 import { registerOrgCacheTag } from '@/server/lib/cache-tags';
+import { appLogger } from '@/server/logging/structured-logger';
+import type { DataClassificationLevel, DataResidencyZone } from '@/server/types/tenant';
 import { CACHE_SCOPE_TENANT_THEME } from '@/server/repositories/cache-scopes';
-import { defaultThemeTokens, type TenantTheme, type ThemeTokenMap } from './tokens';
+import { PrismaThemeRepository } from '@/server/repositories/prisma/org/theme/prisma-theme-repository';
+import { getThemePreset, defaultPresetId } from './theme-presets';
+import type { TenantTheme, ThemeTokenMap } from './tokens';
+import type { OrgThemeSettings } from '@/server/types/theme-types';
 
-const mockThemeOverrides: Record<string, Partial<ThemeTokenMap>> = {
-    'org-demo': {
-        primary: '257 74% 64%',
-        'primary-foreground': '260 100% 98%',
-        'sidebar-background': '258 54% 18%',
-        'sidebar-foreground': '260 40% 96%',
-    },
-};
+// Re-export for convenience
+export type { OrgThemeSettings };
 
-function resolveTheme(orgId?: string | null): TenantTheme {
-    const key = orgId ?? 'default';
-    const overrides = mockThemeOverrides[key] ?? {};
+export interface TenantThemeCacheContext {
+    classification: DataClassificationLevel;
+    residency: DataResidencyZone;
+}
+
+/**
+ * Get the theme repository instance (uses default Prisma client)
+ */
+function getThemeRepository(): PrismaThemeRepository {
+    return new PrismaThemeRepository();
+}
+
+/**
+ * Resolve theme tokens from org settings
+ */
+function resolveThemeFromSettings(
+    orgId: string,
+    orgSettings: OrgThemeSettings | null,
+): TenantTheme {
+    // Get base preset (org-specific or default)
+    const presetId = orgSettings?.presetId ?? defaultPresetId;
+    const preset = getThemePreset(presetId);
+
+    // Apply any custom overrides on top of preset
+    const customOverrides = orgSettings?.customOverrides ?? {};
+
     return {
-        orgId: key,
-        tokens: { ...defaultThemeTokens, ...overrides },
-        updatedAt: new Date(),
+        orgId,
+        presetId,
+        tokens: { ...preset.tokens, ...customOverrides } as ThemeTokenMap,
+        updatedAt: orgSettings?.updatedAt ?? new Date(),
     };
 }
 
+/**
+ * Get tenant theme with database lookup and caching
+ */
 export async function getTenantTheme(orgId?: string | null): Promise<TenantTheme> {
     'use cache';
     cacheLife('hours');
@@ -32,5 +58,48 @@ export async function getTenantTheme(orgId?: string | null): Promise<TenantTheme
     const resolvedOrgId = orgId ?? 'default';
     registerOrgCacheTag(resolvedOrgId, CACHE_SCOPE_TENANT_THEME);
 
-    return Promise.resolve(resolveTheme(resolvedOrgId));
+    // For default/anonymous users, use default theme
+    if (resolvedOrgId === 'default') {
+        return resolveThemeFromSettings('default', null);
+    }
+
+    try {
+        const repo = getThemeRepository();
+        const orgSettings = await repo.getTheme(resolvedOrgId);
+        return resolveThemeFromSettings(resolvedOrgId, orgSettings);
+    } catch (error) {
+        appLogger.warn('theme.load.failed', {
+            orgId: resolvedOrgId,
+            error: error instanceof Error ? error.message : String(error),
+        });
+        return resolveThemeFromSettings(resolvedOrgId, null);
+    }
 }
+
+export async function getTenantThemeWithContext(
+    orgId: string | null | undefined,
+    context: TenantThemeCacheContext,
+): Promise<TenantTheme> {
+    'use cache';
+    cacheLife('hours');
+
+    const resolvedOrgId = orgId ?? 'default';
+    registerOrgCacheTag(resolvedOrgId, CACHE_SCOPE_TENANT_THEME, context.classification, context.residency);
+
+    if (resolvedOrgId === 'default') {
+        return resolveThemeFromSettings('default', null);
+    }
+
+    try {
+        const repo = getThemeRepository();
+        const orgSettings = await repo.getTheme(resolvedOrgId);
+        return resolveThemeFromSettings(resolvedOrgId, orgSettings);
+    } catch (error) {
+        appLogger.warn('theme.load.failed', {
+            orgId: resolvedOrgId,
+            error: error instanceof Error ? error.message : String(error),
+        });
+        return resolveThemeFromSettings(resolvedOrgId, null);
+    }
+}
+

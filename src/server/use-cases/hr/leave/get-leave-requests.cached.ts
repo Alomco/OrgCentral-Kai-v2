@@ -1,5 +1,6 @@
 import { cacheLife, unstable_noStore as noStore } from 'next/cache';
 
+import { toCacheSafeAuthorizationContext } from '@/server/repositories/security/cache-authorization';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
 import type { LeaveRequest } from '@/server/types/leave-types';
 import { getLeaveService } from '@/server/services/hr/leave/leave-service.provider';
@@ -44,5 +45,8 @@ export async function getLeaveRequestsForUi(
         return { requests: result.requests };
     }
 
-    return getLeaveRequestsCached(input);
+    return getLeaveRequestsCached({
+        ...input,
+        authorization: toCacheSafeAuthorizationContext(input.authorization),
+    });
 }

@@ -8,8 +8,12 @@ import { getSessionContext } from '@/server/use-cases/auth/sessions/get-session'
 import { PrismaHRSettingsRepository } from '@/server/repositories/prisma/hr/settings';
 import { updateHrSettings } from '@/server/use-cases/hr/settings/update-hr-settings';
 import { invalidateHrSettingsCacheTag } from '@/server/use-cases/hr/settings/cache-helpers';
+
+import { toFieldErrors } from '../_components/form-errors';
 import { hrSettingsFormValuesSchema } from './schema';
 import type { HrSettingsFormState } from './form-state';
+
+const FIELD_CHECK_MESSAGE = 'Check the highlighted fields and try again.';
 
 function readFormString(formData: FormData, key: string): string {
     const value = formData.get(key);
@@ -70,7 +74,12 @@ export async function updateHrSettingsAction(
 
     const parsed = hrSettingsFormValuesSchema.safeParse(candidate);
     if (!parsed.success) {
-        return { status: 'error', message: 'Invalid form data.', values: previous.values };
+        return {
+            status: 'error',
+            message: FIELD_CHECK_MESSAGE,
+            fieldErrors: toFieldErrors(parsed.error),
+            values: previous.values,
+        };
     }
 
     try {
@@ -83,8 +92,11 @@ export async function updateHrSettingsAction(
         if (!leaveTypesParsed.success) {
             return {
                 status: 'error',
-                message: 'Leave types must be comma-separated labels (max 25, 40 chars each).',
-                values: previous.values,
+                message: FIELD_CHECK_MESSAGE,
+                fieldErrors: {
+                    leaveTypesCsv: 'Leave types must be comma-separated labels (max 25, 40 chars each).',
+                },
+                values: parsed.data,
             };
         }
 
@@ -92,8 +104,11 @@ export async function updateHrSettingsAction(
         if (!adminNotesParsed.success) {
             return {
                 status: 'error',
-                message: 'Admin notes must be 500 characters or fewer.',
-                values: previous.values,
+                message: FIELD_CHECK_MESSAGE,
+                fieldErrors: {
+                    adminNotes: 'Admin notes must be 500 characters or fewer.',
+                },
+                values: parsed.data,
             };
         }
 
@@ -104,8 +119,11 @@ export async function updateHrSettingsAction(
         if (!approvalWorkflowsJsonParsed.success) {
             return {
                 status: 'error',
-                message: 'Approval workflows JSON must be 8000 characters or fewer.',
-                values: previous.values,
+                message: FIELD_CHECK_MESSAGE,
+                fieldErrors: {
+                    approvalWorkflowsJson: 'Approval workflows JSON must be 8000 characters or fewer.',
+                },
+                values: parsed.data,
             };
         }
 
@@ -115,8 +133,12 @@ export async function updateHrSettingsAction(
         } catch (error) {
             return {
                 status: 'error',
-                message: error instanceof Error ? error.message : 'Approval workflows must be valid JSON.',
-                values: previous.values,
+                message: FIELD_CHECK_MESSAGE,
+                fieldErrors: {
+                    approvalWorkflowsJson:
+                        error instanceof Error ? error.message : 'Approval workflows must be valid JSON.',
+                },
+                values: parsed.data,
             };
         }
 
@@ -147,6 +169,7 @@ export async function updateHrSettingsAction(
         return {
             status: 'success',
             message: 'Saved HR settings.',
+            fieldErrors: undefined,
             values: {
                 ...parsed.data,
                 leaveTypesCsv: leaveTypes.join(', '),
@@ -158,6 +181,7 @@ export async function updateHrSettingsAction(
         return {
             status: 'error',
             message: error instanceof Error ? error.message : 'Unable to save HR settings.',
+            fieldErrors: undefined,
             values: previous.values,
         };
     }
