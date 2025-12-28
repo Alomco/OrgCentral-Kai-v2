@@ -16,10 +16,10 @@ export type DeleteLeavePolicyInput = z.infer<typeof deleteLeavePolicyInputSchema
 export interface DeleteLeavePolicyDependencies {
     leavePolicyRepository: ILeavePolicyRepository;
     leaveBalanceRepository: {
-        countLeaveBalancesByPolicy(tenantId: string, policyId: string): Promise<number>;
+        countLeaveBalancesByPolicy(tenant: RepositoryAuthorizationContext['tenantScope'], policyId: string): Promise<number>;
     };
     leaveRequestRepository: {
-        countLeaveRequestsByPolicy(tenantId: string, policyId: string): Promise<number>;
+        countLeaveRequestsByPolicy(tenant: RepositoryAuthorizationContext['tenantScope'], policyId: string): Promise<number>;
     };
 }
 
@@ -43,7 +43,7 @@ export async function deleteLeavePolicy(
     }
 
     const existing = await deps.leavePolicyRepository.getLeavePolicy(
-        request.authorization.orgId,
+        request.authorization.tenantScope,
         request.payload.policyId,
     );
 
@@ -56,11 +56,11 @@ export async function deleteLeavePolicy(
 
     const [balanceCount, requestCount] = await Promise.all([
         deps.leaveBalanceRepository.countLeaveBalancesByPolicy(
-            request.authorization.orgId,
+            request.authorization.tenantScope,
             request.payload.policyId,
         ),
         deps.leaveRequestRepository.countLeaveRequestsByPolicy(
-            request.authorization.orgId,
+            request.authorization.tenantScope,
             request.payload.policyId,
         ),
     ]);
@@ -75,7 +75,7 @@ export async function deleteLeavePolicy(
     }
 
     await deps.leavePolicyRepository.deleteLeavePolicy(
-        request.authorization.orgId,
+        request.authorization.tenantScope,
         request.payload.policyId,
     );
 

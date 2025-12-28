@@ -16,6 +16,7 @@ import { toPrismaInputJson } from '@/server/repositories/prisma/helpers/prisma-u
 import { registerOrgCacheTag, invalidateOrgCache } from '@/server/lib/cache-tags';
 import { CACHE_SCOPE_COMPLIANCE_TEMPLATES } from '@/server/repositories/cache-scopes';
 import { RepositoryAuthorizationError } from '@/server/repositories/security';
+import type { DataClassificationLevel, DataResidencyZone } from '@/server/types/tenant';
 
 type ComplianceTemplateRecord = PrismaComplianceTemplate;
 type ComplianceTemplateCreateData = Prisma.ComplianceTemplateUncheckedCreateInput;
@@ -24,6 +25,8 @@ type ComplianceTemplateUpdateData = Prisma.ComplianceTemplateUncheckedUpdateInpu
 export class PrismaComplianceTemplateRepository
     extends BasePrismaRepository
     implements IComplianceTemplateRepository {
+    private static readonly DEFAULT_CLASSIFICATION: DataClassificationLevel = 'OFFICIAL';
+    private static readonly DEFAULT_RESIDENCY: DataResidencyZone = 'UK_ONLY';
     private get templates(): PrismaClient['complianceTemplate'] {
         return this.prisma.complianceTemplate;
     }
@@ -49,7 +52,12 @@ export class PrismaComplianceTemplateRepository
         const record = await this.templates.create({
             data,
         });
-        registerOrgCacheTag(input.orgId, CACHE_SCOPE_COMPLIANCE_TEMPLATES);
+        registerOrgCacheTag(
+            input.orgId,
+            CACHE_SCOPE_COMPLIANCE_TEMPLATES,
+            PrismaComplianceTemplateRepository.DEFAULT_CLASSIFICATION,
+            PrismaComplianceTemplateRepository.DEFAULT_RESIDENCY,
+        );
         return mapComplianceTemplateRecordToDomain(record as unknown as ComplianceTemplateMapperRecord);
     }
 
@@ -76,14 +84,24 @@ export class PrismaComplianceTemplateRepository
             where: { id: templateId },
             data,
         });
-        await invalidateOrgCache(orgId, CACHE_SCOPE_COMPLIANCE_TEMPLATES);
+        await invalidateOrgCache(
+            orgId,
+            CACHE_SCOPE_COMPLIANCE_TEMPLATES,
+            PrismaComplianceTemplateRepository.DEFAULT_CLASSIFICATION,
+            PrismaComplianceTemplateRepository.DEFAULT_RESIDENCY,
+        );
         return mapComplianceTemplateRecordToDomain(record as unknown as ComplianceTemplateMapperRecord);
     }
 
     async deleteTemplate(orgId: string, templateId: string): Promise<void> {
         await this.ensureTemplateOrg(templateId, orgId);
         await this.templates.delete({ where: { id: templateId } });
-        await invalidateOrgCache(orgId, CACHE_SCOPE_COMPLIANCE_TEMPLATES);
+        await invalidateOrgCache(
+            orgId,
+            CACHE_SCOPE_COMPLIANCE_TEMPLATES,
+            PrismaComplianceTemplateRepository.DEFAULT_CLASSIFICATION,
+            PrismaComplianceTemplateRepository.DEFAULT_RESIDENCY,
+        );
     }
 
     async getTemplate(orgId: string, templateId: string): Promise<ComplianceTemplate | null> {
@@ -94,13 +112,23 @@ export class PrismaComplianceTemplateRepository
         if ((record as { orgId?: string }).orgId !== orgId) {
             throw new RepositoryAuthorizationError('Compliance template access denied for this organization.');
         }
-        registerOrgCacheTag(orgId, CACHE_SCOPE_COMPLIANCE_TEMPLATES);
+        registerOrgCacheTag(
+            orgId,
+            CACHE_SCOPE_COMPLIANCE_TEMPLATES,
+            PrismaComplianceTemplateRepository.DEFAULT_CLASSIFICATION,
+            PrismaComplianceTemplateRepository.DEFAULT_RESIDENCY,
+        );
         return mapComplianceTemplateRecordToDomain(record as unknown as ComplianceTemplateMapperRecord);
     }
 
     async listTemplates(orgId: string): Promise<ComplianceTemplate[]> {
         const records = await this.templates.findMany({ where: { orgId } });
-        registerOrgCacheTag(orgId, CACHE_SCOPE_COMPLIANCE_TEMPLATES);
+        registerOrgCacheTag(
+            orgId,
+            CACHE_SCOPE_COMPLIANCE_TEMPLATES,
+            PrismaComplianceTemplateRepository.DEFAULT_CLASSIFICATION,
+            PrismaComplianceTemplateRepository.DEFAULT_RESIDENCY,
+        );
         return records.map((r) => mapComplianceTemplateRecordToDomain(r as unknown as ComplianceTemplateMapperRecord));
     }
 }

@@ -700,6 +700,10 @@ model LeavePolicy {
   statutoryCompliance Boolean             @default(false) // For statutory leave (sick, maternity, etc.)
   maxConsecutiveDays Int?                 // For policy enforcement
   allowNegativeBalance Boolean           @default(false) // For emergency leave
+  dataClassification DataClassificationLevel @default(OFFICIAL)
+  residencyTag       DataResidencyZone       @default(UK_ONLY)
+  auditSource       String?
+  auditBatchId      String?
   metadata         Json?                 @db.JsonB
 
   org          Organization         @relation(fields: [orgId], references: [id], onDelete: Cascade)
@@ -709,6 +713,7 @@ model LeavePolicy {
   requests     LeaveRequest[]
 
   @@unique([orgId, name])
+  @@index([orgId, dataClassification, residencyTag])
   @@map("leave_policies")
   @@schema("hr")
 }
@@ -741,6 +746,10 @@ model LeaveBalance {
   approvedAt   DateTime? // When the balance was last approved
   approvedBy   String?   @db.Uuid
   // For audit trail
+  dataClassification DataClassificationLevel @default(OFFICIAL)
+  residencyTag       DataResidencyZone       @default(UK_ONLY)
+  auditSource       String?
+  auditBatchId      String?
   metadata     Json?    @db.JsonB
   updatedAt    DateTime @updatedAt
 
@@ -750,6 +759,7 @@ model LeaveBalance {
 
   @@unique([orgId, userId, policyId, periodStart])
   @@index([policyId])
+  @@index([orgId, dataClassification, residencyTag])
   @@map("leave_balances")
   @@schema("hr")
 }
@@ -774,6 +784,10 @@ model LeaveRequest {
   sickNoteReceived  Boolean   @default(false)
   returnToWorkDate  DateTime? // For health monitoring
   // For audit trail
+  dataClassification DataClassificationLevel @default(OFFICIAL)
+  residencyTag       DataResidencyZone       @default(UK_ONLY)
+  auditSource       String?
+  auditBatchId      String?
   metadata       Json?              @db.JsonB
   createdAt      DateTime           @default(now())
   updatedAt      DateTime           @updatedAt
@@ -784,6 +798,7 @@ model LeaveRequest {
 
   @@index([orgId, status])
   @@index([policyId])
+  @@index([orgId, dataClassification, residencyTag])
   @@map("leave_requests")
   @@schema("hr")
 }
@@ -1460,6 +1475,8 @@ model AuditLog {
   securityLevel      Int?   // For security event classification
   // For GDPR compliance
   dataSubjectId String?     // Reference to the data owner
+  immutable  Boolean        @default(true)
+  deletedAt  DateTime?
   // Payload for audit trail
   payload    Json?          @db.JsonB
   createdAt  DateTime       @default(now())

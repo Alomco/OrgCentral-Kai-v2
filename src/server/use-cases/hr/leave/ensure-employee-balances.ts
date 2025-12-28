@@ -31,7 +31,7 @@ export async function ensureEmployeeBalances(
     assertNonEmpty(input.employeeId, 'Employee ID');
 
     const existingBalances = await deps.leaveBalanceRepository.getLeaveBalancesByEmployeeAndYear(
-        input.authorization.orgId,
+        input.authorization.tenantScope,
         input.employeeId,
         input.year,
     );
@@ -52,7 +52,7 @@ export async function ensureEmployeeBalances(
 
     // Fetch all policies once
     const policies = await deps.leavePolicyRepository.getLeavePoliciesByOrganization(
-        input.authorization.orgId,
+        input.authorization.tenantScope,
     );
 
     for (const leaveType of missingLeaveTypes) {
@@ -70,6 +70,10 @@ export async function ensureEmployeeBalances(
         const balancePayload: LeaveBalanceCreateInput = {
             id: randomUUID(),
             orgId: input.authorization.orgId,
+            dataResidency: input.authorization.dataResidency,
+            dataClassification: input.authorization.dataClassification,
+            auditSource: input.authorization.auditSource,
+            auditBatchId: input.authorization.auditBatchId,
             employeeId: input.employeeId,
             leaveType,
             year: input.year,
@@ -81,7 +85,7 @@ export async function ensureEmployeeBalances(
         };
 
         await deps.leaveBalanceRepository.createLeaveBalance(
-            input.authorization.orgId,
+            input.authorization.tenantScope,
             balancePayload,
         );
 

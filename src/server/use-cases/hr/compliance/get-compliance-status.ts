@@ -21,7 +21,12 @@ export async function getComplianceStatus(
     input.userId,
   );
 
-  registerOrgCacheTag(input.authorization.orgId, CACHE_SCOPE_COMPLIANCE_STATUS);
+  registerOrgCacheTag(
+    input.authorization.orgId,
+    CACHE_SCOPE_COMPLIANCE_STATUS,
+    input.authorization.dataClassification,
+    input.authorization.dataResidency,
+  );
 
   return snapshot;
 }

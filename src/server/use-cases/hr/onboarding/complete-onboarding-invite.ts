@@ -122,9 +122,7 @@ export async function completeOnboardingInvite(
             }),
         );
 
-    const profile = existingProfile
-        ? existingProfile
-        : await deps.employeeProfileRepository.findByEmployeeNumber(organization.id, employeeNumber);
+    const profile = existingProfile ?? await deps.employeeProfileRepository.findByEmployeeNumber(organization.id, employeeNumber);
     if (!profile) {
         throw new EntityNotFoundError('Employee profile', { employeeNumber, orgId: organization.id });
     }
@@ -252,8 +250,8 @@ function buildUserActivationPayload(
     payload: { displayName?: string; email?: string },
     fallbackEmail: string,
 ): UserActivationPayload {
-    const email = payload.email?.trim() || fallbackEmail;
-    const displayName = payload.displayName?.trim() || email;
+    const email = payload.email?.trim() ?? fallbackEmail;
+    const displayName = payload.displayName?.trim() ?? email;
     return {
         displayName,
         email,

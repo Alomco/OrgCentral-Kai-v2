@@ -46,6 +46,7 @@ export async function POST(request: NextRequest): Promise<Response> {
             throw new AuthorizationError('Invalid bootstrap secret.');
         }
 
+        // Bootstrap is explicitly gated by env + secret; direct Prisma access is scoped to this one-time flow.
         const auth = createAuth(request.nextUrl.origin);
         const session = await auth.api.getSession({ headers: request.headers });
 

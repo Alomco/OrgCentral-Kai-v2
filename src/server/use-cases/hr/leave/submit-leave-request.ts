@@ -13,7 +13,10 @@ export interface SubmitLeaveRequestDependencies {
 
 export interface SubmitLeaveRequestInput {
     authorization: RepositoryAuthorizationContext;
-    request: Omit<LeaveRequest, 'createdAt'> & { hoursPerDay?: number };
+    request: Omit<
+        LeaveRequest,
+        'createdAt' | 'orgId' | 'dataResidency' | 'dataClassification' | 'auditSource' | 'auditBatchId'
+    > & { hoursPerDay?: number };
 }
 
 export interface SubmitLeaveRequestResult {
@@ -32,13 +35,17 @@ export async function submitLeaveRequestWithPolicy(
 
     const policyId = await resolveLeavePolicyId(
         { leavePolicyRepository },
-        authorization.orgId,
+        authorization.tenantScope,
         request.leaveType,
     );
 
-    await leaveRequestRepository.createLeaveRequest(authorization.orgId, {
+    await leaveRequestRepository.createLeaveRequest(authorization.tenantScope, {
         ...request,
         orgId: authorization.orgId,
+        dataResidency: authorization.dataResidency,
+        dataClassification: authorization.dataClassification,
+        auditSource: authorization.auditSource,
+        auditBatchId: authorization.auditBatchId,
         policyId,
     });
 

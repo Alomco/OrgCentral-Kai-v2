@@ -37,8 +37,8 @@ export async function invalidateCache(payload: CacheTagPayload): Promise<void> {
 export async function invalidateOrgCache(
     orgId: string,
     scope: CacheScope,
-    classification: DataClassificationLevel = 'OFFICIAL',
-    residency: DataResidencyZone = 'UK_ONLY',
+    classification: DataClassificationLevel,
+    residency: DataResidencyZone,
 ): Promise<void> {
     await invalidateCache({ orgId, scope, classification, residency });
 }
@@ -49,8 +49,8 @@ export async function invalidateOrgCache(
 export function registerOrgCacheTag(
     orgId: string,
     scope: CacheScope,
-    classification: DataClassificationLevel = 'OFFICIAL',
-    residency: DataResidencyZone = 'UK_ONLY',
+    classification: DataClassificationLevel,
+    residency: DataResidencyZone,
 ): void {
     registerCacheTag({ orgId, scope, classification, residency });
 }

@@ -38,7 +38,7 @@ export async function listLeavePolicies(
     registerLeaveCacheScopes(request.authorization, 'policies');
 
     const policies = await deps.leavePolicyRepository.getLeavePoliciesByOrganization(
-        request.authorization.orgId,
+        request.authorization.tenantScope,
     );
 
     return { policies };

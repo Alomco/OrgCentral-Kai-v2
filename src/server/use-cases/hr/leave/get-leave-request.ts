@@ -27,7 +27,7 @@ export async function getLeaveRequest(
     registerLeaveCacheScopes(input.authorization, 'requests');
 
     const request = await deps.leaveRequestRepository.getLeaveRequest(
-        input.authorization.orgId,
+        input.authorization.tenantScope,
         input.requestId,
         input.options,
     );

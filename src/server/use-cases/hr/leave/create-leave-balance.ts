@@ -13,7 +13,10 @@ export interface CreateLeaveBalanceDependencies {
 
 export interface CreateLeaveBalanceInput {
     authorization: RepositoryAuthorizationContext;
-    balance: Omit<LeaveBalance, 'createdAt' | 'updatedAt'>;
+    balance: Omit<
+        LeaveBalance,
+        'createdAt' | 'updatedAt' | 'orgId' | 'dataResidency' | 'dataClassification' | 'auditSource' | 'auditBatchId'
+    >;
 }
 
 export interface CreateLeaveBalanceResult {
@@ -32,17 +35,21 @@ export async function createLeaveBalanceWithPolicy(
 
     const policyId = await resolveLeavePolicyId(
         { leavePolicyRepository },
-        authorization.orgId,
+        authorization.tenantScope,
         balance.leaveType,
     );
 
     const balancePayload: LeaveBalanceCreateInput = {
         ...balance,
         orgId: authorization.orgId,
+        dataResidency: authorization.dataResidency,
+        dataClassification: authorization.dataClassification,
+        auditSource: authorization.auditSource,
+        auditBatchId: authorization.auditBatchId,
         policyId,
     };
 
-    await leaveBalanceRepository.createLeaveBalance(authorization.orgId, balancePayload);
+    await leaveBalanceRepository.createLeaveBalance(authorization.tenantScope, balancePayload);
     await invalidateLeaveCacheScopes(authorization, 'balances');
 
     return {

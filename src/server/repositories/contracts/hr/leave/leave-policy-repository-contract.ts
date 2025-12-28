@@ -3,13 +3,14 @@
  * Following SOLID principles with clear separation of concerns
  */
 import type { LeavePolicy } from '@/server/types/leave-types';
+import type { TenantScope } from '@/server/types/tenant';
 
 export interface ILeavePolicyRepository {
   /**
    * Create a new leave policy
    */
   createLeavePolicy(
-    tenantId: string,
+    tenant: TenantScope,
     policy: Omit<LeavePolicy, 'id' | 'createdAt' | 'updatedAt'>
   ): Promise<void>;
 
@@ -17,7 +18,7 @@ export interface ILeavePolicyRepository {
    * Update an existing leave policy
    */
   updateLeavePolicy(
-    tenantId: string,
+    tenant: TenantScope,
     policyId: string,
     updates: Partial<Omit<LeavePolicy, 'id' | 'orgId' | 'createdAt'>>
   ): Promise<void>;
@@ -26,7 +27,7 @@ export interface ILeavePolicyRepository {
    * Get a specific leave policy by ID
    */
   getLeavePolicy(
-    tenantId: string,
+    tenant: TenantScope,
     policyId: string
   ): Promise<LeavePolicy | null>;
 
@@ -34,7 +35,7 @@ export interface ILeavePolicyRepository {
    * Get a leave policy by name within an organization
    */
   getLeavePolicyByName(
-    tenantId: string,
+    tenant: TenantScope,
     name: string
   ): Promise<LeavePolicy | null>;
 
@@ -42,14 +43,14 @@ export interface ILeavePolicyRepository {
    * Get all leave policies for an organization
    */
   getLeavePoliciesByOrganization(
-    tenantId: string
+    tenant: TenantScope
   ): Promise<LeavePolicy[]>;
 
   /**
    * Delete a leave policy
    */
   deleteLeavePolicy(
-    tenantId: string,
+    tenant: TenantScope,
     policyId: string
   ): Promise<void>;
 }

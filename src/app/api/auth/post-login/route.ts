@@ -5,6 +5,7 @@ import { MembershipStatus } from '@prisma/client';
 import { createAuth } from '@/server/lib/auth';
 import { prisma } from '@/server/lib/prisma';
 import { appendSetCookieHeaders } from '@/server/api-adapters/http/set-cookie-headers';
+import { requireSessionAuthorization } from '@/server/security/authorization';
 import {
     getMembershipRoleSnapshot,
     resolveRoleDashboard,
@@ -92,6 +93,11 @@ async function handlePostLogin(request: NextRequest): Promise<NextResponse> {
     if (!membershipSnapshot) {
         return buildNotInvitedRedirect(request, nextPath);
     }
+
+    await requireSessionAuthorization(session, {
+        orgId: desiredOrgId,
+        auditSource: 'auth:post-login',
+    });
 
     const dashboardRole = resolveRoleDashboard(membershipSnapshot);
     const redirectPath = isExplicit

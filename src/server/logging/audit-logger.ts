@@ -37,6 +37,7 @@ export async function recordAuditEvent(event: AuditEventPayload): Promise<void> 
         action: event.action,
         resource: event.resource,
         resourceId: event.resourceId ?? null,
+        immutable: event.immutable ?? true,
         payload: {
             ...event.payload,
             correlationId: event.correlationId,

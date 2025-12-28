@@ -10,12 +10,15 @@ import { CACHE_SCOPE_ONBOARDING_INVITATIONS } from '@/server/repositories/cache-
 import { RepositoryAuthorizationError } from '@/server/repositories/security';
 import { registerOrgCacheTag } from '@/server/lib/cache-tags';
 import { toPrismaInputJson } from '@/server/repositories/prisma/helpers/prisma-utils';
+import type { DataClassificationLevel, DataResidencyZone } from '@/server/types/tenant';
 
 type InvitationDelegate = PrismaClient['invitation'];
 
 export class PrismaOnboardingInvitationRepository
   extends BasePrismaRepository
   implements IOnboardingInvitationRepository {
+  private static readonly DEFAULT_CLASSIFICATION: DataClassificationLevel = 'OFFICIAL';
+  private static readonly DEFAULT_RESIDENCY: DataResidencyZone = 'UK_ONLY';
   private readonly invitation: InvitationDelegate;
 
   constructor(options: BasePrismaRepositoryOptions = {}) {
@@ -80,7 +83,12 @@ export class PrismaOnboardingInvitationRepository
     });
 
     if (record) {
-      registerOrgCacheTag(orgId, CACHE_SCOPE_ONBOARDING_INVITATIONS);
+      registerOrgCacheTag(
+        orgId,
+        CACHE_SCOPE_ONBOARDING_INVITATIONS,
+        PrismaOnboardingInvitationRepository.DEFAULT_CLASSIFICATION,
+        PrismaOnboardingInvitationRepository.DEFAULT_RESIDENCY,
+      );
     }
 
     return record ? this.mapToDomain(record) : null;
@@ -89,7 +97,12 @@ export class PrismaOnboardingInvitationRepository
   async getInvitationByToken(token: string): Promise<OnboardingInvitation | null> {
     const record = await this.invitation.findUnique({ where: { token } });
     if (record) {
-      registerOrgCacheTag(record.orgId, CACHE_SCOPE_ONBOARDING_INVITATIONS);
+      registerOrgCacheTag(
+        record.orgId,
+        CACHE_SCOPE_ONBOARDING_INVITATIONS,
+        PrismaOnboardingInvitationRepository.DEFAULT_CLASSIFICATION,
+        PrismaOnboardingInvitationRepository.DEFAULT_RESIDENCY,
+      );
     }
     return record ? this.mapToDomain(record) : null;
   }

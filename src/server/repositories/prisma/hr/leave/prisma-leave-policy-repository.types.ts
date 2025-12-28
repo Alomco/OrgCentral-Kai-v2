@@ -1,4 +1,10 @@
-import type { Prisma, LeavePolicyType as PrismaLeavePolicyType, LeaveAccrualFrequency as PrismaLeaveAccrualFrequency } from '@prisma/client';
+import type {
+    Prisma,
+    LeavePolicyType as PrismaLeavePolicyType,
+    LeaveAccrualFrequency as PrismaLeaveAccrualFrequency,
+    DataClassificationLevel,
+    DataResidencyZone,
+} from '@prisma/client';
 
 export interface LeavePolicyFilters {
     orgId?: string;
@@ -23,6 +29,10 @@ export interface LeavePolicyCreationData {
     statutoryCompliance?: boolean;
     maxConsecutiveDays?: number | null;
     allowNegativeBalance?: boolean;
+    dataClassification?: DataClassificationLevel;
+    residencyTag?: DataResidencyZone;
+    auditSource?: string | null;
+    auditBatchId?: string | null;
     metadata?: Prisma.InputJsonValue | Record<string, unknown> | null;
 }
 
@@ -40,5 +50,9 @@ export interface LeavePolicyUpdateData {
     statutoryCompliance?: boolean;
     maxConsecutiveDays?: number | null;
     allowNegativeBalance?: boolean;
+    dataClassification?: DataClassificationLevel;
+    residencyTag?: DataResidencyZone;
+    auditSource?: string | null;
+    auditBatchId?: string | null;
     metadata?: Prisma.InputJsonValue | Record<string, unknown> | null;
 }

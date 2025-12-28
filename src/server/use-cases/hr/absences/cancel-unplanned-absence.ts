@@ -99,12 +99,12 @@ async function restoreLeaveBalances(
                 return;
             }
 
-            const balance = await deps.leaveBalanceRepository.getLeaveBalance(authorization.orgId, entry.balanceId);
+            const balance = await deps.leaveBalanceRepository.getLeaveBalance(authorization.tenantScope, entry.balanceId);
             if (!balance) {
                 return;
             }
             await deps.leaveBalanceRepository.updateLeaveBalance(
-                authorization.orgId,
+                authorization.tenantScope,
                 balance.id,
                 buildBalanceUpdate(balance, entry.category ?? 'used', balanceHours),
             );

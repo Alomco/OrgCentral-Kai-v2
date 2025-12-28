@@ -45,7 +45,7 @@ export async function createLeavePolicy(
     }
 
     const existing = await deps.leavePolicyRepository.getLeavePolicyByName(
-        request.authorization.orgId,
+        request.authorization.tenantScope,
         request.payload.name,
     );
 
@@ -59,6 +59,10 @@ export async function createLeavePolicy(
     const now = new Date().toISOString();
     const policyToCreate: Omit<LeavePolicy, 'id' | 'createdAt' | 'updatedAt'> = {
         orgId: request.authorization.orgId,
+        dataResidency: request.authorization.dataResidency,
+        dataClassification: request.authorization.dataClassification,
+        auditSource: request.authorization.auditSource,
+        auditBatchId: request.authorization.auditBatchId,
         departmentId: null,
         name: request.payload.name,
         policyType: request.payload.type,
@@ -76,14 +80,14 @@ export async function createLeavePolicy(
     };
 
     await deps.leavePolicyRepository.createLeavePolicy(
-        request.authorization.orgId,
+        request.authorization.tenantScope,
         policyToCreate,
     );
 
     await invalidateLeaveCacheScopes(request.authorization, 'policies');
 
     const created = await deps.leavePolicyRepository.getLeavePolicyByName(
-        request.authorization.orgId,
+        request.authorization.tenantScope,
         request.payload.name,
     );
 

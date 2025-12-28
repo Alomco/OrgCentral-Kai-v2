@@ -78,6 +78,10 @@ export function mapPrismaLeaveRequestToDomain(
     return {
         id: record.id,
         orgId: record.orgId,
+        dataResidency: record.residencyTag,
+        dataClassification: record.dataClassification,
+        auditSource: record.auditSource ?? 'leave-request',
+        auditBatchId: record.auditBatchId ?? undefined,
         employeeId: metadata.employeeId ?? record.userId,
         userId: record.userId,
         employeeName: metadata.employeeName ?? '',
@@ -111,6 +115,10 @@ export function mapPrismaLeaveBalanceToDomain(record: PrismaLeaveBalance): Leave
     return {
         id: record.id,
         orgId: record.orgId,
+        dataResidency: record.residencyTag,
+        dataClassification: record.dataClassification,
+        auditSource: record.auditSource ?? 'leave-balance',
+        auditBatchId: record.auditBatchId ?? undefined,
         employeeId: metadata.employeeId ?? record.userId,
         leaveType: metadata.leaveType ?? record.policyId,
         year: metadata.year ?? record.periodStart.getUTCFullYear(),
@@ -156,8 +164,8 @@ export function buildLeaveBalanceMetadata(
         pending: input.pending,
         available: input.available,
         // Compliance metadata (from audit context or defaults)
-        informationClass: auditContext?.informationClass ?? 'OFFICIAL_SENSITIVE',
-        residencyRegion: auditContext?.residencyRegion ?? 'UK',
+        informationClass: auditContext?.informationClass ?? input.dataClassification,
+        residencyRegion: auditContext?.residencyRegion ?? input.dataResidency,
         createdBy: auditContext?.createdBy,
     } satisfies LeaveBalanceMetadata;
 }

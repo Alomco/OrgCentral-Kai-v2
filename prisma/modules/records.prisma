@@ -100,6 +100,8 @@ model AuditLog {
   securityLevel      Int?   // For security event classification
   // For GDPR compliance
   dataSubjectId String?     // Reference to the data owner
+  immutable  Boolean        @default(true)
+  deletedAt  DateTime?
   // Payload for audit trail
   payload    Json?          @db.JsonB
   createdAt  DateTime       @default(now())

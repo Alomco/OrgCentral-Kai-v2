@@ -72,9 +72,9 @@ function shouldUseOnboardingFlow(payload: {
     employeeNumber?: string;
     onboardingTemplateId?: string | null;
 }): boolean {
-    return Boolean(
+    return (
         (typeof payload.employeeId === 'string' && payload.employeeId.trim().length > 0) ||
-            (typeof payload.employeeNumber === 'string' && payload.employeeNumber.trim().length > 0) ||
-            (typeof payload.onboardingTemplateId === 'string' && payload.onboardingTemplateId.trim().length > 0),
+        (typeof payload.employeeNumber === 'string' && payload.employeeNumber.trim().length > 0) ||
+        (typeof payload.onboardingTemplateId === 'string' && payload.onboardingTemplateId.trim().length > 0)
     );
 }

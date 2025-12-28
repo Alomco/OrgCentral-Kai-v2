@@ -6,8 +6,11 @@ import type { HRPolicy } from '@/server/types/hr-ops-types';
 import { AuthorizationError } from '@/server/errors';
 import { registerOrgCacheTag } from '@/server/lib/cache-tags';
 import { CACHE_SCOPE_HR_POLICIES } from '@/server/repositories/cache-scopes';
+import type { DataClassificationLevel, DataResidencyZone } from '@/server/types/tenant';
 
 export class PrismaHRPolicyRepository extends BasePrismaRepository implements IHRPolicyRepository {
+  private static readonly DEFAULT_CLASSIFICATION: DataClassificationLevel = 'OFFICIAL';
+  private static readonly DEFAULT_RESIDENCY: DataResidencyZone = 'UK_ONLY';
   async createPolicy(
     orgId: string,
     input: Omit<HRPolicy, 'id' | 'createdAt' | 'updatedAt' | 'status' | 'orgId'> & { status?: HRPolicy['status'] },
@@ -45,13 +48,23 @@ export class PrismaHRPolicyRepository extends BasePrismaRepository implements IH
   }
 
   async getPolicy(orgId: string, policyId: string): Promise<HRPolicy | null> {
-    registerOrgCacheTag(orgId, CACHE_SCOPE_HR_POLICIES);
+    registerOrgCacheTag(
+      orgId,
+      CACHE_SCOPE_HR_POLICIES,
+      PrismaHRPolicyRepository.DEFAULT_CLASSIFICATION,
+      PrismaHRPolicyRepository.DEFAULT_RESIDENCY,
+    );
     const rec = await this.prisma.hRPolicy.findFirst({ where: { id: policyId, orgId } });
     return rec ? mapPrismaHRPolicyToDomain(rec) : null;
   }
 
   async listPolicies(orgId: string, filters?: { status?: string; category?: HRPolicy['category'] }): Promise<HRPolicy[]> {
-    registerOrgCacheTag(orgId, CACHE_SCOPE_HR_POLICIES);
+    registerOrgCacheTag(
+      orgId,
+      CACHE_SCOPE_HR_POLICIES,
+      PrismaHRPolicyRepository.DEFAULT_CLASSIFICATION,
+      PrismaHRPolicyRepository.DEFAULT_RESIDENCY,
+    );
     const where: Prisma.HRPolicyWhereInput = { orgId };
     if (filters?.status) { where.status = filters.status; }
     if (filters?.category) { where.category = filters.category; }

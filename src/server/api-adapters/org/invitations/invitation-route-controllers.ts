@@ -22,6 +22,7 @@ const revokeSchema = z.object({
 const AUDIT_LIST = 'api:org:invitations:list';
 const AUDIT_REVOKE = 'api:org:invitations:revoke';
 const AUDIT_RESEND = 'api:org:invitations:resend';
+const RESOURCE_TYPE_INVITATION = 'org.invitation';
 
 function normalizeOrgId(orgId: string): string {
     const trimmed = orgId.trim();
@@ -55,7 +56,7 @@ export async function listInvitationsController(request: Request, orgId: string)
             requiredPermissions: { member: ['invite'] },
             auditSource: AUDIT_LIST,
             action: 'org.invitation.list',
-            resourceType: 'org.invitation',
+            resourceType: RESOURCE_TYPE_INVITATION,
         },
     );
 
@@ -84,7 +85,7 @@ export async function revokeInvitationController(request: Request, orgId: string
             requiredPermissions: { member: ['invite'] },
             auditSource: AUDIT_REVOKE,
             action: 'org.invitation.revoke',
-            resourceType: 'org.invitation',
+            resourceType: RESOURCE_TYPE_INVITATION,
             resourceAttributes: { token: normalizedToken },
         },
     );
@@ -112,7 +113,7 @@ export async function resendInvitationController(request: Request, orgId: string
             requiredPermissions: { member: ['invite'] },
             auditSource: AUDIT_RESEND,
             action: 'org.invitation.resend',
-            resourceType: 'org.invitation',
+            resourceType: RESOURCE_TYPE_INVITATION,
             resourceAttributes: { token: normalizedToken },
         },
     );

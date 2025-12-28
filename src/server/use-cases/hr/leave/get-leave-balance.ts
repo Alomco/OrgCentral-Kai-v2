@@ -30,12 +30,12 @@ export async function getLeaveBalance(
 
     const balances = input.year
         ? await deps.leaveBalanceRepository.getLeaveBalancesByEmployeeAndYear(
-            input.authorization.orgId,
+            input.authorization.tenantScope,
             input.employeeId,
             input.year,
         )
         : await deps.leaveBalanceRepository.getLeaveBalancesByEmployee(
-            input.authorization.orgId,
+            input.authorization.tenantScope,
             input.employeeId,
         );
 

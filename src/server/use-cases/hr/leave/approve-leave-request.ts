@@ -47,7 +47,7 @@ export async function approveLeaveRequest(
 
     const existingRequest = await fetchLeaveRequest(
         deps.leaveRequestRepository,
-        input.authorization.orgId,
+        input.authorization.tenantScope,
         input.requestId,
     );
 
@@ -57,7 +57,7 @@ export async function approveLeaveRequest(
     const decisionContext = buildLeaveDecisionContext(existingRequest);
 
     await deps.leaveRequestRepository.updateLeaveRequest(
-        input.authorization.orgId,
+        input.authorization.tenantScope,
         input.requestId,
         {
             status: 'approved',

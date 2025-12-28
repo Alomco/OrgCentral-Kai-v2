@@ -110,7 +110,7 @@ async function processEmployee(args: ProcessEmployeeArguments): Promise<ProcessE
     }
 
     const existingBalances = await args.leaveBalanceRepository.getLeaveBalancesByEmployeeAndYear(
-        args.authorization.orgId,
+        args.authorization.tenantScope,
         employeeNumber,
         args.year,
     );
@@ -142,7 +142,7 @@ async function processEmployee(args: ProcessEmployeeArguments): Promise<ProcessE
         });
 
         if (!args.dryRun) {
-            await args.leaveBalanceRepository.createLeaveBalance(args.authorization.orgId, payload);
+            await args.leaveBalanceRepository.createLeaveBalance(args.authorization.tenantScope, payload);
         }
         balancesCreated += 1;
     }
@@ -167,6 +167,10 @@ function buildLeaveBalancePayload(args: LeaveBalancePayloadArguments): LeaveBala
     return {
         id: randomUUID(),
         orgId: args.authorization.orgId,
+        dataResidency: args.authorization.dataResidency,
+        dataClassification: args.authorization.dataClassification,
+        auditSource: args.authorization.auditSource,
+        auditBatchId: args.authorization.auditBatchId,
         employeeId: args.employeeNumber,
         leaveType: args.leaveType,
         year: args.year,

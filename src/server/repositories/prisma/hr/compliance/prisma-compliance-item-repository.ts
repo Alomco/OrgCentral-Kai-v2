@@ -19,6 +19,7 @@ import { toPrismaInputJson } from '@/server/repositories/prisma/helpers/prisma-u
 import { registerOrgCacheTag, invalidateOrgCache } from '@/server/lib/cache-tags';
 import { CACHE_SCOPE_COMPLIANCE_ITEMS } from '@/server/repositories/cache-scopes';
 import { RepositoryAuthorizationError } from '@/server/repositories/security';
+import type { DataClassificationLevel, DataResidencyZone } from '@/server/types/tenant';
 
 type ComplianceLogRecord = PrismaComplianceLogItem;
 type ComplianceLogCreateData = Prisma.ComplianceLogItemUncheckedCreateInput;
@@ -28,6 +29,8 @@ type ComplianceLogFindManyArguments = Prisma.ComplianceLogItemFindManyArgs;
 export class PrismaComplianceItemRepository
     extends BasePrismaRepository
     implements IComplianceItemRepository {
+    private static readonly DEFAULT_CLASSIFICATION: DataClassificationLevel = 'OFFICIAL';
+    private static readonly DEFAULT_RESIDENCY: DataResidencyZone = 'UK_ONLY';
     private readonly statusRepository: IComplianceStatusRepository;
 
     constructor(
@@ -64,7 +67,12 @@ export class PrismaComplianceItemRepository
                 }),
             ),
         );
-        registerOrgCacheTag(input.orgId, CACHE_SCOPE_COMPLIANCE_ITEMS);
+        registerOrgCacheTag(
+            input.orgId,
+            CACHE_SCOPE_COMPLIANCE_ITEMS,
+            PrismaComplianceItemRepository.DEFAULT_CLASSIFICATION,
+            PrismaComplianceItemRepository.DEFAULT_RESIDENCY,
+        );
         await this.statusRepository.recalculateForUser(input.orgId, input.userId);
     }
 
@@ -112,7 +120,12 @@ export class PrismaComplianceItemRepository
             where: { id: itemId },
             data,
         });
-        await invalidateOrgCache(orgId, CACHE_SCOPE_COMPLIANCE_ITEMS);
+        await invalidateOrgCache(
+            orgId,
+            CACHE_SCOPE_COMPLIANCE_ITEMS,
+            PrismaComplianceItemRepository.DEFAULT_CLASSIFICATION,
+            PrismaComplianceItemRepository.DEFAULT_RESIDENCY,
+        );
         await this.statusRepository.recalculateForUser(orgId, userId);
         return mapComplianceLogRecordToDomain(record as unknown as ComplianceLogItemRecord);
     }
@@ -120,7 +133,12 @@ export class PrismaComplianceItemRepository
     async deleteItem(orgId: string, userId: string, itemId: string): Promise<void> {
         await this.ensureItemScope(itemId, orgId, userId);
         await this.complianceLog.delete({ where: { id: itemId } });
-        await invalidateOrgCache(orgId, CACHE_SCOPE_COMPLIANCE_ITEMS);
+        await invalidateOrgCache(
+            orgId,
+            CACHE_SCOPE_COMPLIANCE_ITEMS,
+            PrismaComplianceItemRepository.DEFAULT_CLASSIFICATION,
+            PrismaComplianceItemRepository.DEFAULT_RESIDENCY,
+        );
         await this.statusRepository.recalculateForUser(orgId, userId);
     }
 

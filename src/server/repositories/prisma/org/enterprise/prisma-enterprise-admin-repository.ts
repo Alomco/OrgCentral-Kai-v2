@@ -16,6 +16,7 @@ import { stampCreate, stampUpdate } from '@/server/repositories/prisma/helpers/t
 import { toPrismaInputJson } from '@/server/repositories/prisma/helpers/prisma-utils';
 import { invalidateOrgCache, registerOrgCacheTag } from '@/server/lib/cache-tags';
 import { RepositoryAuthorizationError } from '@/server/repositories/security';
+import type { DataClassificationLevel, DataResidencyZone } from '@/server/types/tenant';
 import { CACHE_SCOPE_ENTERPRISE_MANAGED_ORGS } from '@/server/repositories/cache-scopes';
 
 type ManagedOrgDelegate = PrismaClient['managedOrganization'];
@@ -25,6 +26,8 @@ type ManagedOrgUpdateData = Prisma.ManagedOrganizationUncheckedUpdateInput;
 export class PrismaEnterpriseAdminRepository
     extends BasePrismaRepository
     implements IEnterpriseAdminRepository {
+    private static readonly DEFAULT_CLASSIFICATION: DataClassificationLevel = 'OFFICIAL';
+    private static readonly DEFAULT_RESIDENCY: DataResidencyZone = 'UK_ONLY';
     private get delegate(): ManagedOrgDelegate {
         return this.prisma.managedOrganization;
     }
@@ -42,7 +45,12 @@ export class PrismaEnterpriseAdminRepository
         const record = await this.delegate.create({
             data,
         });
-        registerOrgCacheTag(data.orgId, CACHE_SCOPE_ENTERPRISE_MANAGED_ORGS);
+        registerOrgCacheTag(
+            data.orgId,
+            CACHE_SCOPE_ENTERPRISE_MANAGED_ORGS,
+            PrismaEnterpriseAdminRepository.DEFAULT_CLASSIFICATION,
+            PrismaEnterpriseAdminRepository.DEFAULT_RESIDENCY,
+        );
         return mapManagedOrganizationRecordToDomain(record);
     }
 
@@ -60,7 +68,12 @@ export class PrismaEnterpriseAdminRepository
             if (!record) { return null; }
             throw new RepositoryAuthorizationError('Managed organization access denied for this admin.');
         }
-        registerOrgCacheTag(orgId, CACHE_SCOPE_ENTERPRISE_MANAGED_ORGS);
+        registerOrgCacheTag(
+            orgId,
+            CACHE_SCOPE_ENTERPRISE_MANAGED_ORGS,
+            PrismaEnterpriseAdminRepository.DEFAULT_CLASSIFICATION,
+            PrismaEnterpriseAdminRepository.DEFAULT_RESIDENCY,
+        );
         return mapManagedOrganizationRecordToDomain(record);
     }
 
@@ -74,7 +87,12 @@ export class PrismaEnterpriseAdminRepository
             where: { id: input.orgId },
             data,
         });
-        await invalidateOrgCache(input.orgId, CACHE_SCOPE_ENTERPRISE_MANAGED_ORGS);
+        await invalidateOrgCache(
+            input.orgId,
+            CACHE_SCOPE_ENTERPRISE_MANAGED_ORGS,
+            PrismaEnterpriseAdminRepository.DEFAULT_CLASSIFICATION,
+            PrismaEnterpriseAdminRepository.DEFAULT_RESIDENCY,
+        );
         return mapManagedOrganizationRecordToDomain(record);
     }
 }

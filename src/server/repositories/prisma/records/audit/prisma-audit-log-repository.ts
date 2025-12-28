@@ -12,13 +12,15 @@ export class PrismaAuditLogRepository extends BasePrismaRepository implements IA
   }
 
   async findById(id: string): Promise<AuditLog | null> {
-    return getModelDelegate(this.prisma, 'auditLog').findUnique({
-      where: { id },
+    return getModelDelegate(this.prisma, 'auditLog').findFirst({
+      where: { id, deletedAt: null },
     });
   }
 
   async findAll(filters?: AuditLogFilters): Promise<AuditLog[]> {
     const whereClause: Prisma.AuditLogWhereInput = {};
+
+    whereClause.deletedAt = null;
 
     if (filters?.orgId) {
       whereClause.orgId = filters.orgId;
@@ -77,17 +79,20 @@ export class PrismaAuditLogRepository extends BasePrismaRepository implements IA
     });
   }
 
-  async delete(id: string): Promise<AuditLog> {
-    return getModelDelegate(this.prisma, 'auditLog').delete({
-      where: { id },
-    });
+  delete(_id: string): Promise<AuditLog> {
+    void _id;
+    return Promise.reject(new Error('Audit logs are immutable; use retention workflows to expire records.'));
   }
 
   async deleteByRetentionPolicy(orgId: string, retentionDate: Date): Promise<number> {
-    const result = await getModelDelegate(this.prisma, 'auditLog').deleteMany({
+    const result = await getModelDelegate(this.prisma, 'auditLog').updateMany({
       where: {
         orgId,
-        createdAt: { lt: retentionDate }
+        createdAt: { lt: retentionDate },
+        deletedAt: null,
+      },
+      data: {
+        deletedAt: new Date(),
       }
     });
     return result.count;

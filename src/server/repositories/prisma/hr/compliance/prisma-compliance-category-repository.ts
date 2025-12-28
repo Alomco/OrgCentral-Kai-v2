@@ -9,6 +9,7 @@ import type {
 import type { ComplianceCategory } from '@/server/types/compliance-types';
 import { registerOrgCacheTag, invalidateOrgCache } from '@/server/lib/cache-tags';
 import { CACHE_SCOPE_COMPLIANCE_CATEGORIES } from '@/server/repositories/cache-scopes';
+import type { DataClassificationLevel, DataResidencyZone } from '@/server/types/tenant';
 
 interface ComplianceCategoryRecord {
     id: string;
@@ -37,6 +38,8 @@ function mapRecordToDomain(record: ComplianceCategoryRecord): ComplianceCategory
 export class PrismaComplianceCategoryRepository
     extends BasePrismaRepository
     implements IComplianceCategoryRepository {
+    private static readonly DEFAULT_CLASSIFICATION: DataClassificationLevel = 'OFFICIAL';
+    private static readonly DEFAULT_RESIDENCY: DataResidencyZone = 'UK_ONLY';
     private get categories() {
         return (this.prisma as PrismaClient & { complianceCategory: unknown }).complianceCategory;
     }
@@ -45,7 +48,12 @@ export class PrismaComplianceCategoryRepository
         const records: ComplianceCategoryRecord[] = await (this.categories as {
             findMany: (args: unknown) => Promise<ComplianceCategoryRecord[]>;
         }).findMany({ where: { orgId }, orderBy: [{ sortOrder: 'asc' }, { label: 'asc' }] });
-        registerOrgCacheTag(orgId, CACHE_SCOPE_COMPLIANCE_CATEGORIES);
+        registerOrgCacheTag(
+            orgId,
+            CACHE_SCOPE_COMPLIANCE_CATEGORIES,
+            PrismaComplianceCategoryRepository.DEFAULT_CLASSIFICATION,
+            PrismaComplianceCategoryRepository.DEFAULT_RESIDENCY,
+        );
         return records.map(mapRecordToDomain);
     }
 
@@ -70,7 +78,12 @@ export class PrismaComplianceCategoryRepository
             }),
         });
 
-        await invalidateOrgCache(input.orgId, CACHE_SCOPE_COMPLIANCE_CATEGORIES);
+        await invalidateOrgCache(
+            input.orgId,
+            CACHE_SCOPE_COMPLIANCE_CATEGORIES,
+            PrismaComplianceCategoryRepository.DEFAULT_CLASSIFICATION,
+            PrismaComplianceCategoryRepository.DEFAULT_RESIDENCY,
+        );
         return mapRecordToDomain(record);
     }
 }

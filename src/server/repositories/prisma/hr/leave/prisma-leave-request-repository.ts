@@ -1,6 +1,7 @@
 import { Prisma } from '@prisma/client';
 import { BasePrismaRepository } from '@/server/repositories/prisma/base-prisma-repository';
 import type { ILeaveRequestRepository, LeaveRequestCreateInput, LeaveRequestReadOptions } from '@/server/repositories/contracts/hr/leave/leave-request-repository-contract';
+import type { TenantScope } from '@/server/types/tenant';
 import type { LeaveRequest } from '@/server/types/leave-types';
 import {
     buildLeaveRequestMetadata,
@@ -11,10 +12,12 @@ import { DEFAULT_WORKING_HOURS_PER_DAY } from '@/server/domain/leave/leave-calcu
 import { EntityNotFoundError } from '@/server/errors';
 import { invalidateOrgCache } from '@/server/lib/cache-tags';
 import { CACHE_SCOPE_LEAVE_REQUESTS } from '@/server/repositories/cache-scopes';
+import { isJsonObject } from '@/server/repositories/prisma/helpers/prisma-utils';
 
 export class PrismaLeaveRequestRepository extends BasePrismaRepository implements ILeaveRequestRepository {
 
-    async createLeaveRequest(tenantId: string, request: LeaveRequestCreateInput): Promise<void> {
+    async createLeaveRequest(tenant: TenantScope, request: LeaveRequestCreateInput): Promise<void> {
+        const { orgId } = tenant;
         const hoursPerDay = request.hoursPerDay ?? DEFAULT_WORKING_HOURS_PER_DAY;
         const metadata = buildLeaveRequestMetadata({
             employeeId: request.employeeId,
@@ -31,7 +34,7 @@ export class PrismaLeaveRequestRepository extends BasePrismaRepository implement
         await this.prisma.leaveRequest.create({
             data: {
                 id: request.id,
-                orgId: tenantId,
+                orgId,
                 userId: request.userId,
                 policyId: request.policyId,
                 status: mapDomainStatusToPrisma('submitted'),
@@ -39,31 +42,38 @@ export class PrismaLeaveRequestRepository extends BasePrismaRepository implement
                 endDate: new Date(request.endDate),
                 hours: new Prisma.Decimal(request.totalDays * hoursPerDay),
                 reason: request.reason ?? null,
-                // Cast returned metadata to Prisma's InputJsonValue to satisfy the Prisma client types
-                metadata: metadata as unknown as Prisma.InputJsonValue,
+                dataClassification: request.dataClassification,
+                residencyTag: request.dataResidency,
+                auditSource: request.auditSource ?? tenant.auditSource,
+                auditBatchId: request.auditBatchId ?? tenant.auditBatchId,
+                metadata,
                 submittedAt: new Date(),
             },
         });
 
-        await invalidateOrgCache(tenantId, CACHE_SCOPE_LEAVE_REQUESTS);
+        await invalidateOrgCache(
+            orgId,
+            CACHE_SCOPE_LEAVE_REQUESTS,
+            request.dataClassification,
+            request.dataResidency,
+        );
     }
 
     async updateLeaveRequest(
-        tenantId: string,
+        tenant: TenantScope,
         requestId: string,
         updates: Partial<Pick<LeaveRequest,
             'status' | 'approvedBy' | 'approvedAt' | 'rejectedBy' | 'rejectedAt' |
             'rejectionReason' | 'cancelledBy' | 'cancelledAt' | 'cancellationReason' |
             'managerComments'>>,
     ): Promise<void> {
+        const { orgId } = tenant;
         const existing = await this.prisma.leaveRequest.findUnique({ where: { id: requestId } });
-        if (existing?.orgId !== tenantId) {
-            throw new EntityNotFoundError('Leave request', { requestId, orgId: tenantId });
+        if (!existing || existing.orgId !== orgId) {
+            throw new EntityNotFoundError('Leave request', { requestId, orgId });
         }
 
-        const metadata: Record<string, unknown> = {
-            ...(existing.metadata as Record<string, unknown> | null),
-        };
+        const metadata: Prisma.JsonObject = isJsonObject(existing.metadata) ? { ...existing.metadata } : {};
 
         if ('managerComments' in updates) {
             // managerComments can be null value, keep it as-is when intentionally set
@@ -85,31 +95,38 @@ export class PrismaLeaveRequestRepository extends BasePrismaRepository implement
             data: {
                 status: updates.status ? mapDomainStatusToPrisma(updates.status) : undefined,
                 approverOrgId:
-                    updates.approvedBy || updates.rejectedBy ? tenantId : existing.approverOrgId,
+                    updates.approvedBy || updates.rejectedBy ? orgId : existing.approverOrgId,
                 approverUserId: updates.approvedBy ?? updates.rejectedBy ?? existing.approverUserId,
                 // Prisma expects Date instances for date-time fields; convert from string timestamps if provided
                 decidedAt: updates.approvedAt ? new Date(updates.approvedAt) : updates.rejectedAt ? new Date(updates.rejectedAt) : existing.decidedAt,
                 reason: updates.rejectionReason ?? existing.reason,
                 // Cast metadata to Prisma's expected JSON type
-                metadata: metadata as unknown as Prisma.InputJsonValue,
+                metadata,
             },
         });
 
-        await invalidateOrgCache(tenantId, CACHE_SCOPE_LEAVE_REQUESTS);
+        await invalidateOrgCache(
+            orgId,
+            CACHE_SCOPE_LEAVE_REQUESTS,
+            existing.dataClassification,
+            existing.residencyTag,
+        );
     }
 
-    async getLeaveRequest(tenantId: string, requestId: string, options?: LeaveRequestReadOptions) {
+    async getLeaveRequest(tenant: TenantScope, requestId: string, options?: LeaveRequestReadOptions) {
+        const { orgId } = tenant;
         const record = await this.prisma.leaveRequest.findUnique({ where: { id: requestId } });
-        if (record?.orgId !== tenantId) {
+        if (record?.orgId !== orgId) {
             return null;
         }
         return mapPrismaLeaveRequestToDomain(record, { hoursPerDay: options?.hoursPerDay });
     }
 
-    async getLeaveRequestsByEmployee(tenantId: string, employeeId: string, options?: LeaveRequestReadOptions) {
+    async getLeaveRequestsByEmployee(tenant: TenantScope, employeeId: string, options?: LeaveRequestReadOptions) {
+        const { orgId } = tenant;
         const records = await this.prisma.leaveRequest.findMany({
             where: {
-                orgId: tenantId,
+                orgId,
                 userId: employeeId,
             },
             orderBy: { createdAt: 'desc' },
@@ -118,13 +135,14 @@ export class PrismaLeaveRequestRepository extends BasePrismaRepository implement
     }
 
     async getLeaveRequestsByOrganization(
-        tenantId: string,
+        tenant: TenantScope,
         filters?: { status?: string; startDate?: Date; endDate?: Date },
         options?: LeaveRequestReadOptions,
     ) {
+        const { orgId } = tenant;
         const records = await this.prisma.leaveRequest.findMany({
             where: {
-                orgId: tenantId,
+                orgId,
                 status: filters?.status ? mapDomainStatusToPrisma(filters.status as LeaveRequest['status']) : undefined,
                 startDate: filters?.startDate ? { gte: filters.startDate } : undefined,
                 endDate: filters?.endDate ? { lte: filters.endDate } : undefined,
@@ -134,10 +152,11 @@ export class PrismaLeaveRequestRepository extends BasePrismaRepository implement
         return records.map((record) => mapPrismaLeaveRequestToDomain(record, { hoursPerDay: options?.hoursPerDay }));
     }
 
-    async countLeaveRequestsByPolicy(tenantId: string, policyId: string): Promise<number> {
+    async countLeaveRequestsByPolicy(tenant: TenantScope, policyId: string): Promise<number> {
+        const { orgId } = tenant;
         return this.prisma.leaveRequest.count({
             where: {
-                orgId: tenantId,
+                orgId,
                 policyId,
             },
         });

@@ -4,6 +4,7 @@ import { invalidateOrgCache, registerOrgCacheTag } from '@/server/lib/cache-tags
 import { CACHE_SCOPE_SECURITY_EVENTS } from '@/server/repositories/cache-scopes';
 import type { ISecurityEventRepository } from '@/server/repositories/contracts/auth/security/security-event-repository-contract';
 import type { SecurityEvent } from '@/server/types/hr-types';
+import type { DataClassificationLevel, DataResidencyZone } from '@/server/types/tenant';
 import type {
   SecurityEventCreationData,
   SecurityEventFilters,
@@ -21,6 +22,8 @@ import {
 export class PrismaSecurityEventRepository
   extends BasePrismaRepository
   implements ISecurityEventRepository {
+  private static readonly DEFAULT_CLASSIFICATION: DataClassificationLevel = 'OFFICIAL';
+  private static readonly DEFAULT_RESIDENCY: DataResidencyZone = 'UK_ONLY';
 
   async findById(id: string): Promise<SecurityEvent | null> {
     const record = await this.prisma.securityEvent.findUnique({ where: { id } });
@@ -66,7 +69,12 @@ export class PrismaSecurityEventRepository
   }
 
   async getSecurityEventsCount(orgId: string, daysBack = 7): Promise<number> {
-    registerOrgCacheTag(orgId, CACHE_SCOPE_SECURITY_EVENTS);
+    registerOrgCacheTag(
+      orgId,
+      CACHE_SCOPE_SECURITY_EVENTS,
+      PrismaSecurityEventRepository.DEFAULT_CLASSIFICATION,
+      PrismaSecurityEventRepository.DEFAULT_RESIDENCY,
+    );
     const dateThreshold = new Date();
     dateThreshold.setDate(dateThreshold.getDate() - daysBack);
 
@@ -101,7 +109,12 @@ export class PrismaSecurityEventRepository
   }
 
   async getSecurityEvent(tenantId: string, eventId: string): Promise<SecurityEvent | null> {
-    registerOrgCacheTag(tenantId, CACHE_SCOPE_SECURITY_EVENTS);
+    registerOrgCacheTag(
+      tenantId,
+      CACHE_SCOPE_SECURITY_EVENTS,
+      PrismaSecurityEventRepository.DEFAULT_CLASSIFICATION,
+      PrismaSecurityEventRepository.DEFAULT_RESIDENCY,
+    );
     const record = await this.findById(eventId);
     return record?.orgId === tenantId ? record : null;
   }
@@ -111,7 +124,12 @@ export class PrismaSecurityEventRepository
     userId: string,
     filters?: { eventType?: string; severity?: string; startDate?: Date; endDate?: Date },
   ): Promise<SecurityEvent[]> {
-    registerOrgCacheTag(tenantId, CACHE_SCOPE_SECURITY_EVENTS);
+    registerOrgCacheTag(
+      tenantId,
+      CACHE_SCOPE_SECURITY_EVENTS,
+      PrismaSecurityEventRepository.DEFAULT_CLASSIFICATION,
+      PrismaSecurityEventRepository.DEFAULT_RESIDENCY,
+    );
     return this.findAll({
       orgId: tenantId,
       userId,
@@ -126,7 +144,12 @@ export class PrismaSecurityEventRepository
     tenantId: string,
     filters?: { eventType?: string; severity?: string; userId?: string; startDate?: Date; endDate?: Date },
   ): Promise<SecurityEvent[]> {
-    registerOrgCacheTag(tenantId, CACHE_SCOPE_SECURITY_EVENTS);
+    registerOrgCacheTag(
+      tenantId,
+      CACHE_SCOPE_SECURITY_EVENTS,
+      PrismaSecurityEventRepository.DEFAULT_CLASSIFICATION,
+      PrismaSecurityEventRepository.DEFAULT_RESIDENCY,
+    );
     return this.findAll({
       orgId: tenantId,
       userId: filters?.userId,
@@ -188,7 +211,12 @@ export class PrismaSecurityEventRepository
 
   private async invalidateScope(orgId?: string | null): Promise<void> {
     if (orgId) {
-      await invalidateOrgCache(orgId, CACHE_SCOPE_SECURITY_EVENTS);
+      await invalidateOrgCache(
+        orgId,
+        CACHE_SCOPE_SECURITY_EVENTS,
+        PrismaSecurityEventRepository.DEFAULT_CLASSIFICATION,
+        PrismaSecurityEventRepository.DEFAULT_RESIDENCY,
+      );
     }
   }
 }

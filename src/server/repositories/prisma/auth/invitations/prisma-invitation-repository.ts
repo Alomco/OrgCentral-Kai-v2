@@ -118,7 +118,7 @@ export class PrismaInvitationRepository extends BasePrismaRepository implements 
 
     async revokeInvitation(orgId: string, token: string, revokedByUserId: string, reason?: string): Promise<void> {
         const record = await getInvitationDelegate(this.prisma).findUnique({ where: { token } });
-        if (!record || record.orgId !== orgId) {
+        if (record?.orgId !== orgId) {
             throw new RepositoryAuthorizationError('Invitation not found for this organization.');
         }
 

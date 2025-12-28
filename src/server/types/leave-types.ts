@@ -50,7 +50,7 @@ export interface OrganizationLocation {
   primary?: boolean;
 }
 
-export interface LeaveRequest {
+export interface LeaveRequest extends TenantMetadata {
   id: LeaveRequestId;
   orgId: OrgId;
   employeeId: EmployeeId;
@@ -79,7 +79,7 @@ export interface LeaveRequest {
   managerComments?: string | null;
 }
 
-export interface LeaveBalance {
+export interface LeaveBalance extends TenantMetadata {
   id: LeaveBalanceId;
   orgId: OrgId;
   employeeId: EmployeeId;
@@ -108,7 +108,7 @@ export type LeavePolicyType = (typeof LEAVE_POLICY_TYPES)[number];
 export const LEAVE_ACCRUAL_FREQUENCIES = ['MONTHLY', 'QUARTERLY', 'YEARLY', 'NONE'] as const;
 export type LeaveAccrualFrequency = (typeof LEAVE_ACCRUAL_FREQUENCIES)[number];
 
-export interface LeavePolicy {
+export interface LeavePolicy extends TenantMetadata {
   id: string;
   orgId: OrgId;
   departmentId?: string | null;
@@ -177,7 +177,7 @@ export interface UserData {
   updatedAt: TimestampString;
 }
 
-export interface EmployeeData {
+export interface EmployeeData extends TenantMetadata {
   id: EmployeeId;
   employeeId: EmployeeId;
   userId: UserId;

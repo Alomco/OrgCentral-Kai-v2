@@ -39,7 +39,7 @@ export async function cancelLeaveRequest(
 
     const existingRequest = await fetchLeaveRequest(
         deps.leaveRequestRepository,
-        input.authorization.orgId,
+        input.authorization.tenantScope,
         input.requestId,
     );
 
@@ -49,7 +49,7 @@ export async function cancelLeaveRequest(
     const cancelledAt = getCurrentTimestamp();
 
     await deps.leaveRequestRepository.updateLeaveRequest(
-        input.authorization.orgId,
+        input.authorization.tenantScope,
         input.requestId,
         {
             status: 'cancelled',

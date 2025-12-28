@@ -116,7 +116,7 @@ export async function updateLeavePolicy(
     }
 
     const existing = await deps.leavePolicyRepository.getLeavePolicy(
-        request.authorization.orgId,
+        request.authorization.tenantScope,
         request.policyId,
     );
 
@@ -129,7 +129,7 @@ export async function updateLeavePolicy(
 
     if (request.patch.name && request.patch.name !== existing.name) {
         const collision = await deps.leavePolicyRepository.getLeavePolicyByName(
-            request.authorization.orgId,
+            request.authorization.tenantScope,
             request.patch.name,
         );
 
@@ -144,7 +144,7 @@ export async function updateLeavePolicy(
     const updates = buildLeavePolicyUpdates(request.patch);
 
     await deps.leavePolicyRepository.updateLeavePolicy(
-        request.authorization.orgId,
+        request.authorization.tenantScope,
         request.policyId,
         updates,
     );
@@ -152,7 +152,7 @@ export async function updateLeavePolicy(
     await invalidateLeaveCacheScopes(request.authorization, 'policies');
 
     const updated = await deps.leavePolicyRepository.getLeavePolicy(
-        request.authorization.orgId,
+        request.authorization.tenantScope,
         request.policyId,
     );
 

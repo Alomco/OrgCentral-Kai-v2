@@ -6,6 +6,7 @@
 import type { ILeaveRequestRepository } from '@/server/repositories/contracts/hr/leave/leave-request-repository-contract';
 import type { LeaveRequest, LeaveStatus } from '@/server/types/leave-types';
 import { EntityNotFoundError, ValidationError } from '@/server/errors';
+import type { TenantScope } from '@/server/types/tenant';
 
 /**
  * Fetches and validates a leave request exists
@@ -13,10 +14,10 @@ import { EntityNotFoundError, ValidationError } from '@/server/errors';
  */
 export async function fetchLeaveRequest(
     repository: ILeaveRequestRepository,
-    orgId: string,
+    tenant: TenantScope,
     requestId: string,
 ): Promise<LeaveRequest> {
-    const request = await repository.getLeaveRequest(orgId, requestId);
+    const request = await repository.getLeaveRequest(tenant, requestId);
 
     if (!request) {
         throw new EntityNotFoundError('Leave request', { requestId });

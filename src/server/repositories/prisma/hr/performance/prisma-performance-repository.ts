@@ -14,6 +14,7 @@ import { EntityNotFoundError } from '@/server/errors';
 import { registerOrgCacheTag } from '@/server/lib/cache-tags';
 import { CACHE_SCOPE_PERFORMANCE_GOALS, CACHE_SCOPE_PERFORMANCE_REVIEWS } from '@/server/repositories/cache-scopes';
 import { buildGoalUpdateData, buildReviewUpdateData } from './prisma-performance-repository.helpers';
+import type { DataClassificationLevel, DataResidencyZone } from '@/server/types/tenant';
 
 type ReviewDelegate = PrismaClient['performanceReview'];
 type GoalDelegate = PrismaClient['performanceGoal'];
@@ -24,6 +25,8 @@ export class PrismaPerformanceRepository extends BasePrismaRepository implements
     private readonly orgId: string;
     private readonly reviews: ReviewDelegate;
     private readonly goals: GoalDelegate;
+    private static readonly DEFAULT_CLASSIFICATION: DataClassificationLevel = 'OFFICIAL';
+    private static readonly DEFAULT_RESIDENCY: DataResidencyZone = 'UK_ONLY';
 
     constructor(orgId: string, options: BasePrismaRepositoryOptions = {}) {
         super(options);
@@ -39,7 +42,12 @@ export class PrismaPerformanceRepository extends BasePrismaRepository implements
         }
 
         const reviewScope: string = CACHE_SCOPE_PERFORMANCE_REVIEWS;
-        registerOrgCacheTag(this.orgId, reviewScope);
+        registerOrgCacheTag(
+            this.orgId,
+            reviewScope,
+            PrismaPerformanceRepository.DEFAULT_CLASSIFICATION,
+            PrismaPerformanceRepository.DEFAULT_RESIDENCY,
+        );
         return mapPrismaPerformanceReviewToDomain(record);
     }
 
@@ -50,7 +58,12 @@ export class PrismaPerformanceRepository extends BasePrismaRepository implements
         });
 
         const reviewScope: string = CACHE_SCOPE_PERFORMANCE_REVIEWS;
-        registerOrgCacheTag(this.orgId, reviewScope);
+        registerOrgCacheTag(
+            this.orgId,
+            reviewScope,
+            PrismaPerformanceRepository.DEFAULT_CLASSIFICATION,
+            PrismaPerformanceRepository.DEFAULT_RESIDENCY,
+        );
         return records.map(mapPrismaPerformanceReviewToDomain);
     }
 
@@ -66,7 +79,12 @@ export class PrismaPerformanceRepository extends BasePrismaRepository implements
         });
 
         const goalScope: string = CACHE_SCOPE_PERFORMANCE_GOALS;
-        registerOrgCacheTag(this.orgId, goalScope);
+        registerOrgCacheTag(
+            this.orgId,
+            goalScope,
+            PrismaPerformanceRepository.DEFAULT_CLASSIFICATION,
+            PrismaPerformanceRepository.DEFAULT_RESIDENCY,
+        );
 
         return records.map(mapPrismaPerformanceGoalToDomain);
     }

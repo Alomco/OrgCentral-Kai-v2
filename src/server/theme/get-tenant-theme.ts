@@ -19,6 +19,9 @@ export interface TenantThemeCacheContext {
     residency: DataResidencyZone;
 }
 
+const DEFAULT_CLASSIFICATION: DataClassificationLevel = 'OFFICIAL';
+const DEFAULT_RESIDENCY: DataResidencyZone = 'UK_ONLY';
+
 /**
  * Get the theme repository instance (uses default Prisma client)
  */
@@ -56,7 +59,7 @@ export async function getTenantTheme(orgId?: string | null): Promise<TenantTheme
     cacheLife('hours');
 
     const resolvedOrgId = orgId ?? 'default';
-    registerOrgCacheTag(resolvedOrgId, CACHE_SCOPE_TENANT_THEME);
+    registerOrgCacheTag(resolvedOrgId, CACHE_SCOPE_TENANT_THEME, DEFAULT_CLASSIFICATION, DEFAULT_RESIDENCY);
 
     // For default/anonymous users, use default theme
     if (resolvedOrgId === 'default') {

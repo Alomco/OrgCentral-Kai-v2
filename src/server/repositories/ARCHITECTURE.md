@@ -134,7 +134,7 @@ export class PrismaFooRepository extends BasePrismaRepository implements IFooRep
 - Use structured audit fields: `context.auditSource`, `context.auditBatchId`, and `context.correlationId`.
 
 ## Cache And Invalidation Strategy
-- Register cache tags for the org before reads (`registerOrgCacheTag(context.orgId, '<bucket>')`).
+- Register cache tags for the org before reads (`registerOrgCacheTag(context.orgId, '<bucket>', context.dataClassification, context.dataResidency)`).
 - Invalidate relevant tags immediately after mutations to preserve cache coherency.
 - Use `context.tenantScope` to decide whether to fan-out invalidations across residency zones if a feature requires it.
 

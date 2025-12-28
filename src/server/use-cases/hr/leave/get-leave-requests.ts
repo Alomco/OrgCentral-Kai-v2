@@ -38,7 +38,7 @@ export async function getLeaveRequests(
     if (input.employeeId) {
         assertNonEmpty(input.employeeId, 'Employee ID');
         requests = await deps.leaveRequestRepository.getLeaveRequestsByEmployee(
-            input.authorization.orgId,
+            input.authorization.tenantScope,
             input.employeeId,
             input.options,
         );
@@ -57,7 +57,7 @@ export async function getLeaveRequests(
         }
     } else {
         requests = await deps.leaveRequestRepository.getLeaveRequestsByOrganization(
-            input.authorization.orgId,
+            input.authorization.tenantScope,
             filters,
             input.options,
         );

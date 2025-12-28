@@ -25,17 +25,17 @@ const initialState: RevokeOrgInvitationActionState = { status: 'idle' };
 export function RevokeOrgInvitationForm({ token }: { token: string }) {
     const [state, action, pending] = useActionState(revokeOrgInvitationAction, initialState);
     const [confirmOpen, setConfirmOpen] = useState(false);
-    const formRef = useRef<HTMLFormElement | null>(null);
-    const feedbackRef = useRef<HTMLDivElement | null>(null);
+    const formReference = useRef<HTMLFormElement | null>(null);
+    const feedbackReference = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
         if (!pending && state.status === 'error') {
-            feedbackRef.current?.focus();
+            feedbackReference.current?.focus();
         }
     }, [pending, state.status]);
 
     return (
-        <form ref={formRef} action={action} className="inline-flex flex-col items-end gap-1" aria-busy={pending}>
+        <form ref={formReference} action={action} className="inline-flex flex-col items-end gap-1" aria-busy={pending}>
             <input type="hidden" name="token" value={token} />
 
             <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
@@ -58,7 +58,7 @@ export function RevokeOrgInvitationForm({ token }: { token: string }) {
                             disabled={pending}
                             onClick={() => {
                                 setConfirmOpen(false);
-                                formRef.current?.requestSubmit();
+                                formReference.current?.requestSubmit();
                             }}
                         >
                             {pending ? <Spinner className="mr-2" /> : null}
@@ -70,7 +70,7 @@ export function RevokeOrgInvitationForm({ token }: { token: string }) {
 
             {state.status === 'error' ? (
                 <div
-                    ref={feedbackRef}
+                    ref={feedbackReference}
                     tabIndex={-1}
                     className="text-xs text-destructive"
                     role="status"

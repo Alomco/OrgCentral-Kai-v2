@@ -15,6 +15,7 @@ import { toPrismaInputJson } from '@/server/repositories/prisma/helpers/prisma-u
 import { registerOrgCacheTag, invalidateOrgCache } from '@/server/lib/cache-tags';
 import { CACHE_SCOPE_CHECKLIST_INSTANCES } from '@/server/repositories/cache-scopes';
 import { RepositoryAuthorizationError } from '@/server/repositories/security';
+import type { DataClassificationLevel, DataResidencyZone } from '@/server/types/tenant';
 
 type ChecklistInstanceRecord = PrismaChecklistInstance;
 type ChecklistInstanceCreateData = Prisma.ChecklistInstanceUncheckedCreateInput;
@@ -22,6 +23,8 @@ type ChecklistInstanceUpdateData = Prisma.ChecklistInstanceUncheckedUpdateInput;
 export class PrismaChecklistInstanceRepository
     extends BasePrismaRepository
     implements IChecklistInstanceRepository {
+    private static readonly DEFAULT_CLASSIFICATION: DataClassificationLevel = 'OFFICIAL';
+    private static readonly DEFAULT_RESIDENCY: DataResidencyZone = 'UK_ONLY';
     private get checklistInstances(): PrismaClient['checklistInstance'] {
         return this.prisma.checklistInstance;
     }
@@ -50,7 +53,12 @@ export class PrismaChecklistInstanceRepository
         const record = await this.checklistInstances.create({
             data,
         });
-        registerOrgCacheTag(input.orgId, CACHE_SCOPE_CHECKLIST_INSTANCES);
+        registerOrgCacheTag(
+            input.orgId,
+            CACHE_SCOPE_CHECKLIST_INSTANCES,
+            PrismaChecklistInstanceRepository.DEFAULT_CLASSIFICATION,
+            PrismaChecklistInstanceRepository.DEFAULT_RESIDENCY,
+        );
         return mapChecklistInstanceRecordToDomain(record);
     }
 
@@ -100,7 +108,12 @@ export class PrismaChecklistInstanceRepository
             where: { id: instanceId },
             data,
         });
-        await invalidateOrgCache(orgId, CACHE_SCOPE_CHECKLIST_INSTANCES);
+        await invalidateOrgCache(
+            orgId,
+            CACHE_SCOPE_CHECKLIST_INSTANCES,
+            PrismaChecklistInstanceRepository.DEFAULT_CLASSIFICATION,
+            PrismaChecklistInstanceRepository.DEFAULT_RESIDENCY,
+        );
         return mapChecklistInstanceRecordToDomain(record);
     }
 
@@ -110,7 +123,12 @@ export class PrismaChecklistInstanceRepository
             where: { id: instanceId },
             data: stampUpdate({ status: 'COMPLETED', completedAt: new Date(), orgId }),
         });
-        await invalidateOrgCache(orgId, CACHE_SCOPE_CHECKLIST_INSTANCES);
+        await invalidateOrgCache(
+            orgId,
+            CACHE_SCOPE_CHECKLIST_INSTANCES,
+            PrismaChecklistInstanceRepository.DEFAULT_CLASSIFICATION,
+            PrismaChecklistInstanceRepository.DEFAULT_RESIDENCY,
+        );
         return mapChecklistInstanceRecordToDomain(record);
     }
 
@@ -120,6 +138,11 @@ export class PrismaChecklistInstanceRepository
             where: { id: instanceId },
             data: stampUpdate({ status: 'CANCELLED', orgId }),
         });
-        await invalidateOrgCache(orgId, CACHE_SCOPE_CHECKLIST_INSTANCES);
+        await invalidateOrgCache(
+            orgId,
+            CACHE_SCOPE_CHECKLIST_INSTANCES,
+            PrismaChecklistInstanceRepository.DEFAULT_CLASSIFICATION,
+            PrismaChecklistInstanceRepository.DEFAULT_RESIDENCY,
+        );
     }
 }

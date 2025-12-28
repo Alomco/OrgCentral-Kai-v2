@@ -66,7 +66,7 @@ export async function syncLeaveAccruals(
         input.employeeIds,
     );
 
-    const policyCache = await PolicyCache.bootstrap(deps.leavePolicyRepository, authorization.orgId);
+    const policyCache = await PolicyCache.bootstrap(deps.leavePolicyRepository, authorization.tenantScope);
     const dryRun = Boolean(input.dryRun);
 
     const { processedEmployees, balancesCreated, skippedEmployees, missingPolicies } = await processAccruals({

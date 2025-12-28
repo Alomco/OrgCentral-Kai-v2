@@ -1,5 +1,6 @@
 import type { ILeavePolicyRepository } from '@/server/repositories/contracts/hr/leave/leave-policy-repository-contract';
 import type { LeavePolicy } from '@/server/types/leave-types';
+import type { TenantScope } from '@/server/types/tenant';
 import { resolveLeavePolicyId } from '../utils/resolve-leave-policy';
 import { normalizeLeaveType } from './sync-leave-accruals.entitlements';
 
@@ -8,20 +9,20 @@ export class PolicyCache {
 
     private constructor(
         private readonly policyRepository: ILeavePolicyRepository,
-        private readonly orgId: string,
+        private readonly tenant: TenantScope,
     ) { }
 
     static async bootstrap(
         policyRepository: ILeavePolicyRepository,
-        orgId: string,
+        tenant: TenantScope,
     ): Promise<PolicyCache> {
-        const cache = new PolicyCache(policyRepository, orgId);
+        const cache = new PolicyCache(policyRepository, tenant);
         await cache.warm();
         return cache;
     }
 
     async warm(): Promise<void> {
-        const policies = await this.policyRepository.getLeavePoliciesByOrganization(this.orgId);
+        const policies = await this.policyRepository.getLeavePoliciesByOrganization(this.tenant);
         for (const policy of policies) {
             this.add(policy);
         }
@@ -34,8 +35,8 @@ export class PolicyCache {
             return cached;
         }
 
-        const policyId = await resolveLeavePolicyId({ leavePolicyRepository: this.policyRepository }, this.orgId, leaveType);
-        const policy = await this.policyRepository.getLeavePolicy(this.orgId, policyId);
+        const policyId = await resolveLeavePolicyId({ leavePolicyRepository: this.policyRepository }, this.tenant, leaveType);
+        const policy = await this.policyRepository.getLeavePolicy(this.tenant, policyId);
         if (policy) {
             this.add(policy);
             return policy;

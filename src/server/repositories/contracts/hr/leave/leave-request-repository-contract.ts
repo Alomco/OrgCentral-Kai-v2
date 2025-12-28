@@ -3,6 +3,7 @@
  * Following SOLID principles with clear separation of concerns
  */
 import type { LeaveRequest } from '@/server/types/leave-types';
+import type { TenantScope } from '@/server/types/tenant';
 
 export type LeaveRequestCreateInput = Omit<LeaveRequest, 'createdAt'> & { policyId: string; hoursPerDay?: number };
 export interface LeaveRequestReadOptions {
@@ -14,7 +15,7 @@ export interface ILeaveRequestRepository {
    * Create a new leave request
    */
   createLeaveRequest(
-    tenantId: string,
+    tenant: TenantScope,
     request: LeaveRequestCreateInput
   ): Promise<void>;
 
@@ -22,7 +23,7 @@ export interface ILeaveRequestRepository {
    * Update an existing leave request
    */
   updateLeaveRequest(
-    tenantId: string,
+    tenant: TenantScope,
     requestId: string,
     updates: Partial<Pick<LeaveRequest,
       'status' | 'approvedBy' | 'approvedAt' | 'rejectedBy' | 'rejectedAt' |
@@ -34,7 +35,7 @@ export interface ILeaveRequestRepository {
    * Get a specific leave request by ID
    */
   getLeaveRequest(
-    tenantId: string,
+    tenant: TenantScope,
     requestId: string,
     options?: LeaveRequestReadOptions
   ): Promise<LeaveRequest | null>;
@@ -43,7 +44,7 @@ export interface ILeaveRequestRepository {
    * Get all leave requests for a specific employee
    */
   getLeaveRequestsByEmployee(
-    tenantId: string,
+    tenant: TenantScope,
     employeeId: string,
     options?: LeaveRequestReadOptions
   ): Promise<LeaveRequest[]>;
@@ -52,7 +53,7 @@ export interface ILeaveRequestRepository {
    * Get all leave requests for an organization with optional status filter
    */
   getLeaveRequestsByOrganization(
-    tenantId: string,
+    tenant: TenantScope,
     filters?: { status?: string; startDate?: Date; endDate?: Date },
     options?: LeaveRequestReadOptions
   ): Promise<LeaveRequest[]>;
@@ -62,7 +63,7 @@ export interface ILeaveRequestRepository {
    * Used to guard against deleting policies that are already in use.
    */
   countLeaveRequestsByPolicy(
-    tenantId: string,
+    tenant: TenantScope,
     policyId: string,
   ): Promise<number>;
 }

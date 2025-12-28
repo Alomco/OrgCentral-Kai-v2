@@ -3,6 +3,7 @@
  * Following SOLID principles with clear separation of concerns
  */
 import type { LeaveBalance } from '@/server/types/leave-types';
+import type { TenantScope } from '@/server/types/tenant';
 
 export type LeaveBalanceCreateInput = Omit<LeaveBalance, 'createdAt' | 'updatedAt'> & { policyId: string };
 
@@ -11,7 +12,7 @@ export interface ILeaveBalanceRepository {
    * Create a new leave balance record
    */
   createLeaveBalance(
-    tenantId: string,
+    tenant: TenantScope,
     balance: LeaveBalanceCreateInput
   ): Promise<void>;
 
@@ -19,7 +20,7 @@ export interface ILeaveBalanceRepository {
    * Update an existing leave balance
    */
   updateLeaveBalance(
-    tenantId: string,
+    tenant: TenantScope,
     balanceId: string,
     updates: Partial<{
       used: number;
@@ -33,7 +34,7 @@ export interface ILeaveBalanceRepository {
    * Get a specific leave balance by ID
    */
   getLeaveBalance(
-    tenantId: string,
+    tenant: TenantScope,
     balanceId: string
   ): Promise<LeaveBalance | null>;
 
@@ -41,7 +42,7 @@ export interface ILeaveBalanceRepository {
    * Get leave balances for an employee in a specific year
    */
   getLeaveBalancesByEmployeeAndYear(
-    tenantId: string,
+    tenant: TenantScope,
     employeeId: string,
     year: number
   ): Promise<LeaveBalance[]>;
@@ -50,7 +51,7 @@ export interface ILeaveBalanceRepository {
    * Get all leave balances for an employee regardless of year
    */
   getLeaveBalancesByEmployee(
-    tenantId: string,
+    tenant: TenantScope,
     employeeId: string
   ): Promise<LeaveBalance[]>;
 
@@ -59,7 +60,7 @@ export interface ILeaveBalanceRepository {
    * Used to guard against deleting policies that are already in use.
    */
   countLeaveBalancesByPolicy(
-    tenantId: string,
+    tenant: TenantScope,
     policyId: string,
   ): Promise<number>;
 }

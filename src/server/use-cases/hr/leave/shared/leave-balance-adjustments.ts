@@ -3,6 +3,7 @@ import type { ILeavePolicyRepository } from '@/server/repositories/contracts/hr/
 import type { IOrganizationRepository } from '@/server/repositories/contracts/org/organization/organization-repository-contract';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
 import type { LeaveBalance, LeaveRequest } from '@/server/types/leave-types';
+import type { TenantScope } from '@/server/types/tenant';
 import { resolveLeavePolicyId } from '../utils/resolve-leave-policy';
 
 export interface LeaveBalanceAdjustmentContext {
@@ -37,12 +38,12 @@ export async function reconcileBalanceForApproval(
     context: LeaveBalanceAdjustmentContext,
 ): Promise<void> {
     const lookup = resolveBalanceLookup(context.request);
-    const state = await ensureBalanceState(deps, context.authorization.orgId, context.request, lookup);
+    const state = await ensureBalanceState(deps, context.authorization.tenantScope, context.request, lookup);
     const newUsed = state.used + context.request.totalDays;
     const newPending = Math.max(0, state.pending - context.request.totalDays);
     const newAvailable = state.totalEntitlement - newUsed - newPending;
 
-    await deps.leaveBalanceRepository.updateLeaveBalance(context.authorization.orgId, lookup.balanceId, {
+    await deps.leaveBalanceRepository.updateLeaveBalance(context.authorization.tenantScope, lookup.balanceId, {
         used: newUsed,
         pending: newPending,
         available: newAvailable,
@@ -55,7 +56,7 @@ export async function reconcileBalanceForPendingReduction(
     context: LeaveBalanceAdjustmentContext,
 ): Promise<void> {
     const lookup = resolveBalanceLookup(context.request);
-    const state = await loadBalanceState(deps.leaveBalanceRepository, context.authorization.orgId, lookup.balanceId);
+    const state = await loadBalanceState(deps.leaveBalanceRepository, context.authorization.tenantScope, lookup.balanceId);
     if (!state) {
         return;
     }
@@ -63,7 +64,7 @@ export async function reconcileBalanceForPendingReduction(
     const newPending = Math.max(0, state.pending - context.request.totalDays);
     const newAvailable = state.totalEntitlement - state.used - newPending;
 
-    await deps.leaveBalanceRepository.updateLeaveBalance(context.authorization.orgId, lookup.balanceId, {
+    await deps.leaveBalanceRepository.updateLeaveBalance(context.authorization.tenantScope, lookup.balanceId, {
         pending: newPending,
         available: newAvailable,
         updatedAt: new Date(),
@@ -75,7 +76,7 @@ export async function reconcileBalanceForUsedReduction(
     context: LeaveBalanceAdjustmentContext,
 ): Promise<void> {
     const lookup = resolveBalanceLookup(context.request);
-    const state = await loadBalanceState(deps.leaveBalanceRepository, context.authorization.orgId, lookup.balanceId);
+    const state = await loadBalanceState(deps.leaveBalanceRepository, context.authorization.tenantScope, lookup.balanceId);
     if (!state) {
         return;
     }
@@ -83,7 +84,7 @@ export async function reconcileBalanceForUsedReduction(
     const newUsed = Math.max(0, state.used - context.request.totalDays);
     const newAvailable = state.totalEntitlement - newUsed - state.pending;
 
-    await deps.leaveBalanceRepository.updateLeaveBalance(context.authorization.orgId, lookup.balanceId, {
+    await deps.leaveBalanceRepository.updateLeaveBalance(context.authorization.tenantScope, lookup.balanceId, {
         used: newUsed,
         available: newAvailable,
         updatedAt: new Date(),
@@ -115,26 +116,30 @@ function resolveBalanceLookup(request: Pick<LeaveRequest, 'employeeId' | 'leaveT
 
 async function ensureBalanceState(
     deps: ApprovalBalanceDependencies,
-    orgId: string,
+    tenant: TenantScope,
     request: Pick<LeaveRequest, 'employeeId' | 'leaveType'>,
     lookup: BalanceLookupResult,
 ): Promise<BalanceState> {
-    const existing = await loadBalanceState(deps.leaveBalanceRepository, orgId, lookup.balanceId);
+    const existing = await loadBalanceState(deps.leaveBalanceRepository, tenant, lookup.balanceId);
     if (existing) {
         return existing;
     }
 
-    const entitlements = await deps.organizationRepository.getLeaveEntitlements(orgId);
+    const entitlements = await deps.organizationRepository.getLeaveEntitlements(tenant.orgId);
     const totalEntitlement = entitlements[request.leaveType] ?? 0;
     const policyId = await resolveLeavePolicyId(
         { leavePolicyRepository: deps.leavePolicyRepository },
-        orgId,
+        tenant,
         request.leaveType,
     );
 
-    await deps.leaveBalanceRepository.createLeaveBalance(orgId, {
+    await deps.leaveBalanceRepository.createLeaveBalance(tenant, {
         id: lookup.balanceId,
-        orgId,
+        orgId: tenant.orgId,
+        dataResidency: tenant.dataResidency,
+        dataClassification: tenant.dataClassification,
+        auditSource: tenant.auditSource,
+        auditBatchId: tenant.auditBatchId,
         employeeId: request.employeeId,
         leaveType: request.leaveType,
         year: lookup.year,
@@ -155,10 +160,10 @@ async function ensureBalanceState(
 
 async function loadBalanceState(
     repository: ILeaveBalanceRepository,
-    orgId: string,
+    tenant: TenantScope,
     balanceId: string,
 ): Promise<BalanceState | null> {
-    const record = await repository.getLeaveBalance(orgId, balanceId);
+    const record = await repository.getLeaveBalance(tenant, balanceId);
     if (!record) {
         return null;
     }

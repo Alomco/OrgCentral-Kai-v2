@@ -43,7 +43,12 @@ export async function checkExistingOnboardingTarget(
   }
 
   const invite = await deps.invitationRepository.getActiveInvitationByEmail(input.authorization.orgId, email);
-  registerOrgCacheTag(input.authorization.orgId, CACHE_SCOPE_ONBOARDING_INVITATIONS);
+  registerOrgCacheTag(
+    input.authorization.orgId,
+    CACHE_SCOPE_ONBOARDING_INVITATIONS,
+    input.authorization.dataClassification,
+    input.authorization.dataResidency,
+  );
 
   if (invite) {
     return { exists: true, kind: 'pending_invitation', token: invite.token, expiresAt: invite.expiresAt ?? null };

@@ -1,5 +1,4 @@
 import type {
-  Prisma,
   LeavePolicyType as PrismaLeavePolicyType,
   LeaveAccrualFrequency as PrismaLeaveAccrualFrequency,
 } from '@prisma/client';
@@ -16,60 +15,57 @@ export function normalizeLeavePolicyUpdates(
 ): Partial<LeavePolicyUpdateData> {
   const normalized: Partial<LeavePolicyUpdateData> = {};
 
-  const mappings: [
-    key: keyof typeof updates,
-    apply: (value: (typeof updates)[keyof typeof updates]) => void,
-  ][] = [
-    ['name', (value) => {
-      normalized.name = value as string;
-    }],
-    ['policyType', (value) => {
-      normalized.policyType = value as PrismaLeavePolicyType;
-    }],
-    ['accrualFrequency', (value) => {
-      normalized.accrualFrequency = value as PrismaLeaveAccrualFrequency;
-    }],
-    ['requiresApproval', (value) => {
-      normalized.requiresApproval = value as boolean;
-    }],
-    ['isDefault', (value) => {
-      normalized.isDefault = value as boolean;
-    }],
-    ['statutoryCompliance', (value) => {
-      normalized.statutoryCompliance = value as boolean;
-    }],
-    ['allowNegativeBalance', (value) => {
-      normalized.allowNegativeBalance = value as boolean;
-    }],
-    ['metadata', (value) => {
-      normalized.metadata = value as Prisma.InputJsonValue | Record<string, unknown> | null;
-    }],
-  ];
-
-  for (const [key, apply] of mappings) {
-    const value = updates[key];
-    if (value !== undefined) {
-      apply(value);
-    }
+  if (updates.name !== undefined) {
+    normalized.name = updates.name;
+  }
+  if (updates.policyType !== undefined) {
+    normalized.policyType = updates.policyType as PrismaLeavePolicyType;
+  }
+  if (updates.accrualFrequency !== undefined) {
+    normalized.accrualFrequency = updates.accrualFrequency as PrismaLeaveAccrualFrequency;
+  }
+  if (updates.requiresApproval !== undefined) {
+    normalized.requiresApproval = updates.requiresApproval;
+  }
+  if (updates.isDefault !== undefined) {
+    normalized.isDefault = updates.isDefault;
+  }
+  if (updates.statutoryCompliance !== undefined) {
+    normalized.statutoryCompliance = updates.statutoryCompliance;
+  }
+  if (updates.allowNegativeBalance !== undefined) {
+    normalized.allowNegativeBalance = updates.allowNegativeBalance;
+  }
+  if (updates.dataClassification !== undefined) {
+    normalized.dataClassification = updates.dataClassification;
+  }
+  if (updates.dataResidency !== undefined) {
+    normalized.residencyTag = updates.dataResidency;
+  }
+  if (updates.auditSource !== undefined) {
+    normalized.auditSource = updates.auditSource;
+  }
+  if (updates.auditBatchId !== undefined) {
+    normalized.auditBatchId = updates.auditBatchId;
+  }
+  if (updates.metadata !== undefined) {
+    normalized.metadata = updates.metadata;
   }
 
   if (hasOwnProperty(updates, 'departmentId')) {
-    normalized.departmentId = updates.departmentId as string | null;
+    normalized.departmentId = updates.departmentId;
   }
 
   if (hasOwnProperty(updates, 'accrualAmount')) {
-    normalized.accrualAmount = updates.accrualAmount as number | null;
+    normalized.accrualAmount = updates.accrualAmount;
   }
 
   if (hasOwnProperty(updates, 'carryOverLimit')) {
-    normalized.carryOverLimit = updates.carryOverLimit as number | null;
+    normalized.carryOverLimit = updates.carryOverLimit;
   }
 
   if (updates.activeFrom !== undefined) {
-    normalized.activeFrom =
-      typeof updates.activeFrom === 'string'
-        ? new Date(updates.activeFrom as unknown as string)
-        : (updates.activeFrom as Date);
+    normalized.activeFrom = new Date(updates.activeFrom);
   }
 
   if (hasOwnProperty(updates, 'activeTo')) {
@@ -78,15 +74,13 @@ export function normalizeLeavePolicyUpdates(
       normalized.activeTo = undefined;
     } else if (activeTo === null) {
       normalized.activeTo = null;
-    } else if (typeof activeTo === 'string') {
-      normalized.activeTo = new Date(activeTo);
     } else {
-      normalized.activeTo = activeTo as Date;
+      normalized.activeTo = new Date(activeTo);
     }
   }
 
   if (hasOwnProperty(updates, 'maxConsecutiveDays')) {
-    normalized.maxConsecutiveDays = updates.maxConsecutiveDays as number | null;
+    normalized.maxConsecutiveDays = updates.maxConsecutiveDays;
   }
 
   return normalized;

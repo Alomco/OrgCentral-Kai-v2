@@ -169,7 +169,7 @@ export async function handleCancelLeaveRequest(
         resourceAttributes: { requestId: input.requestId, cancelledBy: input.cancelledBy },
     });
     const existingRequest = await runtime.dependencies.leaveRequestRepository.getLeaveRequest(
-        authorization.orgId,
+        authorization.tenantScope,
         input.requestId,
     );
 

@@ -2,6 +2,7 @@ import type { Prisma, LeavePolicy as PrismaLeavePolicy, LeavePolicyType as Prism
 import { BasePrismaRepository } from '@/server/repositories/prisma/base-prisma-repository';
 import type { ILeavePolicyRepository } from '@/server/repositories/contracts/hr/leave/leave-policy-repository-contract';
 import type { LeavePolicy } from '@/server/types/leave-types';
+import type { TenantScope } from '@/server/types/tenant';
 import type { LeavePolicyFilters, LeavePolicyCreationData, LeavePolicyUpdateData } from './prisma-leave-policy-repository.types';
 import { mapCreateToPrisma, buildPrismaLeavePolicyUpdate, mapPrismaToDomain } from '@/server/repositories/mappers/hr/leave';
 import { EntityNotFoundError } from '@/server/errors';
@@ -90,9 +91,9 @@ export class PrismaLeavePolicyRepository extends BasePrismaRepository implements
   }
 
   // --- Contract wrapper methods ---
-  async createLeavePolicy(tenantId: string, policy: Omit<LeavePolicy, 'id' | 'createdAt' | 'updatedAt'>): Promise<void> {
+  async createLeavePolicy(tenant: TenantScope, policy: Omit<LeavePolicy, 'id' | 'createdAt' | 'updatedAt'>): Promise<void> {
     const dataToCreate: LeavePolicyCreationData = {
-      orgId: tenantId,
+      orgId: tenant.orgId,
       departmentId: policy.departmentId ?? undefined,
       name: policy.name,
       policyType: policy.policyType as PrismaLeavePolicyType,
@@ -107,14 +108,18 @@ export class PrismaLeavePolicyRepository extends BasePrismaRepository implements
       statutoryCompliance: policy.statutoryCompliance ?? false,
       maxConsecutiveDays: policy.maxConsecutiveDays ?? undefined,
       allowNegativeBalance: policy.allowNegativeBalance ?? false,
+      dataClassification: policy.dataClassification,
+      residencyTag: policy.dataResidency,
+      auditSource: policy.auditSource,
+      auditBatchId: policy.auditBatchId ?? tenant.auditBatchId,
       metadata: policy.metadata ?? undefined,
     };
     await this.create(dataToCreate);
   }
 
-  async updateLeavePolicy(tenantId: string, policyId: string, updates: Partial<Omit<LeavePolicy, 'id' | 'orgId' | 'createdAt'>>): Promise<void> {
+  async updateLeavePolicy(tenant: TenantScope, policyId: string, updates: Partial<Omit<LeavePolicy, 'id' | 'orgId' | 'createdAt'>>): Promise<void> {
     const existing = await this.findById(policyId);
-    this.assertPolicyOwnership(existing, tenantId);
+    this.assertPolicyOwnership(existing, tenant.orgId);
     const normalized = normalizeLeavePolicyUpdates(updates);
     const prismaUpdate = buildPrismaLeavePolicyUpdate(normalized);
 
@@ -126,7 +131,7 @@ export class PrismaLeavePolicyRepository extends BasePrismaRepository implements
       await this.prisma.$transaction([
         this.prisma.leavePolicy.updateMany({
           where: {
-            orgId: tenantId,
+            orgId: tenant.orgId,
             id: { not: policyId },
             isDefault: true,
           },
@@ -140,28 +145,28 @@ export class PrismaLeavePolicyRepository extends BasePrismaRepository implements
     await this.prisma.leavePolicy.update({ where: { id: policyId }, data: prismaUpdate });
   }
 
-  async getLeavePolicy(tenantId: string, policyId: string): Promise<LeavePolicy | null> {
+  async getLeavePolicy(tenant: TenantScope, policyId: string): Promise<LeavePolicy | null> {
     const rec = await this.findById(policyId);
-    if (rec?.orgId !== tenantId) { return null; }
+    if (rec?.orgId !== tenant.orgId) { return null; }
     return mapPrismaToDomain(rec);
   }
 
-  async getLeavePolicyByName(tenantId: string, name: string): Promise<LeavePolicy | null> {
-    const rec = await this.findByName(tenantId, name);
-    if (rec?.orgId !== tenantId) {
+  async getLeavePolicyByName(tenant: TenantScope, name: string): Promise<LeavePolicy | null> {
+    const rec = await this.findByName(tenant.orgId, name);
+    if (rec?.orgId !== tenant.orgId) {
       return null;
     }
     return mapPrismaToDomain(rec);
   }
 
-  async getLeavePoliciesByOrganization(tenantId: string): Promise<LeavePolicy[]> {
-    const recs = await this.findAll({ orgId: tenantId });
+  async getLeavePoliciesByOrganization(tenant: TenantScope): Promise<LeavePolicy[]> {
+    const recs = await this.findAll({ orgId: tenant.orgId });
     return recs.map(mapPrismaToDomain);
   }
 
-  async deleteLeavePolicy(tenantId: string, policyId: string): Promise<void> {
+  async deleteLeavePolicy(tenant: TenantScope, policyId: string): Promise<void> {
     const rec = await this.findById(policyId);
-    if (rec?.orgId !== tenantId) { throw new EntityNotFoundError('Leave policy', { orgId: tenantId, policyId }); }
+    if (rec?.orgId !== tenant.orgId) { throw new EntityNotFoundError('Leave policy', { orgId: tenant.orgId, policyId }); }
     await this.delete(policyId);
   }
 }

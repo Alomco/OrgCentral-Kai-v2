@@ -18,6 +18,10 @@ export function mapCreateToPrisma(input: LeavePolicyCreationData): Prisma.LeaveP
         statutoryCompliance,
         maxConsecutiveDays,
         allowNegativeBalance,
+        dataClassification,
+        residencyTag,
+        auditSource,
+        auditBatchId,
         metadata,
     } = input;
 
@@ -36,6 +40,10 @@ export function mapCreateToPrisma(input: LeavePolicyCreationData): Prisma.LeaveP
         statutoryCompliance: statutoryCompliance ?? false,
         maxConsecutiveDays: maxConsecutiveDays ?? undefined,
         allowNegativeBalance: allowNegativeBalance ?? false,
+        dataClassification: dataClassification ?? undefined,
+        residencyTag: residencyTag ?? undefined,
+        auditSource: auditSource ?? undefined,
+        auditBatchId: auditBatchId ?? undefined,
         metadata: (metadata ?? undefined) as Prisma.InputJsonValue,
     } as Prisma.LeavePolicyUncheckedCreateInput;
 }
@@ -82,6 +90,18 @@ export function buildPrismaLeavePolicyUpdate(updates: Partial<LeavePolicyUpdateD
     if (updates.allowNegativeBalance !== undefined) {
         prismaUpdate.allowNegativeBalance = updates.allowNegativeBalance;
     }
+    if (updates.dataClassification !== undefined) {
+        prismaUpdate.dataClassification = updates.dataClassification;
+    }
+    if (updates.residencyTag !== undefined) {
+        prismaUpdate.residencyTag = updates.residencyTag;
+    }
+    if (updates.auditSource !== undefined) {
+        prismaUpdate.auditSource = updates.auditSource;
+    }
+    if (updates.auditBatchId !== undefined) {
+        prismaUpdate.auditBatchId = updates.auditBatchId;
+    }
     if (updates.metadata !== undefined) {
         prismaUpdate.metadata = updates.metadata ? (updates.metadata as Prisma.InputJsonValue) : undefined;
     }
@@ -93,6 +113,10 @@ export function mapPrismaToDomain(record: PrismaLeavePolicy): DomainLeavePolicy 
     return {
         id: record.id,
         orgId: record.orgId,
+        dataResidency: record.residencyTag,
+        dataClassification: record.dataClassification,
+        auditSource: record.auditSource ?? 'leave-policy',
+        auditBatchId: record.auditBatchId ?? undefined,
         name: record.name,
         policyType: record.policyType as LeavePolicyType,
         accrualFrequency: record.accrualFrequency as LeaveAccrualFrequency,

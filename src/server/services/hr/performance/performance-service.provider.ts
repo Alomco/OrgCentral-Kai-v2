@@ -2,6 +2,7 @@ import { PerformanceService, type PerformanceServiceDependencies } from './perfo
 import { PrismaPerformanceRepository } from '@/server/repositories/prisma/hr/performance';
 import type { BasePrismaRepositoryOptions } from '@/server/repositories/prisma/base-prisma-repository';
 import { invalidateOrgCache } from '@/server/lib/cache-tags';
+import type { DataClassificationLevel, DataResidencyZone } from '@/server/types/tenant';
 
 export interface PerformanceServiceProviderOptions {
     overrides?: Partial<PerformanceServiceDependencies>;
@@ -9,6 +10,8 @@ export interface PerformanceServiceProviderOptions {
 }
 
 const sharedDefaultOptions: PerformanceServiceProviderOptions = {};
+const DEFAULT_CLASSIFICATION: DataClassificationLevel = 'OFFICIAL';
+const DEFAULT_RESIDENCY: DataResidencyZone = 'UK_ONLY';
 
 export function getPerformanceService(options: PerformanceServiceProviderOptions = sharedDefaultOptions): PerformanceService {
     const prismaOptions = options.prismaOptions;
@@ -21,7 +24,11 @@ export function getPerformanceService(options: PerformanceServiceProviderOptions
                     if (!scopes?.length) {
                         return;
                     }
-                    await Promise.all(scopes.map((scope) => invalidateOrgCache(tenantId, scope)));
+                    await Promise.all(
+                        scopes.map((scope) =>
+                            invalidateOrgCache(tenantId, scope, DEFAULT_CLASSIFICATION, DEFAULT_RESIDENCY),
+                        ),
+                    );
                 }),
             }),
     };

@@ -3,27 +3,23 @@ import { completeOnboardingInviteController } from '@/server/api-adapters/hr/onb
 import { acceptInvitationController } from '@/server/api-adapters/auth/accept-invitation';
 import { buildErrorResponse } from '@/server/api-adapters/http/error-response';
 import { requireSessionUser } from '@/server/api-adapters/http/session-helpers';
-import { AuthorizationError, ValidationError } from '@/server/errors';
+import { AuthorizationError } from '@/server/errors';
 import { auth, type AuthSession } from '@/server/lib/auth';
 import { PrismaInvitationRepository } from '@/server/repositories/prisma/auth/invitations';
+import { z } from 'zod';
 
-function extractToken(payload: unknown): string {
-    if (!payload || typeof payload !== 'object') {
-        throw new ValidationError('Invitation token is required.');
-    }
-    const record = payload as { token?: unknown; inviteToken?: unknown };
-    const token = typeof record.inviteToken === 'string' ? record.inviteToken : record.token;
-    if (!token || token.trim().length === 0) {
-        throw new ValidationError('Invitation token is required.');
-    }
-    return token.trim();
-}
+const requestSchema = z
+    .union([
+        z.object({ token: z.string().trim().min(1) }),
+        z.object({ inviteToken: z.string().trim().min(1) }),
+    ])
+    .transform((value) => ('token' in value ? value.token : value.inviteToken));
 
 function shouldUseOnboardingFlow(payload: { employeeId?: string; employeeNumber?: string; onboardingTemplateId?: string | null }): boolean {
-    return Boolean(
+    return (
         (typeof payload.employeeId === 'string' && payload.employeeId.trim().length > 0) ||
-            (typeof payload.employeeNumber === 'string' && payload.employeeNumber.trim().length > 0) ||
-            (typeof payload.onboardingTemplateId === 'string' && payload.onboardingTemplateId.trim().length > 0),
+        (typeof payload.employeeNumber === 'string' && payload.employeeNumber.trim().length > 0) ||
+        (typeof payload.onboardingTemplateId === 'string' && payload.onboardingTemplateId.trim().length > 0)
     );
 }
 
@@ -38,8 +34,7 @@ function requireActor(session: AuthSession | null): { userId: string; email: str
 
 export async function POST(request: Request): Promise<NextResponse> {
     try {
-        const payload = (await request.json()) as unknown;
-        const token = extractToken(payload);
+        const token = requestSchema.parse(await request.json());
         const session = await auth.api.getSession({ headers: request.headers });
         const actor = requireActor(session);
         const invitationRepository = new PrismaInvitationRepository();

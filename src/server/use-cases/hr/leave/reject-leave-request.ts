@@ -42,7 +42,7 @@ export async function rejectLeaveRequest(
 
     const existingRequest = await fetchLeaveRequest(
         deps.leaveRequestRepository,
-        input.authorization.orgId,
+        input.authorization.tenantScope,
         input.requestId,
     );
 
@@ -52,7 +52,7 @@ export async function rejectLeaveRequest(
     const decisionContext = buildLeaveDecisionContext(existingRequest);
 
     await deps.leaveRequestRepository.updateLeaveRequest(
-        input.authorization.orgId,
+        input.authorization.tenantScope,
         input.requestId,
         {
             status: 'rejected',
