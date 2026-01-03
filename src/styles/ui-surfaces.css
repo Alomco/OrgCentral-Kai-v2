@@ -1,0 +1,76 @@
+/* Surface hierarchy tokens shared by DOM-level UI styles. */
+
+:root {
+    --ui-surface-container-opacity: clamp(0.82, calc(var(--ui-card-opacity) - 0.08), 0.96);
+    --ui-surface-item-opacity: clamp(0.88, calc(var(--ui-card-opacity) - 0.02), 0.98);
+    --ui-surface-interactive-opacity: clamp(0.92, calc(var(--ui-card-opacity) + 0.03), 1);
+    --ui-surface-container-fill: hsl(var(--card) / var(--ui-surface-container-opacity));
+    --ui-surface-item-fill: hsl(var(--card) / var(--ui-surface-item-opacity));
+    --ui-surface-interactive-fill: hsl(var(--card) / var(--ui-surface-interactive-opacity));
+    --ui-surface-popover-fill: hsl(var(--popover) / clamp(0.9, calc(var(--ui-card-opacity) + 0.02), 1));
+    --ui-surface-blur: var(--ui-backdrop-blur);
+    --ui-surface-item-blur: clamp(0px, calc(var(--ui-backdrop-blur) - 8px), 10px);
+    --ui-surface-interactive-blur: clamp(0px, calc(var(--ui-backdrop-blur) - 6px), 12px);
+    --ui-surface-outline-weak: 0 0 0 1px hsl(var(--ui-surface-tint) / clamp(0.12, calc(var(--ui-border-opacity) - 0.06), 0.3));
+    --ui-surface-outline: 0 0 0 1px hsl(var(--ui-surface-tint) / clamp(0.18, calc(var(--ui-border-opacity) + 0.02), 0.45));
+    --ui-surface-outline-strong: 0 0 0 1px hsl(var(--ui-surface-tint) / clamp(0.26, calc(var(--ui-border-opacity) + 0.1), 0.6));
+    --ui-surface-depth-sm: 0 8px 16px -14px hsl(var(--ui-surface-depth-color) / 0.18);
+    --ui-surface-depth-md: 0 14px 26px -18px hsl(var(--ui-surface-depth-color) / 0.24);
+    --ui-surface-depth-lg: 0 22px 44px -30px hsl(var(--ui-surface-depth-color) / 0.3);
+    --ui-surface-container-shadow: var(--ui-surface-outline), var(--ui-card-shadow), var(--ui-surface-depth-lg);
+    --ui-surface-item-shadow: var(--ui-surface-outline-weak), var(--shadow-md), var(--ui-surface-depth-md);
+    --ui-surface-interactive-shadow: var(--ui-surface-outline), var(--shadow-sm), var(--ui-surface-depth-sm);
+    --ui-surface-interactive-shadow-hover: var(--ui-surface-outline-strong), 0 14px 30px -18px hsl(var(--primary) / clamp(0.08, calc(0.1 + var(--ui-glow-intensity)), 0.45)), 0 22px 44px -30px hsl(var(--ui-surface-depth-color) / 0.32);
+    --ui-surface-shadow: var(--ui-surface-container-shadow);
+    --ui-surface-fill: var(--ui-surface-container-fill);
+}
+
+[data-ui-surface="container"] {
+    --ui-surface-fill: var(--ui-surface-container-fill);
+    --ui-surface-shadow: var(--ui-surface-container-shadow);
+    --ui-border-glow-opacity: var(--ui-border-glow-opacity);
+    --ui-border-glow-opacity-hover: var(--ui-border-glow-opacity-hover);
+}
+
+[data-ui-surface="item"] {
+    --ui-surface-fill: var(--ui-surface-item-fill);
+    --ui-surface-shadow: var(--ui-surface-item-shadow);
+    --ui-surface-blur: var(--ui-surface-item-blur);
+    --ui-border-glow-opacity: 0;
+    --ui-border-glow-opacity-hover: 0;
+    --ui-border-gradient: linear-gradient(135deg, transparent, transparent);
+    --ui-border-animation: none;
+}
+
+[data-ui-surface="interactive"] {
+    --ui-surface-fill: var(--ui-surface-interactive-fill);
+    --ui-surface-shadow: var(--ui-surface-interactive-shadow);
+    --ui-surface-blur: var(--ui-surface-interactive-blur);
+    --ui-border-glow-opacity: 0;
+    --ui-border-gradient: linear-gradient(135deg, hsl(var(--primary) / 0.45), hsl(var(--accent) / 0.4));
+    --ui-border-animation: none;
+}
+
+[data-ui-surface][data-ui-interactive="true"] {
+    cursor: pointer;
+}
+
+[data-ui-surface="interactive"]:hover,
+[data-ui-surface][data-ui-interactive="true"]:hover {
+    box-shadow: var(--ui-surface-interactive-shadow-hover);
+    transform: translateY(-2px);
+}
+
+[data-ui-surface="interactive"]:active,
+[data-ui-surface][data-ui-interactive="true"]:active {
+    box-shadow: var(--ui-surface-interactive-shadow);
+    transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    :root {
+        --ui-border-animation: none;
+        --ui-border-glow-blur: 0px;
+        --ui-backdrop-blur: 0px;
+    }
+}

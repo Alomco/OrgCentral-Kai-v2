@@ -33,7 +33,7 @@ export function HrPageHeader({
                 {icon ? (
                     <div className={cn(
                         'flex items-center justify-center rounded-xl p-2.5',
-                        'bg-gradient-to-br from-[hsl(var(--primary))] to-[hsl(var(--accent))]',
+                        'bg-linear-to-br from-[hsl(var(--primary))] to-[hsl(var(--accent))]',
                         'text-white shadow-lg shadow-[hsl(var(--primary)/0.3)]',
                         'transition-transform duration-200 hover:scale-105',
                     )}>
@@ -46,12 +46,12 @@ export function HrPageHeader({
                         'font-bold tracking-tight',
                         // Gradient text - uses bright colors that stay visible in dark mode
                         // Goes: primary → light primary → accent → light accent for full visibility
-                        'bg-gradient-to-r',
+                        'bg-linear-to-r',
                         'from-[hsl(var(--primary))]',
                         'via-[hsl(var(--accent))]',
                         'to-[hsl(var(--primary))]',
                         'bg-clip-text text-transparent',
-                        'bg-[length:200%_100%]',
+                        'bg-size-[200%_100%]',
                     )}>
                         {title}
                     </h1>

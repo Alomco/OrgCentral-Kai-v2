@@ -1,10 +1,6 @@
 import type { Prisma, EmployeeProfile as PrismaEmployeeProfile } from '@prisma/client';
-import type {
-    EmployeeProfileDTO,
-    EmploymentTypeCode,
-    EmploymentStatusCode,
-    PeopleListFilters,
-} from '@/server/types/hr/people';
+import type { EmployeeProfileDTO, PeopleListFilters } from '@/server/types/hr/people';
+import type { EmployeeProfileSortInput } from '@/server/repositories/contracts/hr/people/employee-profile-repository-contract';
 import {
     buildDomainProfileFields,
     decimalToNumber,
@@ -27,11 +23,6 @@ export const normalizeEmployeeProfileMetadata = (
 export type EmployeeProfileFilters = PeopleListFilters & {
     orgId?: string;
     userId?: string;
-    jobTitle?: string;
-    employmentType?: EmploymentTypeCode;
-    employmentStatus?: EmploymentStatusCode;
-    managerOrgId?: string;
-    managerUserId?: string;
 };
 
 type ExtendedPrismaEmployeeProfile = PrismaEmployeeProfile & EmployeeProfileDTO;
@@ -174,6 +165,7 @@ export function buildPrismaUpdateFromDomain(
 export function buildPrismaWhereFromFilters(filters?: EmployeeProfileFilters): Prisma.EmployeeProfileWhereInput {
     const where: Record<string, unknown> = {};
     if (!filters) { return where; }
+    const andConditions: Prisma.EmployeeProfileWhereInput[] = [];
     if (filters.orgId) { where.orgId = filters.orgId; }
     if (filters.userId) { where.userId = filters.userId; }
     if (filters.jobTitle) {
@@ -182,10 +174,12 @@ export function buildPrismaWhereFromFilters(filters?: EmployeeProfileFilters): P
     }
     if (filters.employmentType) { where.employmentType = filters.employmentType; }
     if (filters.employmentStatus) { where.employmentStatus = filters.employmentStatus; }
-    if (filters.managerOrgId && filters.managerUserId) {
-        where.managerOrgId = filters.managerOrgId;
-        where.managerUserId = filters.managerUserId;
+    if (filters.departmentId) {
+        const departmentFilter: Prisma.StringFilter = { contains: filters.departmentId, mode: 'insensitive' };
+        where.departmentId = departmentFilter;
     }
+    if (filters.managerOrgId) { where.managerOrgId = filters.managerOrgId; }
+    if (filters.managerUserId) { where.managerUserId = filters.managerUserId; }
     if (filters.startDate) {
         const start = toDateValue(filters.startDate);
         if (start) { where.startDate = { gte: start }; }
@@ -194,5 +188,61 @@ export function buildPrismaWhereFromFilters(filters?: EmployeeProfileFilters): P
         const end = toDateValue(filters.endDate);
         if (end) { where.endDate = { lte: end }; }
     }
+    if (filters.search) {
+        const tokens = filters.search
+            .split(/\s+/)
+            .map((token) => token.trim())
+            .filter((token) => token.length > 0);
+        for (const token of tokens) {
+            andConditions.push({
+                OR: [
+                    { displayName: { contains: token, mode: 'insensitive' } },
+                    { firstName: { contains: token, mode: 'insensitive' } },
+                    { lastName: { contains: token, mode: 'insensitive' } },
+                    { email: { contains: token, mode: 'insensitive' } },
+                    { personalEmail: { contains: token, mode: 'insensitive' } },
+                    { employeeNumber: { contains: token, mode: 'insensitive' } },
+                    { jobTitle: { contains: token, mode: 'insensitive' } },
+                ],
+            });
+        }
+    }
+    if (andConditions.length > 0) {
+        where.AND = andConditions;
+    }
     return where as Prisma.EmployeeProfileWhereInput;
+}
+
+export function buildPrismaOrderByFromSort(
+    sort?: EmployeeProfileSortInput,
+): Prisma.EmployeeProfileOrderByWithRelationInput[] {
+    const direction: Prisma.SortOrder = sort?.direction ?? 'asc';
+
+    switch (sort?.key) {
+        case 'startDate':
+            return [
+                { startDate: direction },
+                { employeeNumber: 'asc' },
+            ];
+        case 'status':
+            return [
+                { employmentStatus: direction },
+                { displayName: direction },
+                { employeeNumber: 'asc' },
+            ];
+        case 'jobTitle':
+            return [
+                { jobTitle: direction },
+                { displayName: direction },
+                { employeeNumber: 'asc' },
+            ];
+        case 'name':
+        case undefined:
+            return [
+                { displayName: direction },
+                { lastName: direction },
+                { firstName: direction },
+                { employeeNumber: 'asc' },
+            ];
+    }
 }

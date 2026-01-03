@@ -4,6 +4,7 @@ This document describes how Stripe is integrated for per-user, per-month billing
 
 ## Overview
 - Billing is per active membership (seat count) per org.
+- Pricing cadence supports monthly or annual plans per employee.
 - Stripe checkout is used to start subscriptions.
 - Stripe Billing Portal is used for self-service management.
 - Webhooks update local subscription state.
@@ -18,6 +19,8 @@ Required:
 - `STRIPE_CANCEL_URL`
 
 Optional:
+- `STRIPE_PRICE_ID_MONTHLY`
+- `STRIPE_PRICE_ID_ANNUAL`
 - `STRIPE_PORTAL_RETURN_URL`
 
 ## API Endpoints
@@ -49,6 +52,10 @@ Expected metadata on Stripe subscription/session:
 - Seat sync runs on membership updates and invitation acceptance.
 - Sync only updates Stripe when a subscription is active/trialing/past due.
 
+## Pricing Cadence
+- `billingCadence` selects monthly vs annual pricing for per-employee plans.
+- `STRIPE_PRICE_ID_MONTHLY`/`STRIPE_PRICE_ID_ANNUAL` override the default `STRIPE_PRICE_ID`.
+
 ## Local Entry Point
 Billing is centralized in:
 - `src/server/services/billing/billing-service.ts`
@@ -57,4 +64,3 @@ This is the main entry point for checkout, portal, subscription reads, seat sync
 ## Security Notes
 - All org endpoints enforce `orgId` scoping via session authorization.
 - Webhook uses Stripe signature verification.
-*** End Patch"}}

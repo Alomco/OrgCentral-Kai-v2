@@ -3,7 +3,6 @@ import { headers as nextHeaders } from 'next/headers';
 import Link from 'next/link';
 import { User } from 'lucide-react';
 
-import { Badge } from '@/components/ui/badge';
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -14,44 +13,17 @@ import {
 } from '@/components/ui/breadcrumb';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
 import { getEmployeeProfileByUserForUi } from '@/server/use-cases/hr/people/get-employee-profile-by-user.cached';
 import type { EmployeeProfile } from '@/server/types/hr-types';
 import { getSessionContextOrRedirect } from '@/server/ui/auth/session-redirect';
 
 import { HrPageHeader } from '../_components/hr-page-header';
-import { formatHumanDateTime } from '../_components/format-date';
-
-function coerceDate(value: Date | string | null | undefined): Date | null {
-    if (!value) {
-        return null;
-    }
-
-    const date = typeof value === 'string' ? new Date(value) : value;
-    if (Number.isNaN(date.getTime())) {
-        return null;
-    }
-
-    return date;
-}
-
-function formatDateTime(value: Date | string | null | undefined): string {
-    const date = coerceDate(value);
-    return date ? formatHumanDateTime(date) : '—';
-}
-
-function formatPhoneNumbers(phone: EmployeeProfile['phone']): string {
-    if (!phone) {
-        return '—';
-    }
-
-    const parts = [
-        phone.work ? `Work: ${phone.work}` : null,
-        phone.mobile ? `Mobile: ${phone.mobile}` : null,
-        phone.home ? `Home: ${phone.home}` : null,
-    ].filter((part): part is string => typeof part === 'string');
-
-    return parts.length > 0 ? parts.join(' · ') : '—';
-}
+import { buildInitialSelfProfileFormState } from './form-state';
+import { ProfileContactCard } from './_components/profile-contact-card';
+import { ProfileEditCard } from './_components/profile-edit-card';
+import { ProfilePermissionsCard } from './_components/profile-permissions-card';
+import { ProfileSummaryCard } from './_components/profile-summary-card';
 
 export default async function HrProfilePage() {
     const headerStore = await nextHeaders();
@@ -60,6 +32,8 @@ export default async function HrProfilePage() {
         requiredPermissions: { employeeProfile: ['read'] },
         auditSource: 'ui:hr:profile',
     });
+
+    const profilePromise = getEmployeeProfileByUserForUi({ authorization, userId: authorization.userId });
 
     return (
         <div className="space-y-6">
@@ -88,109 +62,119 @@ export default async function HrProfilePage() {
                 )}
             />
 
-            <Suspense fallback={<IdentityCardSkeleton />}>
-                <IdentityCard authorization={authorization} fallbackEmail={session.user.email} />
+            <Suspense fallback={<ProfileContentSkeleton />}>
+                <ProfileContent
+                    authorization={authorization}
+                    sessionEmail={session.user.email}
+                    sessionImage={session.user.image}
+                    profilePromise={profilePromise}
+                />
             </Suspense>
-
-            <Card>
-                <CardHeader>
-                    <CardTitle>Tenant scope</CardTitle>
-                    <CardDescription>Derived from your organization membership.</CardDescription>
-                </CardHeader>
-                <CardContent className="flex flex-wrap items-center gap-2 text-sm">
-                    <Badge variant="secondary">Org {authorization.orgId}</Badge>
-                    <Badge variant="outline">{authorization.roleKey}</Badge>
-                    <Badge variant="outline">{authorization.dataResidency}</Badge>
-                    <Badge variant="outline">{authorization.dataClassification}</Badge>
-                </CardContent>
-            </Card>
         </div>
     );
 }
 
-async function IdentityCard({
+interface ProfileContentProps {
+    authorization: RepositoryAuthorizationContext;
+    sessionEmail: string | null | undefined;
+    sessionImage: string | null | undefined;
+    profilePromise: Promise<{ profile: EmployeeProfile | null }>;
+}
+
+async function ProfileContent({
     authorization,
-    fallbackEmail,
-}: {
-    authorization: Parameters<typeof getEmployeeProfileByUserForUi>[0]['authorization'];
-    fallbackEmail: string | null | undefined;
-}) {
-    const result = await getEmployeeProfileByUserForUi({ authorization, userId: authorization.userId });
+    sessionEmail,
+    sessionImage,
+    profilePromise,
+}: ProfileContentProps) {
+    const result = await profilePromise;
     const profile = result.profile;
 
+    if (!profile) {
+        return (
+            <Card>
+                <CardHeader>
+                    <CardTitle>Profile unavailable</CardTitle>
+                    <CardDescription>We could not find a profile linked to your account yet.</CardDescription>
+                </CardHeader>
+                <CardContent className="text-sm text-muted-foreground">
+                    Contact your HR admin to link or create your employee profile.
+                </CardContent>
+            </Card>
+        );
+    }
+
     return (
-        <Card>
-            <CardHeader>
-                <CardTitle>Identity</CardTitle>
-                <CardDescription>Basic information for HR workflows.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm">
-                {profile ? (
-                    <>
-                        <div className="flex flex-wrap items-center gap-2">
-                            <Badge variant="secondary">{profile.employmentStatus}</Badge>
-                            <Badge variant="outline">{profile.employmentType}</Badge>
-                            <Badge variant="outline">Employee {profile.employeeNumber}</Badge>
-                        </div>
-
-                        <div className="grid gap-2 sm:grid-cols-2">
-                            <div>
-                                <div className="text-xs font-medium text-muted-foreground">Name</div>
-                                <div className="mt-1">
-                                    {profile.displayName ?? (`${profile.firstName ?? ''} ${profile.lastName ?? ''}`.trim() || '—')}
-                                </div>
-                            </div>
-                            <div>
-                                <div className="text-xs font-medium text-muted-foreground">Work email</div>
-                                <div className="mt-1">{profile.email ?? fallbackEmail ?? '—'}</div>
-                            </div>
-                            <div>
-                                <div className="text-xs font-medium text-muted-foreground">Job title</div>
-                                <div className="mt-1">{profile.jobTitle ?? '—'}</div>
-                            </div>
-                            <div>
-                                <div className="text-xs font-medium text-muted-foreground">Department</div>
-                                <div className="mt-1">{profile.departmentId ?? '—'}</div>
-                            </div>
-                            <div className="sm:col-span-2">
-                                <div className="text-xs font-medium text-muted-foreground">Phone</div>
-                                <div className="mt-1">{formatPhoneNumbers(profile.phone)}</div>
-                            </div>
-                        </div>
-
-                        <div className="grid gap-2 sm:grid-cols-2">
-                            <div>
-                                <div className="text-xs font-medium text-muted-foreground">Created</div>
-                                <div className="mt-1 text-muted-foreground">{formatDateTime(profile.createdAt)}</div>
-                            </div>
-                            <div>
-                                <div className="text-xs font-medium text-muted-foreground">Updated</div>
-                                <div className="mt-1 text-muted-foreground">{formatDateTime(profile.updatedAt)}</div>
-                            </div>
-                        </div>
-                    </>
-                ) : (
-                    <div className="text-muted-foreground">
-                        No employee profile is linked to your account for this organization yet.
-                    </div>
-                )}
-            </CardContent>
-        </Card>
+        <div className="space-y-6">
+            <div className="grid gap-6 lg:grid-cols-3">
+                <ProfileSummaryCard
+                    className="lg:col-span-2"
+                    profile={profile}
+                    fallbackEmail={sessionEmail}
+                    fallbackImageUrl={sessionImage}
+                />
+                <ProfilePermissionsCard authorization={authorization} profile={profile} />
+            </div>
+            <div className="grid gap-6 lg:grid-cols-2">
+                <ProfileContactCard profile={profile} />
+                <ProfileEditCard initialState={buildInitialSelfProfileFormState(profile)} />
+            </div>
+        </div>
     );
 }
 
-function IdentityCardSkeleton() {
+function ProfileContentSkeleton() {
     return (
-        <Card>
-            <CardHeader>
-                <CardTitle>Identity</CardTitle>
-                <CardDescription>Basic information for HR workflows.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-2">
-                <Skeleton className="h-5 w-56" />
-                <Skeleton className="h-24 w-full" />
-                <Skeleton className="h-12 w-full" />
-            </CardContent>
-        </Card>
+        <div className="space-y-6">
+            <div className="grid gap-6 lg:grid-cols-3">
+                <Card className="lg:col-span-2">
+                    <CardHeader>
+                        <Skeleton className="h-6 w-40" />
+                        <Skeleton className="h-4 w-56" />
+                    </CardHeader>
+                    <CardContent className="grid gap-3 sm:grid-cols-2">
+                        <Skeleton className="h-4 w-40" />
+                        <Skeleton className="h-4 w-40" />
+                        <Skeleton className="h-4 w-40" />
+                        <Skeleton className="h-4 w-40" />
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader>
+                        <Skeleton className="h-5 w-32" />
+                        <Skeleton className="h-4 w-48" />
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-full" />
+                    </CardContent>
+                </Card>
+            </div>
+            <div className="grid gap-6 lg:grid-cols-2">
+                <Card>
+                    <CardHeader>
+                        <Skeleton className="h-5 w-32" />
+                        <Skeleton className="h-4 w-56" />
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-full" />
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader>
+                        <Skeleton className="h-5 w-32" />
+                        <Skeleton className="h-4 w-56" />
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-full" />
+                    </CardContent>
+                </Card>
+            </div>
+        </div>
     );
 }

@@ -47,6 +47,7 @@ function resolveThemeFromSettings(
         orgId,
         presetId,
         tokens: { ...preset.tokens, ...customOverrides } as ThemeTokenMap,
+        darkTokens: { ...preset.darkTokens, ...customOverrides } as ThemeTokenMap,
         updatedAt: orgSettings?.updatedAt ?? new Date(),
     };
 }

@@ -10,6 +10,8 @@ import { HrStatusBadge } from '../../_components/hr-status-badge';
 export interface PerformanceReviewsPanelProps {
     authorization: RepositoryAuthorizationContext;
     userId?: string;
+    title?: string;
+    description?: string;
 }
 
 const COLUMNS: readonly HrDataTableColumn[] = [
@@ -38,18 +40,25 @@ function getRatingColor(rating: number | null | undefined): string {
     return 'text-red-600';
 }
 
-export async function PerformanceReviewsPanel({ authorization, userId }: PerformanceReviewsPanelProps) {
+export async function PerformanceReviewsPanel({
+    authorization,
+    userId,
+    title,
+    description,
+}: PerformanceReviewsPanelProps) {
     const result = await getPerformanceReviewsForUi({
         authorization,
         userId,
     });
 
     const reviews = result.reviews;
+    const resolvedTitle = title ?? 'Performance Reviews';
+    const resolvedDescription = description ?? 'Your performance evaluation history.';
 
     return (
         <HrDataTable
-            title="Performance Reviews"
-            description="Your performance evaluation history."
+            title={resolvedTitle}
+            description={resolvedDescription}
             columns={COLUMNS}
             isEmpty={reviews.length === 0}
             emptyMessage="No performance reviews found."

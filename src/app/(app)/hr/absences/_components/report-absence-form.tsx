@@ -17,19 +17,18 @@ import { reportAbsenceAction } from '../actions';
 import type { ReportAbsenceFormState } from '../form-state';
 import { FieldError } from '../../_components/field-error';
 
-const ABSENCE_TYPES = [
-    { id: 'SICK_LEAVE', label: '🤒 Sick Leave', emoji: '🤒' },
-    { id: 'EMERGENCY', label: '🚨 Emergency', emoji: '🚨' },
-    { id: 'PERSONAL', label: '👤 Personal', emoji: '👤' },
-    { id: 'OTHER', label: '📋 Other', emoji: '📋' },
-] as const;
+export interface AbsenceTypeOption {
+    id: string;
+    label: string;
+}
 
 export interface ReportAbsenceFormProps {
     authorization: RepositoryAuthorizationContext;
     initialState: ReportAbsenceFormState;
+    absenceTypes: AbsenceTypeOption[];
 }
 
-export function ReportAbsenceForm({ authorization, initialState }: ReportAbsenceFormProps) {
+export function ReportAbsenceForm({ authorization, initialState, absenceTypes }: ReportAbsenceFormProps) {
     const formId = useId();
     const formReference = useRef<HTMLFormElement>(null);
     const boundAction = reportAbsenceAction.bind(null, authorization);
@@ -37,11 +36,12 @@ export function ReportAbsenceForm({ authorization, initialState }: ReportAbsence
 
     const isSuccess = state.status === 'success';
     const isError = state.status === 'error';
+    const hasAbsenceTypes = absenceTypes.length > 0;
 
     // Show toast on successful submission
     useEffect(() => {
         if (isSuccess) {
-            toast.success('✅ Absence reported successfully!', {
+            toast.success('Absence reported successfully!', {
                 description: 'Your absence has been recorded and is pending approval.',
             });
             formReference.current?.reset();
@@ -78,12 +78,16 @@ export function ReportAbsenceForm({ authorization, initialState }: ReportAbsence
                     <div className="grid gap-4 sm:grid-cols-2">
                         <div className="space-y-2">
                             <Label htmlFor={`${formId}-type`}>Type</Label>
-                            <Select name="typeId" defaultValue={state.values.typeId}>
+                            <Select
+                                name="typeId"
+                                defaultValue={state.values.typeId}
+                                disabled={!hasAbsenceTypes || isPending}
+                            >
                                 <SelectTrigger id={`${formId}-type`}>
-                                    <SelectValue placeholder="Select type" />
+                                    <SelectValue placeholder={hasAbsenceTypes ? 'Select type' : 'No types configured'} />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {ABSENCE_TYPES.map((type) => (
+                                    {absenceTypes.map((type) => (
                                         <SelectItem key={type.id} value={type.id}>
                                             {type.label}
                                         </SelectItem>
@@ -91,6 +95,11 @@ export function ReportAbsenceForm({ authorization, initialState }: ReportAbsence
                                 </SelectContent>
                             </Select>
                             <FieldError message={state.fieldErrors?.typeId} />
+                            {!hasAbsenceTypes ? (
+                                <p className="text-xs text-muted-foreground">
+                                    No absence types are configured. Ask an HR admin to add absence types in HR Settings.
+                                </p>
+                            ) : null}
                         </div>
 
                         <div className="space-y-2">
@@ -143,7 +152,7 @@ export function ReportAbsenceForm({ authorization, initialState }: ReportAbsence
                         />
                     </div>
 
-                    <Button type="submit" disabled={isPending} className="w-full sm:w-auto">
+                    <Button type="submit" disabled={isPending || !hasAbsenceTypes} className="w-full sm:w-auto">
                         {isPending ? (
                             <>
                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />

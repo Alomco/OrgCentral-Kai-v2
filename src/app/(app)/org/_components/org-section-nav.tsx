@@ -15,6 +15,12 @@ export function OrgSectionNav() {
                 <Link href="/org/roles">Roles</Link>
             </Button>
             <Button asChild variant="secondary" size="sm">
+                <Link href="/org/permissions">Permissions</Link>
+            </Button>
+            <Button asChild variant="secondary" size="sm">
+                <Link href="/org/abac">ABAC Policies</Link>
+            </Button>
+            <Button asChild variant="secondary" size="sm">
                 <Link href="/org/branding">Branding</Link>
             </Button>
             <Button asChild variant="secondary" size="sm">

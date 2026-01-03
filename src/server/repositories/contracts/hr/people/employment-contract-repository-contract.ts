@@ -39,6 +39,14 @@ export interface IEmploymentContractRepository {
   ): Promise<EmploymentContractDTO | null>;
 
   /**
+   * Get all employment contracts for an employee (history, newest first)
+   */
+  getEmploymentContractsByEmployee(
+    tenantId: string,
+    employeeId: string
+  ): Promise<EmploymentContractDTO[]>;
+
+  /**
    * Get all employment contracts for an organization
    */
   getEmploymentContractsByOrganization(

@@ -15,6 +15,34 @@ interface PeopleGuardRequest {
 
 const BASE_DEFAULTS = createHrPeopleAuthorizationDefaults();
 
+function resolveOwnerMatch(
+    authorization: RepositoryAuthorizationContext,
+    resourceAttributes?: Record<string, unknown>,
+): boolean | undefined {
+    if (!resourceAttributes) {
+        return undefined;
+    }
+
+    const explicit = resourceAttributes.ownerMatchesSubject;
+    if (typeof explicit === 'boolean') {
+        return explicit;
+    }
+
+    const ownerId = typeof resourceAttributes.ownerId === 'string'
+        ? resourceAttributes.ownerId
+        : undefined;
+    const userId = typeof resourceAttributes.userId === 'string'
+        ? resourceAttributes.userId
+        : undefined;
+    const candidate = ownerId ?? userId;
+
+    if (!candidate) {
+        return undefined;
+    }
+
+    return candidate === authorization.userId;
+}
+
 async function assertPeopleAccess(
     authorization: RepositoryAuthorizationContext,
     params: {
@@ -24,6 +52,7 @@ async function assertPeopleAccess(
         requiredPermissions?: OrgPermissionMap;
     },
 ): Promise<RepositoryAuthorizationContext> {
+    const ownerMatchesSubject = resolveOwnerMatch(authorization, params.resourceAttributes);
     authorizeOrgAccessRbacOnly(
         {
             orgId: authorization.orgId,
@@ -40,10 +69,15 @@ async function assertPeopleAccess(
         userId: authorization.userId,
         action: params.action,
         resourceType: params.resourceType,
-        roles: [authorization.roleKey],
+        roles: authorization.roleName && authorization.roleName !== authorization.roleKey
+            ? [authorization.roleKey, authorization.roleName]
+            : [authorization.roleKey],
         guardContext: authorization,
         resourceAttributes: {
             ...params.resourceAttributes,
+            ...(typeof ownerMatchesSubject === 'boolean'
+                ? { ownerMatchesSubject }
+                : {}),
             residency: authorization.dataResidency,
             classification: authorization.dataClassification,
             expectedResidency: BASE_DEFAULTS.expectedResidency,

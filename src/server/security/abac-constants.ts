@@ -1,58 +1,22 @@
-import type { AbacPolicy } from './abac-types';
+/**
+ * ABAC Constants
+ *
+ * Re-exports from split policy modules for backwards compatibility.
+ *
+ * @module abac-constants
+ * @see abac-policies/index for the split implementation
+ */
+export {
+  DEFAULT_BOOTSTRAP_POLICIES,
+  ADMIN_TIER_POLICIES,
+  GLOBAL_ADMIN_POLICIES,
+  OWNER_POLICIES,
+  ORG_ADMIN_POLICIES,
+  HR_ADMIN_POLICIES,
+  MANAGER_POLICIES,
+  COMPLIANCE_POLICIES,
+  MEMBER_POLICIES,
+  OWNERSHIP_POLICIES,
+  DEFAULT_DENY_POLICY,
+} from './abac-policies/index';
 
-export const DEFAULT_BOOTSTRAP_POLICIES: AbacPolicy[] = [
-  {
-    id: 'default:abac:globalAdmin:allow-all',
-    description: 'Fallback ABAC: allow global admins to proceed when tenant policies are missing.',
-    effect: 'allow',
-    actions: ['*'],
-    resources: ['*'],
-    condition: { subject: { roles: ['globalAdmin'] } },
-    priority: 1100,
-  },
-  {
-    id: 'default:abac:owner:allow-all',
-    description: 'Fallback ABAC: allow owners to proceed when tenant policies are missing.',
-    effect: 'allow',
-    actions: ['*'],
-    resources: ['*'],
-    condition: { subject: { roles: ['owner'] } },
-    priority: 1000,
-  },
-  {
-    id: 'default:abac:orgAdmin:allow-all',
-    description: 'Fallback ABAC: allow org admins to proceed when tenant policies are missing.',
-    effect: 'allow',
-    actions: ['*'],
-    resources: ['*'],
-    condition: { subject: { roles: ['orgAdmin'] } },
-    priority: 900,
-  },
-  {
-    id: 'default:abac:hrAdmin:allow-hr-resources',
-    description: 'Fallback ABAC: allow HR admins to access all HR resources.',
-    effect: 'allow',
-    actions: ['*'],
-    resources: ['employeeProfile', 'employmentContract', 'leaveRequest', 'absence', 'timeEntry', 'training'],
-    condition: { subject: { roles: ['hrAdmin'] } },
-    priority: 800,
-  },
-  {
-    id: 'default:abac:member:allow-hr-read',
-    description: 'Fallback ABAC: allow members to read HR resources (profiles, leave, etc).',
-    effect: 'allow',
-    actions: ['read', 'list'],
-    resources: ['employeeProfile', 'employmentContract', 'leaveRequest', 'absence', 'timeEntry', 'training'],
-    condition: { subject: { roles: ['member'] } },
-    priority: 700,
-  },
-  {
-    id: 'default:abac:member:allow-hr-create',
-    description: 'Fallback ABAC: allow members to create their own leave/absence/timeEntry requests.',
-    effect: 'allow',
-    actions: ['create'],
-    resources: ['leaveRequest', 'absence', 'timeEntry'],
-    condition: { subject: { roles: ['member'] } },
-    priority: 700,
-  },
-];

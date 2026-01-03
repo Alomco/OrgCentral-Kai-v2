@@ -8,6 +8,14 @@ function normalizeDateString(value?: string): string | undefined {
   return Number.isNaN(parsed.getTime()) ? undefined : parsed.toISOString();
 }
 
+function normalizeOptionalText(value?: string): string | undefined {
+  if (!value) {
+    return undefined;
+  }
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : undefined;
+}
+
 export function normalizeProfileFilters(filters?: PeopleListFilters): PeopleListFilters | undefined {
   if (!filters) {
     return undefined;
@@ -16,6 +24,12 @@ export function normalizeProfileFilters(filters?: PeopleListFilters): PeopleList
     startDate: normalizeDateString(filters.startDate),
     endDate: normalizeDateString(filters.endDate),
     employmentStatus: filters.employmentStatus,
+    employmentType: filters.employmentType,
+    jobTitle: normalizeOptionalText(filters.jobTitle),
+    departmentId: normalizeOptionalText(filters.departmentId),
+    managerOrgId: normalizeOptionalText(filters.managerOrgId),
+    managerUserId: normalizeOptionalText(filters.managerUserId),
+    search: normalizeOptionalText(filters.search),
   };
 }
 

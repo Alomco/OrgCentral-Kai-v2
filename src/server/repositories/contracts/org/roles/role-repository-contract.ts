@@ -51,6 +51,14 @@ export interface IRoleRepository {
   ): Promise<Role[]>;
 
   /**
+   * Get multiple roles by ids for an organization
+   */
+  getRolesByIds(
+    tenantId: string,
+    roleIds: string[]
+  ): Promise<Role[]>;
+
+  /**
    * Delete a role
    */
   deleteRole(

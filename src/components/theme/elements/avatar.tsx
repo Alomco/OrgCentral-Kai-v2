@@ -30,12 +30,12 @@ const avatarVariants = cva(
             },
             ring: {
                 none: '',
-                default: 'ring-2 ring-background',
-                primary: 'ring-2 ring-primary',
-                gradient: 'ring-2 ring-offset-2 ring-offset-background',
+                default: 'shadow-[0_0_0_2px_hsl(var(--background))]',
+                primary: 'shadow-[0_0_0_2px_hsl(var(--primary))]',
+                gradient: 'shadow-[0_0_0_2px_hsl(var(--background)),0_0_0_4px_hsl(var(--primary)/0.4)]',
             },
             interactive: {
-                true: 'cursor-pointer hover:scale-105 hover:ring-primary/50 active:scale-95',
+                true: 'cursor-pointer hover:scale-105 hover:shadow-[0_0_0_2px_hsl(var(--primary)/0.5)] active:scale-95',
                 false: '',
             },
         },
@@ -85,14 +85,14 @@ export function PremiumAvatar({
                     className="aspect-square h-full w-full object-cover"
                 />
             ) : (
-                <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary to-accent text-primary-foreground font-semibold">
+                <div className="flex h-full w-full items-center justify-center bg-linear-to-br from-primary to-accent text-primary-foreground font-semibold">
                     {initials ?? '?'}
                 </div>
             )}
             {status && (
                 <span
                     className={cn(
-                        'absolute bottom-0 right-0 block rounded-full ring-2 ring-background',
+                        'absolute bottom-0 right-0 block rounded-full shadow-[0_0_0_2px_hsl(var(--background))]',
                         size === 'xs' || size === 'sm' ? 'h-2 w-2' : 'h-3 w-3',
                         status === 'online' && 'bg-green-500',
                         status === 'away' && 'bg-yellow-500',
@@ -125,17 +125,24 @@ export function AvatarGroup({ children, max = 4, total, className }: AvatarGroup
     const visible = childArray.slice(0, max);
     const overflow = total ? total - max : childArray.length - max;
 
+    const zIndexClassByPosition = ['z-50', 'z-40', 'z-30', 'z-20', 'z-10', 'z-0'] as const;
+
     return (
         <div className={cn('flex -space-x-3', className)}>
             {visible.map((child, index) => (
-                <div key={index} className="relative" style={{ zIndex: max - index }}>
+                <div
+                    key={index}
+                    className={cn(
+                        'relative',
+                        zIndexClassByPosition[Math.min(index, zIndexClassByPosition.length - 1)],
+                    )}
+                >
                     {child}
                 </div>
             ))}
             {overflow > 0 && (
                 <div
-                    className="relative flex h-10 w-10 items-center justify-center rounded-full bg-muted text-xs font-semibold text-muted-foreground ring-2 ring-background"
-                    style={{ zIndex: 0 }}
+                    className="relative z-0 flex h-10 w-10 items-center justify-center rounded-full bg-muted text-xs font-semibold text-muted-foreground shadow-[0_0_0_2px_hsl(var(--background))]"
                 >
                     +{overflow}
                 </div>

@@ -11,6 +11,9 @@ import {
 import { PrismaOrganizationRepository } from '@/server/repositories/prisma/org/organization/prisma-organization-repository';
 import { PrismaRoleRepository } from '@/server/repositories/prisma/org/roles/prisma-role-repository';
 import { PrismaMembershipRepository } from '@/server/repositories/prisma/org/membership/prisma-membership-repository';
+import { PrismaAbacPolicyRepository } from '@/server/repositories/prisma/org/abac/prisma-abac-policy-repository';
+import { PrismaPermissionResourceRepository } from '@/server/repositories/prisma/org/permissions/prisma-permission-resource-repository';
+import { PrismaAbsenceTypeConfigRepository } from '@/server/repositories/prisma/hr/absences/prisma-absence-type-config-repository';
 import { getOrganization as getOrganizationUseCaseImpl } from '@/server/use-cases/org/organization/get-organization';
 import type { GetOrganizationResult } from '@/server/use-cases/org/organization/get-organization';
 import { createOrganizationWithOwner as createOrganizationWithOwnerUseCase } from '@/server/use-cases/org/organization/create-organization-with-owner';
@@ -148,12 +151,18 @@ export async function createOrganizationController(
     const organizationRepository = new PrismaOrganizationRepository();
     const roleRepository = new PrismaRoleRepository();
     const membershipRepository = new PrismaMembershipRepository();
+    const abacPolicyRepository = new PrismaAbacPolicyRepository();
+    const permissionResourceRepository = new PrismaPermissionResourceRepository();
+    const absenceTypeConfigRepository = new PrismaAbsenceTypeConfigRepository();
 
     return createOrganizationWithOwnerUseCase(
         {
             organizationRepository,
             roleRepository,
             membershipRepository,
+            abacPolicyRepository,
+            permissionResourceRepository,
+            absenceTypeConfigRepository,
         },
         {
             authorization,

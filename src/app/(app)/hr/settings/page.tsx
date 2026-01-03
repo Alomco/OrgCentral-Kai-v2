@@ -16,6 +16,8 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { getSessionContextOrRedirect } from '@/server/ui/auth/session-redirect';
 import { HrSettingsPanel } from './_components/hr-settings-panel';
+import { AbsenceTypeConfigPanel } from './_components/absence-type-config-panel';
+import { LeavePolicyConfigPanel } from './_components/leave-policy-config-panel';
 
 function HrSettingsSkeletonCard() {
     return (
@@ -96,6 +98,14 @@ export default async function HrSettingsPage() {
 
             <Suspense fallback={<HrSettingsSkeletonCard />}>
                 <HrSettingsPanel authorization={authorization} />
+            </Suspense>
+
+            <Suspense fallback={<HrSettingsSkeletonCard />}>
+                <AbsenceTypeConfigPanel authorization={authorization} />
+            </Suspense>
+
+            <Suspense fallback={<HrSettingsSkeletonCard />}>
+                <LeavePolicyConfigPanel authorization={authorization} />
             </Suspense>
         </div>
     );

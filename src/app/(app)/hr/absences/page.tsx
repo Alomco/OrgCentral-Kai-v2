@@ -18,6 +18,7 @@ import { HrCardSkeleton } from '../_components/hr-card-skeleton';
 import { AbsenceListPanel } from './_components/absences-list-panel';
 import { ReportAbsenceForm } from './_components/report-absence-form';
 import { buildInitialReportAbsenceFormState } from './form-state';
+import { listAbsenceTypeConfigsForUi } from '@/server/use-cases/hr/absences/list-absence-type-configs.cached';
 
 export default async function HrAbsencesPage() {
     const headerStore = await nextHeaders();
@@ -31,6 +32,9 @@ export default async function HrAbsencesPage() {
     );
 
     const initialFormState = buildInitialReportAbsenceFormState();
+    const { types: absenceTypes } = await listAbsenceTypeConfigsForUi({
+        authorization,
+    });
 
     return (
         <div className="space-y-6">
@@ -58,6 +62,7 @@ export default async function HrAbsencesPage() {
                 <ReportAbsenceForm
                     authorization={authorization}
                     initialState={initialFormState}
+                    absenceTypes={absenceTypes}
                 />
 
                 <Suspense fallback={<HrCardSkeleton variant="table" />}>

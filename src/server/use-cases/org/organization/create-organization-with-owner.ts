@@ -1,26 +1,33 @@
-import { MembershipStatus, RoleScope } from '@prisma/client';
+import { MembershipStatus } from '@prisma/client';
 
 import { AuthorizationError, ValidationError } from '@/server/errors';
 import type { IMembershipRepository } from '@/server/repositories/contracts/org/membership';
 import type { IOrganizationRepository } from '@/server/repositories/contracts/org/organization/organization-repository-contract';
 import type { IRoleRepository } from '@/server/repositories/contracts/org/roles/role-repository-contract';
+import type { IAbacPolicyRepository } from '@/server/repositories/contracts/org/abac/abac-policy-repository-contract';
+import type { IPermissionResourceRepository } from '@/server/repositories/contracts/org/permissions/permission-resource-repository-contract';
+import type { IAbsenceTypeConfigRepository } from '@/server/repositories/contracts/hr/absences/absence-type-config-repository-contract';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
-import { orgRoles, type OrgPermissionMap } from '@/server/security/access-control';
+import { ROLE_TEMPLATES } from '@/server/security/role-templates';
+import { TENANT_ROLE_KEYS } from '@/server/security/role-constants';
+import { DEFAULT_BOOTSTRAP_POLICIES } from '@/server/security/abac-constants';
 import type { OrganizationData } from '@/server/types/leave-types';
 import type { Role } from '@/server/types/hr-types';
 import { buildAuthorizationContext, generateEmployeeNumber } from '@/server/use-cases/shared/builders';
+import { seedPermissionResources } from '@/server/use-cases/org/permissions/seed-permission-resources';
+import { seedDefaultAbsenceTypes } from '@/server/use-cases/hr/absences/seed-default-absence-types';
 
 import { createOrganization } from './create-organization';
 
 const OWNER_ROLE_NAME = 'owner';
-const OWNER_ROLE_DESCRIPTION = 'Organization owner';
-
-const OWNER_ROLE_PERMISSIONS = orgRoles.owner.statements as OrgPermissionMap;
 
 export interface CreateOrganizationWithOwnerDependencies {
     organizationRepository: Pick<IOrganizationRepository, 'createOrganization'>;
-    roleRepository: Pick<IRoleRepository, 'getRoleByName' | 'createRole'>;
+    roleRepository: Pick<IRoleRepository, 'createRole' | 'updateRole' | 'getRolesByOrganization'>;
     membershipRepository: Pick<IMembershipRepository, 'createMembershipWithProfile'>;
+    abacPolicyRepository: Pick<IAbacPolicyRepository, 'getPoliciesForOrg' | 'setPoliciesForOrg'>;
+    permissionResourceRepository: Pick<IPermissionResourceRepository, 'listResources' | 'createResource'>;
+    absenceTypeConfigRepository: Pick<IAbsenceTypeConfigRepository, 'getConfigs' | 'createConfig'>;
 }
 
 export interface CreateOrganizationWithOwnerInput {
@@ -55,7 +62,20 @@ export async function createOrganizationWithOwner(
         },
     );
 
-    await ensureOwnerRole(deps.roleRepository, organization.id);
+    await ensureBuiltinRoles(deps.roleRepository, organization.id);
+    await ensureAbacPolicies(deps.abacPolicyRepository, organization.id);
+    await seedPermissionResources(
+        { permissionResourceRepository: deps.permissionResourceRepository },
+        { orgId: organization.id },
+    );
+    await seedDefaultAbsenceTypes(
+        { typeConfigRepository: deps.absenceTypeConfigRepository },
+        {
+            orgId: organization.id,
+            dataResidency: organization.dataResidency,
+            dataClassification: organization.dataClassification,
+        },
+    );
 
     const ownerContext = buildOwnerContext(organization, input.authorization, input.actor.userId);
 
@@ -82,22 +102,55 @@ export async function createOrganizationWithOwner(
     return { organization };
 }
 
-async function ensureOwnerRole(
+async function ensureBuiltinRoles(
     roleRepository: CreateOrganizationWithOwnerDependencies['roleRepository'],
     orgId: string,
 ): Promise<void> {
-    const existing = await roleRepository.getRoleByName(orgId, OWNER_ROLE_NAME);
-    if (existing) {
-        return;
+    const existing = await roleRepository.getRolesByOrganization(orgId);
+    const byName = new Map(existing.map((role) => [role.name, role]));
+
+    for (const roleKey of TENANT_ROLE_KEYS) {
+        const template = ROLE_TEMPLATES[roleKey];
+        if (byName.has(template.name)) {
+            continue;
+        }
+        await roleRepository.createRole(orgId, {
+            orgId,
+            name: template.name,
+            description: template.description,
+            scope: template.scope,
+            permissions: template.permissions as Role['permissions'],
+            inheritsRoleIds: [],
+            isSystem: template.isSystem ?? false,
+            isDefault: template.isDefault ?? false,
+        });
     }
 
-    await roleRepository.createRole(orgId, {
-        orgId,
-        name: OWNER_ROLE_NAME,
-        description: OWNER_ROLE_DESCRIPTION,
-        scope: RoleScope.ORG,
-        permissions: OWNER_ROLE_PERMISSIONS as Role['permissions'],
-    });
+    const refreshed = await roleRepository.getRolesByOrganization(orgId);
+    const refreshedByName = new Map(refreshed.map((role) => [role.name, role]));
+
+    for (const roleKey of TENANT_ROLE_KEYS) {
+        const template = ROLE_TEMPLATES[roleKey];
+        const role = refreshedByName.get(template.name);
+        if (!role || !template.inherits?.length) {
+            continue;
+        }
+        const inheritedRoleIds = template.inherits
+            .map((name) => refreshedByName.get(name)?.id)
+            .filter((id): id is string => typeof id === 'string');
+        await roleRepository.updateRole(orgId, role.id, { inheritsRoleIds: inheritedRoleIds });
+    }
+}
+
+async function ensureAbacPolicies(
+    abacRepository: CreateOrganizationWithOwnerDependencies['abacPolicyRepository'],
+    orgId: string,
+): Promise<void> {
+    const existing = await abacRepository.getPoliciesForOrg(orgId);
+    if (existing.length > 0) {
+        return;
+    }
+    await abacRepository.setPoliciesForOrg(orgId, DEFAULT_BOOTSTRAP_POLICIES);
 }
 
 function buildOwnerContext(

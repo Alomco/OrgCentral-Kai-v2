@@ -43,7 +43,7 @@ Purpose: lift the mature Firebase + Cloud Functions backend that lives in `old/`
    - Rewrite `old/firebase/functions/src/lib/notifications.ts` as `NotificationService` implementing `NotificationPort`. Use Resend + Novu providers selectable via DI.
    - All notifications log to `AuditLog` + Mongo `auditLogs` (dual write) following zero-trust guidance.
 3. **Guards + policy enforcement**
-   - Port guard helpers (`guards.ts`) into `src/server/security/guards.ts`. Wrap CASL ability factories plus Better Auth context resolvers.
+   - Port guard helpers (`guards.ts`) into `src/server/security/guards.ts`. Wrap DB-driven permission resolution plus Better Auth context resolvers.
    - Build `PolicyEvaluationService` that ensures RBAC + ABAC checks run before repository calls.
 
 ## Phase 3 – Identity, Membership, and Org Lifecycle
@@ -56,7 +56,7 @@ Purpose: lift the mature Firebase + Cloud Functions backend that lives in `old/`
 3. **Org provisioning**
    - Port `createOrganization`, `updateOrgSettings`, custom role CRUD from `org-admin.ts` into dedicated services:
      - `OrganizationService` (manages metadata, leave defaults).
-     - `CustomRoleService` (wraps Prisma `Role` + `Permission` models, includes CASL sync).
+     - `CustomRoleService` (manages Role records with permissions JSON, inheritance, and registry constraints; integrates permission resolver + cache invalidation).
    - Publish events to BullMQ outbox for cross-domain updates (branding, notifications, entitlements).
 
 ## Phase 4 – HR Domain (Leave, Absences, Onboarding, People)
@@ -84,7 +84,7 @@ Purpose: lift the mature Firebase + Cloud Functions backend that lives in `old/`
 2. **Workflow automation**
    - Move `workflow-admin.ts` logic into `WorkflowTemplateService` + `WorkflowRunService`, enabling interface-based adapters for future providers (e.g., Temporal, Durable Functions).
 3. **Enterprise + platform admin**
-   - `enterprise-admin.ts` functionalities (multi-org oversight, cross-tenant reports) should become dedicated repositories with restricted CASL policies.
+   - `enterprise-admin.ts` functionalities (multi-org oversight, cross-tenant reports) should become dedicated repositories with restricted RBAC/ABAC policies.
    - Platform admin APIs become Next Route Handlers under `src/app/api/platform-admin/**` using streaming JSON responses.
 
 ## Phase 6 – Notifications & AI Assistants

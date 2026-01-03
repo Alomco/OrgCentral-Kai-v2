@@ -3,7 +3,9 @@ import { z } from 'zod';
 import { ValidationError } from '@/server/errors';
 import { readJson } from '@/server/api-adapters/http/request-utils';
 import { getSessionContext } from '@/server/use-cases/auth/sessions/get-session';
-import { getBillingService } from '@/server/services/billing/billing-service.provider';
+import { createBillingCheckoutSession } from '@/server/use-cases/billing/create-billing-checkout-session';
+import { createBillingPortalSession } from '@/server/use-cases/billing/create-billing-portal-session';
+import { getBillingSubscription } from '@/server/use-cases/billing/get-billing-subscription';
 import type { OrganizationSubscriptionData } from '@/server/types/billing-types';
 
 const checkoutRequestSchema = z.object({}).strict();
@@ -46,8 +48,7 @@ export async function createBillingCheckoutController(
     },
   );
 
-  const billingService = getBillingService();
-  const result = await billingService.createCheckoutSession({
+  const result = await createBillingCheckoutSession({}, {
     authorization,
     customerEmail: session.user.email,
   });
@@ -80,8 +81,7 @@ export async function createBillingPortalController(
     },
   );
 
-  const billingService = getBillingService();
-  const result = await billingService.createPortalSession({ authorization });
+  const result = await createBillingPortalSession({}, { authorization });
 
   return { success: true, url: result.url };
 }
@@ -108,8 +108,7 @@ export async function getBillingSubscriptionController(
     },
   );
 
-  const billingService = getBillingService();
-  const subscription = await billingService.getSubscription({ authorization });
+  const { subscription } = await getBillingSubscription({}, { authorization });
 
   return { success: true, subscription };
 }

@@ -1,8 +1,8 @@
 'use server';
 
 import { headers } from 'next/headers';
-import { z } from 'zod';
 import type { Prisma } from '@prisma/client';
+import { z } from 'zod';
 
 import { getSessionContext } from '@/server/use-cases/auth/sessions/get-session';
 import { PrismaHRSettingsRepository } from '@/server/repositories/prisma/hr/settings';
@@ -20,7 +20,6 @@ function readFormString(formData: FormData, key: string): string {
     return typeof value === 'string' ? value : '';
 }
 
-const leaveTypesListSchema = z.array(z.string().trim().min(1).max(40)).max(25);
 const adminNotesSchema = z.string().trim().max(500);
 const approvalWorkflowsJsonSchema = z.string().trim().max(8000);
 
@@ -67,7 +66,6 @@ export async function updateHrSettingsAction(
         standardHoursPerDay: formData.get('standardHoursPerDay'),
         standardDaysPerWeek: formData.get('standardDaysPerWeek'),
         enableOvertime: formData.get('enableOvertime') === 'on',
-        leaveTypesCsv: readFormString(formData, 'leaveTypesCsv'),
         adminNotes: readFormString(formData, 'adminNotes'),
         approvalWorkflowsJson: readFormString(formData, 'approvalWorkflowsJson'),
     };
@@ -83,23 +81,6 @@ export async function updateHrSettingsAction(
     }
 
     try {
-        const leaveTypesCandidate = parsed.data.leaveTypesCsv
-            .split(',')
-            .map((entry) => entry.trim())
-            .filter((entry) => entry.length > 0);
-
-        const leaveTypesParsed = leaveTypesListSchema.safeParse(leaveTypesCandidate);
-        if (!leaveTypesParsed.success) {
-            return {
-                status: 'error',
-                message: FIELD_CHECK_MESSAGE,
-                fieldErrors: {
-                    leaveTypesCsv: 'Leave types must be comma-separated labels (max 25, 40 chars each).',
-                },
-                values: parsed.data,
-            };
-        }
-
         const adminNotesParsed = adminNotesSchema.safeParse(parsed.data.adminNotes);
         if (!adminNotesParsed.success) {
             return {
@@ -112,7 +93,6 @@ export async function updateHrSettingsAction(
             };
         }
 
-        const leaveTypes = leaveTypesParsed.data;
         const adminNotes = adminNotesParsed.data;
 
         const approvalWorkflowsJsonParsed = approvalWorkflowsJsonSchema.safeParse(parsed.data.approvalWorkflowsJson);
@@ -155,7 +135,6 @@ export async function updateHrSettingsAction(
                     overtimePolicy: {
                         enableOvertime: parsed.data.enableOvertime,
                     },
-                    leaveTypes,
                     approvalWorkflows,
                     metadata: {
                         adminNotes: adminNotes.length > 0 ? adminNotes : null,
@@ -172,7 +151,6 @@ export async function updateHrSettingsAction(
             fieldErrors: undefined,
             values: {
                 ...parsed.data,
-                leaveTypesCsv: leaveTypes.join(', '),
                 adminNotes,
                 approvalWorkflowsJson: approvalWorkflowsJsonParsed.data.trim(),
             },

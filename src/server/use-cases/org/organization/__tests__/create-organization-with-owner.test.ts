@@ -4,6 +4,7 @@ import { MembershipStatus, RoleScope } from '@prisma/client';
 import type { MembershipCreationInput, MembershipCreationResult } from '@/server/repositories/contracts/org/membership';
 import type { CreateOrganizationInput } from '@/server/repositories/contracts/org/organization/organization-repository-contract';
 import type { Role } from '@/server/types/hr-types';
+import type { AbsenceTypeConfig } from '@/server/types/hr-ops-types';
 import type { OrganizationData } from '@/server/types/leave-types';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
 import { normalizeLeaveYearStartDate } from '@/server/types/org/leave-year-start-date';
@@ -37,19 +38,39 @@ describe('createOrganizationWithOwner', () => {
         const organization = buildOrganizationData();
 
         const createOrganization = vi.fn(async (input: CreateOrganizationInput) => organization);
-        const getRoleByName = vi.fn(async (orgId: string, name: string) => null);
+        const getRolesByOrganization = vi.fn(async () => []);
         const createRole = vi.fn(
             async (orgId: string, roleData: Omit<Role, 'id' | 'createdAt' | 'updatedAt'>) => { },
         );
+        const updateRole = vi.fn(async () => { });
         const createMembershipWithProfile = vi.fn(
             async (_ctx: RepositoryAuthorizationContext, _input: MembershipCreationInput): Promise<MembershipCreationResult> =>
                 ({ organizationId: organization.id, roles: ['owner'] })
         );
+        const getPoliciesForOrg = vi.fn(async () => []);
+        const setPoliciesForOrg = vi.fn(async () => { });
+        const listPermissionResources = vi.fn(async () => []);
+        const createPermissionResource = vi.fn(async () => { });
+        const getAbsenceTypeConfigs = vi.fn(async () => [] as AbsenceTypeConfig[]);
+        const createAbsenceTypeConfig = vi.fn(
+            async (
+                _orgId: string,
+                input: Omit<AbsenceTypeConfig, 'id' | 'createdAt' | 'updatedAt'>,
+            ): Promise<AbsenceTypeConfig> => ({
+                ...input,
+                id: 'absence-type-1',
+                createdAt: new Date('2024-01-01T00:00:00.000Z'),
+                updatedAt: new Date('2024-01-01T00:00:00.000Z'),
+            }),
+        );
 
         const deps: CreateOrganizationWithOwnerDependencies = {
             organizationRepository: { createOrganization },
-            roleRepository: { getRoleByName, createRole },
+            roleRepository: { getRolesByOrganization, createRole, updateRole },
             membershipRepository: { createMembershipWithProfile },
+            abacPolicyRepository: { getPoliciesForOrg, setPoliciesForOrg },
+            permissionResourceRepository: { listResources: listPermissionResources, createResource: createPermissionResource },
+            absenceTypeConfigRepository: { getConfigs: getAbsenceTypeConfigs, createConfig: createAbsenceTypeConfig },
         };
 
         const authorization = buildAuthorizationContext({
@@ -89,14 +110,12 @@ describe('createOrganizationWithOwner', () => {
 
         expect(result.organization.id).toBe(organization.id);
         expect(createOrganization).toHaveBeenCalledWith(organizationInput);
-        expect(getRoleByName).toHaveBeenCalledWith(organization.id, 'owner');
+        expect(getRolesByOrganization).toHaveBeenCalledWith(organization.id);
         expect(createRole).toHaveBeenCalledWith(
             organization.id,
-            expect.objectContaining({
-                name: 'owner',
-                scope: RoleScope.ORG,
-            }),
+            expect.objectContaining({ name: 'owner', scope: RoleScope.ORG }),
         );
+        expect(setPoliciesForOrg).toHaveBeenCalled();
 
         const call = createMembershipWithProfile.mock.calls[0];
         if (!call) throw new Error('Expected createMembershipWithProfile to be called');
@@ -111,5 +130,10 @@ describe('createOrganizationWithOwner', () => {
             }),
         );
         expect(membershipInput.profile.employeeNumber).toEqual(expect.any(String));
+
+        expect(listPermissionResources).toHaveBeenCalledWith(organization.id);
+        expect(createPermissionResource).toHaveBeenCalled();
+        expect(getAbsenceTypeConfigs).toHaveBeenCalledWith(organization.id, { includeInactive: true });
+        expect(createAbsenceTypeConfig).toHaveBeenCalled();
     });
 });

@@ -3,21 +3,18 @@ import { headers } from 'next/headers';
 
 import { RoleCreateForm } from './_components/role-create-form';
 import { RoleRow } from './_components/role-row';
-import { resolveOrgContext } from '@/server/org/org-context';
 import { getSessionContextOrRedirect } from '@/server/ui/auth/session-redirect';
 import { getRoleService } from '@/server/services/org';
 
 export default async function OrgRolesPage() {
     noStore();
 
-    const orgContext = await resolveOrgContext();
     const headerStore = await headers();
 
     const { authorization } = await getSessionContextOrRedirect(
         {},
         {
             headers: headerStore,
-            orgId: orgContext.orgId,
             requiredPermissions: { organization: ['update'] },
             auditSource: 'ui:org-roles',
         },

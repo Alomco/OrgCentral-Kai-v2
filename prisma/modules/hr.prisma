@@ -246,8 +246,8 @@ model LeavePolicy {
   allowNegativeBalance Boolean           @default(false) // For emergency leave
   dataClassification DataClassificationLevel @default(OFFICIAL)
   residencyTag       DataResidencyZone       @default(UK_ONLY)
-  auditSource       String?
-  auditBatchId      String?
+  auditSource      String?
+  auditBatchId     String?
   metadata         Json?                 @db.JsonB
 
   org          Organization         @relation(fields: [orgId], references: [id], onDelete: Cascade)
@@ -292,8 +292,8 @@ model LeaveBalance {
   // For audit trail
   dataClassification DataClassificationLevel @default(OFFICIAL)
   residencyTag       DataResidencyZone       @default(UK_ONLY)
-  auditSource       String?
-  auditBatchId      String?
+  auditSource      String?
+  auditBatchId     String?
   metadata     Json?    @db.JsonB
   updatedAt    DateTime @updatedAt
 
@@ -330,8 +330,8 @@ model LeaveRequest {
   // For audit trail
   dataClassification DataClassificationLevel @default(OFFICIAL)
   residencyTag       DataResidencyZone       @default(UK_ONLY)
-  auditSource       String?
-  auditBatchId      String?
+  auditSource      String?
+  auditBatchId     String?
   metadata       Json?              @db.JsonB
   createdAt      DateTime           @default(now())
   updatedAt      DateTime           @updatedAt

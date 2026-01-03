@@ -43,7 +43,7 @@ export async function createLeaveBalanceController(
 
     const { userId } = requireSessionUser(authSession);
     const decision = await getFeatureFlagDecision('leave_policy_resolver', userId);
-    const balance = buildBalanceModel(payload, authorization.orgId);
+    const balance = buildBalanceModel(payload, authorization);
 
     const result = await service.createLeaveBalance({
         authorization,
@@ -58,7 +58,10 @@ export async function createLeaveBalanceController(
     };
 }
 
-function buildBalanceModel(payload: LeaveBalancePayload, orgId: string): Omit<LeaveBalance, 'createdAt' | 'updatedAt'> {
+function buildBalanceModel(
+    payload: LeaveBalancePayload,
+    authorization: { orgId: string; dataResidency: LeaveBalance['dataResidency']; dataClassification: LeaveBalance['dataClassification'] },
+): Omit<LeaveBalance, 'createdAt' | 'updatedAt'> {
     const used = payload.used;
     const pending = payload.pending;
     const totalEntitlement = payload.totalEntitlement;
@@ -67,7 +70,7 @@ function buildBalanceModel(payload: LeaveBalancePayload, orgId: string): Omit<Le
 
     return {
         id: payload.id ?? randomUUID(),
-        orgId,
+        orgId: authorization.orgId,
         employeeId: payload.employeeId,
         leaveType: payload.leaveType,
         year: payload.year,
@@ -75,5 +78,8 @@ function buildBalanceModel(payload: LeaveBalancePayload, orgId: string): Omit<Le
         used,
         pending,
         available,
+        dataResidency: authorization.dataResidency,
+        dataClassification: authorization.dataClassification,
+        auditSource: 'api:hr:leave:balance:create',
     };
 }

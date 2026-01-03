@@ -67,6 +67,8 @@ export const buildUserRepository = (): IUserRepository =>
     addUserToOrganization: vi.fn(async () => undefined),
     removeUserFromOrganization: vi.fn(async () => undefined),
     getUsersInOrganization: vi.fn(async () => []),
+    countUsersInOrganization: vi.fn(async () => 0),
+    getUsersInOrganizationPaged: vi.fn(async () => []),
 } as unknown as IUserRepository);
 
 export const buildMembershipRepository = (): IMembershipRepository =>

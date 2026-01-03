@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useTransition, useEffect } from 'react';
-import { Database, Users, Calendar, Building2, Trash2, RefreshCw, ShieldCheck } from 'lucide-react';
+import { Database, Users, Calendar, Building2, Trash2, RefreshCw, ShieldCheck, Key } from 'lucide-react';
 import {
     seedFakeEmployees,
     seedFakeLeaveRequests,
@@ -11,21 +11,31 @@ import {
     seedAbacPolicies,
     getAbacPolicyStatus,
 } from '../_actions/seed-fake-data';
+import {
+    seedPermissionResourcesForDev,
+    getPermissionResourceStatus,
+} from '../_actions/seed-permission-resources';
 
 export function DataSeederPanel() {
     const [stats, setStats] = useState({ employees: 0, leaveRequests: 0, departments: 0 });
     const [abacStatus, setAbacStatus] = useState({ hasAbacPolicies: false, policyCount: 0 });
+    const [permissionStatus, setPermissionStatus] = useState({
+        hasPermissionResources: false,
+        resourceCount: 0,
+    });
     const [message, setMessage] = useState('');
     const [isPending, startTransition] = useTransition();
 
     const loadStats = () => {
         startTransition(async () => {
-            const [dataStats, abac] = await Promise.all([
+            const [dataStats, abac, permissions] = await Promise.all([
                 getSeededDataStats(),
                 getAbacPolicyStatus(),
+                getPermissionResourceStatus(),
             ]);
             setStats(dataStats);
             setAbacStatus(abac);
+            setPermissionStatus(permissions);
         });
     };
 
@@ -73,6 +83,14 @@ export function DataSeederPanel() {
         });
     };
 
+    const handleSeedPermissionResources = () => {
+        startTransition(async () => {
+            const result = await seedPermissionResourcesForDev();
+            setMessage(result.message);
+            if (result.success) { loadStats(); }
+        });
+    };
+
     const seedButtons = [
         { label: '5 Employees', onClick: () => handleSeedEmployees(5), icon: Users },
         { label: '10 Employees', onClick: () => handleSeedEmployees(10), icon: Users },
@@ -110,9 +128,18 @@ export function DataSeederPanel() {
                         {abacStatus.hasAbacPolicies ? `${String(abacStatus.policyCount)} ABAC policies` : 'No ABAC policies'}
                     </span>
                 </div>
+                <div className={`flex items-center gap-2 rounded-full border px-3 py-1 text-sm ${permissionStatus.hasPermissionResources ? 'border-emerald-600 bg-emerald-900/30' : 'border-amber-700 bg-amber-950/30'}`}>
+                    <Key className={`h-4 w-4 ${permissionStatus.hasPermissionResources ? 'text-emerald-400' : 'text-amber-400'}`} />
+                    <span className={permissionStatus.hasPermissionResources ? 'text-emerald-100' : 'text-amber-200'}>
+                        {permissionStatus.hasPermissionResources
+                            ? `${String(permissionStatus.resourceCount)} permission resources`
+                            : 'No permission resources'}
+                    </span>
+                </div>
                 <button
                     onClick={loadStats}
                     disabled={isPending}
+                    title="Refresh statistics"
                     className="p-1 text-emerald-400 hover:text-emerald-200 disabled:opacity-50"
                 >
                     <RefreshCw className={`h-4 w-4 ${isPending ? 'animate-spin' : ''}`} />
@@ -136,6 +163,14 @@ export function DataSeederPanel() {
 
             {/* Clear & ABAC Buttons */}
             <div className="mt-4 flex flex-wrap gap-2">
+                <button
+                    onClick={handleSeedPermissionResources}
+                    disabled={isPending}
+                    className="inline-flex items-center gap-2 rounded-lg border border-emerald-700 px-3 py-1.5 text-sm font-medium text-emerald-200 transition hover:border-emerald-500 hover:bg-emerald-950/30 hover:text-emerald-100 disabled:opacity-50"
+                >
+                    <Key className="h-4 w-4" />
+                    Seed Permission Resources
+                </button>
                 <button
                     onClick={handleSeedAbac}
                     disabled={isPending}

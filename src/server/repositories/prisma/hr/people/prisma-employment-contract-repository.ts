@@ -203,6 +203,11 @@ export class PrismaEmploymentContractRepository extends BasePrismaRepository imp
     return mapPrismaEmploymentContractToDomain(rec);
   }
 
+  async getEmploymentContractsByEmployee(tenantId: string, employeeId: string): Promise<EmploymentContractDTO[]> {
+    const recs = await this.findByUserId(tenantId, employeeId, false);
+    return recs.map((rec) => mapPrismaEmploymentContractToDomain(rec));
+  }
+
   async getEmploymentContractsByOrganization(tenantId: string, filters?: ContractListFilters): Promise<EmploymentContractDTO[]> {
     const recs = await this.findAll({
       orgId: tenantId,

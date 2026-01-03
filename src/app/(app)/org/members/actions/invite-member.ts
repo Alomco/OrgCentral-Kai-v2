@@ -2,8 +2,6 @@
 
 import { headers } from 'next/headers';
 import { z } from 'zod';
-
-import { resolveOrgContext } from '@/server/org/org-context';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
 import { getSessionContext } from '@/server/use-cases/auth/sessions/get-session';
 import { getMembershipService } from '@/server/services/org/membership/membership-service.provider';
@@ -23,7 +21,6 @@ export async function inviteMemberAction(
     formData: FormData,
 ): Promise<InviteMemberActionState> {
     void _previous;
-    const orgContext = await resolveOrgContext();
     const headerStore = await headers();
 
     const parsed = inviteMemberSchema.safeParse({
@@ -39,7 +36,6 @@ export async function inviteMemberAction(
         {},
         {
             headers: headerStore,
-            orgId: orgContext.orgId,
             requiredPermissions: { member: ['invite'] },
             auditSource: 'ui:org-members:invite',
             action: 'invite',

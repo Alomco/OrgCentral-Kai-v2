@@ -2,7 +2,11 @@ import { prisma as defaultPrismaClient } from '@/server/lib/prisma';
 import type { BasePrismaRepositoryOptions } from '@/server/repositories/prisma/base-prisma-repository';
 import { PrismaOrganizationRepository } from '@/server/repositories/prisma/org/organization/prisma-organization-repository';
 import { PrismaMembershipRepository } from '@/server/repositories/prisma/org/membership/prisma-membership-repository';
-import { PrismaOrganizationSubscriptionRepository } from '@/server/repositories/prisma/org/billing';
+import {
+  PrismaBillingInvoiceRepository,
+  PrismaOrganizationSubscriptionRepository,
+  PrismaPaymentMethodRepository,
+} from '@/server/repositories/prisma/org/billing';
 import { resolveBillingConfig } from '@/server/services/billing/billing-config';
 import { StripeBillingGateway } from '@/server/services/billing/stripe-billing-gateway';
 import { BillingService, type BillingServiceDependencies } from '@/server/services/billing/billing-service';
@@ -29,6 +33,8 @@ export function resolveBillingService(
     subscriptionRepository: new PrismaOrganizationSubscriptionRepository(repoOptions),
     membershipRepository: new PrismaMembershipRepository(repoOptions),
     organizationRepository: new PrismaOrganizationRepository({ prisma: prismaClient }),
+    paymentMethodRepository: new PrismaPaymentMethodRepository(repoOptions),
+    billingInvoiceRepository: new PrismaBillingInvoiceRepository(repoOptions),
     billingGateway: new StripeBillingGateway(billingConfig),
     billingConfig,
   };
@@ -57,5 +63,17 @@ export function getBillingService(
 
 export type BillingServiceContract = Pick<
   BillingService,
-  'createCheckoutSession' | 'createPortalSession' | 'getSubscription' | 'syncSeats' | 'handleWebhookEvent'
+  | 'createCheckoutSession'
+  | 'createPortalSession'
+  | 'getSubscription'
+  | 'syncSeats'
+  | 'syncSubscriptionPreferences'
+  | 'createSetupIntent'
+  | 'listPaymentMethods'
+  | 'setDefaultPaymentMethod'
+  | 'removePaymentMethod'
+  | 'listInvoices'
+  | 'getInvoice'
+  | 'getUpcomingInvoice'
+  | 'handleWebhookEvent'
 >;

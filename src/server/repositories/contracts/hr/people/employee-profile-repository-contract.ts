@@ -4,6 +4,21 @@
  */
 import type { EmployeeProfileDTO, PeopleListFilters } from '@/server/types/hr/people';
 
+export type EmployeeProfileSortKey = 'name' | 'startDate' | 'status' | 'jobTitle';
+export type EmployeeProfileSortDirection = 'asc' | 'desc';
+
+export interface EmployeeProfileSortInput {
+  key: EmployeeProfileSortKey;
+  direction: EmployeeProfileSortDirection;
+}
+
+export interface EmployeeProfilePagedQuery {
+  page: number;
+  pageSize: number;
+  filters?: PeopleListFilters;
+  sort?: EmployeeProfileSortInput;
+}
+
 export interface IEmployeeProfileRepository {
   /**
    * Create a new employee profile
@@ -44,6 +59,14 @@ export interface IEmployeeProfileRepository {
   getEmployeeProfilesByOrganization(
     tenantId: string,
     filters?: PeopleListFilters
+  ): Promise<EmployeeProfileDTO[]>;
+
+  /**
+   * Get employee profiles for an organization with pagination and sorting.
+   */
+  getEmployeeProfilesByOrganizationPaged(
+    tenantId: string,
+    query: EmployeeProfilePagedQuery
   ): Promise<EmployeeProfileDTO[]>;
 
   /**

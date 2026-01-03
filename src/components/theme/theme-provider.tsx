@@ -1,7 +1,8 @@
 
 'use client';
 
-import { createContext, useContext, useEffect, useMemo, useSyncExternalStore, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useSyncExternalStore, type ReactNode } from 'react';
+import { useTheme as useNextTheme } from 'next-themes';
 
 import { getThemePreset, themePresets, type ThemePresetId } from '@/server/theme/theme-presets';
 import { themeTokenKeys } from '@/server/theme/tokens';
@@ -76,6 +77,7 @@ function subscribeToThemeChanges(onStoreChange: () => void) {
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
+    const { theme: mode, resolvedTheme } = useNextTheme();
     const storedTheme = useSyncExternalStore(
         subscribeToThemeChanges,
         readStoredTheme,
@@ -84,45 +86,67 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
     const themes = useMemo(() => THEME_PRESETS, []);
 
-    const applyThemeToDOM = (themeId: ThemeId) => {
+    const resolvedMode = resolvedTheme ?? (mode === 'dark' ? 'dark' : 'light');
+    const activeMode: 'light' | 'dark' = resolvedMode === 'dark' ? 'dark' : 'light';
+
+    const applyThemeDataAttributes = useCallback((themeId: ThemeId | null, themeMode: 'light' | 'dark') => {
+        const root = document.documentElement;
+        const body = document.body;
+
+        if (themeId) {
+            root.dataset.theme = themeId;
+            body.dataset.theme = themeId;
+        } else {
+            delete root.dataset.theme;
+            delete body.dataset.theme;
+        }
+
+        root.dataset.themeMode = themeMode;
+        body.dataset.themeMode = themeMode;
+    }, []);
+
+    const applyThemeToDOM = useCallback((themeId: ThemeId, themeMode: 'light' | 'dark') => {
         const preset = getThemePreset(themeId);
+        const tokens = themeMode === 'dark' ? preset.darkTokens : preset.tokens;
         const root = document.documentElement;
 
-        // Apply only defined theme tokens to allow globals.css placeholders to work for undefined ones
-        Object.entries(preset.tokens).forEach(([key, value]) => {
+        Object.entries(tokens).forEach(([key, value]) => {
             if (typeof value === 'string' && value.length > 0) {
                 root.style.setProperty(`--${key}`, value);
             }
         });
-    };
 
-    const clearThemeFromDOM = () => {
+        applyThemeDataAttributes(themeId, themeMode);
+    }, [applyThemeDataAttributes]);
+
+    const clearThemeFromDOM = useCallback((themeMode: 'light' | 'dark') => {
         const root = document.documentElement;
         themeTokenKeys.forEach((key) => {
             root.style.removeProperty(`--${key}`);
         });
-    };
+        applyThemeDataAttributes(null, themeMode);
+    }, [applyThemeDataAttributes]);
 
     useEffect(() => {
         // Only override tenant-provided theme when a user has explicitly picked one.
         if (!storedTheme) {
-            clearThemeFromDOM();
+            clearThemeFromDOM(activeMode);
             return;
         }
 
-        applyThemeToDOM(storedTheme);
-    }, [storedTheme]);
+        applyThemeToDOM(storedTheme, activeMode);
+    }, [activeMode, storedTheme, applyThemeToDOM, clearThemeFromDOM]);
 
     const setTheme = (themeId: ThemeId) => {
         localStorage.setItem(getThemeStorageKey(), themeId);
         window.dispatchEvent(new Event(THEME_CHANGE_EVENT));
-        applyThemeToDOM(themeId);
+        applyThemeToDOM(themeId, activeMode);
     };
 
     const clearTheme = () => {
         localStorage.removeItem(getThemeStorageKey());
         window.dispatchEvent(new Event(THEME_CHANGE_EVENT));
-        clearThemeFromDOM();
+        clearThemeFromDOM(activeMode);
     };
 
     return (

@@ -4,7 +4,6 @@ import { headers } from 'next/headers';
 import { z } from 'zod';
 
 import { PrismaBrandingRepository } from '@/server/repositories/prisma/org/branding/prisma-branding-repository';
-import { resolveOrgContext } from '@/server/org/org-context';
 import { getSessionContext } from '@/server/use-cases/auth/sessions/get-session';
 import { resetOrgBranding } from '@/server/use-cases/org/branding/reset-org-branding';
 import { updateOrgBranding } from '@/server/use-cases/org/branding/update-org-branding';
@@ -36,7 +35,6 @@ export async function updateOrgBrandingAction(
 ): Promise<OrgBrandingState> {
     void _previous;
 
-    const orgContext = await resolveOrgContext();
     const headerStore = await headers();
 
     const parsed = brandingSchema.safeParse({
@@ -57,7 +55,6 @@ export async function updateOrgBrandingAction(
         {},
         {
             headers: headerStore,
-            orgId: orgContext.orgId,
             requiredPermissions: { organization: ['update'] },
             auditSource: 'ui:org-branding:update',
         },
@@ -68,7 +65,7 @@ export async function updateOrgBrandingAction(
         { brandingRepository: repository },
         {
             authorization,
-            orgId: orgContext.orgId,
+            orgId: authorization.orgId,
             updates: parsed.data,
         },
     );
@@ -83,14 +80,12 @@ export async function resetOrgBrandingAction(
     void _previous;
     void _formData;
 
-    const orgContext = await resolveOrgContext();
     const headerStore = await headers();
 
     const { authorization } = await getSessionContext(
         {},
         {
             headers: headerStore,
-            orgId: orgContext.orgId,
             requiredPermissions: { organization: ['update'] },
             auditSource: 'ui:org-branding:reset',
         },
@@ -101,7 +96,7 @@ export async function resetOrgBrandingAction(
         { brandingRepository: repository },
         {
             authorization,
-            orgId: orgContext.orgId,
+            orgId: authorization.orgId,
         },
     );
 

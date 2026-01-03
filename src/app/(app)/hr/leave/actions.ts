@@ -156,6 +156,9 @@ export async function submitLeaveRequestAction(
             createdBy: userId,
             submittedAt: new Date().toISOString(),
             hoursPerDay,
+            dataResidency: session.authorization.dataResidency,
+            dataClassification: session.authorization.dataClassification,
+            auditSource: 'ui:hr-leave:submit',
         };
 
         const service = getLeaveService();

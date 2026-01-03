@@ -10,6 +10,8 @@ import { leaveRequestStatusBadgeVariant } from '../../_components/hr-badge-varia
 export interface LeaveRequestsPanelProps {
     authorization: RepositoryAuthorizationContext;
     employeeId?: string;
+    title?: string;
+    description?: string;
 }
 
 function formatDate(value: string): string {
@@ -21,12 +23,20 @@ function formatDate(value: string): string {
     return formatHumanDate(parsed);
 }
 
-export async function LeaveRequestsPanel({ authorization, employeeId }: LeaveRequestsPanelProps) {
+export async function LeaveRequestsPanel({
+    authorization,
+    employeeId,
+    title,
+    description,
+}: LeaveRequestsPanelProps) {
+    const resolvedTitle = title ?? 'Requests';
+    const resolvedDescription = description ?? 'Recent leave requests linked to your profile.';
+
     if (!employeeId) {
         return (
             <Card>
                 <CardHeader>
-                    <CardTitle>Requests</CardTitle>
+                    <CardTitle>{resolvedTitle}</CardTitle>
                     <CardDescription>Your account is missing an employee identifier for this organization.</CardDescription>
                 </CardHeader>
             </Card>
@@ -39,8 +49,8 @@ export async function LeaveRequestsPanel({ authorization, employeeId }: LeaveReq
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Requests</CardTitle>
-                <CardDescription>Recent leave requests linked to your profile.</CardDescription>
+                <CardTitle>{resolvedTitle}</CardTitle>
+                <CardDescription>{resolvedDescription}</CardDescription>
             </CardHeader>
             <CardContent>
                 {requests.length === 0 ? (

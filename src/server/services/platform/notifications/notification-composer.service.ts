@@ -6,6 +6,9 @@ import { assertOrgAccessWithAbac, type OrgAccessInput } from '@/server/security/
 import { recordAuditEvent, type AuditEventPayload } from '@/server/logging/audit-logger';
 import { registerNotificationCache } from '@/server/repositories/notifications/notification-cache';
 import { AbstractBaseService } from '@/server/services/abstract-base-service';
+import { loadOrgSettings } from '@/server/services/org/settings/org-settings-store';
+import type { OrgSettings } from '@/server/services/org/settings/org-settings-model';
+import { shouldDeliverNotification } from './notification-delivery-policy';
 import {
   type ComposeNotificationInput,
   type ComposeNotificationResult,
@@ -33,6 +36,7 @@ export interface NotificationComposerDependencies {
   deliveryAdapters?: NotificationDeliveryAdapter[];
   guard?: (input: OrgAccessInput) => Promise<unknown>;
   auditRecorder?: (event: AuditEventPayload) => Promise<void>;
+  orgSettingsLoader?: (orgId: string) => Promise<OrgSettings>;
   defaultRetentionPolicyId: string;
 }
 
@@ -42,6 +46,7 @@ export class NotificationComposerService extends AbstractBaseService {
   private readonly adapters: NotificationDeliveryAdapter[];
   private readonly guard: (input: OrgAccessInput) => Promise<unknown>;
   private readonly auditRecorder: (event: AuditEventPayload) => Promise<void>;
+  private readonly orgSettingsLoader: (orgId: string) => Promise<OrgSettings>;
   private readonly defaultRetentionPolicyId: string;
 
   constructor(private readonly dependencies: NotificationComposerDependencies) {
@@ -51,6 +56,7 @@ export class NotificationComposerService extends AbstractBaseService {
     this.adapters = dependencies.deliveryAdapters ?? [];
     this.guard = dependencies.guard ?? assertOrgAccessWithAbac;
     this.auditRecorder = dependencies.auditRecorder ?? recordAuditEvent;
+    this.orgSettingsLoader = dependencies.orgSettingsLoader ?? loadOrgSettings;
     this.defaultRetentionPolicyId = dependencies.defaultRetentionPolicyId;
   }
 
@@ -68,11 +74,11 @@ export class NotificationComposerService extends AbstractBaseService {
     });
 
     return this.executeInServiceContext(context, 'platform.notifications.compose', async () => {
-      const preferences = await loadNotificationPreferences(
-        this.preferenceRepo,
-        createInput.orgId,
-        createInput.userId,
-      );
+      const orgSettings = await this.orgSettingsLoader(createInput.orgId);
+      const allowDelivery = shouldDeliverNotification(orgSettings, createInput.topic);
+      const preferences = allowDelivery
+        ? await loadNotificationPreferences(this.preferenceRepo, createInput.orgId, createInput.userId)
+        : [];
       const notification = await unwrapResult(
         this.repo.createNotification(input.authorization, createInput),
       );
@@ -81,14 +87,25 @@ export class NotificationComposerService extends AbstractBaseService {
         classification: input.authorization.dataClassification,
         residency: input.authorization.dataResidency,
       });
-      const deliveries = await dispatchNotificationDeliveries(
-        this.adapters,
-        notification,
-        input.targets ?? [],
-        preferences,
-        this.logger,
-      );
-      await this.audit(notification, input.authorization, deliveries, 'compose');
+      const targets = input.targets ?? [];
+
+      const suppressedDeliveries: NotificationDeliveryResult[] = targets.map((target) => ({
+        provider: target.provider ?? target.channel.toLowerCase(),
+        channel: target.channel,
+        status: 'skipped',
+        detail: 'suppressed by org notification settings',
+      }));
+
+      const deliveries = allowDelivery
+        ? await dispatchNotificationDeliveries(
+            this.adapters,
+            notification,
+            targets,
+            preferences,
+            this.logger,
+          )
+        : suppressedDeliveries;
+      await this.audit(notification, input.authorization, deliveries, allowDelivery ? 'compose' : 'suppressed');
 
       return { notification, deliveries };
     });

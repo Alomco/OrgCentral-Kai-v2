@@ -16,17 +16,17 @@ import { cn } from '@/lib/utils';
 // ============================================================================
 
 const featureCardVariants = cva(
-    'group relative overflow-hidden rounded-lg border p-6 transition-all',
+    'group relative overflow-hidden rounded-lg p-6 transition-all',
     {
         variants: {
             variant: {
-                default: 'bg-card hover:shadow-lg',
-                glass: 'bg-card/50 backdrop-blur-md border-border/30 hover:bg-card/70',
-                gradient: 'bg-gradient-to-br from-card via-card to-primary/5 border-primary/20',
-                outline: 'bg-transparent hover:bg-card/50',
+                default: '',
+                glass: '[--ui-surface-fill:hsl(var(--card)/0.72)] [--ui-surface-blur:16px]',
+                gradient: 'bg-gradient-to-br from-card/90 via-card/80 to-primary/8',
+                outline: '[--ui-surface-fill:transparent] [--ui-surface-shadow:var(--ui-surface-outline-weak)] hover:[--ui-surface-fill:hsl(var(--card)/0.88)] hover:[--ui-surface-shadow:var(--ui-surface-item-shadow)]',
             },
             interactive: {
-                true: 'cursor-pointer hover:border-primary/50 hover:-translate-y-1',
+                true: '',
                 false: '',
             },
         },
@@ -56,11 +56,15 @@ export function FeatureCard({
     className,
     onClick,
 }: FeatureCardProps) {
+    const isInteractive = Boolean(interactive);
+
     return (
         <div
             className={cn(featureCardVariants({ variant, interactive }), className)}
             onClick={onClick}
             data-slot="feature-card"
+            data-ui-surface={isInteractive ? 'interactive' : 'item'}
+            data-ui-interactive={isInteractive ? 'true' : undefined}
         >
             {icon && (
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-accent text-white shadow-lg shadow-primary/25">
@@ -90,20 +94,21 @@ export interface InfoCardProps {
 
 export function InfoCard({ label, value, icon, variant = 'default', className }: InfoCardProps) {
     const variantStyles = {
-        default: 'border-border bg-card',
-        success: 'border-green-500/30 bg-green-500/5',
-        warning: 'border-yellow-500/30 bg-yellow-500/5',
-        error: 'border-destructive/30 bg-destructive/5',
+        default: '',
+        success: 'text-emerald-600 dark:text-emerald-400 [--ui-surface-fill:hsl(142_76%_35%_/_0.12)] dark:[--ui-surface-fill:hsl(142_76%_30%_/_0.2)]',
+        warning: 'text-amber-600 dark:text-amber-400 [--ui-surface-fill:hsl(45_93%_47%_/_0.12)] dark:[--ui-surface-fill:hsl(45_93%_40%_/_0.2)]',
+        error: 'text-destructive [--ui-surface-fill:hsl(var(--destructive)/0.12)] dark:[--ui-surface-fill:hsl(var(--destructive)/0.18)]',
     };
 
     return (
         <div
             className={cn(
-                'flex items-center gap-4 rounded-lg border p-4',
+                'flex items-center gap-4 rounded-lg p-4',
                 variantStyles[variant],
                 className,
             )}
             data-slot="info-card"
+            data-ui-surface="item"
         >
             {icon && (
                 <div className={cn(
@@ -139,10 +144,11 @@ export function ActionCard({ title, description, action, className }: ActionCard
     return (
         <div
             className={cn(
-                'flex items-center justify-between gap-4 rounded-lg border bg-card p-4',
+                'flex items-center justify-between gap-4 rounded-lg p-4',
                 className,
             )}
             data-slot="action-card"
+            data-ui-surface="interactive"
         >
             <div className="min-w-0 flex-1">
                 <p className="font-medium">{title}</p>

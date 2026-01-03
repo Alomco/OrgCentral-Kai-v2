@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
+import type { TenantScope } from '@/server/types/tenant';
 import type { ILeavePolicyRepository } from '@/server/repositories/contracts/hr/leave/leave-policy-repository-contract';
 import { assertPrivilegedOrgPolicyActor } from '@/server/security/authorization/hr-policies';
 import { AuthorizationError, EntityNotFoundError } from '@/server/errors';
@@ -16,10 +17,10 @@ export type DeleteLeavePolicyInput = z.infer<typeof deleteLeavePolicyInputSchema
 export interface DeleteLeavePolicyDependencies {
     leavePolicyRepository: ILeavePolicyRepository;
     leaveBalanceRepository: {
-        countLeaveBalancesByPolicy(tenant: RepositoryAuthorizationContext['tenantScope'], policyId: string): Promise<number>;
+        countLeaveBalancesByPolicy(tenant: TenantScope, policyId: string): Promise<number>;
     };
     leaveRequestRepository: {
-        countLeaveRequestsByPolicy(tenant: RepositoryAuthorizationContext['tenantScope'], policyId: string): Promise<number>;
+        countLeaveRequestsByPolicy(tenant: TenantScope, policyId: string): Promise<number>;
     };
 }
 

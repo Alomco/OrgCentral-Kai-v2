@@ -4,14 +4,15 @@ import type { BasePrismaRepositoryOptions } from '@/server/repositories/prisma/b
 import { invalidateOrgCache } from '@/server/lib/cache-tags';
 import type { DataClassificationLevel, DataResidencyZone } from '@/server/types/tenant';
 
+const DEFAULT_CLASSIFICATION: DataClassificationLevel = 'OFFICIAL';
+const DEFAULT_RESIDENCY: DataResidencyZone = 'UK_ONLY';
+
 export interface PerformanceServiceProviderOptions {
     overrides?: Partial<PerformanceServiceDependencies>;
     prismaOptions?: Pick<BasePrismaRepositoryOptions, 'prisma' | 'trace' | 'onAfterWrite'>;
 }
 
 const sharedDefaultOptions: PerformanceServiceProviderOptions = {};
-const DEFAULT_CLASSIFICATION: DataClassificationLevel = 'OFFICIAL';
-const DEFAULT_RESIDENCY: DataResidencyZone = 'UK_ONLY';
 
 export function getPerformanceService(options: PerformanceServiceProviderOptions = sharedDefaultOptions): PerformanceService {
     const prismaOptions = options.prismaOptions;

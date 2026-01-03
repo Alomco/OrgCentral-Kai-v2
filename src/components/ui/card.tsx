@@ -2,29 +2,23 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
-function Card({ className, ...props }: React.ComponentProps<"div">) {
+type CardProps = React.ComponentProps<"div"> & {
+  "data-ui-surface"?: "container" | "item" | "interactive"
+}
+
+function Card({
+  className,
+  "data-ui-surface": dataUiSurface = "container",
+  ...props
+}: CardProps) {
   return (
     <div
       data-slot="card"
+      data-ui-surface={dataUiSurface}
       className={cn(
-        // Base styling
-        "flex flex-col gap-6 rounded-xl py-6",
-        // Glassmorphism effect
-        "bg-gradient-to-br from-white/95 via-white/90 to-white/85",
-        "dark:from-slate-900/95 dark:via-slate-900/90 dark:to-slate-900/85",
-        "backdrop-blur-sm",
-        // Border with theme color tint
-        "border border-[hsl(var(--primary)/0.1)]",
-        "dark:border-[hsl(var(--primary)/0.15)]",
-        // Shadow with theme color
-        "shadow-lg shadow-[hsl(var(--primary)/0.05)]",
-        "dark:shadow-[hsl(var(--primary)/0.1)]",
-        // Text
+        "flex flex-col gap-6 py-6",
         "text-card-foreground",
-        // Hover effects
         "transition-all duration-300 ease-out",
-        "hover:shadow-xl hover:shadow-[hsl(var(--primary)/0.1)]",
-        "hover:border-[hsl(var(--primary)/0.2)]",
         className
       )}
       {...props}

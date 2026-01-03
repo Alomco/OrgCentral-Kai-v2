@@ -1,8 +1,4 @@
-import {
-    combineRoleStatements,
-    type OrgPermissionMap,
-    type OrgRoleKey,
-} from '../access-control';
+import type { OrgPermissionMap } from '../access-control';
 
 export interface DelegatedAdminScope {
     module: string;
@@ -22,10 +18,6 @@ export interface RbacDecision {
     allowed: boolean;
     reasons: string[];
     matchedScope?: DelegatedAdminScope;
-}
-
-function permissionsForRole(roleKey: OrgRoleKey): OrgPermissionMap {
-    return combineRoleStatements([roleKey]);
 }
 
 function satisfiesPermissions(
@@ -52,14 +44,13 @@ function isScopeActive(scope: DelegatedAdminScope, now: Date): boolean {
 }
 
 export function evaluateRbac(
-    roleKey: OrgRoleKey,
+    grantedPermissions: OrgPermissionMap,
     requirement: RbacRequirement,
     now: Date = new Date(),
 ): RbacDecision {
     const reasons: string[] = [];
 
     const requiredPermissions = requirement.requiredPermissions ?? {};
-    const grantedPermissions = permissionsForRole(roleKey);
 
     if (!satisfiesPermissions(grantedPermissions, requiredPermissions)) {
         reasons.push('Role permissions do not satisfy requiredPermissions.');
@@ -95,10 +86,10 @@ export function evaluateRbac(
 }
 
 export function assertRbac(
-    roleKey: OrgRoleKey,
+    grantedPermissions: OrgPermissionMap,
     requirement: RbacRequirement,
 ): void {
-    const decision = evaluateRbac(roleKey, requirement);
+    const decision = evaluateRbac(grantedPermissions, requirement);
     if (!decision.allowed) {
         throw new Error(decision.reasons.join(' '));
     }

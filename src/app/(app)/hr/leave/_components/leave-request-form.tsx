@@ -59,7 +59,7 @@ export function LeaveRequestForm({ initialState }: LeaveRequestFormProps) {
                     </div>
                 ) : null}
 
-                <form ref={formReference} action={action} className="space-y-4" aria-busy="false">
+                <form ref={formReference} action={action} className="space-y-4" aria-busy={pending}>
                     <fieldset disabled={pending} className="space-y-4">
                         <div className="grid gap-3 sm:grid-cols-2">
                             <div className="space-y-1.5">

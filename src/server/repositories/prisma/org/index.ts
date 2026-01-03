@@ -2,6 +2,7 @@ export * from './membership';
 export * from './organization';
 export * from './users';
 export * from './roles';
+export * from './permissions/prisma-permission-resource-repository';
 export * from './departments';
 export * from './notifications';
 export * from './integrations';

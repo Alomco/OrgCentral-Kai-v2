@@ -14,8 +14,6 @@ export const hrOvertimePolicySchema = z
     })
     .strict();
 
-const hrLeaveTypesSchema = z.array(z.string().trim().min(1)).max(25);
-
 const hrSettingsMetadataSchema = z.looseObject({
     adminNotes: z.union([z.string().trim().max(500), z.null()]).optional(),
 });
@@ -31,7 +29,6 @@ export const hrSettingsFormValuesSchema = z
             .min(1, { message: 'Days per week must be at least 1.' })
             .max(7, { message: 'Days per week must be 7 or less.' }),
         enableOvertime: z.boolean(),
-        leaveTypesCsv: z.string().max(500, { message: 'Leave types must be 500 characters or less.' }),
         adminNotes: z.string().max(500, { message: 'Admin notes must be 500 characters or less.' }),
         approvalWorkflowsJson: z
             .string()
@@ -44,14 +41,12 @@ export type HrSettingsFormValues = z.infer<typeof hrSettingsFormValuesSchema>;
 export function deriveHrSettingsFormDefaults(settings: HRSettings): HrSettingsFormValues {
     const workingHoursParsed = hrWorkingHoursSchema.safeParse(settings.workingHours ?? undefined);
     const overtimeParsed = hrOvertimePolicySchema.safeParse(settings.overtimePolicy ?? undefined);
-    const leaveTypesParsed = hrLeaveTypesSchema.safeParse(settings.leaveTypes ?? undefined);
     const metadataParsed = hrSettingsMetadataSchema.safeParse(settings.metadata ?? undefined);
     const approvalWorkflowsJson = stringifyJsonForTextarea(settings.approvalWorkflows);
 
     const workingHours = workingHoursParsed.success ? workingHoursParsed.data : hrWorkingHoursSchema.parse({});
     const overtimePolicy = overtimeParsed.success ? overtimeParsed.data : hrOvertimePolicySchema.parse({});
 
-    const leaveTypesCsv = leaveTypesParsed.success ? leaveTypesParsed.data.join(', ') : '';
     const adminNotesRaw = metadataParsed.success ? metadataParsed.data.adminNotes : undefined;
     const adminNotes = typeof adminNotesRaw === 'string' ? adminNotesRaw : '';
 
@@ -59,7 +54,6 @@ export function deriveHrSettingsFormDefaults(settings: HRSettings): HrSettingsFo
         standardHoursPerDay: workingHours.standardHoursPerDay,
         standardDaysPerWeek: workingHours.standardDaysPerWeek,
         enableOvertime: overtimePolicy.enableOvertime,
-        leaveTypesCsv,
         adminNotes,
         approvalWorkflowsJson,
     };

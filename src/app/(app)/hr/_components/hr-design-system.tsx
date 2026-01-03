@@ -31,42 +31,26 @@ export function HrGlassCard({
     animated = false,
 }: HrGlassCardProps) {
     const baseStyles = cn(
-        // Core glass effect
         'relative rounded-xl overflow-hidden',
-        'bg-gradient-to-br from-white/90 via-white/80 to-white/70',
-        'dark:from-slate-900/90 dark:via-slate-900/80 dark:to-slate-900/70',
-        'backdrop-blur-xl',
-        // Border with theme color
-        'border border-[hsl(var(--primary)/0.15)]',
-        'dark:border-[hsl(var(--primary)/0.25)]',
-        // Shadow with theme color tint
-        'shadow-lg shadow-[hsl(var(--primary)/0.08)]',
-        'dark:shadow-[hsl(var(--primary)/0.15)]',
-        // Transition
         'transition-all duration-300 ease-out',
     );
 
-    const interactiveStyles = interactive
-        ? cn(
-            'hover:shadow-xl hover:shadow-[hsl(var(--primary)/0.15)]',
-            'dark:hover:shadow-[hsl(var(--primary)/0.25)]',
-            'hover:border-[hsl(var(--primary)/0.3)]',
-            'hover:-translate-y-0.5',
-        )
-        : '';
-
     const glowStyles = glow
         ? cn(
-            'before:absolute before:inset-0 before:-z-10',
-            'before:bg-gradient-to-r before:from-[hsl(var(--primary)/0.2)] before:to-[hsl(var(--accent)/0.2)]',
-            'before:blur-xl before:opacity-0 hover:before:opacity-100',
-            'before:transition-opacity before:duration-500',
+            'after:absolute after:inset-2 after:-z-10',
+            'after:bg-gradient-to-r after:from-[hsl(var(--primary)/0.18)] after:to-[hsl(var(--accent)/0.18)]',
+            'after:blur-lg after:opacity-0 hover:after:opacity-100',
+            'after:transition-opacity after:duration-500',
         )
         : '';
 
     return (
         <div className={cn(animated && 'glass-card-wrapper')}>
-            <div className={cn(baseStyles, interactiveStyles, glowStyles, className)}>
+            <div
+                className={cn(baseStyles, glowStyles, className)}
+                data-ui-surface="container"
+                data-ui-interactive={interactive ? 'true' : undefined}
+            >
                 {children}
             </div>
         </div>
@@ -105,7 +89,7 @@ export function HrGradientHeader({
                 {icon ? (
                     <div className={cn(
                         'flex items-center justify-center rounded-xl p-2.5',
-                        'bg-gradient-to-br from-[hsl(var(--primary))] to-[hsl(var(--accent))]',
+                        'bg-linear-to-br from-[hsl(var(--primary))] to-[hsl(var(--accent))]',
                         'text-white shadow-lg shadow-[hsl(var(--primary)/0.3)]',
                     )}>
                         {icon}
@@ -115,9 +99,9 @@ export function HrGradientHeader({
                     <h1 className={cn(
                         sizeStyles[size],
                         'font-bold tracking-tight',
-                        'bg-gradient-to-r from-[hsl(var(--foreground))] via-[hsl(var(--primary))] to-[hsl(var(--accent))]',
+                        'bg-linear-to-r from-[hsl(var(--foreground))] via-[hsl(var(--primary))] to-[hsl(var(--accent))]',
                         'bg-clip-text text-transparent',
-                        'bg-[length:200%_auto] animate-[gradient-shift_3s_ease_infinite]',
+                        'bg-size-[200%_auto] animate-[gradient-shift_3s_ease_infinite]',
                     )}>
                         {title}
                     </h1>
@@ -230,7 +214,7 @@ export function HrGradientButton({
             onClick={onClick}
             className={cn(
                 'relative overflow-hidden rounded-lg font-semibold text-white',
-                'bg-gradient-to-r from-[hsl(var(--primary))] via-[hsl(var(--primary)/0.9)] to-[hsl(var(--accent))]',
+                'bg-linear-to-r from-[hsl(var(--primary))] via-[hsl(var(--primary)/0.9)] to-[hsl(var(--accent))]',
                 'shadow-lg shadow-[hsl(var(--primary)/0.3)]',
                 'transition-all duration-300 ease-out',
                 'hover:shadow-xl hover:shadow-[hsl(var(--primary)/0.4)]',
@@ -244,7 +228,7 @@ export function HrGradientButton({
             {/* Shimmer effect */}
             <span className={cn(
                 'absolute inset-0 -translate-x-full',
-                'bg-gradient-to-r from-transparent via-white/20 to-transparent',
+                'bg-linear-to-r from-transparent via-white/20 to-transparent',
                 'group-hover:animate-[shimmer_1.5s_infinite]',
             )} />
             {children}
@@ -267,19 +251,19 @@ export interface HrStatCardProps {
 const accentStyles = {
     primary: {
         icon: 'from-[hsl(var(--primary))] to-[hsl(var(--primary)/0.7)]',
-        border: 'border-l-[hsl(var(--primary))]',
+        bar: 'bg-linear-to-b from-[hsl(var(--primary))] to-[hsl(var(--accent)/0.6)] shadow-[0_0_12px_hsl(var(--primary)/0.35)]',
     },
     accent: {
         icon: 'from-[hsl(var(--accent))] to-[hsl(var(--accent)/0.7)]',
-        border: 'border-l-[hsl(var(--accent))]',
+        bar: 'bg-linear-to-b from-[hsl(var(--accent))] to-[hsl(var(--primary)/0.6)] shadow-[0_0_12px_hsl(var(--accent)/0.35)]',
     },
     success: {
         icon: 'from-emerald-500 to-emerald-400',
-        border: 'border-l-emerald-500',
+        bar: 'bg-linear-to-b from-emerald-500 to-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.35)]',
     },
     warning: {
         icon: 'from-amber-500 to-amber-400',
-        border: 'border-l-amber-500',
+        bar: 'bg-linear-to-b from-amber-500 to-amber-300 shadow-[0_0_12px_rgba(245,158,11,0.35)]',
     },
 };
 
@@ -293,7 +277,14 @@ export function HrStatCard({
     const accent = accentStyles[accentColor];
 
     return (
-        <HrGlassCard className={cn('p-5 border-l-4', accent.border)}>
+        <HrGlassCard className={cn('relative p-5 pl-8')}>
+            <span
+                aria-hidden="true"
+                className={cn(
+                    'absolute inset-y-4 left-3 w-1 rounded-full',
+                    accent.bar,
+                )}
+            />
             <div className="flex items-start justify-between">
                 <div>
                     <p className="text-sm font-medium text-muted-foreground">{label}</p>
@@ -310,7 +301,7 @@ export function HrStatCard({
                 {icon ? (
                     <div className={cn(
                         'flex items-center justify-center rounded-lg p-2',
-                        'bg-gradient-to-br text-white',
+                        'bg-linear-to-br text-white',
                         accent.icon,
                     )}>
                         {icon}

@@ -1,0 +1,179 @@
+'use client';
+
+import { useActionState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
+
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Spinner } from '@/components/ui/spinner';
+import { Textarea } from '@/components/ui/textarea';
+import type { ComplianceTemplate } from '@/server/types/compliance-types';
+
+import { FieldError } from '../../_components/field-error';
+import {
+    createComplianceTemplateAction,
+    type ComplianceTemplateCreateState,
+} from '../actions/compliance-templates';
+import { seedComplianceTemplatesAction } from '../actions/seed-templates';
+import { ComplianceTemplateRow } from './compliance-template-row';
+
+const initialCreateState: ComplianceTemplateCreateState = {
+    status: 'idle',
+    values: {
+        name: '',
+        categoryKey: '',
+        version: '',
+        itemsJson: '',
+    },
+};
+
+export function ComplianceTemplatesManager(props: { templates: ComplianceTemplate[] }) {
+    const router = useRouter();
+    const [state, action, pending] = useActionState(
+        createComplianceTemplateAction,
+        initialCreateState,
+    );
+    const formReference = useRef<HTMLFormElement | null>(null);
+
+    useEffect(() => {
+        if (!pending && state.status === 'success') {
+            router.refresh();
+            formReference.current?.reset();
+        }
+    }, [pending, router, state.status]);
+
+    const nameError = state.fieldErrors?.name;
+    const categoryError = state.fieldErrors?.categoryKey;
+    const versionError = state.fieldErrors?.version;
+    const itemsError = state.fieldErrors?.itemsJson;
+
+    const message =
+        state.status === 'error'
+            ? state.message
+            : state.status === 'success'
+                ? state.message
+                : null;
+
+    return (
+        <div className="space-y-6">
+            <form
+                ref={formReference}
+                action={action}
+                className="space-y-4"
+                aria-busy={pending}
+            >
+                <fieldset disabled={pending} className="space-y-4">
+                    <div className="grid gap-4 sm:grid-cols-2">
+                        <div className="space-y-2">
+                            <Label htmlFor="compliance-template-name">Name</Label>
+                            <Input
+                                id="compliance-template-name"
+                                name="name"
+                                required
+                                key={`compliance-template-name-${state.values.name}`}
+                                defaultValue={state.values.name}
+                                aria-invalid={Boolean(nameError)}
+                                aria-describedby={nameError ? 'compliance-template-name-error' : undefined}
+                            />
+                            <FieldError id="compliance-template-name-error" message={nameError} />
+                        </div>
+
+                        <div className="grid gap-4 sm:grid-cols-2">
+                            <div className="space-y-2">
+                                <Label htmlFor="compliance-template-category">Category key</Label>
+                                <Input
+                                    id="compliance-template-category"
+                                    name="categoryKey"
+                                    placeholder="uk_employment"
+                                    key={`compliance-template-category-${state.values.categoryKey}`}
+                                    defaultValue={state.values.categoryKey}
+                                    aria-invalid={Boolean(categoryError)}
+                                    aria-describedby={categoryError ? 'compliance-template-category-error' : undefined}
+                                />
+                                <FieldError
+                                    id="compliance-template-category-error"
+                                    message={categoryError}
+                                />
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="compliance-template-version">Version</Label>
+                                <Input
+                                    id="compliance-template-version"
+                                    name="version"
+                                    placeholder="1"
+                                    key={`compliance-template-version-${state.values.version}`}
+                                    defaultValue={state.values.version}
+                                    aria-invalid={Boolean(versionError)}
+                                    aria-describedby={versionError ? 'compliance-template-version-error' : undefined}
+                                />
+                                <FieldError
+                                    id="compliance-template-version-error"
+                                    message={versionError}
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="compliance-template-items">Template items (JSON)</Label>
+                        <Textarea
+                            id="compliance-template-items"
+                            name="itemsJson"
+                            required
+                            rows={8}
+                            placeholder={`[\n  {\n    "id": "uk_employment.right_to_work",\n    "name": "Right to work check",\n    "type": "DOCUMENT",\n    "isMandatory": true\n  }\n]`}
+                            key={`compliance-template-items-${state.values.itemsJson}`}
+                            defaultValue={state.values.itemsJson}
+                            className="font-mono text-xs"
+                            aria-invalid={Boolean(itemsError)}
+                            aria-describedby={itemsError ? 'compliance-template-items-error' : undefined}
+                        />
+                        <FieldError id="compliance-template-items-error" message={itemsError} />
+                        <p className="text-xs text-muted-foreground">
+                            Provide a JSON array with id, name, type, and isMandatory for each item.
+                        </p>
+                    </div>
+                </fieldset>
+
+                <div className="flex flex-wrap items-center gap-3">
+                    <Button type="submit" size="sm" disabled={pending}>
+                        {pending ? <Spinner className="mr-2" /> : null}
+                        {pending ? 'Creating...' : 'Create template'}
+                    </Button>
+                    {message ? (
+                        <p
+                            className={
+                                state.status === 'error'
+                                    ? 'text-xs text-destructive'
+                                    : 'text-xs text-muted-foreground'
+                            }
+                        >
+                            {message}
+                        </p>
+                    ) : null}
+                </div>
+            </form>
+
+            <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="text-sm font-medium">Existing templates</div>
+                <form action={seedComplianceTemplatesAction}>
+                    <Button type="submit" size="sm" variant="outline">
+                        Seed default templates
+                    </Button>
+                </form>
+            </div>
+
+            {props.templates.length === 0 ? (
+                <p className="text-sm text-muted-foreground">No templates configured yet.</p>
+            ) : (
+                <div className="space-y-3">
+                    {props.templates.map((template) => (
+                        <ComplianceTemplateRow key={template.id} template={template} />
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+}

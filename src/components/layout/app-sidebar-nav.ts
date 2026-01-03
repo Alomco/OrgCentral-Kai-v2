@@ -1,5 +1,6 @@
 import {
     BarChart3,
+    Building,
     CalendarDays,
     FileText,
     LayoutDashboard,
@@ -35,6 +36,19 @@ export const navItems: NavItem[] = [
             { href: "/hr/policies", label: "Policies", icon: FileText },
             { href: "/hr/compliance", label: "Compliance", icon: Shield },
             { href: "/hr/performance", label: "Performance", icon: BarChart3 },
+        ],
+    },
+    {
+        href: "/org",
+        label: "Organization",
+        icon: Building,
+        isAccordion: true,
+        subItems: [
+            { href: "/org/profile", label: "Profile", icon: Building },
+            { href: "/org/members", label: "Members", icon: Users },
+            { href: "/org/roles", label: "Roles", icon: Shield },
+            { href: "/org/branding", label: "Branding", icon: FileText },
+            { href: "/org/settings", label: "Settings", icon: Settings },
         ],
     },
     { href: "/settings", label: "Settings", icon: Settings },

@@ -102,14 +102,23 @@ export async function completeOnboardingInvite(
         employeeNumber,
     );
 
-    const creationResult = existingProfile
+    const linkedProfile = existingProfile
+        ? await linkProfileIfNeeded({
+            repository: deps.employeeProfileRepository,
+            orgId: organization.id,
+            profile: existingProfile,
+            userId: input.userId,
+        })
+        : null;
+
+    const creationResult = linkedProfile
         ? await handleExistingProfile({
             deps,
             authorization,
             employeeNumber,
             contractData,
             onboardingChecklist,
-            existingProfile,
+            existingProfile: linkedProfile,
         })
         : await createEmployeeProfile(
             createProfileDependencies(deps),
@@ -122,12 +131,10 @@ export async function completeOnboardingInvite(
             }),
         );
 
-    const profile = existingProfile ?? await deps.employeeProfileRepository.findByEmployeeNumber(organization.id, employeeNumber);
+    const profile = linkedProfile ?? await deps.employeeProfileRepository.findByEmployeeNumber(organization.id, employeeNumber);
     if (!profile) {
         throw new EntityNotFoundError('Employee profile', { employeeNumber, orgId: organization.id });
     }
-
-    await deps.employeeProfileRepository.linkProfileToUser(organization.id, employeeNumber, input.userId);
 
     const membershipResult = await ensureMembership({
         authorization,
@@ -200,6 +207,22 @@ async function handleExistingProfile(params: {
     return {
         contractCreated: contractCreated || undefined,
         checklistInstanceId,
+    };
+}
+
+async function linkProfileIfNeeded(params: {
+    repository: IEmployeeProfileRepository;
+    orgId: string;
+    profile: NonNullable<Awaited<ReturnType<IEmployeeProfileRepository['findByEmployeeNumber']>>>;
+    userId: string;
+}): Promise<NonNullable<Awaited<ReturnType<IEmployeeProfileRepository['findByEmployeeNumber']>>>> {
+    if (params.profile.userId === params.userId) {
+        return params.profile;
+    }
+    await params.repository.linkProfileToUser(params.orgId, params.profile.employeeNumber, params.userId);
+    return {
+        ...params.profile,
+        userId: params.userId,
     };
 }
 

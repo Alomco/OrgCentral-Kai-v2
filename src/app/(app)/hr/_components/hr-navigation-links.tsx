@@ -49,11 +49,11 @@ export function HrNavigationLinks({ items }: { items: HrNavigationItem[] }) {
                         href={item.href}
                         aria-current={active ? 'page' : undefined}
                         className={cn(
-                            'rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
-                            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                            'relative rounded-md px-3 py-1.5 text-sm font-medium transition',
+                            'focus-visible:outline-none focus-visible:shadow-[0_0_0_1px_hsl(var(--primary)/0.4),0_0_0_4px_hsl(var(--primary)/0.2)]',
                             active
-                                ? 'bg-primary/10 text-primary'
-                                : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                                ? 'bg-primary/12 text-foreground shadow-[0_10px_20px_-16px_hsl(var(--primary)/0.45)] after:absolute after:left-2 after:right-2 after:-bottom-0.5 after:h-0.5 after:rounded-full after:bg-linear-to-r after:from-primary/80 after:via-accent/60 after:to-transparent'
+                                : 'text-muted-foreground hover:bg-muted/70 hover:text-foreground hover:shadow-[0_8px_16px_-14px_hsl(var(--foreground)/0.2)]',
                         )}
                     >
                         {item.label}

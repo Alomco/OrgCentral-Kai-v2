@@ -71,17 +71,12 @@ async function OrgStatsCard() {
         auditSource: 'ui:admin:stats',
     });
 
-    const [users, roles] = await Promise.all([
-        getUserService().listUsersInOrganization({ authorization }),
+    const userService = getUserService();
+    const [activeUsers, pendingInvites, roles] = await Promise.all([
+        userService.countUsersInOrganization({ authorization, filters: { status: 'ACTIVE' } }),
+        userService.countUsersInOrganization({ authorization, filters: { status: 'INVITED' } }),
         getRoleService().listRoles({ authorization }),
     ]);
-
-    const activeUsers = users.filter((u: { memberships?: { status?: string }[] }) =>
-        u.memberships?.some((m: { status?: string }) => m.status === 'ACTIVE')
-    ).length;
-    const pendingInvites = users.filter((u: { memberships?: { status?: string }[] }) =>
-        u.memberships?.some((m: { status?: string }) => m.status === 'INVITED')
-    ).length;
 
     return (
         <ThemeGrid cols={3} gap="lg">

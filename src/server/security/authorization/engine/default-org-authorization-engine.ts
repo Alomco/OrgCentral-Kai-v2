@@ -58,10 +58,15 @@ async function assertAbac(input: OrgAuthorizationInput, context: OrgAuthorizatio
         return;
     }
 
+    const baseRole = context.roleKey === 'custom' ? 'custom' : context.roleKey;
+    const roleTokens = new Set<string>([baseRole]);
+    if (context.roleName && context.roleName !== baseRole) {
+        roleTokens.add(context.roleName);
+    }
     const subject = makeSubject(
         input.orgId,
         input.userId,
-        [context.roleKey === 'custom' ? 'custom' : context.roleKey],
+        Array.from(roleTokens),
         {
             residency: context.dataResidency,
             classification: context.dataClassification,

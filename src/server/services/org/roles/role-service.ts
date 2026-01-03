@@ -1,8 +1,11 @@
-import { RoleScope } from '@prisma/client';
 import type { IRoleRepository } from '@/server/repositories/contracts/org/roles/role-repository-contract';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
 import { AbstractOrgService } from '@/server/services/org/abstract-org-service';
 import type { Role } from '@/server/types/hr-types';
+import { recordAuditEvent } from '@/server/logging/audit-logger';
+import { getPermissionResolutionService } from '@/server/services/security/permission-resolution-service.provider';
+import { CACHE_SCOPE_PERMISSIONS } from '@/server/repositories/cache-scopes';
+import { invalidateOrgCache } from '@/server/lib/cache-tags';
 import {
   createRole as createRoleUseCase,
   type CreateRoleInput,
@@ -75,6 +78,8 @@ export class RoleService extends AbstractOrgService {
       createRoleUseCase({ roleRepository: this.dependencies.roleRepository }, input),
     );
 
+    await this.invalidatePermissionCaches(input.authorization);
+    await this.auditRoleChange(input.authorization, role, 'created');
     await this.notify(input.authorization, role, 'created');
     return role;
   }
@@ -95,6 +100,8 @@ export class RoleService extends AbstractOrgService {
       updateRoleUseCase({ roleRepository: this.dependencies.roleRepository }, input),
     );
 
+    await this.invalidatePermissionCaches(input.authorization);
+    await this.auditRoleChange(input.authorization, role, 'updated');
     await this.notify(input.authorization, role, 'updated');
     return role;
   }
@@ -112,16 +119,53 @@ export class RoleService extends AbstractOrgService {
       deleteRoleUseCase({ roleRepository: this.dependencies.roleRepository }, input),
     );
 
+    await this.invalidatePermissionCaches(input.authorization);
+    await this.auditRoleChange(input.authorization, result.role, 'deleted');
     await this.notify(input.authorization, {
-      id: result.roleId,
-      orgId: input.authorization.orgId,
-      name: result.roleName,
-      description: null,
-      scope: RoleScope.ORG,
-      permissions: {},
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      ...result.role,
+      description: result.role.description ?? null,
+      permissions: result.role.permissions,
+      createdAt: result.role.createdAt,
+      updatedAt: result.role.updatedAt,
     }, 'deleted');
+  }
+
+  private async auditRoleChange(
+    authorization: RepositoryAuthorizationContext,
+    role: Role,
+    kind: RoleChangeKind,
+  ): Promise<void> {
+    await recordAuditEvent({
+      orgId: authorization.orgId,
+      userId: authorization.userId,
+      eventType: 'POLICY_CHANGE',
+      action: `role.${kind}`,
+      resource: ROLE_RESOURCE_TYPE,
+      resourceId: role.id,
+      payload: {
+        name: role.name,
+        scope: role.scope,
+        permissions: role.permissions,
+        inheritsRoleIds: role.inheritsRoleIds ?? [],
+        isSystem: role.isSystem ?? false,
+        isDefault: role.isDefault ?? false,
+      },
+      correlationId: authorization.correlationId,
+      residencyZone: authorization.dataResidency,
+      classification: authorization.dataClassification,
+      auditSource: authorization.auditSource,
+      auditBatchId: authorization.auditBatchId,
+    });
+  }
+
+  private async invalidatePermissionCaches(authorization: RepositoryAuthorizationContext): Promise<void> {
+    getPermissionResolutionService().invalidateOrgPermissions(authorization.orgId);
+    await invalidateOrgCache(
+      authorization.orgId,
+      CACHE_SCOPE_PERMISSIONS,
+      authorization.dataClassification,
+      authorization.dataResidency,
+    );
   }
 
   private async notify(

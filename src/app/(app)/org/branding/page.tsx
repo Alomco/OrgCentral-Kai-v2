@@ -2,21 +2,18 @@ import { unstable_noStore as noStore } from 'next/cache';
 import { headers } from 'next/headers';
 
 import { OrgBrandingForm } from './_components/org-branding-form';
-import { resolveOrgContext } from '@/server/org/org-context';
 import { getOrgBranding } from '@/server/branding/get-org-branding';
 import { getSessionContextOrRedirect } from '@/server/ui/auth/session-redirect';
 
 export default async function OrgBrandingPage() {
     noStore();
 
-    const orgContext = await resolveOrgContext();
     const headerStore = await headers();
 
     const { authorization } = await getSessionContextOrRedirect(
         {},
         {
             headers: headerStore,
-            orgId: orgContext.orgId,
             requiredPermissions: { organization: ['update'] },
             auditSource: 'ui:org-branding',
         },

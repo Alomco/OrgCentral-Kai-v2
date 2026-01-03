@@ -13,6 +13,7 @@ function profileRepoWithData(data: EmployeeProfileDTO[]): IEmployeeProfileReposi
     getEmployeeProfile: async () => null,
     getEmployeeProfileByUser: async () => null,
     getEmployeeProfilesByOrganization: async () => data,
+    getEmployeeProfilesByOrganizationPaged: async () => data,
     countEmployeeProfilesByOrganization: async () => data.length,
     findByEmployeeNumber: async () => null,
     findByEmail: async () => null,
@@ -28,6 +29,7 @@ function contractRepoWithData(data: EmploymentContractDTO[]): IEmploymentContrac
     updateEmploymentContract: vi.fn().mockResolvedValue(undefined),
     getEmploymentContract: async () => null,
     getEmploymentContractByEmployee: async () => null,
+    getEmploymentContractsByEmployee: async () => data,
     getEmploymentContractsByOrganization: async () => data,
     deleteEmploymentContract: async () => { },
   };

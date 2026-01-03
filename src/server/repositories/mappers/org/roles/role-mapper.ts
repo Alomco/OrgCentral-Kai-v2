@@ -10,9 +10,12 @@ export function mapPrismaRoleToDomain(record: PrismaRole): Role {
         id: record.id,
         orgId: record.orgId,
         name: record.name,
-        description: record.description ?? undefined,
+        description: record.description,
         scope: record.scope,
         permissions: record.permissions,
+        inheritsRoleIds: record.inheritsRoleIds,
+        isSystem: record.isSystem,
+        isDefault: record.isDefault,
         createdAt: record.createdAt,
         updatedAt: record.updatedAt,
     };
@@ -26,6 +29,9 @@ export function mapDomainRoleToPrisma(input: Role): PrismaRole {
         description: input.description ?? null,
         scope: input.scope,
         permissions: input.permissions,
+        inheritsRoleIds: input.inheritsRoleIds ?? [],
+        isSystem: input.isSystem ?? false,
+        isDefault: input.isDefault ?? false,
         createdAt: input.createdAt,
         updatedAt: input.updatedAt,
     };

@@ -10,6 +10,8 @@ import { HrStatusBadge } from '../../_components/hr-status-badge';
 export interface TrainingRecordsPanelProps {
     authorization: RepositoryAuthorizationContext;
     userId?: string;
+    title?: string;
+    description?: string;
 }
 
 const COLUMNS: readonly HrDataTableColumn[] = [
@@ -35,18 +37,25 @@ function isExpiringSoon(expiryDate: Date | null | undefined): boolean {
     return date.getTime() - Date.now() < thirtyDays && date.getTime() > Date.now();
 }
 
-export async function TrainingRecordsPanel({ authorization, userId }: TrainingRecordsPanelProps) {
+export async function TrainingRecordsPanel({
+    authorization,
+    userId,
+    title,
+    description,
+}: TrainingRecordsPanelProps) {
     const result = await getTrainingRecordsForUi({
         authorization,
         userId,
     });
 
     const records = result.records;
+    const resolvedTitle = title ?? 'Training Records';
+    const resolvedDescription = description ?? 'Your training and certification history.';
 
     return (
         <HrDataTable
-            title="Training Records"
-            description="Your training and certification history."
+            title={resolvedTitle}
+            description={resolvedDescription}
             columns={COLUMNS}
             isEmpty={records.length === 0}
             emptyMessage="No training records found."

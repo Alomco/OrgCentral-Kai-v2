@@ -4,7 +4,6 @@ import {
     evaluateAbac,
     makeResource,
     makeSubject,
-    DEFAULT_BOOTSTRAP_POLICIES,
     AbacService,
 } from '@/server/security/abac';
 import type { AbacPolicy } from '@/server/security/abac-types';
@@ -139,32 +138,4 @@ describe('evaluateCondition and selector logic', () => {
     expect(allowed).toBe(true);
   });
 
-  it('falls back to bootstrap policies when repository returns none', async () => {
-    const repo = new FakeRepository([]);
-    const service = new AbacService(repo);
-
-    const policies = await service.getEvaluatedPoliciesForOrg('org-1');
-    expect(policies.map((p) => p.id)).toEqual([
-      'default:abac:owner:allow-all',
-      'default:abac:orgAdmin:allow-all',
-    ]);
-
-    const adminAllowed = await service.evaluate(
-      'org-1',
-      'read',
-      'hr.time-entry',
-      makeSubject('org-1', 'user-1', ['orgAdmin']),
-      makeResource({}),
-    );
-    const memberDenied = await service.evaluate(
-      'org-1',
-      'read',
-      'hr.time-entry',
-      makeSubject('org-1', 'user-2', ['member']),
-      makeResource({}),
-    );
-
-    expect(adminAllowed).toBe(true);
-    expect(memberDenied).toBe(false);
-  });
 });

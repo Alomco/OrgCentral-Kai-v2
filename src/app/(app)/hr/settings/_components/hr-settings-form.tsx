@@ -33,7 +33,6 @@ export function HrSettingsForm(props: {
 
     const standardHoursPerDayError = readFieldError(state.fieldErrors, 'standardHoursPerDay');
     const standardDaysPerWeekError = readFieldError(state.fieldErrors, 'standardDaysPerWeek');
-    const leaveTypesCsvError = readFieldError(state.fieldErrors, 'leaveTypesCsv');
     const adminNotesError = readFieldError(state.fieldErrors, 'adminNotes');
     const approvalWorkflowsJsonError = readFieldError(state.fieldErrors, 'approvalWorkflowsJson');
 
@@ -44,7 +43,6 @@ export function HrSettingsForm(props: {
 
     const hoursPerDayErrorId = standardHoursPerDayError ? 'standardHoursPerDay-error' : undefined;
     const daysPerWeekErrorId = standardDaysPerWeekError ? 'standardDaysPerWeek-error' : undefined;
-    const leaveTypesErrorId = leaveTypesCsvError ? 'leaveTypesCsv-error' : undefined;
     const adminNotesErrorId = adminNotesError ? 'adminNotes-error' : undefined;
     const workflowsErrorId = approvalWorkflowsJsonError ? 'approvalWorkflowsJson-error' : undefined;
 
@@ -58,7 +56,7 @@ export function HrSettingsForm(props: {
     }, [pending, state.status]);
 
     return (
-        <form ref={formReference} action={formAction} aria-busy="false">
+        <form ref={formReference} action={formAction} aria-busy={pending}>
             <Card>
                 <CardHeader>
                     <CardTitle>Working hours</CardTitle>
@@ -138,26 +136,6 @@ export function HrSettingsForm(props: {
                                 aria-describedby="enableOvertime-help"
                                 disabled={pending}
                             />
-                        </div>
-
-                        <Separator />
-
-                        <div className="space-y-2">
-                            <Label htmlFor="leaveTypesCsv">Leave types</Label>
-                            <Input
-                                id="leaveTypesCsv"
-                                name="leaveTypesCsv"
-                                type="text"
-                                placeholder="Annual leave, Sick leave, Compassionate leave"
-                                key={`leave-${state.values.leaveTypesCsv}`}
-                                defaultValue={state.values.leaveTypesCsv}
-                                aria-invalid={leaveTypesErrorId ? 'true' : undefined}
-                                aria-describedby={leaveTypesErrorId}
-                            />
-                            <FieldError id={leaveTypesErrorId} message={leaveTypesCsvError} />
-                            <p className="text-xs text-muted-foreground">
-                                Comma-separated labels (max 25). This is used as the initial leave catalog.
-                            </p>
                         </div>
 
                         <div className="space-y-2">

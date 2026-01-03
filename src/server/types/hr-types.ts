@@ -119,6 +119,9 @@ export interface Role {
   description?: string | null;
   scope: $Enums.RoleScope;
   permissions: JsonValue;
+  inheritsRoleIds?: string[];
+  isSystem?: boolean;
+  isDefault?: boolean;
   createdAt: Date;
   updatedAt: Date;
 }

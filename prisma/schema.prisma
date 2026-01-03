@@ -394,6 +394,75 @@ model OrganizationSubscription {
   @@schema("hr")
 }
 
+enum PaymentMethodType {
+  CARD
+  BACS_DEBIT
+  SEPA_DEBIT
+  @@schema("hr")
+}
+
+model PaymentMethod {
+  id                     String                @id @default(uuid()) @db.Uuid
+  orgId                  String                @db.Uuid
+  stripePaymentMethodId  String                @unique @db.Text
+  type                   PaymentMethodType
+  last4                  String
+  brand                  String?               @db.Text
+  bankName               String?               @db.Text
+  expiryMonth            Int?
+  expiryYear             Int?
+  isDefault              Boolean               @default(false)
+  metadata               Json?                 @db.JsonB
+  dataClassification     DataClassificationLevel @default(OFFICIAL)
+  residencyTag           DataResidencyZone       @default(UK_ONLY)
+  createdAt              DateTime              @default(now())
+  updatedAt              DateTime              @updatedAt
+
+  org Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@index([orgId])
+  @@index([orgId, isDefault])
+  @@map("payment_methods")
+  @@schema("hr")
+}
+
+enum InvoiceStatus {
+  DRAFT
+  OPEN
+  PAID
+  VOID
+  UNCOLLECTIBLE
+  @@schema("hr")
+}
+
+model BillingInvoice {
+  id                String                @id @default(uuid()) @db.Uuid
+  orgId             String                @db.Uuid
+  stripeInvoiceId   String                @unique @db.Text
+  status            InvoiceStatus
+  amountDue         Int
+  amountPaid        Int
+  currency          String                @default("gbp")
+  periodStart       DateTime
+  periodEnd         DateTime
+  userCount         Int
+  invoiceUrl        String?               @db.Text
+  invoicePdf        String?               @db.Text
+  paidAt            DateTime?
+  metadata          Json?                 @db.JsonB
+  dataClassification DataClassificationLevel @default(OFFICIAL)
+  residencyTag       DataResidencyZone       @default(UK_ONLY)
+  createdAt         DateTime              @default(now())
+  updatedAt         DateTime              @updatedAt
+
+  org Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@index([orgId, periodStart])
+  @@index([orgId, status])
+  @@map("billing_invoices")
+  @@schema("hr")
+}
+
 // HR notification models with tenant scoping and compliance metadata
 
 enum HRNotificationType {
@@ -702,8 +771,8 @@ model LeavePolicy {
   allowNegativeBalance Boolean           @default(false) // For emergency leave
   dataClassification DataClassificationLevel @default(OFFICIAL)
   residencyTag       DataResidencyZone       @default(UK_ONLY)
-  auditSource       String?
-  auditBatchId      String?
+  auditSource      String?
+  auditBatchId     String?
   metadata         Json?                 @db.JsonB
 
   org          Organization         @relation(fields: [orgId], references: [id], onDelete: Cascade)
@@ -748,8 +817,8 @@ model LeaveBalance {
   // For audit trail
   dataClassification DataClassificationLevel @default(OFFICIAL)
   residencyTag       DataResidencyZone       @default(UK_ONLY)
-  auditSource       String?
-  auditBatchId      String?
+  auditSource      String?
+  auditBatchId     String?
   metadata     Json?    @db.JsonB
   updatedAt    DateTime @updatedAt
 
@@ -786,8 +855,8 @@ model LeaveRequest {
   // For audit trail
   dataClassification DataClassificationLevel @default(OFFICIAL)
   residencyTag       DataResidencyZone       @default(UK_ONLY)
-  auditSource       String?
-  auditBatchId      String?
+  auditSource      String?
+  auditBatchId     String?
   metadata       Json?              @db.JsonB
   createdAt      DateTime           @default(now())
   updatedAt      DateTime           @updatedAt
@@ -1713,6 +1782,7 @@ model Organization {
   hrPolicies             HRPolicy[]
   hrNotifications        HRNotification[]
   notificationMessages   NotificationMessage[] @relation("OrgNotificationMessages")
+  permissionResources    PermissionResource[]
   hrSettings             HRSettings?
   checklistTemplates     ChecklistTemplate[] @relation("OrgChecklistTemplates")
   checklistInstances     ChecklistInstance[] @relation("OrgChecklistInstances")
@@ -1721,6 +1791,8 @@ model Organization {
   complianceLogItems     ComplianceLogItem[] @relation("OrgComplianceLogItems")
   managedOrganizations   ManagedOrganization[] @relation("ManagedOrgOrganization")
   subscriptions          OrganizationSubscription[]
+  paymentMethods         PaymentMethod[]
+  billingInvoices        BillingInvoice[]
   @@index([tenantId]) // For tenant isolation
   @@map("organizations") // PostgreSQL schema mapping
   @@schema("hr")
@@ -1774,12 +1846,32 @@ model Role {
   description String?
   scope       RoleScope @default(ORG)
   permissions Json      @default("{}") @db.JsonB
+  inheritsRoleIds String[] @default([]) @db.Text
+  isSystem    Boolean   @default(false)
+  isDefault   Boolean   @default(false)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   org         Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
   memberships Membership[]
   @@unique([orgId, name])
   @@map("roles")
+  @@schema("hr")
+}
+model PermissionResource {
+  id          String   @id @default(uuid()) @db.Uuid
+  orgId       String   @db.Uuid
+  resource    String
+  actions     String[] @db.Text
+  description String?
+  metadata    Json?    @db.JsonB
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  org Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@unique([orgId, resource])
+  @@index([orgId])
+  @@map("permission_resources")
   @@schema("hr")
 }
 model Department {

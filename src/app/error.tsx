@@ -17,21 +17,19 @@ interface GlobalErrorProps {
 
 export default function GlobalError({ reset }: GlobalErrorProps) {
     return (
-        <html>
-            <body className="bg-[hsl(var(--background))]">
-                <ErrorPageLayout intent="danger" fullScreen>
-                    <ErrorIllustration src={serverErrorImage} alt="Something went wrong" />
-                    <ErrorContent
-                        title="Something went wrong"
-                        description="Please try again or return to the dashboard."
-                        intent="danger"
-                    />
-                    <ErrorActions>
-                        <ErrorRetryButton reset={reset} />
-                        <ErrorLinkButton href="/">Go home</ErrorLinkButton>
-                    </ErrorActions>
-                </ErrorPageLayout>
-            </body>
-        </html>
+        <div className="min-h-screen bg-[hsl(var(--background))]">
+            <ErrorPageLayout intent="danger" fullScreen>
+                <ErrorIllustration src={serverErrorImage} alt="Something went wrong" />
+                <ErrorContent
+                    title="Something went wrong"
+                    description="Please try again or return to the dashboard."
+                    intent="danger"
+                />
+                <ErrorActions>
+                    <ErrorRetryButton reset={reset} />
+                    <ErrorLinkButton href="/">Go home</ErrorLinkButton>
+                </ErrorActions>
+            </ErrorPageLayout>
+        </div>
     );
 }

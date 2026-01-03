@@ -44,8 +44,8 @@ Keep the folder hierarchy aligned with the product domain (`org`, `hr`, `records
 This workflow ensures that both RBAC and ABAC policies are honored before **any** SQL executes. The same guard also enforces residency and classification constraints, helping the platform remain compliant with zero-trust mandates.
 
 ## RBAC And ABAC Expectations
-- RBAC role statements live in `src/server/security/access-control.ts`. Repositories never hardcode role names; they rely on the guard input prepared by services.
-- ABAC policies are stored via `PrismaAbacPolicyRepository` and evaluated by `evaluateAbac`. Services must provide action/resource pairs when calling `withRepositoryAuthorization`.
+- RBAC permissions should be resolved from Role records (including inheritance) via the permission resolution service. During migration, some guard contexts still fall back to role templates or membership-scoped permission maps; avoid adding new hardcoded statements outside templates.
+- ABAC policies are stored via `PrismaAbacPolicyRepository` and evaluated by `evaluateAbac`. Default policy templates are seeded on org creation, but runtime defaults may still exist; services must provide action/resource pairs when calling `withRepositoryAuthorization`.
 - When filtering results (e.g., fetching all departments), apply additional attribute-level checks if the resource contains owner- or department-level metadata. When possible, delegate ABAC filtering to query predicates to avoid over-fetching.
 - Always bubble up ABAC failures as `RepositoryAuthorizationError` or domain-specific errors that clearly indicate policy denial.
 
@@ -165,8 +165,11 @@ This pattern highlights the zero-trust requirements: the guard approves the acti
 
 ## References
 - `src/server/security/guards.ts` – RBAC/ABAC guard implementation.
-- `src/server/security/access-control.ts` – RBAC roles and statements.
+- `src/server/security/role-templates.ts` - Built-in role templates used to seed org-specific Role records.
+- `src/server/services/security/permission-resolution-service.ts` - Role permission resolution and caching.
 - `src/server/repositories/security/repository-authorization.ts` – Helper utilities introduced in this guide.
 - `src/server/repositories/README.md` – High-level overview and quick-start.
 
 Keep this document updated whenever the repository layer evolves so engineers and auditors can trace how RBAC, ABAC, strict typing, linting, reusability, modularity, and zero-trust principles are enforced across OrgCentral.
+
+

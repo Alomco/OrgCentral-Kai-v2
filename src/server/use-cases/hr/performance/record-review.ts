@@ -5,6 +5,8 @@ import type {
 } from '@/server/repositories/contracts/hr/performance/performance-repository.contract';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
 import { assertNonEmpty } from '@/server/use-cases/shared';
+import { emitHrNotification } from '@/server/use-cases/hr/notifications/notification-emitter';
+import { appLogger } from '@/server/logging/structured-logger';
 
 export interface RecordPerformanceReviewDependencies {
     repository: PerformanceRepository;
@@ -28,5 +30,31 @@ export async function recordPerformanceReview(
     assertNonEmpty(input.review.reviewerUserId, 'Reviewer user ID');
 
     const review = await deps.repository.createReview(input.review);
+
+    // Emit notification to the employee (subject of the review)
+    try {
+        await emitHrNotification(
+            {},
+            {
+                authorization: input.authorization,
+                notification: {
+                    userId: input.review.employeeId, // employeeId currently represents the target user identifier
+                    title: 'New Performance Review',
+                    message: 'A new performance review has been created for you.',
+                    type: 'performance-review',
+                    priority: 'medium',
+                    actionUrl: `/hr/performance/reviews/${review.id}`,
+                    metadata: { reviewId: review.id },
+                },
+            },
+        );
+    } catch (error) {
+        appLogger.warn('hr.performance.review.notification.failed', {
+            reviewId: review.id,
+            orgId: input.authorization.orgId,
+            error: error instanceof Error ? error.message : 'unknown',
+        });
+    }
+
     return { review };
 }

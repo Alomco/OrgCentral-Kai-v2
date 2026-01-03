@@ -9,17 +9,16 @@ import {
   RoleScope,
 } from '@prisma/client';
 import { prisma } from '@/server/lib/prisma';
+import { PrismaAbacPolicyRepository } from '@/server/repositories/prisma/org/abac/prisma-abac-policy-repository';
+import { resolveRoleTemplate } from '@/server/security/role-templates';
+import { isOrgRoleKey, type OrgRoleKey } from '@/server/security/access-control';
+import { DEFAULT_BOOTSTRAP_POLICIES } from '@/server/security/abac-constants';
+import { setAbacPolicies } from '@/server/use-cases/org/abac/set-abac-policies';
+import { buildAuthorizationContext } from '@/server/use-cases/shared/builders';
 
 type Json = Prisma.InputJsonValue;
 
-const OWNER_ROLE_PERMISSIONS: Record<string, string[]> = {
-  organization: ['create', 'read', 'update', 'delete', 'governance'],
-  member: ['read', 'invite', 'update', 'remove'],
-  invitation: ['create', 'cancel'],
-  audit: ['read', 'write'],
-  cache: ['tag', 'invalidate'],
-  residency: ['enforce'],
-};
+const BOOTSTRAP_ABAC_AUDIT_SOURCE = 'bootstrap:cold-start';
 
 export interface ColdStartConfig {
   platformOrgSlug?: string;
@@ -66,23 +65,40 @@ export async function runColdStart(config: ColdStartConfig = {}): Promise<ColdSt
     },
   });
 
+  const roleKey: OrgRoleKey = isOrgRoleKey(settings.roleName) ? settings.roleName : 'owner';
+  const template = resolveRoleTemplate(roleKey);
+
   const role = await prisma.role.upsert({
     where: { orgId_name: { orgId: organization.id, name: settings.roleName } },
     update: {
       scope: RoleScope.GLOBAL,
-      permissions: OWNER_ROLE_PERMISSIONS as Json,
+      permissions: template.permissions,
+      inheritsRoleIds: [],
+      isSystem: template.isSystem ?? true,
+      isDefault: template.isDefault ?? true,
     },
     create: {
       orgId: organization.id,
       name: settings.roleName,
       description: 'Platform bootstrap owner role',
       scope: RoleScope.GLOBAL,
-      permissions: OWNER_ROLE_PERMISSIONS as Json,
+      permissions: template.permissions,
+      inheritsRoleIds: [],
+      isSystem: template.isSystem ?? true,
+      isDefault: template.isDefault ?? true,
     },
   });
 
   const globalAdmin = await upsertUser(settings.globalAdminEmail, settings.globalAdminName);
   const developmentAdmin = await upsertUser(settings.developmentAdminEmail, settings.developmentAdminName);
+
+  await ensureAbacPolicies({
+    orgId: organization.id,
+    userId: globalAdmin.id,
+    roleKey,
+    dataResidency: organization.dataResidency,
+    dataClassification: organization.dataClassification,
+  });
 
   await Promise.all([
     ensureMembership(organization.id, globalAdmin.id, role.id, 'bootstrap:global-admin'),
@@ -155,4 +171,40 @@ async function ensureMembership(orgId: string, userId: string, roleId: string, a
       createdBy: userId,
     },
   });
+}
+
+interface AbacBootstrapContext {
+  orgId: string;
+  userId: string;
+  roleKey: OrgRoleKey;
+  dataResidency: DataResidencyZone;
+  dataClassification: DataClassificationLevel;
+}
+
+async function ensureAbacPolicies(context: AbacBootstrapContext): Promise<void> {
+  const repository = new PrismaAbacPolicyRepository();
+  const existing = await repository.getPoliciesForOrg(context.orgId);
+  if (existing.length > 0) {
+    return;
+  }
+
+  const authorization = buildAuthorizationContext({
+    orgId: context.orgId,
+    userId: context.userId,
+    roleKey: context.roleKey,
+    dataResidency: context.dataResidency,
+    dataClassification: context.dataClassification,
+    auditSource: BOOTSTRAP_ABAC_AUDIT_SOURCE,
+    tenantScope: {
+      orgId: context.orgId,
+      dataResidency: context.dataResidency,
+      dataClassification: context.dataClassification,
+      auditSource: BOOTSTRAP_ABAC_AUDIT_SOURCE,
+    },
+  });
+
+  await setAbacPolicies(
+    { policyRepository: repository },
+    { authorization, policies: DEFAULT_BOOTSTRAP_POLICIES },
+  );
 }

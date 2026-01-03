@@ -152,7 +152,7 @@ Already configured! After OAuth login, users can enable 2FA in their profile set
 ### Organization Access Control
 OAuth users are subject to organization-based access control:
 - Only `.gov.uk` emails can create organizations (configurable)
-- Role-based permissions using CASL
+- Role-based permissions resolved from DB-driven roles and ABAC policies (role-template fallback during migration)
 - Multi-tenant isolation
 
 ## Next Steps

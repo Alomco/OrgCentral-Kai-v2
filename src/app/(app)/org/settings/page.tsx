@@ -1,36 +1,30 @@
 import { Suspense } from 'react';
-import { cacheLife, unstable_noStore as noStore } from 'next/cache';
 import { headers } from 'next/headers';
-import { z } from 'zod';
-import type { Prisma } from '@prisma/client';
 
-import { InvitePolicyForm, initialInvitePolicyState, type InvitePolicyState } from './_components/invite-policy-form';
-import { resolveOrgContext } from '@/server/org/org-context';
-import { invalidateOrgCache, registerOrgCacheTag } from '@/server/lib/cache-tags';
+import { InvitePolicyForm } from './_components/invite-policy-form';
+import { SecuritySettingsForm } from './_components/security-settings-form';
+import { NotificationSettingsForm } from './_components/notification-settings-form';
+import { BillingSettingsForm } from './_components/billing-settings-form';
+import { BillingOverviewPanel } from './_components/billing-overview-panel';
+import { BillingPaymentMethodsPanel } from './_components/billing-payment-methods-panel';
+import { BillingHistoryPanel } from './_components/billing-history-panel';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
-import { getSessionContext } from '@/server/use-cases/auth/sessions/get-session';
 import { getSessionContextOrRedirect } from '@/server/ui/auth/session-redirect';
-import { prisma } from '@/server/lib/prisma';
-
-const invitePolicySchema = z.object({
-    open: z.boolean().default(false),
-});
-
-const organizationSettingsSchema = z.looseObject({
-    invites: invitePolicySchema.optional(),
-});
-
-const INVITE_POLICY_CACHE_SCOPE = 'org:invite-policy';
+import { getOrgSettingsForUi } from './settings-store';
+import {
+    updateInvitePolicy,
+    updateSecuritySettings,
+    updateNotificationSettings,
+} from './settings-actions';
+import { updateBillingSettings } from './billing-settings-actions';
 
 export default async function OrgSettingsPage() {
-    const orgContext = await resolveOrgContext();
     const headerStore = await headers();
 
     const { authorization } = await getSessionContextOrRedirect(
         {},
         {
             headers: headerStore,
-            orgId: orgContext.orgId,
             requiredPermissions: { organization: ['manage'] },
             auditSource: 'ui:org-settings:read',
         },
@@ -40,14 +34,68 @@ export default async function OrgSettingsPage() {
         <div className="space-y-6 p-6">
             <div>
                 <p className="text-xs uppercase tracking-[0.18em] text-[hsl(var(--muted-foreground))]">Settings</p>
-                <h1 className="text-2xl font-semibold text-[hsl(var(--foreground))]">Access & invites</h1>
+                <h1 className="text-2xl font-semibold text-[hsl(var(--foreground))]">Organization settings</h1>
                 <p className="text-sm text-[hsl(var(--muted-foreground))]">
-                    Control how people can join your organization ({authorization.orgId}).
+                    Manage security, notifications, and billing preferences for {authorization.orgId}.
                 </p>
             </div>
-            <Suspense fallback={<InvitePolicySkeleton />}>
-                <InvitePolicyPanel authorization={authorization} />
-            </Suspense>
+            <div className="space-y-6">
+                <section className="space-y-3">
+                    <div>
+                        <h2 className="text-lg font-semibold text-[hsl(var(--foreground))]">Access & invites</h2>
+                        <p className="text-sm text-[hsl(var(--muted-foreground))]">
+                            Control how people can join your organization.
+                        </p>
+                    </div>
+                    <Suspense fallback={<SettingsSkeleton />}>
+                        <InvitePolicyPanel authorization={authorization} />
+                    </Suspense>
+                </section>
+                <section className="space-y-3">
+                    <div>
+                        <h2 className="text-lg font-semibold text-[hsl(var(--foreground))]">Security</h2>
+                        <p className="text-sm text-[hsl(var(--muted-foreground))]">
+                            Set defaults for MFA and session controls.
+                        </p>
+                    </div>
+                    <Suspense fallback={<SettingsSkeleton />}>
+                        <SecuritySettingsPanel authorization={authorization} />
+                    </Suspense>
+                </section>
+                <section className="space-y-3">
+                    <div>
+                        <h2 className="text-lg font-semibold text-[hsl(var(--foreground))]">Notifications</h2>
+                        <p className="text-sm text-[hsl(var(--muted-foreground))]">
+                            Configure admin digests and critical alerts.
+                        </p>
+                    </div>
+                    <Suspense fallback={<SettingsSkeleton />}>
+                        <NotificationSettingsPanel authorization={authorization} />
+                    </Suspense>
+                </section>
+                <section className="space-y-3">
+                    <div>
+                        <h2 className="text-lg font-semibold text-[hsl(var(--foreground))]">Billing</h2>
+                        <p className="text-sm text-[hsl(var(--muted-foreground))]">
+                            Manage billing contacts and renewal preferences.
+                        </p>
+                    </div>
+                    <div className="space-y-4">
+                        <Suspense fallback={<SettingsSkeleton />}>
+                            <BillingOverviewPanel authorization={authorization} />
+                        </Suspense>
+                        <Suspense fallback={<SettingsSkeleton />}>
+                            <BillingPaymentMethodsPanel authorization={authorization} />
+                        </Suspense>
+                        <Suspense fallback={<SettingsSkeleton />}>
+                            <BillingHistoryPanel authorization={authorization} />
+                        </Suspense>
+                        <Suspense fallback={<SettingsSkeleton />}>
+                            <BillingSettingsPanel authorization={authorization} />
+                        </Suspense>
+                    </div>
+                </section>
+            </div>
         </div>
     );
 }
@@ -57,107 +105,37 @@ async function InvitePolicyPanel({
 }: {
     authorization: RepositoryAuthorizationContext;
 }) {
-    const initialOpen = await getInvitePolicyForUi(authorization);
-    return <InvitePolicyForm action={updateInvitePolicy} defaultOpen={initialOpen} />;
+    const settings = await getOrgSettingsForUi(authorization);
+    return <InvitePolicyForm action={updateInvitePolicy} defaultOpen={settings.invites.open} />;
 }
 
-function InvitePolicySkeleton() {
+async function SecuritySettingsPanel({
+    authorization,
+}: {
+    authorization: RepositoryAuthorizationContext;
+}) {
+    const settings = await getOrgSettingsForUi(authorization);
+    return <SecuritySettingsForm action={updateSecuritySettings} defaultSettings={settings.security} />;
+}
+
+async function NotificationSettingsPanel({
+    authorization,
+}: {
+    authorization: RepositoryAuthorizationContext;
+}) {
+    const settings = await getOrgSettingsForUi(authorization);
+    return <NotificationSettingsForm action={updateNotificationSettings} defaultSettings={settings.notifications} />;
+}
+
+async function BillingSettingsPanel({
+    authorization,
+}: {
+    authorization: RepositoryAuthorizationContext;
+}) {
+    const settings = await getOrgSettingsForUi(authorization);
+    return <BillingSettingsForm action={updateBillingSettings} defaultSettings={settings.billing} />;
+}
+
+function SettingsSkeleton() {
     return <div className="h-28 w-full animate-pulse rounded-2xl bg-[hsl(var(--muted))]" />;
-}
-
-async function getInvitePolicyForUi(authorization: RepositoryAuthorizationContext): Promise<boolean> {
-    async function loadCached(input: RepositoryAuthorizationContext): Promise<boolean> {
-        'use cache';
-        cacheLife('minutes');
-
-        registerOrgCacheTag(
-            input.orgId,
-            INVITE_POLICY_CACHE_SCOPE,
-            input.dataClassification,
-            input.dataResidency,
-        );
-
-        return loadInvitePolicy(input.orgId);
-    }
-
-    if (authorization.dataClassification !== 'OFFICIAL') {
-        noStore();
-        return loadInvitePolicy(authorization.orgId);
-    }
-
-    return loadCached(authorization);
-}
-
-async function loadInvitePolicy(orgId: string): Promise<boolean> {
-    const org = await prisma.organization.findUnique({
-        where: { id: orgId },
-        select: { settings: true },
-    });
-
-    const parsedSettings = organizationSettingsSchema.safeParse(org?.settings ?? {});
-    return parsedSettings.success ? (parsedSettings.data.invites?.open ?? false) : false;
-}
-
-export async function updateInvitePolicy(
-    _previous: InvitePolicyState = initialInvitePolicyState,
-    formData: FormData,
-): Promise<InvitePolicyState> {
-    'use server';
-
-    const orgContext = await resolveOrgContext();
-    const headerStore = await headers();
-
-    const parsed = invitePolicySchema.safeParse({
-        open: formData.get('invite-open') === 'on',
-    });
-
-    if (!parsed.success) {
-        return { status: 'error', message: 'Invalid form data', open: _previous.open };
-    }
-
-    const { authorization } = await getSessionContext(
-        {},
-        {
-            headers: headerStore,
-            orgId: orgContext.orgId,
-            requiredPermissions: { organization: ['manage'] },
-            auditSource: 'ui:org-settings:invite-policy',
-        },
-    );
-
-    const org = await prisma.organization.findUnique({
-        where: { id: authorization.orgId },
-        select: { settings: true },
-    });
-
-    const settingsObject = coerceJsonObject(org?.settings ?? {});
-    const nextSettings: Prisma.InputJsonObject = {
-        ...settingsObject,
-        invites: { open: parsed.data.open },
-    };
-
-    await prisma.organization.update({
-        where: { id: authorization.orgId },
-        data: { settings: nextSettings },
-    });
-
-    await invalidateOrgCache(
-        authorization.orgId,
-        INVITE_POLICY_CACHE_SCOPE,
-        authorization.dataClassification,
-        authorization.dataResidency,
-    );
-
-    return {
-        status: 'success',
-        message: parsed.data.open ? 'Invites are now open' : 'Invites are restricted',
-        open: parsed.data.open,
-    };
-}
-
-function coerceJsonObject(value: Prisma.JsonValue): Prisma.JsonObject {
-    if (value && typeof value === 'object' && !Array.isArray(value)) {
-        return value;
-    }
-    return {};
 }

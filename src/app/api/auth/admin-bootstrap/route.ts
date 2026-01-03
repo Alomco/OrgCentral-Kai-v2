@@ -15,7 +15,11 @@ import { AuthorizationError, ValidationError } from '@/server/errors';
 import { createAuth } from '@/server/lib/auth';
 import { syncBetterAuthUserToPrisma } from '@/server/lib/auth-sync';
 import { prisma } from '@/server/lib/prisma';
-import { orgRoles } from '@/server/security/access-control';
+import { PrismaAbacPolicyRepository } from '@/server/repositories/prisma/org/abac/prisma-abac-policy-repository';
+import { resolveRoleTemplate } from '@/server/security/role-templates';
+import { DEFAULT_BOOTSTRAP_POLICIES } from '@/server/security/abac-constants';
+import { setAbacPolicies } from '@/server/use-cases/org/abac/set-abac-policies';
+import { buildAuthorizationContext } from '@/server/use-cases/shared/builders';
 import { buildErrorResponse } from '@/server/api-adapters/http/error-response';
 import { appendSetCookieHeaders } from '@/server/api-adapters/http/set-cookie-headers';
 import {
@@ -103,18 +107,44 @@ export async function POST(request: NextRequest): Promise<Response> {
                 dataResidency: DataResidencyZone.UK_ONLY,
                 dataClassification: DataClassificationLevel.OFFICIAL,
             },
-            select: { id: true, slug: true, name: true },
+            select: { id: true, slug: true, name: true, dataResidency: true, dataClassification: true },
         });
 
         assertUuid(organization.id, 'Organization id');
 
-        const permissions = orgRoles[config.roleName].statements as Record<string, string[]>;
+        const abacPolicyRepository = new PrismaAbacPolicyRepository();
+        const existingPolicies = await abacPolicyRepository.getPoliciesForOrg(organization.id);
+        if (existingPolicies.length === 0) {
+            const authorization = buildAuthorizationContext({
+                orgId: organization.id,
+                userId,
+                roleKey: config.roleName,
+                dataResidency: organization.dataResidency,
+                dataClassification: organization.dataClassification,
+                auditSource: BOOTSTRAP_SEED_SOURCE,
+                tenantScope: {
+                    orgId: organization.id,
+                    dataResidency: organization.dataResidency,
+                    dataClassification: organization.dataClassification,
+                    auditSource: BOOTSTRAP_SEED_SOURCE,
+                },
+            });
+            await setAbacPolicies(
+                { policyRepository: abacPolicyRepository },
+                { authorization, policies: DEFAULT_BOOTSTRAP_POLICIES },
+            );
+        }
+
+        const permissions = resolveRoleTemplate(config.roleName).permissions as Record<string, string[]>;
 
         const role = await prisma.role.upsert({
             where: { orgId_name: { orgId: organization.id, name: config.roleName } },
             update: {
                 scope: RoleScope.GLOBAL,
                 permissions: permissions as Prisma.InputJsonValue,
+                inheritsRoleIds: [],
+                isSystem: true,
+                isDefault: true,
             },
             create: {
                 orgId: organization.id,
@@ -122,6 +152,9 @@ export async function POST(request: NextRequest): Promise<Response> {
                 description: 'Platform administrator',
                 scope: RoleScope.GLOBAL,
                 permissions: permissions as Prisma.InputJsonValue,
+                inheritsRoleIds: [],
+                isSystem: true,
+                isDefault: true,
             },
             select: { id: true, name: true },
         });

@@ -24,6 +24,10 @@ export interface IOrganizationSubscriptionRepository {
     orgId: string,
   ): Promise<OrganizationSubscriptionData | null>;
 
+  getByStripeCustomerId(stripeCustomerId: string): Promise<OrganizationSubscriptionData | null>;
+
+  getByStripeSubscriptionId(stripeSubscriptionId: string): Promise<OrganizationSubscriptionData | null>;
+
   upsertSubscription(
     context: RepositoryAuthorizationContext,
     input: OrganizationSubscriptionUpsertInput,

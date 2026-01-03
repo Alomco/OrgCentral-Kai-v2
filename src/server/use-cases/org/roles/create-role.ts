@@ -5,8 +5,7 @@ import type { RepositoryAuthorizationContext } from '@/server/repositories/secur
 import type { Role } from '@/server/types/hr-types';
 import { invalidateOrgCache } from '@/server/lib/cache-tags';
 import { CACHE_SCOPE_ROLES } from '@/server/repositories/cache-scopes';
-
-const RESERVED_ROLE_NAMES = ['owner', 'orgAdmin', 'member'] as const;
+import { isOrgRoleKey } from '@/server/security/access-control';
 
 export interface CreateRoleInput {
   authorization: RepositoryAuthorizationContext;
@@ -14,6 +13,7 @@ export interface CreateRoleInput {
   description?: string | null;
   permissions?: Role['permissions'];
   scope?: RoleScope;
+  inheritsRoleIds?: string[];
 }
 
 export interface CreateRoleDependencies {
@@ -45,6 +45,7 @@ export async function createRole(
     description: input.description ?? null,
     scope: input.scope ?? RoleScope.ORG,
     permissions: input.permissions ?? {},
+    inheritsRoleIds: input.inheritsRoleIds ?? [],
   });
 
   await invalidateOrgCache(
@@ -63,5 +64,5 @@ export async function createRole(
 }
 
 function isReservedRole(name: string): boolean {
-  return RESERVED_ROLE_NAMES.includes(name as (typeof RESERVED_ROLE_NAMES)[number]);
+  return isOrgRoleKey(name);
 }

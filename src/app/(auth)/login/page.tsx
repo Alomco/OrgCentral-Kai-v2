@@ -9,20 +9,22 @@ import AuthLayout from "@/components/auth/AuthLayout";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { Button } from "@/components/ui/button";
 import { registerCacheTag } from "@/server/lib/cache-tags";
-import { getSessionContext } from '@/server/use-cases/auth/sessions/get-session';
-import {
-    getMembershipRoleSnapshot,
-    resolveRoleDashboard,
-    ROLE_DASHBOARD_PATHS,
-} from '@/server/ui/auth/role-redirect';
+import { auth } from '@/server/lib/auth';
+import { sanitizeNextPath } from '@/server/ui/auth/role-redirect';
 
 export const metadata: Metadata = {
     title: "Login • OrgCentral",
     description: "Sign in to your OrgCentral account.",
 };
 
+type LoginSearchParams = Record<string, string | string[] | undefined>;
+
 interface LoginPageProps {
-    searchParams?: Record<string, string | string[] | undefined>;
+    searchParams: Promise<LoginSearchParams>;
+}
+
+interface ResolvedLoginPageProps {
+    searchParams: LoginSearchParams;
 }
 
 interface LoginPageCopy {
@@ -64,41 +66,67 @@ async function LoginPageContent({ initialOrgSlug }: LoginPageContentProps) {
     );
 }
 
-export default function LoginPage({ searchParams }: LoginPageProps) {
+export default async function LoginPage({ searchParams }: LoginPageProps) {
+    const resolvedSearchParams = await searchParams;
+
     return (
         <Suspense fallback={<LoginPageFallback />}>
-            <LoginGate searchParams={searchParams} />
+            <LoginGate searchParams={resolvedSearchParams} />
         </Suspense>
     );
 }
 
-async function LoginGate({ searchParams }: LoginPageProps) {
+async function LoginGate({ searchParams }: ResolvedLoginPageProps) {
     const headerStore = await nextHeaders();
-    const sessionResult = await getSessionContext(
-        {},
-        {
-            headers: headerStore,
-            requiredPermissions: { organization: ['read'] },
-            auditSource: 'ui:login-redirect',
-        },
-    ).catch(() => null);
+    const session = await auth.api.getSession({
+        headers: headerStore,
+        query: { disableRefresh: true },
+    });
 
-    if (sessionResult) {
-        const { authorization } = sessionResult;
-        const membershipSnapshot = await getMembershipRoleSnapshot(
-            authorization.orgId,
-            authorization.userId,
-        );
-        const dashboardRole = membershipSnapshot
-            ? resolveRoleDashboard(membershipSnapshot)
-            : 'employee';
+    const initialOrgSlug = extractOrgSlug(searchParams);
 
-        redirect(ROLE_DASHBOARD_PATHS[dashboardRole]);
+    if (session?.session) {
+        redirect(buildPostLoginRedirect(searchParams, initialOrgSlug));
     }
 
-    const initialOrgSlugValue = searchParams?.org;
-    const initialOrgSlug = typeof initialOrgSlugValue === 'string' ? initialOrgSlugValue : undefined;
     return <LoginPageContent initialOrgSlug={initialOrgSlug} />;
+}
+
+function buildPostLoginRedirect(
+    searchParams: ResolvedLoginPageProps['searchParams'],
+    initialOrgSlug?: string,
+): string {
+    const params = new URLSearchParams();
+    const orgSlug = initialOrgSlug ?? extractOrgSlug(searchParams);
+    const nextPath = extractNextPath(searchParams);
+
+    if (nextPath) {
+        params.set('next', nextPath);
+    }
+
+    if (orgSlug) {
+        params.set('org', orgSlug);
+    }
+
+    const query = params.toString();
+    return query ? `/api/auth/post-login?${query}` : '/api/auth/post-login';
+}
+
+function extractNextPath(searchParams: ResolvedLoginPageProps['searchParams']): string | null {
+    const value = searchParams.next;
+    const nextParameter = Array.isArray(value) ? value[0] : value;
+    return sanitizeNextPath(typeof nextParameter === 'string' ? nextParameter : null);
+}
+
+function extractOrgSlug(searchParams: ResolvedLoginPageProps['searchParams']): string | undefined {
+    const value = searchParams.org;
+    const orgSlug = Array.isArray(value) ? value[0] : value;
+    if (typeof orgSlug !== 'string') {
+        return undefined;
+    }
+
+    const trimmed = orgSlug.trim();
+    return trimmed.length > 0 ? trimmed : undefined;
 }
 
 function AuthFooter() {

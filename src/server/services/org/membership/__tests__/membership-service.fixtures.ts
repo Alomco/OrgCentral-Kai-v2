@@ -2,7 +2,7 @@ import type { IInvitationRepository, InvitationCreateInput, InvitationRecord, In
 import type { IMembershipRepository, MembershipCreationInput, MembershipCreationResult } from '@/server/repositories/contracts/org/membership';
 import type { IOrganizationRepository } from '@/server/repositories/contracts/org/organization/organization-repository-contract';
 import type { CreateOrganizationInput, OrganizationProfileUpdate } from '@/server/repositories/contracts/org/organization/organization-repository-contract';
-import type { IUserRepository } from '@/server/repositories/contracts/org/users/user-repository-contract';
+import type { IUserRepository, UserListFilters } from '@/server/repositories/contracts/org/users/user-repository-contract';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
 import type { OrganizationData, UserData } from '@/server/types/leave-types';
 import { normalizeLeaveYearStartDate, type LeaveYearStartDate } from '@/server/types/org/leave-year-start-date';
@@ -144,6 +144,22 @@ export class FakeUserRepository implements IUserRepository {
     async getUsersInOrganization(
         _context: RepositoryAuthorizationContext,
         _organizationId: string,
+    ): Promise<UserData[]> {
+        return [];
+    }
+
+    async countUsersInOrganization(
+        _context: RepositoryAuthorizationContext,
+        _organizationId: string,
+        _filters?: UserListFilters,
+    ): Promise<number> {
+        return 0;
+    }
+
+    async getUsersInOrganizationPaged(
+        _context: RepositoryAuthorizationContext,
+        _organizationId: string,
+        _query: { page: number; pageSize: number },
     ): Promise<UserData[]> {
         return [];
     }

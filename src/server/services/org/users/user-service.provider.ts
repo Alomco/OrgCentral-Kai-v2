@@ -57,4 +57,7 @@ export function getUserService(
     return provider.getService(overrides);
 }
 
-export type UserServiceContract = Pick<UserService, 'listUsersInOrganization'>;
+export type UserServiceContract = Pick<
+    UserService,
+    'listUsersInOrganization' | 'listUsersInOrganizationPaged' | 'countUsersInOrganization'
+>;

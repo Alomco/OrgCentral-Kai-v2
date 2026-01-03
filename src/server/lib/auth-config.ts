@@ -6,7 +6,7 @@ import { nextCookies } from 'better-auth/next-js';
 import { mcp, organization, username, twoFactor } from 'better-auth/plugins';
 
 import { prisma } from '@/server/lib/prisma';
-import { orgAccessControl, orgRoles } from '@/server/security/access-control';
+import { orgAccessControl, orgRoles } from '@/server/security/better-auth-access';
 
 import { createAuthDatabaseHooks, getAuthSyncQueueClientOrNull } from '@/server/lib/auth-sync-hooks';
 import { isAuthSyncEnabled } from '@/server/lib/auth-environment';

@@ -9,6 +9,7 @@ import type { RepositoryAuthorizationContext } from '@/server/repositories/secur
 import { OrgScopedPrismaRepository } from '@/server/repositories/prisma/org/org-scoped-prisma-repository';
 import { getModelDelegate, toPrismaInputJson } from '@/server/repositories/prisma/helpers/prisma-utils';
 import { mapOrganizationSubscriptionToData } from '@/server/repositories/mappers/org/billing/organization-subscription-mapper';
+import { CACHE_SCOPE_BILLING_SUBSCRIPTION } from '@/server/repositories/cache-scopes';
 
 const SUBSCRIPTION_NOT_FOUND_MESSAGE = 'Organization subscription not found.';
 
@@ -19,6 +20,7 @@ export class PrismaOrganizationSubscriptionRepository
     context: RepositoryAuthorizationContext,
     orgId: string,
   ): Promise<OrganizationSubscriptionData | null> {
+    this.tagCache(context, CACHE_SCOPE_BILLING_SUBSCRIPTION);
     const subscription = await getModelDelegate(this.prisma, 'organizationSubscription').findUnique({
       where: { orgId },
     });
@@ -27,6 +29,20 @@ export class PrismaOrganizationSubscriptionRepository
     }
     this.assertTenantRecord(subscription, context.orgId);
     return mapOrganizationSubscriptionToData(subscription);
+  }
+
+  async getByStripeCustomerId(stripeCustomerId: string): Promise<OrganizationSubscriptionData | null> {
+    const subscription = await getModelDelegate(this.prisma, 'organizationSubscription').findUnique({
+      where: { stripeCustomerId },
+    });
+    return subscription ? mapOrganizationSubscriptionToData(subscription) : null;
+  }
+
+  async getByStripeSubscriptionId(stripeSubscriptionId: string): Promise<OrganizationSubscriptionData | null> {
+    const subscription = await getModelDelegate(this.prisma, 'organizationSubscription').findUnique({
+      where: { stripeSubscriptionId },
+    });
+    return subscription ? mapOrganizationSubscriptionToData(subscription) : null;
   }
 
   async upsertSubscription(
@@ -84,6 +100,7 @@ export class PrismaOrganizationSubscriptionRepository
       },
     });
 
+    await this.invalidateCache(context, CACHE_SCOPE_BILLING_SUBSCRIPTION);
     return mapOrganizationSubscriptionToData(subscription);
   }
 
@@ -113,6 +130,7 @@ export class PrismaOrganizationSubscriptionRepository
       },
     });
 
+    await this.invalidateCache(context, CACHE_SCOPE_BILLING_SUBSCRIPTION);
     return mapOrganizationSubscriptionToData(subscription);
   }
 }

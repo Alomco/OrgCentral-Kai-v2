@@ -2,7 +2,7 @@
 import { z } from 'zod';
 import { getSecurityEventService } from '@/server/services/auth/security-event-service';
 import type { SecurityEventService } from '@/server/services/auth/security-event-service';
-import type { LogSecurityEventInput, LogSecurityEventRequest } from '@/server/types';
+import type { LogSecurityEventInput } from '@/server/types';
 import { LogSecurityEventRequestSchema } from '@/server/types';
 import { recordSecurityEvent } from '@/server/use-cases/auth/security/log-security-event-action';
 
@@ -25,7 +25,7 @@ export async function logSecurityEventController(
     actor: unknown,
     service: SecurityEventService = securityEventService,
 ): Promise<{ success: true }> {
-    const input = LogSecurityEventRequestSchema.parse(payload) as LogSecurityEventRequest;
+    const input = LogSecurityEventRequestSchema.parse(payload);
     const { userId } = ActorSchema.parse(actor);
     const logInput: LogSecurityEventInput = { ...input, userId };
     return recordSecurityEvent(logInput, { service });

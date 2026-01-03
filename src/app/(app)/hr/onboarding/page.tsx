@@ -2,9 +2,10 @@ import { Suspense } from 'react';
 import { headers as nextHeaders } from 'next/headers';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { UserPlus } from 'lucide-react';
+import { UserPlus, Wand2 } from 'lucide-react';
 
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -69,6 +70,20 @@ export default async function HrOnboardingPage() {
                 description="Invite employees and manage onboarding checklists for your organization."
                 icon={<UserPlus className="h-5 w-5" />}
             />
+
+            {canInviteMembers ? (
+                <div className="flex items-center gap-3">
+                    <Button asChild>
+                        <Link href="/hr/onboarding/new">
+                            <Wand2 className="mr-2 h-4 w-4" />
+                            Onboard New Employee
+                        </Link>
+                    </Button>
+                    <span className="text-sm text-muted-foreground">
+                        Use the wizard for a guided onboarding experience
+                    </span>
+                </div>
+            ) : null}
 
             <div className="grid gap-6 lg:grid-cols-2">
                 {canInviteMembers ? (

@@ -1,7 +1,7 @@
 import { randomUUID, timingSafeEqual } from 'node:crypto';
 import { prisma } from '@/server/lib/prisma';
 import { AuthorizationError, ValidationError } from '@/server/errors';
-import { orgRoles, type OrgRoleKey } from '@/server/security/access-control';
+import { isOrgRoleKey, type OrgRoleKey } from '@/server/security/access-control';
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -23,8 +23,8 @@ export interface PlatformBootstrapConfig {
 export function resolvePlatformConfig(): PlatformBootstrapConfig {
     const roleCandidate = process.env.GLOBAL_ADMIN_ROLE_NAME ?? DEFAULT_GLOBAL_ADMIN_ROLE;
 
-    if (!(roleCandidate in orgRoles)) {
-        throw new ValidationError('GLOBAL_ADMIN_ROLE_NAME must be one of: owner, orgAdmin, compliance, member.');
+    if (!isOrgRoleKey(roleCandidate)) {
+        throw new ValidationError('GLOBAL_ADMIN_ROLE_NAME must be one of the built-in role keys.');
     }
 
     return {
@@ -32,7 +32,7 @@ export function resolvePlatformConfig(): PlatformBootstrapConfig {
         platformOrgName: process.env.PLATFORM_ORG_NAME ?? DEFAULT_PLATFORM_ORG_NAME,
         platformTenantId: process.env.PLATFORM_TENANT_ID ?? DEFAULT_PLATFORM_TENANT_ID,
         platformRegionCode: process.env.PLATFORM_ORG_REGION ?? DEFAULT_PLATFORM_REGION_CODE,
-        roleName: roleCandidate as OrgRoleKey,
+        roleName: roleCandidate,
     };
 }
 

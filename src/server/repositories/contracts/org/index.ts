@@ -8,5 +8,6 @@ export * from './membership';
 export * from './membership/membership-repository.types';
 export * from './notifications/notification-preference-repository-contract';
 export * from './organization/organization-repository-contract';
+export * from './permissions/permission-resource-repository-contract';
 export * from './roles/role-repository-contract';
 export * from './users/user-repository-contract';

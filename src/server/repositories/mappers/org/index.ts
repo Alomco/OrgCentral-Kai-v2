@@ -3,6 +3,7 @@ export * from './integrations/integration-config-mapper';
 export * from './membership/membership-mapper';
 export * from './notifications/notification-preference-mapper';
 export * from './roles/role-mapper';
+export * from './permissions/permission-resource-mapper';
 export * from './users/user-mapper';
 export * from './branding/branding-mapper';
 export * from './enterprise/enterprise-admin-mapper';

@@ -1,17 +1,11 @@
-/**
- * 🎨 DOM-Level UI Style Support
- * 
+/* dYZ" DOM-Level UI Style Support
  * CSS custom properties and data-attribute selectors for UI style presets.
- * Add this to globals.css or import separately.
- * 
  * @module styles/ui-styles
  */
 
-/* ============================================================================
- * UI Style Token Defaults (Glass Neon) - SSR Safe Defaults
- * ============================================================================ */
+@import "./ui-surfaces.css";
 
- :root {
+:root {
     /* UI Style Tokens - Defaults (Glass Neon) matches server/theme/ui-style-presets.ts */
     --ui-backdrop-blur: 12px;
     --ui-glow-intensity: 0.35;
@@ -20,58 +14,181 @@
     --ui-transition: var(--ui-transition-duration) var(--ui-transition-easing);
     --ui-border-opacity: 0.2;
     --ui-card-opacity: 0.9;
-    
-    /* Shadow presets (Base values) */
+    --ui-surface-tint: var(--border);
+    --ui-surface-depth-color: var(--foreground);
     --shadow-none: none;
     --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
     --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
     --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
     --shadow-glow: 0 8px 24px -4px hsl(var(--primary) / 0.25);
-
-    /* Mapped Variables (Default to Glass Neon values) */
     --ui-card-shadow: var(--shadow-glow);
     --ui-border-radius: var(--radius-lg);
+    --ui-input-shadow: inset 0 0 0 1px hsl(var(--border) / 0.35), 0 6px 14px -12px hsl(var(--foreground) / 0.3);
+    --ui-control-shadow: 0 0 0 1px hsl(var(--border) / var(--ui-border-opacity));
+    --ui-focus-shadow: 0 0 0 1px hsl(var(--primary) / 0.45), 0 0 0 6px hsl(var(--primary) / 0.2);
+    --ui-border-width: 2px;
+    --ui-border-glow-opacity: 0;
+    --ui-border-glow-opacity-hover: 0;
+    --ui-border-glow-blur: 2px;
+    --ui-border-gradient: linear-gradient(135deg, transparent, transparent);
+    --ui-border-animation: none;
 }
 
-/* ============================================================================
- * Component Usage of UI Style Tokens
- * ============================================================================ */
+[data-ui-style="glass-neon"] {
+    --ui-surface-tint: var(--primary);
+    --ui-surface-depth-color: var(--primary);
+    --ui-surface-depth-md: 0 16px 32px -22px hsl(var(--primary) / 0.32);
+    --ui-surface-depth-lg: 0 20px 42px -28px hsl(var(--primary) / 0.4);
+    --ui-input-shadow: inset 0 0 0 1px hsl(var(--primary) / 0.25), 0 10px 20px -14px hsl(var(--primary) / 0.35);
+    --ui-control-shadow: 0 0 0 1px hsl(var(--primary) / 0.35);
+    --ui-focus-shadow: 0 0 0 1px hsl(var(--primary) / 0.55), 0 0 0 8px hsl(var(--primary) / 0.25);
+    --ui-border-width: 3px;
+    --ui-border-glow-opacity: 0.18;
+    --ui-border-glow-opacity-hover: 0.35;
+    --ui-border-glow-blur: 4px;
+    --ui-border-gradient: conic-gradient(
+        from var(--border-angle-1),
+        transparent 0deg,
+        hsl(var(--primary) / 0.7) 90deg,
+        transparent 180deg,
+        hsl(var(--accent) / 0.7) 270deg,
+        transparent 360deg
+    );
+    --ui-border-animation: rotateBorderAngles 6s linear infinite;
+}
 
-/* Premium Card & Popovers & Dialogs */
-[data-slot="card"],
-[data-slot="popover-content"],
-[data-slot="dialog-content"],
-[data-slot="sheet-content"], 
-.glass-card {
-    transition: all var(--ui-transition);
-    backdrop-filter: blur(var(--ui-backdrop-blur));
-    box-shadow: var(--ui-card-shadow);
+[data-ui-style="clean-corporate"] {
+    --ui-surface-tint: var(--border);
+    --ui-surface-depth-color: var(--foreground);
+    --ui-surface-outline-weak: inset 0 0 0 1px hsl(var(--border) / 0.3), inset 0 1px 0 hsl(var(--background) / 0.5);
+    --ui-surface-outline: inset 0 0 0 1px hsl(var(--border) / 0.4), inset 0 1px 0 hsl(var(--background) / 0.6);
+    --ui-input-shadow: inset 0 0 0 1px hsl(var(--border) / 0.5);
+    --ui-control-shadow: inset 0 0 0 1px hsl(var(--border) / 0.5);
+    --ui-focus-shadow: 0 0 0 1px hsl(var(--primary) / 0.45), 0 0 0 4px hsl(var(--primary) / 0.15);
+    --ui-border-glow-opacity-hover: 0;
+}
+
+[data-ui-style="soft-neutral"] {
+    --ui-surface-tint: var(--border);
+    --ui-surface-depth-color: var(--foreground);
+    --ui-input-shadow: inset 0 0 0 1px hsl(var(--border) / 0.25), 0 10px 18px -16px hsl(var(--foreground) / 0.2);
+    --ui-control-shadow: 0 0 0 1px hsl(var(--border) / 0.22);
+    --ui-focus-shadow: 0 0 0 1px hsl(var(--primary) / 0.4), 0 0 0 7px hsl(var(--accent) / 0.18);
+    --ui-border-glow-opacity-hover: 0.08;
+}
+
+[data-ui-style="bold-amoled"] {
+    --ui-surface-tint: var(--primary);
+    --ui-surface-depth-color: var(--background);
+    --ui-input-shadow: inset 0 0 0 1px hsl(var(--primary) / 0.35), 0 12px 22px -16px hsl(var(--primary) / 0.4);
+    --ui-control-shadow: 0 0 0 1px hsl(var(--primary) / 0.45);
+    --ui-focus-shadow: 0 0 0 1px hsl(var(--primary) / 0.65), 0 0 0 9px hsl(var(--primary) / 0.3);
+    --ui-border-glow-opacity: 0.22;
+    --ui-border-glow-opacity-hover: 0.45;
+    --ui-border-glow-blur: 3px;
+}
+
+[data-ui-style="material-motion"] {
+    --ui-surface-tint: var(--border);
+    --ui-surface-depth-color: var(--foreground);
+    --ui-surface-outline-weak: inset 0 0 0 1px hsl(var(--border) / 0.14);
+    --ui-surface-outline: inset 0 0 0 1px hsl(var(--border) / 0.2);
+    --ui-input-shadow: inset 0 0 0 1px hsl(var(--border) / 0.25), 0 8px 16px -14px hsl(var(--foreground) / 0.2);
+    --ui-control-shadow: inset 0 0 0 1px hsl(var(--border) / 0.2);
+    --ui-focus-shadow: 0 0 0 1px hsl(var(--primary) / 0.4), 0 0 0 6px hsl(var(--primary) / 0.2);
+    --ui-border-glow-opacity-hover: 0;
+}
+
+/* Component Usage */
+
+:is([data-slot="card"], [data-slot="alert"], [data-slot="popover-content"], [data-slot="dialog-content"],
+    [data-slot="alert-dialog-content"], [data-slot="sheet-content"], [data-slot="hover-card-content"], [data-slot="select-content"],
+    [data-slot="dropdown-menu-content"], [data-slot="dropdown-menu-sub-content"], [data-slot="context-menu-content"],
+    [data-slot="context-menu-sub-content"], [data-slot="menubar-content"], [data-slot="menubar-sub-content"],
+    [data-slot="navigation-menu-content"], [data-slot="navigation-menu-viewport"], [data-slot="tooltip-content"],
+    [data-slot="command"], [data-ui-surface]) {
+    position: relative;
+    border: 0;
+    outline: none;
     border-radius: var(--ui-border-radius);
-    background-color: hsl(var(--card) / var(--ui-card-opacity));
-    border-color: hsl(var(--border) / var(--ui-border-opacity));
+    background-color: var(--ui-surface-fill);
+    -webkit-backdrop-filter: blur(var(--ui-surface-blur));
+    backdrop-filter: blur(var(--ui-surface-blur));
+    box-shadow: var(--ui-surface-shadow);
+    transition: box-shadow var(--ui-transition), background-color var(--ui-transition), backdrop-filter var(--ui-transition), transform var(--ui-transition);
 }
 
-/* Specific overrides for Glass Neon Glow if needed */
-[data-ui-style="glass-neon"] [data-slot="card"] {
-    border-color: hsl(var(--primary) / var(--ui-border-opacity));
+:is([data-slot="popover-content"], [data-slot="dialog-content"], [data-slot="alert-dialog-content"], [data-slot="sheet-content"],
+    [data-slot="hover-card-content"], [data-slot="select-content"], [data-slot="dropdown-menu-content"], [data-slot="dropdown-menu-sub-content"],
+    [data-slot="context-menu-content"], [data-slot="context-menu-sub-content"], [data-slot="menubar-content"], [data-slot="menubar-sub-content"],
+    [data-slot="navigation-menu-content"], [data-slot="navigation-menu-viewport"], [data-slot="tooltip-content"], [data-slot="command"]) {
+    --ui-surface-fill: var(--ui-surface-popover-fill);
 }
 
-/* Premium Input Focus */
-[data-slot="input"]:focus-visible,
-[data-slot="textarea"]:focus-visible,
-.focus-ring-theme:focus-visible {
-    box-shadow: 0 0 0 3px hsl(var(--primary) / var(--ui-glow-intensity));
+:is([data-slot="card"], [data-slot="alert"], [data-slot="popover-content"], [data-slot="dialog-content"],
+    [data-slot="alert-dialog-content"], [data-slot="sheet-content"], [data-slot="hover-card-content"], [data-slot="select-content"],
+    [data-slot="dropdown-menu-content"], [data-slot="dropdown-menu-sub-content"], [data-slot="context-menu-content"],
+    [data-slot="context-menu-sub-content"], [data-slot="menubar-content"], [data-slot="menubar-sub-content"],
+    [data-slot="navigation-menu-content"], [data-slot="navigation-menu-viewport"], [data-slot="tooltip-content"],
+    [data-slot="command"], [data-ui-surface])::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: var(--ui-border-width);
+    background: var(--ui-border-gradient);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    opacity: var(--ui-border-glow-opacity);
+    filter: blur(var(--ui-border-glow-blur));
+    animation: var(--ui-border-animation);
+    pointer-events: none;
+    transition: opacity var(--ui-transition);
+}
+
+:is([data-slot="card"], [data-slot="alert"], [data-slot="popover-content"], [data-slot="dialog-content"],
+    [data-slot="alert-dialog-content"], [data-slot="sheet-content"], [data-slot="hover-card-content"], [data-slot="select-content"],
+    [data-slot="dropdown-menu-content"], [data-slot="dropdown-menu-sub-content"], [data-slot="context-menu-content"],
+    [data-slot="context-menu-sub-content"], [data-slot="menubar-content"], [data-slot="menubar-sub-content"],
+    [data-slot="navigation-menu-content"], [data-slot="navigation-menu-viewport"], [data-slot="tooltip-content"],
+    [data-slot="command"], [data-ui-surface]):hover::before {
+    opacity: var(--ui-border-glow-opacity-hover);
+}
+
+:is([data-slot="input"], [data-slot="textarea"], [data-slot="select-trigger"], [data-slot="input-group"]) {
+    border: 0;
+    outline: none;
+    box-shadow: var(--ui-input-shadow);
+    transition: box-shadow var(--ui-transition), background-color var(--ui-transition);
+}
+
+:is([data-slot="input"], [data-slot="textarea"], [data-slot="select-trigger"], [data-slot="input-group"]):focus-visible {
+    box-shadow: var(--ui-input-shadow), var(--ui-focus-shadow);
+}
+
+:is([data-slot="checkbox"], [data-slot="radio-group-item"], [data-slot="switch"], [data-slot="input-otp-slot"]) {
+    border: 0;
+    outline: none;
+    box-shadow: var(--ui-control-shadow);
     transition: box-shadow var(--ui-transition);
 }
 
-/* Premium Dialog/Popover Overlay */
+:is([data-slot="button"], [data-slot="toggle"], [data-slot="tabs-trigger"], [data-slot="checkbox"], [data-slot="radio-group-item"],
+    [data-slot="switch"], [data-slot$="-trigger"], [data-slot$="-close"]):focus-visible {
+    outline: none;
+    box-shadow: var(--ui-focus-shadow), var(--tw-shadow, 0 0 #0000);
+}
+
 [data-slot="dialog-overlay"],
+[data-slot="alert-dialog-overlay"],
 [data-slot="sheet-overlay"] {
+    -webkit-backdrop-filter: blur(var(--ui-backdrop-blur));
     backdrop-filter: blur(var(--ui-backdrop-blur));
     transition: backdrop-filter var(--ui-transition);
 }
 
-/* Premium Avatar */
 [data-slot="avatar"],
 [data-slot="premium-avatar"] {
     transition: transform var(--ui-transition), box-shadow var(--ui-transition);
@@ -82,14 +199,11 @@
     transform: scale(1.05);
 }
 
-/* Premium Accordion */
 [data-slot="accordion-trigger"] {
     transition: color var(--ui-transition);
 }
 
-/* ============================================================================
- * Premium Scrollbar
- * ============================================================================ */
+/* Premium Scrollbar */
 
 ::-webkit-scrollbar {
     width: 6px;
@@ -110,7 +224,10 @@
 }
 
 /* Firefox */
-* {
-    scrollbar-width: thin;
-    scrollbar-color: hsl(var(--muted-foreground) / 0.3) transparent;
+
+@supports (scrollbar-width: thin) {
+    * {
+        scrollbar-width: thin;
+        scrollbar-color: hsl(var(--muted-foreground) / 0.3) transparent;
+    }
 }

@@ -4,8 +4,7 @@ import type { RepositoryAuthorizationContext } from '@/server/repositories/secur
 import type { Role } from '@/server/types/hr-types';
 import { invalidateOrgCache } from '@/server/lib/cache-tags';
 import { CACHE_SCOPE_ROLES } from '@/server/repositories/cache-scopes';
-
-const RESERVED_ROLE_NAMES = ['owner', 'orgAdmin', 'member'] as const;
+import { isOrgRoleKey } from '@/server/security/access-control';
 
 export interface DeleteRoleInput {
   authorization: RepositoryAuthorizationContext;
@@ -18,8 +17,7 @@ export interface DeleteRoleDependencies {
 
 export interface DeleteRoleResult {
   success: true;
-  roleId: string;
-  roleName: string;
+  role: Role;
 }
 
 export async function deleteRole(
@@ -44,9 +42,9 @@ export async function deleteRole(
     input.authorization.dataClassification,
     input.authorization.dataResidency,
   );
-  return { success: true, roleId: input.roleId, roleName: existing.name };
+  return { success: true, role: existing };
 }
 
 function isReservedRole(role: Role): boolean {
-  return RESERVED_ROLE_NAMES.includes(role.name as (typeof RESERVED_ROLE_NAMES)[number]);
+  return isOrgRoleKey(role.name);
 }

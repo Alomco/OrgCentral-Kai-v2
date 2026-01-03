@@ -8,6 +8,8 @@ import { requireSessionAuthorization } from '@/server/security/authorization';
 import { auth, type AuthSession } from '@/server/lib/auth';
 import type { DataClassificationLevel, DataResidencyZone } from '@/server/types/tenant';
 import { normalizeHeaders, buildMetadata as buildJsonMetadata } from '@/server/use-cases/shared';
+import { loadOrgSettings } from '@/server/services/org/settings/org-settings-store';
+import { enforceOrgSessionSecurity } from './session-security';
 
 export type SessionRepositoryContract = Pick<
     IUserSessionRepository,
@@ -50,6 +52,8 @@ export async function getSessionContext(
     }
 
     const authorization = await requireSessionAuthorization(session, extractAccessRequest(input));
+    const orgSettings = await loadOrgSettings(authorization.orgId);
+    enforceOrgSessionSecurity(session, orgSettings, input.ipAddress);
     await syncUserSessionRecord(deps.userSessionRepository, authorization.orgId, session, {
         ipAddress: input.ipAddress,
         userAgent: input.userAgent,

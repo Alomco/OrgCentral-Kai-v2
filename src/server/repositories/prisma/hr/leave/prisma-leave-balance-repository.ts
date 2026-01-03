@@ -10,7 +10,7 @@ import { EntityNotFoundError } from '@/server/errors';
 
 export class PrismaLeaveBalanceRepository extends BasePrismaRepository implements ILeaveBalanceRepository {
     async createLeaveBalance(tenant: TenantScope, balance: LeaveBalanceCreateInput): Promise<void> {
-        const { orgId, auditSource, auditBatchId } = tenant;
+        const { orgId, auditBatchId } = tenant;
         const { policyId, ...balanceData } = balance;
         const periodStart = new Date(Date.UTC(balanceData.year, 0, 1));
         const periodEnd = new Date(Date.UTC(balanceData.year, 11, 31, 23, 59, 59, 999));
@@ -28,7 +28,7 @@ export class PrismaLeaveBalanceRepository extends BasePrismaRepository implement
                 carriedHours: new Prisma.Decimal(balanceData.pending),
                 dataClassification: balanceData.dataClassification,
                 residencyTag: balanceData.dataResidency,
-                auditSource: balanceData.auditSource ?? auditSource,
+                auditSource: balanceData.auditSource,
                 auditBatchId: balanceData.auditBatchId ?? auditBatchId,
                 metadata: buildLeaveBalanceMetadata(balanceData),
             },
@@ -49,7 +49,7 @@ export class PrismaLeaveBalanceRepository extends BasePrismaRepository implement
     ): Promise<void> {
         const { orgId } = tenant;
         const existing = await this.prisma.leaveBalance.findUnique({ where: { id: balanceId } });
-        if (!existing || existing.orgId !== orgId) {
+        if (existing?.orgId !== orgId) {
             throw new EntityNotFoundError('Leave balance', { id: balanceId, orgId });
         }
 

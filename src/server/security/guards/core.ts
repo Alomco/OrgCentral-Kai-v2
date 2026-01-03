@@ -2,21 +2,15 @@ import { randomUUID } from 'node:crypto';
 
 import type { OrganizationData } from '@/server/types/leave-types';
 import type { DataClassificationLevel, DataResidencyZone, TenantScope } from '@/server/types/tenant';
-import {
-    combineRoleStatements,
-    orgRoles,
-    type OrgPermissionMap,
-    type OrgRoleKey,
-} from '@/server/security/access-control';
+import { isOrgRoleKey, type OrgPermissionMap, type OrgRoleKey } from '@/server/security/access-control';
+import type { RoleScope } from '@prisma/client';
 import {
     authorizeOrgAccessAbacOnly,
     authorizeOrgAccessRbacOnly,
 } from '@/server/security/authorization/engine';
 
 import { getGuardMembershipRepository } from './membership-repository';
-import {
-    resolveGrantedPermissions,
-} from './permission-requirements';
+import { getPermissionResolutionService } from '@/server/services/security/permission-resolution-service.provider';
 
 export interface OrgAccessInput {
     orgId: string;
@@ -38,7 +32,10 @@ export interface OrgAccessContext {
     orgId: string;
     userId: string;
     roleKey: OrgRoleKey | 'custom';
-    /** Effective RBAC permissions for the member (built-in role statements or custom role.permissions). */
+    roleName?: string | null;
+    roleId?: string | null;
+    roleScope?: RoleScope | null;
+    /** Effective RBAC permissions resolved from role definitions + inheritance. */
     permissions: OrgPermissionMap;
     dataResidency: DataResidencyZone;
     dataClassification: DataClassificationLevel;
@@ -87,16 +84,15 @@ export async function assertOrgAccess(input: OrgAccessInput): Promise<OrgAccessC
     const dataResidency = membership.organization.dataResidency;
     const dataClassification = membership.organization.dataClassification;
 
-    const grantedPermissions = resolveGrantedPermissions(
-        knownRole,
-        combineRoleStatements,
-        membership.rolePermissions,
-    );
+    const grantedPermissions = await getPermissionResolutionService().resolveMembershipPermissions(membership);
 
     const context: OrgAccessContext = {
         orgId: input.orgId,
         userId: input.userId,
         roleKey: knownRole,
+        roleName: membership.roleName ?? null,
+        roleId: membership.roleId ?? null,
+        roleScope: membership.roleScope ?? null,
         permissions: grantedPermissions,
         dataResidency,
         dataClassification,
@@ -122,8 +118,7 @@ function resolveRoleKey(roleName?: string | null): OrgRoleKey | 'custom' {
     if (!roleName) {
         return 'custom';
     }
-    const normalized = roleName as OrgRoleKey;
-    return normalized in orgRoles ? normalized : 'custom';
+    return isOrgRoleKey(roleName) ? roleName : 'custom';
 }
 
 function extractAuditBatchId(metadata: unknown): string | undefined {

@@ -98,7 +98,7 @@ export async function emitPolicyUpdateNotifications(
         recipients.add(profile.userId);
     }
 
-    const title = input.event === 'created' ? 'New HR policy published' : 'HR policy updated';
+    const title = input.event === 'created' ? 'New HR policy published' : 'HR policy published';
     const message = `${input.policy.title} (v${input.policy.version}) is now available.`;
 
     for (const userId of recipients) {

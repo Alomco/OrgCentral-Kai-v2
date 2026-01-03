@@ -6,6 +6,7 @@ import type { User } from '@/server/types/hr-types';
 import type { UserData } from '@/server/types/leave-types';
 import type { Membership } from '@/server/types/membership';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
+import type { MembershipStatus } from '@prisma/client';
 
 export interface IUserRepository {
   findById(userId: string): Promise<User | null>;
@@ -56,6 +57,44 @@ export interface IUserRepository {
     context: RepositoryAuthorizationContext,
     organizationId: string
   ): Promise<UserData[]>;
+
+  /**
+   * Count users in an organization.
+   */
+  countUsersInOrganization(
+    context: RepositoryAuthorizationContext,
+    organizationId: string,
+    filters?: UserListFilters
+  ): Promise<number>;
+
+  /**
+   * Get users in an organization with pagination.
+   */
+  getUsersInOrganizationPaged(
+    context: RepositoryAuthorizationContext,
+    organizationId: string,
+    query: UserPagedQuery
+  ): Promise<UserData[]>;
 }
 
 export type IUserMembershipRepository = IUserRepository;
+
+export interface UserListFilters {
+  search?: string;
+  status?: MembershipStatus;
+  role?: string;
+}
+
+export type UserSortKey = 'name' | 'email' | 'status' | 'role';
+export type UserSortDirection = 'asc' | 'desc';
+
+export interface UserSortInput {
+  key: UserSortKey;
+  direction: UserSortDirection;
+}
+
+export interface UserPagedQuery extends UserListFilters {
+  page: number;
+  pageSize: number;
+  sort?: UserSortInput;
+}

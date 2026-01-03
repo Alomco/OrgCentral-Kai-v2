@@ -16,9 +16,6 @@ export default async function OrgProfilePage() {
             <Suspense fallback={<CardSkeleton />}>
                 <ProfileDetails profilePromise={profilePromise} />
             </Suspense>
-            <Suspense fallback={<FormSkeleton />}>
-                <ProfileEditor profilePromise={profilePromise} />
-            </Suspense>
         </div>
     );
 }
@@ -31,7 +28,10 @@ async function ProfileHeader({ profilePromise }: { profilePromise: Promise<OrgPr
                 Organization
             </p>
             <h1 className="text-3xl font-semibold text-[hsl(var(--foreground))]">{organization.name}</h1>
-            <p className="text-sm text-[hsl(var(--muted-foreground))]">Region {organization.regionCode} / Residency {organization.dataResidency} / Classification {organization.dataClassification}</p>
+            <p className="text-sm text-[hsl(var(--muted-foreground))]">
+                Region {organization.regionCode} · Residency {organization.dataResidency} · Classification{' '}
+                {organization.dataClassification}
+            </p>
         </div>
     );
 }
@@ -39,20 +39,18 @@ async function ProfileHeader({ profilePromise }: { profilePromise: Promise<OrgPr
 async function ProfileDetails({ profilePromise }: { profilePromise: Promise<OrgProfile> }) {
     const { organization } = await profilePromise;
     return (
-        <div className="rounded-2xl bg-[hsl(var(--card)/0.6)] p-6 shadow-[0_20px_60px_-40px_hsl(var(--primary)/0.6)] backdrop-blur">
-            <div className="grid gap-4 sm:grid-cols-2">
-                <Detail label="Slug" value={organization.slug} />
-                <Detail label="Primary leave type" value={organization.primaryLeaveType} />
-                <Detail label="Leave year start" value={organization.leaveYearStartDate} />
-                <Detail label="Org ID" value={organization.id} />
+        <div className="space-y-6">
+            <div className="rounded-2xl bg-[hsl(var(--card)/0.6)] p-6 shadow-[0_20px_60px_-40px_hsl(var(--primary)/0.6)] backdrop-blur">
+                <div className="grid gap-4 sm:grid-cols-2">
+                    <Detail label="Slug" value={organization.slug} />
+                    <Detail label="Primary leave type" value={organization.primaryLeaveType} />
+                    <Detail label="Leave year start" value={organization.leaveYearStartDate} />
+                    <Detail label="Org ID" value={organization.id} />
+                </div>
             </div>
+            <OrgProfileForm organization={organization} />
         </div>
     );
-}
-
-async function ProfileEditor({ profilePromise }: { profilePromise: Promise<OrgProfile> }) {
-    const { organization } = await profilePromise;
-    return <OrgProfileForm organization={organization} />;
 }
 
 function Detail({ label, value }: { label: string; value: string }) {
@@ -75,11 +73,10 @@ function ProfileSkeleton() {
 }
 
 function CardSkeleton() {
-    return <div className="h-40 w-full animate-pulse rounded-2xl bg-[hsl(var(--muted))]" />;
+    return (
+        <div className="space-y-4">
+            <div className="h-40 w-full animate-pulse rounded-2xl bg-[hsl(var(--muted))]" />
+            <div className="h-96 w-full animate-pulse rounded-2xl bg-[hsl(var(--muted))]" />
+        </div>
+    );
 }
-
-function FormSkeleton() {
-    return <div className="h-80 w-full animate-pulse rounded-2xl bg-[hsl(var(--muted))]" />;
-}
-
-

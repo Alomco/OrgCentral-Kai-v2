@@ -43,6 +43,12 @@ export default function DevelopmentDashboardPage() {
                             Employee dashboard
                         </Link>
                         <Link
+                            href="/org/profile"
+                            className="inline-flex items-center justify-center rounded-full border border-emerald-800 px-4 py-2 text-sm font-medium text-emerald-100 transition hover:border-emerald-600 hover:text-white"
+                        >
+                            Organization
+                        </Link>
+                        <Link
                             href="/hr/dashboard"
                             className="inline-flex items-center justify-center rounded-full border border-emerald-800 px-4 py-2 text-sm font-medium text-emerald-100 transition hover:border-emerald-600 hover:text-white"
                         >

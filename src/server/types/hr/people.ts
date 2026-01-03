@@ -196,6 +196,12 @@ export interface PeopleListFilters {
   startDate?: string;
   endDate?: string;
   employmentStatus?: EmploymentStatusCode;
+  employmentType?: EmploymentTypeCode;
+  jobTitle?: string;
+  departmentId?: string;
+  managerOrgId?: string;
+  managerUserId?: string;
+  search?: string;
 }
 
 export interface ContractListFilters {

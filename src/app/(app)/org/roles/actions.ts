@@ -2,8 +2,6 @@
 
 import { headers } from 'next/headers';
 import { z } from 'zod';
-
-import { resolveOrgContext } from '@/server/org/org-context';
 import { getSessionContext } from '@/server/use-cases/auth/sessions/get-session';
 import { getRoleService } from '@/server/services/org';
 import type { Role } from '@/server/types/hr-types';
@@ -28,7 +26,6 @@ export async function createRoleAction(
 ): Promise<RoleCreateState> {
     void _previous;
 
-    const orgContext = await resolveOrgContext();
     const headerStore = await headers();
 
     const parsed = createRoleSchema.safeParse({
@@ -44,7 +41,6 @@ export async function createRoleAction(
         {},
         {
             headers: headerStore,
-            orgId: orgContext.orgId,
             requiredPermissions: { organization: ['update'] },
             auditSource: 'ui:org-roles:create',
         },
@@ -79,7 +75,6 @@ export async function updateRoleInlineAction(
     formData: FormData,
 ): Promise<InlineRoleActionState> {
     void _previous;
-    const orgContext = await resolveOrgContext();
     const headerStore = await headers();
 
     const parsed = updateRoleInlineSchema.safeParse({
@@ -97,7 +92,6 @@ export async function updateRoleInlineAction(
         {},
         {
             headers: headerStore,
-            orgId: orgContext.orgId,
             requiredPermissions: { organization: ['update'] },
             auditSource: 'ui:org-roles:update',
         },
@@ -146,7 +140,6 @@ export async function deleteRoleInlineAction(
     formData: FormData,
 ): Promise<InlineRoleActionState> {
     void _previous;
-    const orgContext = await resolveOrgContext();
     const headerStore = await headers();
 
     const parsed = deleteRoleInlineSchema.safeParse({
@@ -161,7 +154,6 @@ export async function deleteRoleInlineAction(
         {},
         {
             headers: headerStore,
-            orgId: orgContext.orgId,
             requiredPermissions: { organization: ['update'] },
             auditSource: 'ui:org-roles:delete',
         },

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 
-import { AbacService, DEFAULT_BOOTSTRAP_POLICIES } from '@/server/security/abac';
+import { AbacService } from '@/server/security/abac';
 import type { IAbacPolicyRepository } from '@/server/repositories/contracts/org/abac/abac-policy-repository-contract';
 import type { AbacPolicy } from '@/server/security/abac-types';
 
@@ -170,27 +170,4 @@ describe('AbacService', () => {
     expect(cannotReadOthers).toBe(false);
   });
 
-  it('falls back to bootstrap policies when no tenant policies are present', async () => {
-    const policies = await service.getEvaluatedPoliciesForOrg(orgId);
-    expect(policies.map((p) => p.id)).toEqual(['default:abac:owner:allow-all', 'default:abac:orgAdmin:allow-all']);
-
-    const adminAllowed = await service.evaluate(
-      orgId,
-      'read',
-      'hr.time-entry',
-      { roles: ['orgAdmin'], userId: 'user-1' },
-      {},
-    );
-    const memberDenied = await service.evaluate(
-      orgId,
-      'read',
-      'hr.time-entry',
-      { roles: ['member'], userId: 'user-2' },
-      {},
-    );
-
-    expect(adminAllowed).toBe(true);
-    expect(memberDenied).toBe(false);
-    expect(DEFAULT_BOOTSTRAP_POLICIES).toHaveLength(2);
-  });
 });

@@ -20,6 +20,9 @@ interface ReminderStats {
     usersTargeted: number;
 }
 
+const NOTIFICATION_TYPE_DOCUMENT_EXPIRY = 'document-expiry' as const;
+const NOTIFICATION_TYPE_COMPLIANCE_REMINDER = 'compliance-reminder' as const;
+
 export class ComplianceReminderProcessor {
     private readonly complianceItemRepository: IComplianceItemRepository;
     private readonly complianceTemplateRepository?: IComplianceTemplateRepository;
@@ -140,6 +143,37 @@ export class ComplianceReminderProcessor {
         referenceDate: Date,
         authorization: RepositoryAuthorizationContext,
     ): Promise<void> {
+        const expiringDocuments = items.filter((item) => item.status === 'COMPLETE');
+        const pendingTasks = items.filter((item) => item.status !== 'COMPLETE');
+
+        if (expiringDocuments.length > 0) {
+            await this.sendNotification(
+                userId,
+                expiringDocuments,
+                referenceDate,
+                authorization,
+                NOTIFICATION_TYPE_DOCUMENT_EXPIRY,
+            );
+        }
+
+        if (pendingTasks.length > 0) {
+            await this.sendNotification(
+                userId,
+                pendingTasks,
+                referenceDate,
+                authorization,
+                NOTIFICATION_TYPE_COMPLIANCE_REMINDER,
+            );
+        }
+    }
+
+    private async sendNotification(
+        userId: string,
+        items: ComplianceLogItem[],
+        referenceDate: Date,
+        authorization: RepositoryAuthorizationContext,
+        type: typeof NOTIFICATION_TYPE_COMPLIANCE_REMINDER | typeof NOTIFICATION_TYPE_DOCUMENT_EXPIRY,
+    ): Promise<void> {
         const sorted = [...items].sort((a, b) => {
             const aTime = a.dueDate ? a.dueDate.getTime() : Number.POSITIVE_INFINITY;
             const bTime = b.dueDate ? b.dueDate.getTime() : Number.POSITIVE_INFINITY;
@@ -148,11 +182,12 @@ export class ComplianceReminderProcessor {
         const nearestDue = sorted[0]?.dueDate ?? referenceDate;
         const daysUntilDue = Math.max(0, differenceInCalendarDays(nearestDue, referenceDate));
         const priority = this.resolvePriority(daysUntilDue);
-        const title =
-            daysUntilDue <= 1
-                ? 'Compliance task due now'
-                : `Compliance tasks due in ${String(daysUntilDue)} days`;
-        const message = this.buildMessage(items.length, nearestDue);
+        
+        const title = type === NOTIFICATION_TYPE_DOCUMENT_EXPIRY
+            ? (daysUntilDue <= 1 ? 'Document expiring now' : `Document expiring in ${String(daysUntilDue)} days`)
+            : (daysUntilDue <= 1 ? 'Compliance task due now' : `Compliance tasks due in ${String(daysUntilDue)} days`);
+            
+        const message = this.buildMessage(items.length, nearestDue, type);
 
         await emitHrNotification(
             { service: this.notificationService },
@@ -162,7 +197,7 @@ export class ComplianceReminderProcessor {
                     userId,
                     title,
                     message,
-                    type: 'compliance-reminder',
+                    type,
                     priority,
                     metadata: {
                         items: items.map((item) => ({
@@ -237,10 +272,20 @@ export class ComplianceReminderProcessor {
         return 'medium' as const;
     }
 
-    private buildMessage(itemCount: number, dueDate: Date): string {
+    private buildMessage(
+        itemCount: number,
+        dueDate: Date,
+        type: typeof NOTIFICATION_TYPE_COMPLIANCE_REMINDER | typeof NOTIFICATION_TYPE_DOCUMENT_EXPIRY,
+    ): string {
         const formatter = new Intl.DateTimeFormat('en-GB', { dateStyle: 'long' });
         const dateLabel = formatter.format(dueDate);
-        const noun = itemCount === 1 ? 'task' : 'tasks';
+        const noun = itemCount === 1 ? 'task' : 'tasks'; // or document/documents
+        
+        if (type === NOTIFICATION_TYPE_DOCUMENT_EXPIRY) {
+            const documentNoun = itemCount === 1 ? 'document is' : 'documents are';
+             return `You have ${String(itemCount)} compliance ${documentNoun} expiring by ${dateLabel}. Please review and renew if necessary.`;
+        }
+        
         return `You have ${String(itemCount)} compliance ${noun} due by ${dateLabel}. Review the compliance workspace to upload the required evidence.`;
     }
 }

@@ -15,6 +15,8 @@ import { complianceItemStatusBadgeVariant } from '../../_components/hr-badge-var
 export interface ComplianceItemsPanelProps {
     authorization: RepositoryAuthorizationContext;
     userId: string;
+    title?: string;
+    description?: string;
 }
 
 function formatDate(value: Date | null | undefined): string {
@@ -24,7 +26,12 @@ function formatDate(value: Date | null | undefined): string {
     return formatHumanDate(value);
 }
 
-export async function ComplianceItemsPanel({ authorization, userId }: ComplianceItemsPanelProps) {
+export async function ComplianceItemsPanel({
+    authorization,
+    userId,
+    title,
+    description,
+}: ComplianceItemsPanelProps) {
     const useCaseDeps: ListComplianceItemsGroupedDependencies = {
         complianceItemRepository: new PrismaComplianceItemRepository(),
         complianceCategoryRepository: new PrismaComplianceCategoryRepository(),
@@ -36,8 +43,8 @@ export async function ComplianceItemsPanel({ authorization, userId }: Compliance
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Your compliance items</CardTitle>
-                <CardDescription>Assigned items and their current status.</CardDescription>
+                <CardTitle>{title ?? 'Your compliance items'}</CardTitle>
+                <CardDescription>{description ?? 'Assigned items and their current status.'}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
                 {totalItems === 0 ? (

@@ -11,6 +11,7 @@ import {
     resolveRoleDashboard,
     resolveRoleRedirectPath,
     ROLE_DASHBOARD_PATHS,
+    sanitizeNextPath,
 } from '@/server/ui/auth/role-redirect';
 
 const DEFAULT_NEXT_PATH = '/dashboard';
@@ -133,13 +134,6 @@ function buildLoginRedirect(request: NextRequest, nextPath: string): NextRespons
 function buildNotInvitedRedirect(request: NextRequest, nextPath: string): NextResponse {
     const url = new URL(`${NOT_INVITED_PATH}?next=${encodeURIComponent(nextPath)}`, request.nextUrl.origin);
     return NextResponse.redirect(url);
-}
-
-function sanitizeNextPath(candidate: string): string | null {
-    if (!candidate.startsWith('/') || candidate.startsWith('//') || candidate.includes('://')) {
-        return null;
-    }
-    return candidate;
 }
 
 async function ensureAuthOrganizationBridge(

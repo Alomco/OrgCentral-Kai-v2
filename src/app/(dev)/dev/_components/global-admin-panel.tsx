@@ -119,6 +119,7 @@ export function GlobalAdminPanel() {
                     <button
                         onClick={loadAdmins}
                         disabled={isPending}
+                        title="Refresh admin list"
                         className="p-1 text-emerald-400 hover:text-emerald-200 disabled:opacity-50"
                     >
                         <RefreshCw className={`h-4 w-4 ${isPending ? 'animate-spin' : ''}`} />

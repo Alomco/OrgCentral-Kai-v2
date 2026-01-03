@@ -6,7 +6,12 @@ import {
   type PrismaClientBase,
   buildMembershipMetadataJson,
 } from '@/server/repositories/prisma/helpers/prisma-utils';
-import type { IUserRepository } from '@/server/repositories/contracts/org/users/user-repository-contract';
+import type {
+  IUserRepository,
+  UserListFilters,
+  UserPagedQuery,
+  UserSortInput,
+} from '@/server/repositories/contracts/org/users/user-repository-contract';
 import { mapPrismaUserToDomain } from '@/server/repositories/mappers/org/users/user-mapper';
 import { mapPrismaMembershipToDomain } from '@/server/repositories/mappers/org/membership/membership-mapper';
 import type { UserData } from '@/server/types/leave-types';
@@ -227,6 +232,61 @@ export class PrismaUserRepository extends OrgScopedPrismaRepository implements I
     }
     return results;
   }
+
+  async countUsersInOrganization(
+    context: RepositoryAuthorizationContext,
+    organizationId: string,
+    filters?: UserListFilters,
+  ): Promise<number> {
+    if (organizationId !== context.orgId) {
+      return 0;
+    }
+    const whereClause = buildUserMembershipWhere(organizationId, filters);
+    return getModelDelegate(this.prisma, 'membership').count({
+      where: whereClause,
+    });
+  }
+
+  async getUsersInOrganizationPaged(
+    context: RepositoryAuthorizationContext,
+    organizationId: string,
+    query: UserPagedQuery,
+  ): Promise<UserData[]> {
+    if (organizationId !== context.orgId) {
+      return [];
+    }
+
+    const safePage = Math.max(1, Math.floor(query.page));
+    const safePageSize = Math.max(1, Math.floor(query.pageSize));
+    const skip = (safePage - 1) * safePageSize;
+
+    const memberships = await getModelDelegate(this.prisma, 'membership').findMany({
+      where: buildUserMembershipWhere(organizationId, query),
+      include: { user: true, role: { select: { name: true } } },
+      orderBy: buildUserMembershipOrderBy(query.sort),
+      skip,
+      take: safePageSize,
+    });
+
+    const results: UserData[] = [];
+    for (const mem of memberships) {
+      const user = mem.user;
+      const domainUser = mapPrismaUserToDomain(user);
+      const domainMembership: Membership = mapPrismaMembershipToDomain(mem as PrismaMembership & { org?: Organization | null });
+      results.push({
+        id: domainUser.id,
+        email: domainUser.email,
+        displayName: domainUser.displayName ?? '',
+        roles: [],
+        memberships: [domainMembership],
+        memberOf: [domainMembership.organizationId],
+        rolesByOrg: { [domainMembership.organizationId]: domainMembership.roles },
+        createdAt: domainUser.createdAt.toISOString(),
+        updatedAt: domainUser.updatedAt.toISOString(),
+      });
+    }
+    return results;
+  }
 }
 
 async function resolvePrimaryRoleId(
@@ -243,4 +303,66 @@ async function resolvePrimaryRoleId(
     select: { id: true },
   });
   return role?.id ?? null;
+}
+
+function buildUserMembershipWhere(
+  organizationId: string,
+  filters?: UserListFilters,
+): Prisma.MembershipWhereInput {
+  const searchValue = filters?.search?.trim() ?? '';
+  const roleValue = filters?.role?.trim() ?? '';
+  const whereClause: Prisma.MembershipWhereInput = {
+    orgId: organizationId,
+  };
+
+  if (filters?.status) {
+    whereClause.status = filters.status;
+  }
+
+  if (roleValue) {
+    whereClause.role = { name: roleValue };
+  }
+
+  if (searchValue) {
+    whereClause.user = {
+      OR: [
+        { email: { contains: searchValue, mode: 'insensitive' } },
+        { displayName: { contains: searchValue, mode: 'insensitive' } },
+      ],
+    };
+  }
+
+  return whereClause;
+}
+
+function buildUserMembershipOrderBy(
+  sort?: UserSortInput,
+): Prisma.MembershipOrderByWithRelationInput[] {
+  const direction = sort?.direction ?? 'asc';
+
+  if (!sort) {
+    return [{ user: { email: 'asc' } }];
+  }
+
+  switch (sort.key) {
+    case 'name':
+      return [
+        { user: { displayName: direction } },
+        { user: { email: 'asc' } },
+      ];
+    case 'email':
+      return [{ user: { email: direction } }];
+    case 'status':
+      return [
+        { status: direction },
+        { user: { email: 'asc' } },
+      ];
+    case 'role':
+      return [
+        { role: { name: direction } },
+        { user: { email: 'asc' } },
+      ];
+    default:
+      return [{ user: { email: 'asc' } }];
+  }
 }

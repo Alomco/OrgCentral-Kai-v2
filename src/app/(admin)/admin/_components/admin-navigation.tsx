@@ -10,6 +10,7 @@ type NavAudience = 'admin' | 'dev';
 
 const ADMIN_NAV_ITEMS = [
     { href: '/admin/dashboard', label: 'Dashboard', audience: 'admin' },
+    { href: '/org/profile', label: 'Organization', audience: 'admin' },
     { href: '/org/members', label: 'Members', audience: 'admin' },
     { href: '/org/roles', label: 'Roles', audience: 'admin' },
     { href: '/hr/dashboard', label: 'HR', audience: 'admin' },

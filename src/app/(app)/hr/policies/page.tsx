@@ -15,11 +15,13 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { listHrPoliciesForUi } from '@/server/use-cases/hr/policies/list-hr-policies.cached';
+import { getSessionContext } from '@/server/use-cases/auth/sessions/get-session';
 import { getSessionContextOrRedirect } from '@/server/ui/auth/session-redirect';
 import type { HRPolicy } from '@/server/types/hr-ops-types';
 
 import { formatHumanDate } from '../_components/format-date';
 import { HrPageHeader } from '../_components/hr-page-header';
+import { PolicyAdminPanel } from './_components/policy-admin-panel';
 
 function sortPoliciesByEffectiveDateDescending(policies: HRPolicy[]): HRPolicy[] {
     return policies.slice().sort((left, right) => right.effectiveDate.getTime() - left.effectiveDate.getTime());
@@ -43,6 +45,20 @@ async function PoliciesPageContent() {
 
     const { policies } = await listHrPoliciesForUi({ authorization });
     const sortedPolicies = sortPoliciesByEffectiveDateDescending(policies);
+
+    const adminAuthorization = await getSessionContext(
+        {},
+        {
+            headers: headerStore,
+            requiredPermissions: { organization: ['update'] },
+            auditSource: 'ui:hr:policies:admin',
+            action: 'read',
+            resourceType: 'hr.policy',
+            resourceAttributes: { view: 'admin' },
+        },
+    )
+        .then((result) => result.authorization)
+        .catch(() => null);
 
     return (
         <div className="space-y-6">
@@ -122,6 +138,10 @@ async function PoliciesPageContent() {
                     )}
                 </CardContent>
             </Card>
+
+            {adminAuthorization ? (
+                <PolicyAdminPanel authorization={adminAuthorization} />
+            ) : null}
         </div>
     );
 }

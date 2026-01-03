@@ -8,3 +8,5 @@ export { getUserService, type UserServiceContract, type UserServiceProviderOptio
 
 export { BrandingService, type BrandingServiceDependencies } from './branding/branding-service';
 export { getBrandingService, type BrandingServiceContract, type BrandingServiceProviderOptions } from './branding/branding-service.provider';
+
+export { getPermissionResourceService } from './permissions/permission-resource-service.provider';

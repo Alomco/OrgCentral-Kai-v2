@@ -54,6 +54,9 @@ export class PrismaRoleRepository extends OrgScopedPrismaRepository implements I
       name: role.name,
       description: role.description ?? null,
       permissions: role.permissions as Prisma.InputJsonValue,
+      inheritsRoleIds: role.inheritsRoleIds ?? [],
+      isSystem: role.isSystem ?? false,
+      isDefault: role.isDefault ?? false,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -66,6 +69,16 @@ export class PrismaRoleRepository extends OrgScopedPrismaRepository implements I
     this.assertOrgRecord(await this.prisma.role.findUnique({ where: { id: roleId } }), tenantId);
 
     await this.prisma.role.update({ where: { id: roleId }, data: updates as Prisma.RoleUncheckedUpdateInput });
+  }
+
+  async getRolesByIds(tenantId: string, roleIds: string[]): Promise<Role[]> {
+    if (!roleIds.length) {
+      return [];
+    }
+    const records = await this.prisma.role.findMany({
+      where: { orgId: tenantId, id: { in: roleIds } },
+    });
+    return records.map((record) => mapPrismaRoleToDomain(record));
   }
 
   async deleteRole(tenantId: string, roleId: string): Promise<void> {

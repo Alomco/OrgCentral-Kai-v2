@@ -37,7 +37,7 @@ interface NavItemRenderProps extends SharedNavState {
 }
 
 const activeIconTileClassName =
-    'bg-sidebar-primary/20 text-sidebar-primary-foreground ring-1 ring-primary/25'
+    'bg-sidebar-primary/20 text-sidebar-primary-foreground shadow-[0_0_0_1px_hsl(var(--primary)/0.35),0_10px_22px_-16px_hsl(var(--primary)/0.45)]'
 
 const inactiveIconTileClassName =
     'bg-sidebar-accent/30 text-sidebar-foreground/70 group-hover/navitem:bg-sidebar-accent/45 group-hover/navitem:text-sidebar-foreground'
@@ -57,7 +57,7 @@ function CollapsedAccordionNavItem({ item, isActive }: NavItemRenderProps) {
                         'group-data-[collapsible=icon]:justify-center',
                         'hover:scale-105',
                         isActive &&
-                        'bg-sidebar-accent/45 ring-1 ring-sidebar-border/50',
+                        'bg-sidebar-accent/50 shadow-[0_0_0_1px_hsl(var(--sidebar-border)/0.6),0_12px_24px_-20px_hsl(var(--primary)/0.35)]',
                         !isActive &&
                         'hover:bg-sidebar-accent/35'
                     )}
@@ -114,7 +114,7 @@ function ExpandedAccordionNavItem({ item, isActive, pathname, open }: NavItemRen
                     'group/nav',
                     '[&[data-state=open]>svg]:rotate-180 [&>svg]:transition-transform [&>svg]:duration-300',
                     isActive &&
-                    'bg-sidebar-accent/45 ring-1 ring-sidebar-border/50'
+                    'relative bg-sidebar-accent/50 shadow-[0_0_0_1px_hsl(var(--sidebar-border)/0.55),0_12px_24px_-20px_hsl(var(--primary)/0.35)] before:absolute before:inset-y-2 before:left-2 before:w-1 before:rounded-full before:bg-linear-to-b before:from-primary/80 before:via-primary/30 before:to-transparent before:shadow-[0_0_10px_hsl(var(--primary)/0.4)]'
                 )}
             >
                 <div className="flex flex-1 items-center gap-3">
@@ -149,10 +149,9 @@ function ExpandedAccordionNavItem({ item, isActive, pathname, open }: NavItemRen
             >
                 <SidebarMenu
                     className={cn(
-                        'space-y-1.5 ml-3 pl-4 border-l-2 border-gradient-to-b',
-                        'border-sidebar-border/50 hover:border-primary/30 transition-colors duration-300',
-                        'relative before:absolute before:inset-y-0 before:left-0 before:w-px',
-                        'before:bg-linear-to-b before:from-primary/25 before:via-transparent before:to-transparent'
+                        'space-y-1.5 ml-3 pl-4 relative',
+                        'before:absolute before:inset-y-1 before:left-1 before:w-px',
+                        'before:bg-linear-to-b before:from-primary/35 before:via-sidebar-border/30 before:to-transparent'
                     )}
                 >
                     {item.subItems?.map((subItem, index) => (

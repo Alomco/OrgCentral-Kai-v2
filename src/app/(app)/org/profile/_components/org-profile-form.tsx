@@ -87,7 +87,7 @@ export function OrgProfileForm({ organization }: { organization: OrganizationDat
 
     return (
         <form action={formAction} className={panelVariants()}>
-            <fieldset disabled={pending} aria-busy={pending} className="grid gap-6">
+            <fieldset disabled={pending} className="grid gap-6">
                 <div>
                     <p className="text-sm font-semibold text-[hsl(var(--foreground))]">Profile settings</p>
                     <p className="text-xs text-[hsl(var(--muted-foreground))]">

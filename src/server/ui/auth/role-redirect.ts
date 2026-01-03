@@ -62,6 +62,18 @@ export function resolveRoleRedirectPath(role: RoleDashboardKey, nextPath: string
     return ROLE_DASHBOARD_PATHS[role];
 }
 
+export function sanitizeNextPath(candidate: string | null | undefined): string | null {
+    if (!candidate) {
+        return null;
+    }
+
+    if (!candidate.startsWith('/') || candidate.startsWith('//') || candidate.includes('://')) {
+        return null;
+    }
+
+    return candidate;
+}
+
 export function isRoleNextPathAllowed(role: RoleDashboardKey, nextPath: string): boolean {
     const normalizedPath = normalizePathname(nextPath);
 

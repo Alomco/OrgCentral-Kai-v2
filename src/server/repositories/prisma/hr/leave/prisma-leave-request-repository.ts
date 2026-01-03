@@ -44,7 +44,7 @@ export class PrismaLeaveRequestRepository extends BasePrismaRepository implement
                 reason: request.reason ?? null,
                 dataClassification: request.dataClassification,
                 residencyTag: request.dataResidency,
-                auditSource: request.auditSource ?? tenant.auditSource,
+                auditSource: request.auditSource,
                 auditBatchId: request.auditBatchId ?? tenant.auditBatchId,
                 metadata,
                 submittedAt: new Date(),
@@ -69,7 +69,7 @@ export class PrismaLeaveRequestRepository extends BasePrismaRepository implement
     ): Promise<void> {
         const { orgId } = tenant;
         const existing = await this.prisma.leaveRequest.findUnique({ where: { id: requestId } });
-        if (!existing || existing.orgId !== orgId) {
+        if (existing?.orgId !== orgId) {
             throw new EntityNotFoundError('Leave request', { requestId, orgId });
         }
 

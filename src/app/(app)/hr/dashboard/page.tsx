@@ -120,7 +120,11 @@ async function PoliciesSummaryCard({ authorization }: { authorization: Dashboard
                             <Link
                                 key={policy.id}
                                 href={`/hr/policies/${policy.id}`}
-                                className="flex items-center justify-between rounded-lg border px-3 py-2 text-sm transition-colors hover:bg-muted"
+                                className={
+                                    'flex items-center justify-between rounded-lg border border-border/50 bg-background/20 px-3 py-2 text-sm transition-colors ' +
+                                    'hover:bg-muted/40 hover:border-border ' +
+                                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background'
+                                }
                             >
                                 <span className="font-medium truncate">{policy.title}</span>
                                 <span className="text-xs text-muted-foreground shrink-0 ml-2">
@@ -180,9 +184,13 @@ function QuickActionsCard({
                         <Link
                             key={action.href}
                             href={action.href}
-                            className="flex items-start gap-3 rounded-lg border p-3 transition-colors hover:bg-muted"
+                            className={
+                                'group flex items-start gap-3 rounded-lg border border-border/50 bg-background/20 p-3 transition-colors ' +
+                                'hover:bg-muted/40 hover:border-border ' +
+                                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background'
+                            }
                         >
-                            <action.icon className="h-5 w-5 shrink-0 text-muted-foreground" />
+                            <action.icon className="h-5 w-5 shrink-0 text-primary/80 transition-colors group-hover:text-primary" />
                             <div>
                                 <div className="font-medium text-sm">{action.label}</div>
                                 <div className="text-xs text-muted-foreground">{action.description}</div>
@@ -215,6 +223,7 @@ async function DashboardContent() {
 
     return (
         <div className="space-y-6">
+            <h1 className="sr-only">HR Dashboard</h1>
             <Breadcrumb>
                 <BreadcrumbList>
                     <BreadcrumbItem>

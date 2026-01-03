@@ -1,5 +1,4 @@
 import { ValidationError } from '@/server/errors';
-import { AuthorizationError } from '@/server/errors';
 import { EntityNotFoundError } from '@/server/errors';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
 import type { AcceptInvitationResult } from '@/server/use-cases/auth/accept-invitation';
@@ -15,12 +14,15 @@ import { updateMembershipStatus as updateMembershipStatusUseCase } from '@/serve
 import { normalizeRoles } from '@/server/use-cases/shared';
 import { buildAuthorizationContext, invalidateIdentityCache } from './membership-service.helpers';
 import type { BillingServiceContract } from '@/server/services/billing/billing-service.provider';
+import {
+    enforceInviteRolePolicy,
+    ORG_MEMBERSHIP_RESOURCE_TYPE,
+    recordMembershipAuditEvent,
+} from './membership-service.policy';
 
 export type MembershipServiceDependencies = AcceptInvitationDependencies & {
     billingService?: BillingServiceContract;
 };
-
-const ORG_MEMBERSHIP_RESOURCE_TYPE = 'org.membership';
 
 export interface AcceptInvitationServiceInput {
     token: string;
@@ -103,6 +105,10 @@ export class MembershipService extends AbstractOrgService {
                 },
             );
             await invalidateIdentityCache(input.authorization);
+            await recordMembershipAuditEvent(input.authorization, input.targetUserId, {
+                targetUserId: input.targetUserId,
+                roles: membership.roles,
+            }, 'roles.updated');
             return membership;
         });
     }
@@ -224,37 +230,10 @@ export class MembershipService extends AbstractOrgService {
             );
             await invalidateIdentityCache(authorization);
             await this.dependencies.billingService?.syncSeats({ authorization });
+            await recordMembershipAuditEvent(authorization, targetUserId, {
+                targetUserId,
+                status,
+            }, 'status.updated');
         });
     }
-}
-
-function enforceInviteRolePolicy(
-    authorization: RepositoryAuthorizationContext,
-    roles: string[],
-): void {
-    const primaryRole = roles[0] ?? 'member';
-    const roleKey = authorization.roleKey;
-
-    if (roleKey === 'globalAdmin' || roleKey === 'owner') {
-        if (primaryRole !== 'orgAdmin') {
-            throw new AuthorizationError('Global admins may only invite organization admins.');
-        }
-        return;
-    }
-
-    if (roleKey === 'orgAdmin') {
-        if (primaryRole !== 'hrAdmin') {
-            throw new AuthorizationError('Organization admins may only invite HR admins.');
-        }
-        return;
-    }
-
-    if (roleKey === 'hrAdmin') {
-        if (primaryRole !== 'member') {
-            throw new AuthorizationError('HR admins may only invite members.');
-        }
-        return;
-    }
-
-    throw new AuthorizationError('You are not permitted to invite users with this role.');
 }

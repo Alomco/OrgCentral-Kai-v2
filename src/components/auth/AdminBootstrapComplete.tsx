@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Loader2, ShieldAlert, ShieldCheck } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -15,44 +15,46 @@ interface BootstrapState {
     message?: string;
 }
 
-function extractErrorMessage(payload: unknown): string | null {
-    if (!payload || typeof payload !== 'object') {
+interface BootstrapErrorPayload {
+    readonly error?: {
+        readonly message?: string;
+    };
+}
+
+function isBootstrapErrorPayload(value: object): value is BootstrapErrorPayload {
+    return 'error' in value;
+}
+
+function extractErrorMessage(payload: object | null): string | null {
+    if (!payload) {
         return null;
     }
 
-    const record = payload as Record<string, unknown>;
-    const error = record.error;
-    if (!error || typeof error !== 'object') {
+    if (!isBootstrapErrorPayload(payload) || !payload.error || typeof payload.error !== 'object') {
         return null;
     }
 
-    const message = (error as Record<string, unknown>).message;
+    const message = payload.error.message;
     return typeof message === 'string' && message.trim().length > 0 ? message : null;
 }
 
 export function AdminBootstrapComplete() {
     const router = useRouter();
-
-    const token = useMemo(() => {
-        if (typeof window === 'undefined') {
-            return null;
-        }
-        return window.sessionStorage.getItem(ADMIN_BOOTSTRAP_SECRET_STORAGE_KEY);
-    }, []);
-
-    const [state, setState] = useState<BootstrapState>(() => {
-        if (!token) {
-            return {
-                status: 'error',
-                message: 'Missing bootstrap secret. Start again and enter the secret before continuing.',
-            };
-        }
-
-        return { status: 'loading' };
-    });
+    const [state, setState] = useState<BootstrapState>({ status: 'loading' });
 
     useEffect(() => {
-        if (!token) {
+        // Read token after mount to avoid SSR/CSR markup drift.
+        const storedToken = typeof window === 'undefined'
+            ? null
+            : window.sessionStorage.getItem(ADMIN_BOOTSTRAP_SECRET_STORAGE_KEY);
+
+        if (!storedToken) {
+            queueMicrotask(() => {
+                setState({
+                    status: 'error',
+                    message: 'Missing bootstrap secret. Start again and enter the secret before continuing.',
+                });
+            });
             return;
         }
 
@@ -63,12 +65,12 @@ export function AdminBootstrapComplete() {
                 const response = await fetch('/api/auth/admin-bootstrap', {
                     method: 'POST',
                     headers: { 'content-type': 'application/json' },
-                    body: JSON.stringify({ token }),
+                    body: JSON.stringify({ token: storedToken }),
                     signal: controller.signal,
                 });
 
                 if (!response.ok) {
-                    const errorPayload: unknown = await response.json().catch(() => null);
+                    const errorPayload = await response.json().catch(() => null) as object | null;
                     const statusCode = String(response.status);
                     const message =
                         extractErrorMessage(errorPayload) ??
@@ -88,12 +90,13 @@ export function AdminBootstrapComplete() {
                 setState({ status: 'error', message });
             }
         };
+
         void run().catch(() => {
             setState({ status: 'error', message: 'Unexpected bootstrap error.' });
         });
 
         return () => controller.abort();
-    }, [router, token]);
+    }, [router]);
 
     if (state.status === 'error') {
         return (

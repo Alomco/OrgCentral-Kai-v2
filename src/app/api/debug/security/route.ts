@@ -4,7 +4,7 @@ import type { AbacPolicy } from '@/server/security/abac-types';
 import { getTenantAbacPolicies } from '@/server/security/abac';
 import { createAuth } from '@/server/lib/auth';
 import { prisma } from '@/server/lib/prisma';
-import { orgRoles, type OrgRoleKey } from '@/server/security/access-control';
+import { isOrgRoleKey } from '@/server/security/access-control';
 import { getSessionContext } from '@/server/use-cases/auth/sessions/get-session';
 
 // Note: Removed 'export const dynamic = "force-dynamic"' as it's incompatible with nextConfig.cacheComponents
@@ -80,10 +80,6 @@ function safeIsoString(value: unknown): string | undefined {
     return undefined;
 }
 
-function isOrgRoleKey(value: string): value is OrgRoleKey {
-    return value in orgRoles;
-}
-
 async function listSessionOrganizations(userId: string): Promise<DebugOrgSummary[]> {
     const memberships = await prisma.authOrgMember.findMany({
         where: { userId },
@@ -152,7 +148,7 @@ export async function GET(request: NextRequest): Promise<Response> {
 
         const roleStatements =
             typeof authorization.roleKey === 'string' && isOrgRoleKey(authorization.roleKey)
-                ? (orgRoles[authorization.roleKey].statements as Record<string, string[]>)
+                ? (authorization.permissions as Record<string, string[]>)
                 : undefined;
 
         return noStoreJson<DebugSecurityResponse>({

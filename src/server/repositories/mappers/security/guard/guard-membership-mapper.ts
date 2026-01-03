@@ -12,7 +12,7 @@ export const guardMembershipInclude = {
             dataClassification: true,
         },
     },
-    role: { select: { name: true, permissions: true } },
+    role: { select: { name: true, scope: true, permissions: true } },
 } satisfies Prisma.MembershipInclude;
 
 export type GuardMembershipWithOrg = Prisma.MembershipGetPayload<{
@@ -58,7 +58,9 @@ export function mapPrismaGuardMembershipToRecord(record: GuardMembershipWithOrg)
         orgId: record.orgId,
         userId: record.userId,
         status: record.status,
+        roleId: record.roleId ?? null,
         roleName: record.role ? record.role.name : null,
+        roleScope: record.role ? record.role.scope : null,
         rolePermissions,
         departmentId: record.departmentId ?? null,
         metadata,

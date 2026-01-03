@@ -1,7 +1,17 @@
 import type { EmployeeProfile as PrismaEmployeeProfile, Prisma } from '@prisma/client';
 import { BasePrismaRepository, type BasePrismaRepositoryOptions } from '@/server/repositories/prisma/base-prisma-repository';
-import type { IEmployeeProfileRepository } from '@/server/repositories/contracts/hr/people/employee-profile-repository-contract';
-import { mapPrismaEmployeeProfileToDomain, buildPrismaCreateFromDomain, buildPrismaUpdateFromDomain, buildPrismaWhereFromFilters, normalizeEmployeeProfileMetadata } from '@/server/repositories/mappers/hr/people/employee-profile-mapper';
+import type {
+  EmployeeProfilePagedQuery,
+  IEmployeeProfileRepository,
+} from '@/server/repositories/contracts/hr/people/employee-profile-repository-contract';
+import {
+  mapPrismaEmployeeProfileToDomain,
+  buildPrismaCreateFromDomain,
+  buildPrismaUpdateFromDomain,
+  buildPrismaWhereFromFilters,
+  buildPrismaOrderByFromSort,
+  normalizeEmployeeProfileMetadata,
+} from '@/server/repositories/mappers/hr/people/employee-profile-mapper';
 import type { EmployeeProfileDTO, PeopleListFilters } from '@/server/types/hr/people';
 import type { EmployeeProfileFilters } from '@/server/repositories/mappers/hr/people/employee-profile-mapper';
 import { EntityNotFoundError } from '@/server/errors';
@@ -71,6 +81,21 @@ export class PrismaEmployeeProfileRepository extends BasePrismaRepository implem
 
   async getEmployeeProfilesByOrganization(tenantId: string, filters?: PeopleListFilters): Promise<EmployeeProfileDTO[]> {
     const recs = await this.findAll({ orgId: tenantId, ...(filters ?? {}) });
+    return recs.map((r) => mapPrismaEmployeeProfileToDomain(r));
+  }
+
+  async getEmployeeProfilesByOrganizationPaged(
+    tenantId: string,
+    query: EmployeeProfilePagedQuery
+  ): Promise<EmployeeProfileDTO[]> {
+    const safePage = Math.max(1, Math.floor(query.page));
+    const safePageSize = Math.max(1, Math.floor(query.pageSize));
+    const recs = await this.prisma.employeeProfile.findMany({
+      where: buildPrismaWhereFromFilters({ orgId: tenantId, ...(query.filters ?? {}) }),
+      orderBy: buildPrismaOrderByFromSort(query.sort),
+      skip: (safePage - 1) * safePageSize,
+      take: safePageSize,
+    });
     return recs.map((r) => mapPrismaEmployeeProfileToDomain(r));
   }
 

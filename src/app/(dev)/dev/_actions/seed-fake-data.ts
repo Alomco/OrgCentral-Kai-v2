@@ -11,6 +11,9 @@ import {
     LeaveAccrualFrequency,
 } from '@prisma/client';
 import { prisma } from '@/server/lib/prisma';
+import { invalidateOrgCache } from '@/server/lib/cache-tags';
+import { CACHE_SCOPE_ABAC_POLICIES } from '@/server/repositories/cache-scopes';
+import { PrismaAbacPolicyRepository } from '@/server/repositories/prisma/org/abac/prisma-abac-policy-repository';
 import { revalidatePath } from 'next/cache';
 import { DEFAULT_BOOTSTRAP_POLICIES } from '@/server/security/abac-constants';
 
@@ -349,27 +352,20 @@ export async function getSeededDataStats(): Promise<{
 export async function seedAbacPolicies(): Promise<SeedResult> {
     try {
         const org = await getDefaultOrg();
-
-        // Get current settings
-        const currentSettings = org.settings as Record<string, unknown> | null;
-        const updatedSettings = {
-            ...(currentSettings ?? {}),
-            abacPolicies: DEFAULT_BOOTSTRAP_POLICIES,
-        };
-
-        // Update organization with ABAC policies
-        await prisma.organization.update({
-            where: { id: org.id },
-            data: {
-                settings: updatedSettings as unknown as Prisma.InputJsonValue,
-            },
-        });
+        const repository = new PrismaAbacPolicyRepository();
+        await repository.setPoliciesForOrg(org.id, DEFAULT_BOOTSTRAP_POLICIES);
+        await invalidateOrgCache(
+            org.id,
+            CACHE_SCOPE_ABAC_POLICIES,
+            org.dataClassification,
+            org.dataResidency,
+        );
 
         revalidatePath('/dev');
         revalidatePath('/hr');
         return {
             success: true,
-            message: `Seeded ${String(DEFAULT_BOOTSTRAP_POLICIES.length)} ABAC policies to org settings`,
+            message: `Seeded ${String(DEFAULT_BOOTSTRAP_POLICIES.length)} ABAC policies`,
             count: DEFAULT_BOOTSTRAP_POLICIES.length,
         };
     } catch (error) {
@@ -384,10 +380,9 @@ export async function getAbacPolicyStatus(): Promise<{
 }> {
     try {
         const org = await getDefaultOrg();
-        const settings = org.settings as Record<string, unknown> | null;
-        const abacPolicies = settings?.abacPolicies;
-        const policyArray = Array.isArray(abacPolicies) ? abacPolicies : [];
-        return { hasAbacPolicies: policyArray.length > 0, policyCount: policyArray.length };
+        const repository = new PrismaAbacPolicyRepository();
+        const policies = await repository.getPoliciesForOrg(org.id);
+        return { hasAbacPolicies: policies.length > 0, policyCount: policies.length };
     } catch {
         return { hasAbacPolicies: false, policyCount: 0 };
     }

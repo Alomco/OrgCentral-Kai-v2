@@ -10,17 +10,8 @@ import {
     DataClassificationLevel,
 } from '@prisma/client';
 import { prisma } from '@/server/lib/prisma';
+import { resolveRoleTemplate } from '@/server/security/role-templates';
 import { revalidatePath } from 'next/cache';
-
-const OWNER_ROLE_PERMISSIONS: Record<string, string[]> = {
-    organization: ['create', 'read', 'update', 'delete', 'governance'],
-    member: ['read', 'invite', 'update', 'remove'],
-    invitation: ['create', 'cancel'],
-    audit: ['read', 'write'],
-    cache: ['tag', 'invalidate'],
-    residency: ['enforce'],
-    employeeProfile: ['create', 'read', 'update', 'delete'],
-};
 
 // Default admin emails
 const PLATFORM_ORG_SLUG = 'orgcentral-platform';
@@ -94,18 +85,19 @@ export async function createGlobalAdmin(email: string, displayName?: string): Pr
         }) as { id: string };
 
         // Ensure owner role exists (uses 'owner' to match OrgRoleKey for ABAC)
+        const template = resolveRoleTemplate('owner');
         const role = await prisma.role.upsert({
             where: { orgId_name: { orgId: organization.id, name: 'owner' } },
             update: {
                 scope: RoleScope.GLOBAL,
-                permissions: OWNER_ROLE_PERMISSIONS as Prisma.InputJsonValue,
+                permissions: template.permissions as Prisma.InputJsonValue,
             },
             create: {
                 orgId: organization.id,
                 name: 'owner',
                 description: 'Platform owner with full administrative access',
                 scope: RoleScope.GLOBAL,
-                permissions: OWNER_ROLE_PERMISSIONS as Prisma.InputJsonValue,
+                permissions: template.permissions as Prisma.InputJsonValue,
             },
         });
 

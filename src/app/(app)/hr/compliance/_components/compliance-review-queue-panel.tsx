@@ -117,10 +117,10 @@ export async function ComplianceReviewQueuePanel({ authorization }: ComplianceRe
                                         </TableCell>
                                         <TableCell>{formatDate(item.dueDate)}</TableCell>
                                         <TableCell className="text-muted-foreground">{formatDate(item.updatedAt)}</TableCell>
-                                        <TableCell className="max-w-[22rem] truncate" title={item.notes ?? undefined}>
+                                        <TableCell className="max-w-88 truncate" title={item.notes ?? undefined}>
                                             {item.notes ?? '—'}
                                         </TableCell>
-                                        <TableCell className="max-w-[22rem] truncate">
+                                        <TableCell className="max-w-88 truncate">
                                             {renderAttachments(item.attachments)}
                                         </TableCell>
                                         <TableCell className="text-right">

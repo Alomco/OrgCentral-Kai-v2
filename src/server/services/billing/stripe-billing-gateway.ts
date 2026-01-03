@@ -4,39 +4,41 @@ import type {
   BillingCheckoutSessionInput,
   BillingCheckoutSessionResult,
   BillingGateway,
+  BillingInvoicePreview,
+  BillingPaymentMethodType,
   BillingPortalSessionInput,
   BillingPortalSessionResult,
   BillingProrationBehavior,
-  BillingSubscriptionSnapshot,
+  BillingSetupIntentInput,
+  BillingSetupIntentResult,
+  BillingSubscriptionUpdateInput,
   BillingWebhookEvent,
+  PaymentMethodSummary,
 } from '@/server/services/billing/billing-gateway';
 import type { BillingConfig } from '@/server/services/billing/billing-config';
-import type { BillingSubscriptionStatus } from '@/server/types/billing-types';
+import { resolveBillingPriceIds } from '@/server/services/billing/billing-preferences';
+import {
+  buildSupportedPaymentMethodTypes,
+  toInvoicePreview,
+  toPaymentMethodSummary,
+} from '@/server/services/billing/stripe-billing-gateway.mappers';
+import { parseStripeWebhookEvent } from '@/server/services/billing/stripe-billing-gateway.webhooks';
 
 const DEFAULT_STRIPE_API_VERSION: Stripe.LatestApiVersion = '2024-04-10';
-
-const STATUS_MAP: Record<Stripe.Subscription.Status, BillingSubscriptionStatus> = {
-  incomplete: 'INCOMPLETE',
-  incomplete_expired: 'INCOMPLETE_EXPIRED',
-  trialing: 'TRIALING',
-  active: 'ACTIVE',
-  past_due: 'PAST_DUE',
-  canceled: 'CANCELED',
-  unpaid: 'UNPAID',
-  paused: 'PAUSED',
-};
 
 export class StripeBillingGateway implements BillingGateway {
   private readonly stripe: Stripe;
   private readonly webhookSecret: string;
-  private readonly priceId: string;
+  private readonly priceIds: Set<string>;
+  private readonly supportedPaymentMethodTypes: BillingPaymentMethodType[];
 
   constructor(config: BillingConfig) {
     this.stripe = new Stripe(config.stripeSecretKey, {
       apiVersion: (config.stripeApiVersion ?? DEFAULT_STRIPE_API_VERSION) as Stripe.LatestApiVersion,
     });
     this.webhookSecret = config.stripeWebhookSecret;
-    this.priceId = config.stripePriceId;
+    this.priceIds = new Set(resolveBillingPriceIds(config));
+    this.supportedPaymentMethodTypes = buildSupportedPaymentMethodTypes(config);
   }
 
   async createCheckoutSession(
@@ -83,6 +85,69 @@ export class StripeBillingGateway implements BillingGateway {
     return { url: session.url };
   }
 
+  async createSetupIntent(
+    input: BillingSetupIntentInput,
+  ): Promise<BillingSetupIntentResult> {
+    const intent = await this.stripe.setupIntents.create({
+      customer: input.customerId,
+      payment_method_types: input.paymentMethodTypes,
+    });
+
+    if (!intent.client_secret) {
+      throw new Error('Stripe setup intent missing client secret.');
+    }
+
+    return { clientSecret: intent.client_secret };
+  }
+
+  async listPaymentMethods(customerId: string): Promise<PaymentMethodSummary[]> {
+    const customer = await this.stripe.customers.retrieve(customerId);
+    if (customer.deleted) {
+      return [];
+    }
+    const defaultPaymentMethodId =
+      typeof customer.invoice_settings.default_payment_method === 'string'
+        ? customer.invoice_settings.default_payment_method
+        : customer.invoice_settings.default_payment_method?.id;
+
+    const results = await Promise.allSettled(
+      this.supportedPaymentMethodTypes.map((type) =>
+        this.stripe.paymentMethods.list({ customer: customerId, type }),
+      ),
+    );
+
+    const methods = results.flatMap((result) =>
+      result.status === 'fulfilled' ? result.value.data : [],
+    );
+
+    return methods.map((method) => toPaymentMethodSummary(method, defaultPaymentMethodId));
+  }
+
+  async detachPaymentMethod(paymentMethodId: string): Promise<void> {
+    await this.stripe.paymentMethods.detach(paymentMethodId);
+  }
+
+  async setDefaultPaymentMethod(input: {
+    customerId: string;
+    paymentMethodId: string;
+  }): Promise<void> {
+    await this.stripe.customers.update(input.customerId, {
+      invoice_settings: { default_payment_method: input.paymentMethodId },
+    });
+  }
+
+  async previewUpcomingInvoice(customerId: string): Promise<BillingInvoicePreview | null> {
+    try {
+      const invoice = await this.stripe.invoices.retrieveUpcoming({ customer: customerId });
+      return toInvoicePreview(invoice, this.priceIds);
+    } catch (error) {
+      if (error instanceof Stripe.errors.StripeError && error.code === 'invoice_upcoming_none') {
+        return null;
+      }
+      throw error;
+    }
+  }
+
   async updateSubscriptionSeats(input: {
     subscriptionItemId: string;
     seatCount: number;
@@ -99,75 +164,37 @@ export class StripeBillingGateway implements BillingGateway {
     );
   }
 
-  parseWebhookEvent(input: { signature: string; payload: string }): BillingWebhookEvent {
-    const event = this.stripe.webhooks.constructEvent(
-      input.payload,
-      input.signature,
-      this.webhookSecret,
+  async updateSubscription(input: BillingSubscriptionUpdateInput): Promise<void> {
+    const update: Stripe.SubscriptionUpdateParams = {};
+    if (input.cancelAtPeriodEnd !== undefined) {
+      update.cancel_at_period_end = input.cancelAtPeriodEnd;
+    }
+    if (input.priceId) {
+      if (!input.subscriptionItemId) {
+        throw new Error('Subscription item id is required to update pricing.');
+      }
+      update.items = [{ id: input.subscriptionItemId, price: input.priceId }];
+      update.proration_behavior = input.prorationBehavior ?? 'create_prorations';
+    }
+
+    if (Object.keys(update).length === 0) {
+      return;
+    }
+
+    await this.stripe.subscriptions.update(
+      input.subscriptionId,
+      update,
+      input.idempotencyKey ? { idempotencyKey: input.idempotencyKey } : undefined,
     );
-
-    if (event.type === 'checkout.session.completed') {
-      const session = event.data.object;
-      const metadata = session.metadata;
-      const clientReferenceId = session.client_reference_id;
-      return {
-        type: 'checkout.completed',
-        session: {
-          orgId: getMetadataValue(metadata, 'orgId') ?? clientReferenceId,
-          userId: getMetadataValue(metadata, 'userId'),
-        },
-      };
-    }
-
-    if (event.type.startsWith('customer.subscription.')) {
-      const subscription = event.data.object as Stripe.Subscription;
-      const snapshot = this.toSubscriptionSnapshot(subscription);
-      const createdAt = new Date(event.created * 1000);
-
-      if (event.type === 'customer.subscription.created') {
-        return { type: 'subscription.created', subscription: snapshot, stripeEventCreatedAt: createdAt };
-      }
-      if (event.type === 'customer.subscription.updated') {
-        return { type: 'subscription.updated', subscription: snapshot, stripeEventCreatedAt: createdAt };
-      }
-      if (event.type === 'customer.subscription.deleted') {
-        return { type: 'subscription.deleted', subscription: snapshot, stripeEventCreatedAt: createdAt };
-      }
-    }
-
-    return { type: 'ignored', eventType: event.type };
   }
-  private toSubscriptionSnapshot(subscription: Stripe.Subscription): BillingSubscriptionSnapshot {
-    const item = subscription.items.data.find((entry) => entry.price.id === this.priceId);
-    if (!item) {
-      throw new Error('Stripe subscription is missing the expected price item.');
-    }
 
-    const customerId =
-      typeof subscription.customer === 'string'
-        ? subscription.customer
-        : subscription.customer.id;
-    const metadata = subscription.metadata;
-
-    return {
-      orgId: getMetadataValue(metadata, 'orgId'),
-      userId: getMetadataValue(metadata, 'userId'),
-      stripeCustomerId: customerId,
-      stripeSubscriptionId: subscription.id,
-      stripeSubscriptionItemId: item.id,
-      stripePriceId: item.price.id,
-      status: STATUS_MAP[subscription.status],
-      seatCount: item.quantity ?? 1,
-      currentPeriodEnd: new Date(subscription.current_period_end * 1000),
-      cancelAtPeriodEnd: subscription.cancel_at_period_end,
-      metadata,
-    };
+  parseWebhookEvent(input: { signature: string; payload: string }): BillingWebhookEvent {
+    return parseStripeWebhookEvent({
+      stripe: this.stripe,
+      webhookSecret: this.webhookSecret,
+      priceIds: this.priceIds,
+      signature: input.signature,
+      payload: input.payload,
+    });
   }
-}
-
-function getMetadataValue(metadata: Stripe.Metadata | null, key: string): string | null {
-  if (!metadata) {
-    return null;
-  }
-  return Object.prototype.hasOwnProperty.call(metadata, key) ? metadata[key] : null;
 }

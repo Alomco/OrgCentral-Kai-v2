@@ -43,13 +43,14 @@ export async function handleCreatePolicy(
             { authorization, policy: input.policy },
         );
 
-        await emitPolicyUpdateNotifications({
-            authorization,
-            policy,
-            event: 'created',
-            employeeProfileRepository: runtime.dependencies.employeeProfileRepository,
-            excludeUserId: authorization.userId,
-        });
+        if (policy.status === 'active') {
+            await emitPolicyUpdateNotifications({
+                authorization,
+                policy,
+                event: 'created',
+                employeeProfileRepository: runtime.dependencies.employeeProfileRepository,
+            });
+        }
 
         return policy;
     });
@@ -78,6 +79,11 @@ export async function handleUpdatePolicy(
     });
 
     return runtime.executeInServiceContext(context, 'hr.policies.policy.update', async () => {
+        const existingPolicy = await runtime.dependencies.policyRepository.getPolicy(
+            authorization.orgId,
+            input.policyId,
+        );
+
         if (input.updates.effectiveDate && input.updates.expiryDate) {
             assertValidPolicyDateRange(input.updates.effectiveDate, input.updates.expiryDate);
         }
@@ -87,13 +93,15 @@ export async function handleUpdatePolicy(
             { authorization, policyId: input.policyId, updates: input.updates },
         );
 
-        await emitPolicyUpdateNotifications({
-            authorization,
-            policy,
-            event: 'updated',
-            employeeProfileRepository: runtime.dependencies.employeeProfileRepository,
-            excludeUserId: authorization.userId,
-        });
+        const shouldNotify = policy.status === 'active' && existingPolicy?.status !== 'active';
+        if (shouldNotify) {
+            await emitPolicyUpdateNotifications({
+                authorization,
+                policy,
+                event: 'updated',
+                employeeProfileRepository: runtime.dependencies.employeeProfileRepository,
+            });
+        }
 
         return policy;
     });

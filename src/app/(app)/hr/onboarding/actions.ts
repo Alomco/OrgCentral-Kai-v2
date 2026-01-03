@@ -15,6 +15,14 @@ import {
 import {
     updateChecklistTemplateAction as updateChecklistTemplateActionImpl,
 } from './actions/checklist-templates.update';
+import {
+    toggleChecklistItemAction as toggleChecklistItemActionImpl,
+    completeChecklistAction as completeChecklistActionImpl,
+} from './actions/checklist-instance';
+import {
+    submitOnboardingWizardAction as submitOnboardingWizardActionImpl,
+    checkEmailExistsAction as checkEmailExistsActionImpl,
+} from './wizard/wizard.actions';
 
 export async function inviteEmployeeAction(
     ...args: Parameters<typeof inviteEmployeeActionImpl>
@@ -44,4 +52,28 @@ export async function updateChecklistTemplateAction(
     ...args: Parameters<typeof updateChecklistTemplateActionImpl>
 ): Promise<Awaited<ReturnType<typeof updateChecklistTemplateActionImpl>>> {
     return updateChecklistTemplateActionImpl(...args);
+}
+
+export async function toggleChecklistItemAction(
+    ...args: Parameters<typeof toggleChecklistItemActionImpl>
+): Promise<Awaited<ReturnType<typeof toggleChecklistItemActionImpl>>> {
+    return toggleChecklistItemActionImpl(...args);
+}
+
+export async function completeChecklistAction(
+    ...args: Parameters<typeof completeChecklistActionImpl>
+): Promise<Awaited<ReturnType<typeof completeChecklistActionImpl>>> {
+    return completeChecklistActionImpl(...args);
+}
+
+export async function submitOnboardingWizardAction(
+    ...args: Parameters<typeof submitOnboardingWizardActionImpl>
+): Promise<Awaited<ReturnType<typeof submitOnboardingWizardActionImpl>>> {
+    return submitOnboardingWizardActionImpl(...args);
+}
+
+export async function checkEmailExistsAction(
+    ...args: Parameters<typeof checkEmailExistsActionImpl>
+): Promise<Awaited<ReturnType<typeof checkEmailExistsActionImpl>>> {
+    return checkEmailExistsActionImpl(...args);
 }

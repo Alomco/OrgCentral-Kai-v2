@@ -37,13 +37,14 @@ export async function TenantThemeRegistry({
     const resolvedOrgId = orgId ?? 'default';
 
     const cssVariables = buildCssVariables(theme.tokens, tenantOverrideKeys);
+    const darkCssVariables = buildCssVariables(theme.darkTokens, tenantOverrideKeys);
 
     return (
         <>
             <style
                 suppressHydrationWarning
                 dangerouslySetInnerHTML={{
-                    __html: `:root { ${cssVariables} } .dark { ${cssVariables} }`,
+                    __html: `:root { ${cssVariables} } .dark { ${darkCssVariables} }`,
                 }}
             />
             <script

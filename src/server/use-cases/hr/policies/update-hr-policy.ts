@@ -28,10 +28,11 @@ export async function updateHrPolicy(
 
     RepositoryAuthorizer.default().assertTenantRecord(existing, input.authorization);
 
-    return deps.policyRepository.updatePolicy(
+    const updatedPolicy = await deps.policyRepository.updatePolicy(
         input.authorization.orgId,
         input.policyId,
         input.updates,
     );
-}
 
+    return updatedPolicy;
+}

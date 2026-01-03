@@ -134,6 +134,7 @@ export function buildProfileRepo(profiles: EmployeeProfileDTO[]): IEmployeeProfi
     getEmployeeProfile: async () => null,
     getEmployeeProfileByUser: async () => null,
     getEmployeeProfilesByOrganization: async () => profiles,
+    getEmployeeProfilesByOrganizationPaged: async () => profiles,
     countEmployeeProfilesByOrganization: async () => profiles.length,
     findByEmployeeNumber: async () => null,
     findByEmail: async () => null,
@@ -149,6 +150,7 @@ export function buildContractRepo(contracts: EmploymentContractDTO[]): IEmployme
     updateEmploymentContract: async () => { },
     getEmploymentContract: async () => null,
     getEmploymentContractByEmployee: async () => null,
+    getEmploymentContractsByEmployee: async () => contracts,
     getEmploymentContractsByOrganization: async () => contracts,
     deleteEmploymentContract: async () => { },
   };

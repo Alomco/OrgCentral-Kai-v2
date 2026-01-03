@@ -2,10 +2,10 @@
 
 import { useCallback, useMemo, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
-import { useRouter } from "next/navigation";
 
 import type { LoginActionInput } from "@/features/auth/login/login-contracts";
-import { isLoginActionResult, normalizeFieldErrors, type LoginFieldErrors } from "./login-form-errors";
+import type { LoginFieldErrors } from "./login-form-errors";
+import { authClient } from "@/lib/auth-client";
 
 export type ResidencyZoneOption = "UK_ONLY" | "UK_AND_EEA" | "GLOBAL_RESTRICTED";
 export type ClassificationLevelOption = "PUBLIC" | "OFFICIAL" | "OFFICIAL_SENSITIVE";
@@ -57,8 +57,21 @@ function isFormIncomplete(values: LoginFormValues): boolean {
     return !values.email || !values.password || !values.orgSlug;
 }
 
+function resolveNextPathFromLocation(): string {
+    try {
+        const url = new URL(window.location.href);
+        const next = url.searchParams.get("next");
+        if (typeof next === "string" && next.trim().startsWith("/")) {
+            return next.trim();
+        }
+    } catch {
+        // ignore
+    }
+
+    return "/dashboard";
+}
+
 export function useLoginForm(options?: UseLoginFormOptions): UseLoginFormResult {
-    const router = useRouter();
     const [values, setValues] = useState<LoginFormValues>({
         ...DEFAULT_VALUES,
         orgSlug: options?.initialOrgSlug ?? DEFAULT_VALUES.orgSlug,
@@ -83,7 +96,7 @@ export function useLoginForm(options?: UseLoginFormOptions): UseLoginFormResult 
     const handleSubmit = useCallback((event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
-        (async () => {
+        const submit = async (): Promise<void> => {
             setSubmitMessage(null);
             setErrors({});
 
@@ -94,44 +107,42 @@ export function useLoginForm(options?: UseLoginFormOptions): UseLoginFormResult 
 
             const payload: LoginActionInput = {
                 ...memoizedValues,
-                userAgent: typeof window !== "undefined" ? window.navigator.userAgent : undefined,
+                userAgent: window.navigator.userAgent,
             };
 
             setIsSubmitting(true);
             try {
-                const response = await fetch("/api/auth/login", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json", Accept: "application/json" },
-                    body: JSON.stringify(payload),
-                    credentials: "same-origin",
+                const nextPath = resolveNextPathFromLocation();
+                const callbackURL = `/api/auth/post-login?next=${encodeURIComponent(nextPath)}&org=${encodeURIComponent(payload.orgSlug)}`;
+
+                const { data, error } = await authClient.signIn.email({
+                    email: payload.email,
+                    password: payload.password,
+                    rememberMe: payload.rememberMe,
+                    callbackURL,
                 });
-                const body: unknown = await response.json().catch(() => ({}));
 
-                if (!isLoginActionResult(body)) {
-                    setSubmitMessage("Unexpected response from auth service.");
+                if (error) {
+                    setSubmitMessage(typeof error.message === "string" ? error.message : "Unable to sign in.");
                     return;
                 }
 
-                if (body.ok) {
-                    setSubmitMessage(body.message);
-                    if (body.redirectUrl) {
-                        router.push(body.redirectUrl);
-                    }
-                    return;
-                }
+                const redirectUrl = typeof data.url === "string" && data.url.length > 0 ? data.url : callbackURL;
 
-                setErrors(normalizeFieldErrors(body.fieldErrors));
-                setSubmitMessage(body.message);
+                setSubmitMessage("Login successful. Redirecting you now…");
+                window.location.assign(redirectUrl);
             } catch {
                 setSubmitMessage("We could not reach the authentication service. Please try again.");
             } finally {
                 setIsSubmitting(false);
             }
-        })().catch(() => {
+        };
+
+        void submit().catch(() => {
             setSubmitMessage("We could not reach the authentication service. Please try again.");
             setIsSubmitting(false);
         });
-    }, [memoizedValues, router]);
+    }, [memoizedValues]);
 
     return {
         values,

@@ -107,6 +107,7 @@ model Organization {
   hrPolicies             HRPolicy[]
   hrNotifications        HRNotification[]
   notificationMessages   NotificationMessage[] @relation("OrgNotificationMessages")
+  permissionResources    PermissionResource[]
   hrSettings             HRSettings?
   checklistTemplates     ChecklistTemplate[] @relation("OrgChecklistTemplates")
   checklistInstances     ChecklistInstance[] @relation("OrgChecklistInstances")
@@ -115,6 +116,8 @@ model Organization {
   complianceLogItems     ComplianceLogItem[] @relation("OrgComplianceLogItems")
   managedOrganizations   ManagedOrganization[] @relation("ManagedOrgOrganization")
   subscriptions          OrganizationSubscription[]
+  paymentMethods         PaymentMethod[]
+  billingInvoices        BillingInvoice[]
   @@index([tenantId]) // For tenant isolation
   @@map("organizations") // PostgreSQL schema mapping
   @@schema("hr")
@@ -168,12 +171,32 @@ model Role {
   description String?
   scope       RoleScope @default(ORG)
   permissions Json      @default("{}") @db.JsonB
+  inheritsRoleIds String[] @default([]) @db.Text
+  isSystem    Boolean   @default(false)
+  isDefault   Boolean   @default(false)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   org         Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
   memberships Membership[]
   @@unique([orgId, name])
   @@map("roles")
+  @@schema("hr")
+}
+model PermissionResource {
+  id          String   @id @default(uuid()) @db.Uuid
+  orgId       String   @db.Uuid
+  resource    String
+  actions     String[] @db.Text
+  description String?
+  metadata    Json?    @db.JsonB
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  org Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@unique([orgId, resource])
+  @@index([orgId])
+  @@map("permission_resources")
   @@schema("hr")
 }
 model Department {

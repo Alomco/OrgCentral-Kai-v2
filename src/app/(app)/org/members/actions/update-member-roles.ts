@@ -2,8 +2,6 @@
 
 import { headers } from 'next/headers';
 import { z } from 'zod';
-
-import { resolveOrgContext } from '@/server/org/org-context';
 import { getSessionContext } from '@/server/use-cases/auth/sessions/get-session';
 import { getMembershipService } from '@/server/services/org/membership/membership-service.provider';
 import { normalizeRoleList, type MemberActionState } from './shared';
@@ -20,7 +18,6 @@ export async function updateMemberRolesAction(
     formData: FormData,
 ): Promise<MemberActionState> {
     void _previous;
-    const orgContext = await resolveOrgContext();
     const headerStore = await headers();
 
     const parsed = updateMemberRolesSchema.safeParse({
@@ -36,7 +33,6 @@ export async function updateMemberRolesAction(
         {},
         {
             headers: headerStore,
-            orgId: orgContext.orgId,
             requiredPermissions: { organization: ['update'] },
             auditSource: 'ui:org-members:update-roles',
         },

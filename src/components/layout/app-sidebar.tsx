@@ -6,7 +6,6 @@ import {
     Building,
     ShieldCheck,
     ChevronsUpDown,
-    Check,
 } from 'lucide-react';
 
 import type { AuthSession } from '@/server/lib/auth';
@@ -38,9 +37,10 @@ import styles from './app-sidebar.module.css';
 interface AppSidebarProps {
     session: NonNullable<AuthSession>;
     authorization: RepositoryAuthorizationContext;
+    organizationLabel: string | null;
 }
 
-export function AppSidebar({ authorization }: AppSidebarProps) {
+export function AppSidebar({ authorization, organizationLabel }: AppSidebarProps) {
     const pathname = usePathname();
     const { open } = useSidebar();
 
@@ -60,7 +60,7 @@ export function AppSidebar({ authorization }: AppSidebarProps) {
                         data-collapsed={!open}
                     >
                         <span className={styles.logoText}>
-                            OrgCentral
+                            {organizationLabel ?? 'OrgCentral'}
                         </span>
                     </Link>
                 </div>
@@ -92,7 +92,9 @@ export function AppSidebar({ authorization }: AppSidebarProps) {
                                             <Building className="h-5 w-5" />
                                         </div>
                                         <div className={styles.tenantInfo} data-collapsed={!open}>
-                                            <span className={styles.tenantName}>{authorization.orgId.slice(0, 12)}</span>
+                                            <span className={styles.tenantName}>
+                                                {organizationLabel ?? 'Organization'}
+                                            </span>
                                             <span className={styles.tenantRole}>
                                                 {authorization.roleKey}
                                             </span>
@@ -107,10 +109,11 @@ export function AppSidebar({ authorization }: AppSidebarProps) {
                                 side={open ? 'bottom' : 'right'}
                                 sideOffset={4}
                             >
-                                <DropdownMenuItem className="gap-2">
-                                    <Building className="h-4 w-4" />
-                                    <span className="flex-1">Org {authorization.orgId}</span>
-                                    <Check className="h-4 w-4" />
+                                <DropdownMenuItem className="gap-2" asChild>
+                                    <Link href="/org/profile">
+                                        <Building className="h-4 w-4" />
+                                        <span className="flex-1">Organization</span>
+                                    </Link>
                                 </DropdownMenuItem>
                                 {isAdmin ? (
                                     <DropdownMenuItem className="gap-2" asChild>

@@ -1,10 +1,8 @@
 "use server";
-
 import { headers } from 'next/headers';
 import { z } from 'zod';
-
 import { invalidateOrgCache } from '@/server/lib/cache-tags';
-import { resolveOrgContext } from '@/server/org/org-context';
+import { recordAuditEvent } from '@/server/logging/audit-logger';
 import { PrismaOrganizationRepository } from '@/server/repositories/prisma/org/organization/prisma-organization-repository';
 import { getSessionContext } from '@/server/use-cases/auth/sessions/get-session';
 import { updateOrganizationProfile } from '@/server/use-cases/org/organization/update-profile';
@@ -12,6 +10,11 @@ import {
     organizationProfileUpdateSchema,
     type OrganizationProfileUpdateInput,
 } from '@/server/validators/org/organization-profile';
+import {
+    normalizeNullableText,
+    normalizeOptionalText,
+    normalizeRequiredText,
+} from './profile-form-utils';
 
 export interface OrgProfileActionState {
     status: 'idle' | 'success' | 'error';
@@ -144,7 +147,6 @@ export async function updateOrgProfileAction(
 ): Promise<OrgProfileActionState> {
     void _previous;
 
-    const orgContext = await resolveOrgContext();
     const headerStore = await headers();
 
     const fieldErrors: Record<string, string[]> = {};
@@ -199,12 +201,10 @@ export async function updateOrgProfileAction(
         {},
         {
             headers: headerStore,
-            orgId: orgContext.orgId,
             requiredPermissions: { organization: ['update'] },
             auditSource: 'ui:org-profile:update',
             action: 'org.organization.update',
             resourceType: 'org.organization',
-            resourceAttributes: { orgId: orgContext.orgId },
         },
     );
 
@@ -221,6 +221,24 @@ export async function updateOrgProfileAction(
         },
     );
 
+    await recordAuditEvent({
+        orgId: authorization.orgId,
+        userId: authorization.userId,
+        eventType: 'DATA_CHANGE',
+        action: 'org.profile.update',
+        resource: 'org.organization',
+        resourceId: authorization.orgId,
+        payload: {
+            updatedFields: Object.keys(parsed.data),
+            contactDetails: contactDetails === null ? 'cleared' : 'updated',
+        },
+        correlationId: authorization.correlationId,
+        residencyZone: authorization.dataResidency,
+        classification: authorization.dataClassification,
+        auditSource: authorization.auditSource,
+        auditBatchId: authorization.auditBatchId,
+    });
+
     await invalidateOrgCache(
         authorization.orgId,
         ORG_PROFILE_CACHE_SCOPE,
@@ -229,29 +247,4 @@ export async function updateOrgProfileAction(
     );
 
     return { status: 'success', message: 'Profile updated.' };
-}
-
-function normalizeRequiredText(value: FormDataEntryValue | null): string {
-    if (typeof value !== 'string') {
-        return '';
-    }
-    return value.trim();
-}
-
-function normalizeNullableText(value: FormDataEntryValue | null): string | null {
-    if (typeof value !== 'string') {
-        return null;
-    }
-
-    const trimmed = value.trim();
-    return trimmed ? trimmed : null;
-}
-
-function normalizeOptionalText(value: FormDataEntryValue | null): string | undefined {
-    if (typeof value !== 'string') {
-        return undefined;
-    }
-
-    const trimmed = value.trim();
-    return trimmed ? trimmed : undefined;
 }

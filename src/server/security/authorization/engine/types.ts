@@ -22,6 +22,8 @@ export interface OrgAuthorizationContext {
     orgId: string;
     userId: string;
     roleKey: OrgRoleKey | 'custom';
+    roleName?: string | null;
+    roleId?: string | null;
     permissions: OrgPermissionMap;
     dataResidency: DataResidencyZone;
     dataClassification: DataClassificationLevel;

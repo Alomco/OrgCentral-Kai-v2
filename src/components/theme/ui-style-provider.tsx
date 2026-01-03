@@ -89,6 +89,7 @@ export function UiStyleProvider({ children }: { children: ReactNode }) {
     const applyStyleToDOM = (styleKey: UiStyleKey) => {
         const cssVariables = getUiStyleCssVariables(styleKey);
         const root = document.documentElement;
+        const body = document.body;
 
         Object.entries(cssVariables).forEach(([key, value]) => {
             root.style.setProperty(key, value);
@@ -96,6 +97,7 @@ export function UiStyleProvider({ children }: { children: ReactNode }) {
 
         // Also set the data attribute for potential specific overrides
         root.dataset.uiStyle = styleKey;
+        body.dataset.uiStyle = styleKey;
     };
 
     // Apply style to DOM on mount and change

@@ -46,6 +46,7 @@ export interface TenantTheme {
     orgId: string;
     presetId?: string;
     tokens: ThemeTokenMap;
+    darkTokens: ThemeTokenMap;
     updatedAt: Date;
 }
 
@@ -109,4 +110,47 @@ export const defaultThemeTokens = {
     'sidebar-accent-foreground': palette.sidebarAccentForeground,
     'sidebar-border': palette.sidebarBorder,
     'sidebar-ring': palette.sidebarRing,
+} as const satisfies ThemeTokenMap;
+
+const DARK_FOREGROUND: HslValue = '262 20% 96%';
+const DARK_SURFACE: HslValue = '262 45% 9%';
+const DARK_PRIMARY: HslValue = '262 90% 68%';
+const DARK_SECONDARY: HslValue = '262 35% 15%';
+const DARK_BORDER: HslValue = '262 35% 20%';
+const DARK_ACCENT: HslValue = '330 85% 65%';
+
+export const defaultDarkThemeTokens = {
+    background: '262 47% 7%',
+    foreground: DARK_FOREGROUND,
+    card: DARK_SURFACE,
+    'card-foreground': DARK_FOREGROUND,
+    popover: DARK_SURFACE,
+    'popover-foreground': DARK_FOREGROUND,
+    primary: DARK_PRIMARY,
+    'primary-foreground': '0 0% 100%',
+    secondary: DARK_SECONDARY,
+    'secondary-foreground': DARK_FOREGROUND,
+    muted: DARK_SECONDARY,
+    'muted-foreground': '262 20% 65%',
+    accent: DARK_ACCENT,
+    'accent-foreground': '0 0% 100%',
+    destructive: '0 72% 58%',
+    'destructive-foreground': palette.destructiveForeground,
+    border: DARK_BORDER,
+    input: DARK_BORDER,
+    ring: DARK_PRIMARY,
+    'chart-1': DARK_ACCENT,
+    'chart-2': DARK_PRIMARY,
+    'chart-3': '200 95% 50%',
+    'chart-4': '48 96% 65%',
+    'chart-5': '31 87% 60%',
+    sidebar: DARK_SURFACE,
+    'sidebar-background': DARK_SURFACE,
+    'sidebar-foreground': DARK_FOREGROUND,
+    'sidebar-primary': DARK_PRIMARY,
+    'sidebar-primary-foreground': '0 0% 100%',
+    'sidebar-accent': DARK_SECONDARY,
+    'sidebar-accent-foreground': DARK_FOREGROUND,
+    'sidebar-border': DARK_BORDER,
+    'sidebar-ring': '217.2 91.2% 59.8%',
 } as const satisfies ThemeTokenMap;
