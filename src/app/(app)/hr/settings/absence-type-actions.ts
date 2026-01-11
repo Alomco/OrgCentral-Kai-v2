@@ -10,6 +10,11 @@ import { createAbsenceTypeConfig } from '@/server/use-cases/hr/absences/create-a
 import { updateAbsenceTypeConfig } from '@/server/use-cases/hr/absences/update-absence-type-config';
 
 import { toFieldErrors } from '../_components/form-errors';
+import type {
+    AbsenceTypeCreateState,
+    AbsenceTypeCreateValues,
+    AbsenceTypeInlineState,
+} from './absence-type-actions.types';
 
 const keySchema = z
     .string()
@@ -30,25 +35,6 @@ const updateAbsenceTypeSchema = z.object({
     tracksBalance: z.boolean(),
     isActive: z.boolean(),
 });
-
-export interface AbsenceTypeCreateValues {
-    label: string;
-    key: string;
-    tracksBalance: boolean;
-    isActive: boolean;
-}
-
-export interface AbsenceTypeCreateState {
-    status: 'idle' | 'success' | 'error';
-    message?: string;
-    fieldErrors?: Partial<Record<keyof AbsenceTypeCreateValues, string>>;
-    values: AbsenceTypeCreateValues;
-}
-
-export interface AbsenceTypeInlineState {
-    status: 'idle' | 'success' | 'error';
-    message?: string;
-}
 
 const defaultCreateValues: AbsenceTypeCreateValues = {
     label: '',

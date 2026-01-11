@@ -11,9 +11,13 @@ import { getSessionContext } from '@/server/use-cases/auth/sessions/get-session'
 import { revokeOnboardingInvitation } from '@/server/use-cases/hr/onboarding/invitations/revoke-onboarding-invitation';
 import { getInvitationEmailDependencies } from '@/server/use-cases/notifications/invitation-email.provider';
 import { resendInvitationEmail } from '@/server/use-cases/notifications/resend-invitation-email';
-import { isInvitationDeliverySuccessful } from '@/server/use-cases/notifications/invitation-email.helpers';
+import {
+    getInvitationDeliveryFailureMessage,
+    isInvitationDeliverySuccessful,
+} from '@/server/use-cases/notifications/invitation-email.helpers';
 
 import type { OnboardingRevokeInviteFormState } from '../form-state';
+import type { ResendOnboardingInvitationActionState } from './onboarding-invitations.types';
 
 function readFormString(formData: FormData, key: string): string {
     const value = formData.get(key);
@@ -30,11 +34,6 @@ const resendInviteSchema = z.object({
 });
 
 const onboardingInvitationRepository = new PrismaOnboardingInvitationRepository();
-
-export type ResendOnboardingInvitationActionState =
-    | { status: 'idle' }
-    | { status: 'success'; message: string; invitationUrl: string }
-    | { status: 'error'; message: string };
 
 export async function revokeOnboardingInvitationAction(
     previous: OnboardingRevokeInviteFormState,
@@ -146,9 +145,7 @@ export async function resendOnboardingInvitationAction(
         if (!isInvitationDeliverySuccessful(result.delivery)) {
             return {
                 status: 'error',
-                message: result.delivery.status === 'skipped'
-                    ? result.delivery.detail ?? 'Email delivery is not configured.'
-                    : 'Invitation email could not be delivered.',
+                message: getInvitationDeliveryFailureMessage(result.delivery),
             };
         }
 

@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import type { WorkerJobAuthorization, WorkerJobEnvelope, WorkerJobMetadata } from '@/server/workers/abstract-org-worker';
 import { DATA_CLASSIFICATION_LEVELS, DATA_RESIDENCY_ZONES } from '@/server/types/tenant';
+import type { TrainingReminderPayload } from '@/server/use-cases/hr/training/send-training-reminders';
 
 export const TRAINING_REMINDER_JOB_NAME = 'hr.training.reminder';
 
@@ -25,7 +26,7 @@ export const jobMetadataSchema: z.ZodType<WorkerJobMetadata | undefined> = z
     .partial()
     .optional();
 
-export const trainingReminderPayloadSchema = z.object({
+export const trainingReminderPayloadSchema: z.ZodType<TrainingReminderPayload> = z.object({
     referenceDate: z.coerce.date().optional(),
     daysUntilExpiry: z.number().int().positive().max(365).default(30),
     targetUserIds: z.array(z.uuid()).optional(),
@@ -33,7 +34,7 @@ export const trainingReminderPayloadSchema = z.object({
 });
 
 export type TrainingReminderPayloadInput = z.input<typeof trainingReminderPayloadSchema>;
-export type TrainingReminderPayload = z.output<typeof trainingReminderPayloadSchema>;
+export type { TrainingReminderPayload };
 
 export const trainingReminderEnvelopeSchema = z.object({
     orgId: z.uuid(),

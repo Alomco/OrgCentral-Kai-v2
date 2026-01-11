@@ -1,7 +1,7 @@
 import type { JobsOptions } from 'bullmq';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
-import type { QueueRegistryOptions } from '@/server/workers/config/queue-registry';
-import { DEFAULT_WORKER_TIMEZONE, WORKER_CACHE_SCOPES, WORKER_QUEUE_NAMES } from '@/server/workers/constants';
+import type { QueueRegistryOptions } from '@/server/lib/queue-registry';
+import { DEFAULT_WORKER_TIMEZONE, WORKER_CACHE_SCOPES, WORKER_QUEUE_NAMES } from '@/server/lib/worker-constants';
 import { SchedulerService, type RepeatExpression } from '@/server/workers/scheduler/scheduler-service';
 import {
     LEAVE_ACCRUAL_JOB_NAME,

@@ -69,9 +69,13 @@ export class PrismaDataSubjectRightsRepository extends BasePrismaRepository impl
   }
 
   async update(id: string, data: DataSubjectRightUpdateData): Promise<DataSubjectRight> {
+    const updateData = {
+      ...data,
+      metadata: data.metadata !== undefined ? toPrismaInputJson(data.metadata) : undefined,
+    };
     return getModelDelegate(this.prisma, 'dataSubjectRight').update({
       where: { id },
-      data,
+      data: updateData,
     });
   }
 

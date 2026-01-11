@@ -7,11 +7,8 @@ import { cva } from 'class-variance-authority';
 import { Button } from '@/components/ui/button';
 import type { OrganizationData } from '@/server/types/leave-types';
 
-import {
-    initialOrgProfileActionState,
-    updateOrgProfileAction,
-    type OrgProfileActionState,
-} from '../actions';
+import { updateOrgProfileAction } from '../actions';
+import { initialOrgProfileActionState, type OrgProfileActionState } from '../actions.state';
 import {
     ContactCard,
     TextAreaField,
@@ -201,4 +198,3 @@ export function OrgProfileForm({ organization }: { organization: OrganizationDat
         </form>
     );
 }
-

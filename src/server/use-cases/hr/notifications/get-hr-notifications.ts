@@ -1,6 +1,7 @@
-import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
+import type { RepositoryAuthorizationContext } from '@/server/types/repository-authorization';
 import type { HRNotificationDTO, HRNotificationListFilters } from '@/server/types/hr/notifications';
-import { getHrNotificationService, type HrNotificationServiceContract } from '@/server/services/hr/notifications/hr-notification-service.provider';
+import { getHrNotificationService } from '@/server/use-cases/hr/notifications/notification-composition';
+import type { HrNotificationService } from '@/server/services/hr/notifications/hr-notification-service';
 
 // Use-case: list HR notifications for a user or org through HR notification services with filters.
 
@@ -16,7 +17,7 @@ export interface GetHrNotificationsResult {
 }
 
 export interface GetHrNotificationsDependencies {
-    service?: HrNotificationServiceContract;
+    service?: HrNotificationService;
 }
 
 export async function getHrNotifications(

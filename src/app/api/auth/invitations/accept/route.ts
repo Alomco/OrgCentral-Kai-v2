@@ -5,7 +5,7 @@ import { buildErrorResponse } from '@/server/api-adapters/http/error-response';
 import { requireSessionUser } from '@/server/api-adapters/http/session-helpers';
 import { AuthorizationError } from '@/server/errors';
 import { auth, type AuthSession } from '@/server/lib/auth';
-import { PrismaInvitationRepository } from '@/server/repositories/prisma/auth/invitations';
+import { shouldUseOnboardingFlow } from '@/server/use-cases/auth/invitations/resolve-invitation-flow';
 import { z } from 'zod';
 
 const requestSchema = z
@@ -14,14 +14,6 @@ const requestSchema = z
         z.object({ inviteToken: z.string().trim().min(1) }),
     ])
     .transform((value) => ('token' in value ? value.token : value.inviteToken));
-
-function shouldUseOnboardingFlow(payload: { employeeId?: string; employeeNumber?: string; onboardingTemplateId?: string | null }): boolean {
-    return (
-        (typeof payload.employeeId === 'string' && payload.employeeId.trim().length > 0) ||
-        (typeof payload.employeeNumber === 'string' && payload.employeeNumber.trim().length > 0) ||
-        (typeof payload.onboardingTemplateId === 'string' && payload.onboardingTemplateId.trim().length > 0)
-    );
-}
 
 function requireActor(session: AuthSession | null): { userId: string; email: string } {
     const { userId, email } = requireSessionUser(session);
@@ -37,9 +29,7 @@ export async function POST(request: Request): Promise<NextResponse> {
         const token = requestSchema.parse(await request.json());
         const session = await auth.api.getSession({ headers: request.headers });
         const actor = requireActor(session);
-        const invitationRepository = new PrismaInvitationRepository();
-        const invitation = await invitationRepository.findByToken(token);
-        const useOnboardingFlow = invitation ? shouldUseOnboardingFlow(invitation.onboardingData) : false;
+        const useOnboardingFlow = await shouldUseOnboardingFlow(token);
         const result = useOnboardingFlow
             ? await completeOnboardingInviteController({ inviteToken: token }, actor)
             : await acceptInvitationController({ token }, actor);

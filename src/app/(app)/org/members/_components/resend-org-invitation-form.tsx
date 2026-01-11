@@ -4,10 +4,8 @@ import { useActionState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
-import {
-    resendOrgInvitationAction,
-    type ResendOrgInvitationActionState,
-} from '../actions/resend-invitation';
+import { resendOrgInvitationAction } from '../actions/resend-invitation';
+import type { ResendOrgInvitationActionState } from '../actions/invitation-actions.types';
 
 const initialState: ResendOrgInvitationActionState = { status: 'idle' };
 

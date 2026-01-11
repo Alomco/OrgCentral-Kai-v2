@@ -1,9 +1,8 @@
-import type { AuditLog, Prisma } from '@prisma/client';
-import type { PrismaClient } from '@prisma/client';
+import type { Prisma, PrismaClient } from '@prisma/client';
 import type { IAuditLogRepository } from '@/server/repositories/contracts/records/audit-log-repository-contract';
-import { getModelDelegate } from '@/server/repositories/prisma/helpers/prisma-utils';
+import { getModelDelegate, toPrismaInputJson } from '@/server/repositories/prisma/helpers/prisma-utils';
 import { BasePrismaRepository } from '@/server/repositories/prisma/base-prisma-repository';
-import type { AuditLogFilters, AuditLogCreationData } from './prisma-audit-log-repository.types';
+import type { AuditLogFilters, AuditLogCreationData, AuditLogRecord } from './prisma-audit-log-repository.types';
 import { prisma as defaultPrismaClient } from '@/server/lib/prisma';
 
 export class PrismaAuditLogRepository extends BasePrismaRepository implements IAuditLogRepository {
@@ -11,13 +10,13 @@ export class PrismaAuditLogRepository extends BasePrismaRepository implements IA
     super(prisma);
   }
 
-  async findById(id: string): Promise<AuditLog | null> {
+  async findById(id: string): Promise<AuditLogRecord | null> {
     return getModelDelegate(this.prisma, 'auditLog').findFirst({
       where: { id, deletedAt: null },
     });
   }
 
-  async findAll(filters?: AuditLogFilters): Promise<AuditLog[]> {
+  async findAll(filters?: AuditLogFilters): Promise<AuditLogRecord[]> {
     const whereClause: Prisma.AuditLogWhereInput = {};
 
     whereClause.deletedAt = null;
@@ -62,24 +61,29 @@ export class PrismaAuditLogRepository extends BasePrismaRepository implements IA
     });
   }
 
-  async create(data: AuditLogCreationData): Promise<AuditLog> {
+  async create(data: AuditLogCreationData): Promise<AuditLogRecord> {
     return getModelDelegate(this.prisma, 'auditLog').create({
-      data,
+      data: {
+        ...data,
+        payload: toPrismaInputJson(data.payload) as Prisma.InputJsonValue,
+      },
     });
   }
 
-  async createBulk(data: AuditLogCreationData[]): Promise<AuditLog[]> {
-    return getModelDelegate(this.prisma, 'auditLog').createMany({
-      data,
-      skipDuplicates: true
-    }).then(() => {
-      // Since createMany doesn't return the created records, we'll just return empty array
-      // In a real implementation, you might want to fetch these records separately if needed
-      return [];
-    });
+  async createBulk(data: AuditLogCreationData[]): Promise<AuditLogRecord[]> {
+    const normalized = data.map((item) => ({
+      ...item,
+      payload: toPrismaInputJson(item.payload) as Prisma.InputJsonValue,
+    }));
+    return getModelDelegate(this.prisma, 'auditLog')
+      .createMany({
+        data: normalized,
+        skipDuplicates: true,
+      })
+      .then(() => []);
   }
 
-  delete(_id: string): Promise<AuditLog> {
+  delete(_id: string): Promise<AuditLogRecord> {
     void _id;
     return Promise.reject(new Error('Audit logs are immutable; use retention workflows to expire records.'));
   }

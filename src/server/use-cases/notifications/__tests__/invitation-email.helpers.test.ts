@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { IInvitationRepository, InvitationRecord } from '@/server/repositories/contracts/auth/invitations';
 import type { NotificationDeliveryAdapter } from '@/server/services/platform/notifications/notification-types';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
-import { deliverInvitationEmail } from '../invitation-email.helpers';
+import { deliverInvitationEmail, getInvitationDeliveryFailureMessage } from '../invitation-email.helpers';
 
 const baseInvitation: InvitationRecord = {
     token: 'token-123',
@@ -158,5 +158,35 @@ describe('deliverInvitationEmail', () => {
         );
 
         expect(result.delivery.status).toBe('failed');
+    });
+});
+
+describe('getInvitationDeliveryFailureMessage', () => {
+    it('returns skipped detail when delivery is skipped', () => {
+        const message = getInvitationDeliveryFailureMessage({
+            provider: 'test',
+            channel: 'EMAIL',
+            status: 'skipped',
+            detail: 'Email delivery is not configured.',
+        });
+
+        expect(message).toContain('provider=test');
+        expect(message).toContain('status=skipped');
+        expect(message).toContain('Email delivery is not configured.');
+    });
+
+    it('redacts email addresses and URLs from provider details', () => {
+        const message = getInvitationDeliveryFailureMessage({
+            provider: 'test',
+            channel: 'EMAIL',
+            status: 'failed',
+            detail: '550 mailbox unavailable for invitee@example.com - see https://provider.example.com/help?token=abc',
+        });
+
+        expect(message).toContain('[redacted email]');
+        expect(message).toContain('[redacted url]');
+        expect(message).not.toContain('invitee@example.com');
+        expect(message).not.toContain('https://provider.example.com');
+        expect(message).not.toContain('token=abc');
     });
 });

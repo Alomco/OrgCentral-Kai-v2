@@ -76,19 +76,28 @@ export class PrismaEventOutboxRepository extends BasePrismaRepository implements
   }
 
   async update(id: string, data: EventOutboxUpdateData): Promise<EventOutbox> {
-    // Ensure `error` nullability maps correctly to Prisma Null types if needed
-    const updateData: EventOutboxUpdateData = { ...data };
-    if ('error' in updateData) {
-      const errorValue = updateData.error;
-      if (errorValue === null) {
-        updateData.error = Prisma.JsonNull as unknown as Prisma.InputJsonValue;
-      } else if (errorValue !== undefined) {
-        updateData.error = errorValue;
-      }
+    const updateData: Prisma.EventOutboxUpdateInput = {};
+    if (data.status !== undefined) {
+      updateData.status = data.status;
+    }
+    if (data.error !== undefined) {
+      updateData.error = data.error === null ? Prisma.JsonNull : toPrismaInputJson(data.error);
+    }
+    if (data.processedAt !== undefined) {
+      updateData.processedAt = data.processedAt;
+    }
+    if (data.maxRetries !== undefined) {
+      updateData.maxRetries = data.maxRetries;
+    }
+    if (data.retryCount !== undefined) {
+      updateData.retryCount = data.retryCount;
+    }
+    if (data.availableAt !== undefined) {
+      updateData.availableAt = data.availableAt;
     }
     return getModelDelegate(this.prisma, 'eventOutbox').update({
       where: { id },
-      data: updateData as unknown as Prisma.EventOutboxUpdateInput,
+      data: updateData,
     });
   }
 

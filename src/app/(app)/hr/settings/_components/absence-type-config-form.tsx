@@ -12,10 +12,8 @@ import { Switch } from '@/components/ui/switch';
 import type { AbsenceTypeConfig } from '@/server/types/hr-ops-types';
 
 import { FieldError } from '../../_components/field-error';
-import {
-    createAbsenceTypeAction,
-    type AbsenceTypeCreateState,
-} from '../absence-type-actions';
+import { createAbsenceTypeAction } from '../absence-type-actions';
+import type { AbsenceTypeCreateState } from '../absence-type-actions.types';
 import { AbsenceTypeRow } from './absence-type-row';
 
 const initialCreateState: AbsenceTypeCreateState = {

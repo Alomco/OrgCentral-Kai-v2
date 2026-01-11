@@ -1,6 +1,6 @@
 import { AuthorizationError } from '@/server/errors';
 import type { IBrandingRepository } from '@/server/repositories/contracts/org/branding/branding-repository-contract';
-import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
+import type { RepositoryAuthorizationContext } from '@/server/types/repository-authorization';
 import type { OrgBranding } from '@/server/types/branding-types';
 
 export interface GetOrgBrandingDependencies {

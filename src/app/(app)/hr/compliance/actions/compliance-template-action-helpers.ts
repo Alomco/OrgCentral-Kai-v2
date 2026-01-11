@@ -6,9 +6,6 @@ import { getSessionContext } from '@/server/use-cases/auth/sessions/get-session'
 
 const COMPLIANCE_TEMPLATES_AUDIT_SOURCE_PREFIX = 'ui:hr:compliance:templates';
 const COMPLIANCE_TEMPLATE_RESOURCE_TYPE = 'hr.compliance.template';
-const COMPLIANCE_TEMPLATES_NOT_AUTHORIZED_MESSAGE = 'Not authorized to manage compliance templates.';
-const COMPLIANCE_TEMPLATES_PATH = '/hr/compliance';
-const FIELD_ERROR_MESSAGE = 'Check the highlighted fields and try again.';
 const ORG_PERMISSION_UPDATE = 'update' as const;
 
 type ComplianceTemplateAction = 'create' | 'update' | 'delete';
@@ -30,9 +27,3 @@ export async function getComplianceTemplateSession(action: ComplianceTemplateAct
         return null;
     }
 }
-
-export {
-    COMPLIANCE_TEMPLATES_NOT_AUTHORIZED_MESSAGE,
-    COMPLIANCE_TEMPLATES_PATH,
-    FIELD_ERROR_MESSAGE,
-};

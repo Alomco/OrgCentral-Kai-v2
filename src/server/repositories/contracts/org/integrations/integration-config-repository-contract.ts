@@ -3,7 +3,7 @@
  * Following SOLID principles with clear separation of concerns
  */
 import type { IntegrationConfig } from '@/server/types/hr-types';
-import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
+import type { RepositoryAuthorizationContext } from '@/server/types/repository-authorization';
 
 export interface IIntegrationConfigRepository {
   /**

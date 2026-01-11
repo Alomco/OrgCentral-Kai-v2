@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import type { WorkerJobAuthorization, WorkerJobEnvelope, WorkerJobMetadata } from '@/server/workers/abstract-org-worker';
 import { DATA_CLASSIFICATION_LEVELS, DATA_RESIDENCY_ZONES } from '@/server/types/tenant';
+import type { DocumentExpiryPayload } from '@/server/use-cases/hr/compliance/process-document-expiry';
 
 export const DOCUMENT_EXPIRY_JOB_NAME = 'hr.compliance.document-expiry';
 
@@ -25,12 +26,12 @@ export const documentExpiryJobMetadataSchema: z.ZodType<WorkerJobMetadata | unde
     .partial()
     .optional();
 
-export const documentExpiryPayloadSchema = z.object({
+export const documentExpiryPayloadSchema: z.ZodType<DocumentExpiryPayload> = z.object({
     dryRun: z.boolean().optional(),
     thresholdDays: z.array(z.number().positive()).default([30, 14, 7]),
 });
 
-export type DocumentExpiryPayload = z.infer<typeof documentExpiryPayloadSchema>;
+export type { DocumentExpiryPayload };
 
 export const documentExpiryEnvelopeSchema = z.object({
     orgId: z.uuid(),

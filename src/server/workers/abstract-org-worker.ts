@@ -7,8 +7,8 @@ import {
 } from '@/server/repositories/security';
 import { AbstractBaseService, type ServiceExecutionContext } from '@/server/services/abstract-base-service';
 import type { OrgAccessInput } from '@/server/security/guards';
-import type { WorkerQueueName } from '@/server/workers/constants';
-import { getQueue, type QueueRegistryOptions } from '@/server/workers/config/queue-registry';
+import type { WorkerQueueName } from '@/server/lib/worker-constants';
+import { getQueue, type QueueRegistryOptions } from '@/server/lib/queue-registry';
 
 export interface WorkerJobMetadata {
     correlationId?: string;

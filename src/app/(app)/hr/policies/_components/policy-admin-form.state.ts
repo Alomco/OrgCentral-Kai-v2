@@ -1,4 +1,4 @@
-import type { PolicyAdminCreateState } from '../policy-admin-actions';
+import type { PolicyAdminCreateState } from '../policy-admin-form-utils';
 
 function toDateInputValue(date: Date): string {
     return date.toISOString().slice(0, 10);

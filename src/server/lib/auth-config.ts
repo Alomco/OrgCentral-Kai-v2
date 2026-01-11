@@ -8,11 +8,21 @@ import { mcp, organization, username, twoFactor } from 'better-auth/plugins';
 import { prisma } from '@/server/lib/prisma';
 import { orgAccessControl, orgRoles } from '@/server/security/better-auth-access';
 
-import { createAuthDatabaseHooks, getAuthSyncQueueClientOrNull } from '@/server/lib/auth-sync-hooks';
+import {
+    createAuthDatabaseHooks,
+    getAuthSyncQueueClientOrNull,
+    type AuthSyncQueueClient,
+} from '@/server/lib/auth-sync-hooks';
 import { isAuthSyncEnabled } from '@/server/lib/auth-environment';
 
-export function createAuth(baseURL: string) {
-    const authSyncQueue = getAuthSyncQueueClientOrNull(isAuthSyncEnabled());
+export interface AuthConfigDependencies {
+    authSyncQueueFactory?: () => AuthSyncQueueClient;
+}
+
+export function createAuth(baseURL: string, deps: AuthConfigDependencies = {}) {
+    const authSyncQueue = deps.authSyncQueueFactory
+        ? getAuthSyncQueueClientOrNull(isAuthSyncEnabled(), deps.authSyncQueueFactory)
+        : null;
 
     return betterAuth({
         baseURL,

@@ -5,10 +5,11 @@ import { ValidationError } from '@/server/errors';
 import { readJson } from '@/server/api-adapters/http/request-utils';
 import type { OrgPermissionMap } from '@/server/security/access-control';
 
-import { PrismaBrandingRepository } from '@/server/repositories/prisma/org/branding/prisma-branding-repository';
-import { getOrgBranding } from '@/server/use-cases/org/branding/get-org-branding';
-import { updateOrgBranding } from '@/server/use-cases/org/branding/update-org-branding';
-import { resetOrgBranding } from '@/server/use-cases/org/branding/reset-org-branding';
+import {
+    getOrgBrandingWithPrisma,
+    updateOrgBrandingWithPrisma,
+    resetOrgBrandingWithPrisma,
+} from '@/server/use-cases/org/branding/branding-composition';
 
 const AUDIT_SOURCE = {
     get: 'api:org:branding:get',
@@ -51,8 +52,7 @@ export async function getOrgBrandingController(request: Request, orgId: string) 
         },
     );
 
-    const repository = new PrismaBrandingRepository();
-    return getOrgBranding({ brandingRepository: repository }, { authorization, orgId: normalizedOrgId });
+    return getOrgBrandingWithPrisma({ authorization, orgId: normalizedOrgId });
 }
 
 export async function updateOrgBrandingController(request: Request, orgId: string) {
@@ -77,15 +77,11 @@ export async function updateOrgBrandingController(request: Request, orgId: strin
         },
     );
 
-    const repository = new PrismaBrandingRepository();
-    return updateOrgBranding(
-        { brandingRepository: repository },
-        {
-            authorization,
-            orgId: normalizedOrgId,
-            updates,
-        },
-    );
+    return updateOrgBrandingWithPrisma({
+        authorization,
+        orgId: normalizedOrgId,
+        updates,
+    });
 }
 
 export async function resetOrgBrandingController(request: Request, orgId: string) {
@@ -107,12 +103,8 @@ export async function resetOrgBrandingController(request: Request, orgId: string
         },
     );
 
-    const repository = new PrismaBrandingRepository();
-    return resetOrgBranding(
-        { brandingRepository: repository },
-        {
-            authorization,
-            orgId: normalizedOrgId,
-        },
-    );
+    return resetOrgBrandingWithPrisma({
+        authorization,
+        orgId: normalizedOrgId,
+    });
 }

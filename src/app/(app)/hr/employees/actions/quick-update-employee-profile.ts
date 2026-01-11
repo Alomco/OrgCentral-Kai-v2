@@ -11,6 +11,7 @@ import { EMPLOYMENT_STATUS_VALUES } from '@/server/types/hr/people';
 import type { ProfileMutationPayload } from '@/server/types/hr/people';
 
 import { REVALIDATE_EMPLOYEE_LIST_PATH, UNAUTHORIZED_PROFILE_MESSAGE, UPDATE_PROFILE_ERROR_MESSAGE } from './constants';
+import type { EmployeeQuickEditState } from './quick-update-employee-profile.state';
 
 const UUID_PATTERN = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/;
 const quickEditSchema = z.object({
@@ -23,16 +24,6 @@ const quickEditSchema = z.object({
         .optional()
         .transform((value) => (value && value.length > 0 ? value : undefined)),
 });
-
-export interface EmployeeQuickEditState {
-    status: 'idle' | 'success' | 'error';
-    message?: string;
-    fieldErrors?: Partial<Record<'employmentStatus' | 'jobTitle', string>>;
-}
-
-export const EMPLOYEE_QUICK_EDIT_INITIAL_STATE: EmployeeQuickEditState = {
-    status: 'idle',
-};
 
 export async function quickUpdateEmployeeProfileAction(
     previous: EmployeeQuickEditState,

@@ -18,12 +18,6 @@ import {
     type PermissionResourceInlineState,
 } from './permission-resource-form-utils';
 
-export type {
-    PermissionResourceCreateState,
-    PermissionResourceInlineState,
-    PermissionResourceFormValues,
-} from './permission-resource-form-utils';
-
 const requiredPermissions = { organization: ['update'] } as const;
 const ORG_PERMISSIONS_PATH = '/org/permissions';
 const NOT_AUTHORIZED_PERMISSION_RESOURCE_MESSAGE = 'Not authorized to manage permission resources.';

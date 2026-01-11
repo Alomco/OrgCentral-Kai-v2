@@ -7,6 +7,6 @@ export { getMembershipService, type MembershipServiceContract, type MembershipSe
 export { getUserService, type UserServiceContract, type UserServiceProviderOptions } from './users/user-service.provider';
 
 export { BrandingService, type BrandingServiceDependencies } from './branding/branding-service';
-export { getBrandingService, type BrandingServiceContract, type BrandingServiceProviderOptions } from './branding/branding-service.provider';
+export { getBrandingService, type BrandingServiceContract } from './branding/branding-service.provider';
 
 export { getPermissionResourceService } from './permissions/permission-resource-service.provider';

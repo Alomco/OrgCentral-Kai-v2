@@ -17,10 +17,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 
-import {
-    deleteComplianceTemplateAction,
-    type ComplianceTemplateInlineState,
-} from '../actions/compliance-templates';
+import { deleteComplianceTemplateAction } from '../actions/compliance-templates';
+import type { ComplianceTemplateInlineState } from '../compliance-template-form-utils';
 
 const initialInlineState: ComplianceTemplateInlineState = { status: 'idle' };
 

@@ -18,7 +18,7 @@ const notificationAuditWriter: NotificationAuditWriter = {
       action: 'notification.audit',
       resource: 'notification',
       resourceId: envelope.notificationId,
-      payload: envelope,
+      payload: JSON.parse(JSON.stringify(envelope)) as Record<string, unknown>,
       correlationId: envelope.auditMetadata.correlationId,
       residencyZone: envelope.residencyTag,
       classification: envelope.dataClassification,

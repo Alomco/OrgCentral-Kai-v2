@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import type { WorkerJobAuthorization, WorkerJobEnvelope, WorkerJobMetadata } from '@/server/workers/abstract-org-worker';
 import { DATA_CLASSIFICATION_LEVELS, DATA_RESIDENCY_ZONES } from '@/server/types/tenant';
+import type { OnboardingReminderPayload } from '@/server/use-cases/hr/onboarding/send-onboarding-reminders';
 
 export const ONBOARDING_REMINDER_JOB_NAME = 'onboarding-reminder';
 
@@ -25,11 +26,11 @@ export const onboardingReminderJobMetadataSchema: z.ZodType<WorkerJobMetadata | 
     .partial()
     .optional();
 
-export const onboardingReminderPayloadSchema = z.object({
+export const onboardingReminderPayloadSchema: z.ZodType<OnboardingReminderPayload> = z.object({
     dryRun: z.boolean().optional(),
 });
 
-export type OnboardingReminderPayload = z.infer<typeof onboardingReminderPayloadSchema>;
+export type { OnboardingReminderPayload };
 
 export const onboardingReminderEnvelopeSchema = z.object({
     orgId: z.uuid(),

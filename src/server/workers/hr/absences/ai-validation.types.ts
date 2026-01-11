@@ -1,12 +1,17 @@
 import { z } from 'zod';
-import type { AuditEventPayload } from '@/server/logging/audit-logger';
-import type { IAbsenceTypeConfigRepository } from '@/server/repositories/contracts/hr/absences/absence-type-config-repository-contract';
-import type { IUnplannedAbsenceRepository } from '@/server/repositories/contracts/hr/absences/unplanned-absence-repository-contract';
-import type { AbsenceAttachmentDownloader, AbsenceDocumentAiValidator, AbsenceDocumentAiValidatorResult } from '@/server/types/absence-ai';
-import type { UnplannedAbsence } from '@/server/types/hr-ops-types';
 import { DATA_CLASSIFICATION_LEVELS, DATA_RESIDENCY_ZONES } from '@/server/types/tenant';
+import type {
+    AbsenceAiValidationJob,
+    AbsenceAiValidationJobAuthorization,
+    AbsenceAiValidationStorageMetadata,
+} from '@/server/use-cases/hr/absences/ai-validation.types';
+export type {
+    AbsenceAiValidationJob,
+    AbsenceAiValidationResult,
+    AbsenceAiValidationServiceDeps,
+} from '@/server/use-cases/hr/absences/ai-validation.types';
 
-export const jobAuthorizationSchema = z.object({
+export const jobAuthorizationSchema: z.ZodType<AbsenceAiValidationJobAuthorization> = z.object({
     userId: z.uuid(),
     auditSource: z.string().min(3).default('worker:hr:absences:ai'),
     correlationId: z.uuid().optional(),
@@ -18,7 +23,7 @@ export const jobAuthorizationSchema = z.object({
     expectedResidency: z.enum(DATA_RESIDENCY_ZONES).optional(),
 });
 
-export const storageMetadataSchema = z.object({
+export const storageMetadataSchema: z.ZodType<AbsenceAiValidationStorageMetadata> = z.object({
     storageKey: z.string().min(3),
     fileName: z.string().min(1),
     contentType: z.string().min(3),
@@ -29,7 +34,7 @@ export const storageMetadataSchema = z.object({
     retentionPolicyId: z.uuid().optional(),
 });
 
-export const absenceAiValidationJobSchema = z.object({
+export const absenceAiValidationJobSchema: z.ZodType<AbsenceAiValidationJob> = z.object({
     orgId: z.uuid(),
     absenceId: z.uuid(),
     attachmentId: z.uuid().optional(),
@@ -37,20 +42,3 @@ export const absenceAiValidationJobSchema = z.object({
     authorization: jobAuthorizationSchema,
     storage: storageMetadataSchema,
 });
-
-export type AbsenceAiValidationJob = z.infer<typeof absenceAiValidationJobSchema>;
-
-export interface AbsenceAiValidationResult {
-    absence: UnplannedAbsence;
-    aiResult: AbsenceDocumentAiValidatorResult;
-    cacheTag: string;
-}
-
-export interface AbsenceAiValidationServiceDeps {
-    absenceRepository: IUnplannedAbsenceRepository;
-    typeConfigRepository: IAbsenceTypeConfigRepository;
-    attachmentDownloader: AbsenceAttachmentDownloader;
-    aiValidator: AbsenceDocumentAiValidator;
-    auditLogger?: (event: AuditEventPayload) => Promise<void> | void;
-    now?: () => Date;
-}

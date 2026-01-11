@@ -71,9 +71,13 @@ export class PrismaStatutoryReportRepository extends BasePrismaRepository implem
   }
 
   async update(id: string, data: StatutoryReportUpdateData): Promise<StatutoryReport> {
+    const updateData = {
+      ...data,
+      metadata: data.metadata !== undefined ? toPrismaInputJson(data.metadata) : undefined,
+    };
     return getModelDelegate(this.prisma, 'statutoryReport').update({
       where: { id },
-      data,
+      data: updateData,
     });
   }
 

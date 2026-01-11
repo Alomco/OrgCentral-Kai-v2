@@ -8,8 +8,8 @@ import {
     resolveOrgActors,
     type CronTriggerSummary,
 } from '@/server/api-adapters/cron/cron-shared';
-import { WORKER_CACHE_SCOPES } from '@/server/workers/constants';
-import { getLeaveAccrualQueueClient } from '@/server/workers/hr/leave/accrual.queue';
+import { WORKER_CACHE_SCOPES } from '@/server/lib/worker-constants';
+import { getLeaveAccrualQueueClient } from '@/server/lib/queues/hr/leave-accrual-queue';
 import { leaveAccrualEnvelopeSchema } from '@/server/workers/hr/leave/accrual.types';
 
 const ROLE_PRIORITY: OrgRoleKey[] = ['owner', 'orgAdmin'];

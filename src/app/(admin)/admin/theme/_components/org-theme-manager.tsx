@@ -10,12 +10,8 @@ import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import { getPresetOptions } from '@/server/theme/theme-presets';
 
-import {
-    initialThemeState,
-    resetOrgThemeAction,
-    updateOrgThemeAction,
-    updateOrgThemeColorsAction,
-} from '../actions';
+import { resetOrgThemeAction, updateOrgThemeAction, updateOrgThemeColorsAction } from '../actions';
+import { initialThemeState } from '../actions.state';
 
 interface OrgThemeManagerProps {
     orgId: string;

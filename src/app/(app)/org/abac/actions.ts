@@ -8,12 +8,7 @@ import { PrismaAbacPolicyRepository } from '@/server/repositories/prisma/org/aba
 import { setAbacPolicies } from '@/server/use-cases/org/abac/set-abac-policies';
 import { abacPolicySchema } from '@/server/security/abac-policy-normalizer';
 
-export interface AbacPolicyEditorState {
-    status: 'idle' | 'success' | 'error';
-    message?: string;
-}
-
-export const initialAbacPolicyEditorState: AbacPolicyEditorState = { status: 'idle' };
+import { initialAbacPolicyEditorState, type AbacPolicyEditorState } from './actions.state';
 
 const abacPoliciesSchema = z.array(abacPolicySchema);
 

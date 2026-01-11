@@ -17,7 +17,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 
-import { deleteLeavePolicyAction, type LeavePolicyInlineState } from '../leave-policy-actions';
+import { deleteLeavePolicyAction } from '../leave-policy-actions';
+import type { LeavePolicyInlineState } from '../leave-policy-form-utils';
 
 const initialInlineState: LeavePolicyInlineState = { status: 'idle' };
 

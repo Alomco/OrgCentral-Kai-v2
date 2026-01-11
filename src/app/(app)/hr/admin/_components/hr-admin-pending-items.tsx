@@ -4,7 +4,7 @@ import { Clock, Calendar, FileCheck, ArrowRight } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import type { PendingApprovalItem } from '../actions';
+import type { PendingApprovalItem } from '../actions.types';
 
 interface HrAdminPendingItemsProps {
     items: PendingApprovalItem[];

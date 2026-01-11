@@ -4,24 +4,7 @@ import { headers as nextHeaders } from 'next/headers';
 
 import { getSessionContext } from '@/server/use-cases/auth/sessions/get-session';
 import { getPeopleService } from '@/server/services/hr/people/people-service.provider';
-
-export interface AdminDashboardStats {
-    totalEmployees: number;
-    activeEmployees: number;
-    pendingLeaveRequests: number;
-    complianceAlerts: number;
-    upcomingExpirations: number;
-    newHiresThisMonth: number;
-}
-
-export interface PendingApprovalItem {
-    id: string;
-    type: 'leave' | 'compliance' | 'onboarding';
-    title: string;
-    description: string;
-    submittedAt: Date;
-    submittedBy: string;
-}
+import type { AdminDashboardStats, PendingApprovalItem } from './actions.types';
 
 /**
  * Fetch admin dashboard statistics

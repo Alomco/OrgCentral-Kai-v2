@@ -4,9 +4,6 @@ import { headers } from 'next/headers';
 
 import { getSessionContext } from '@/server/use-cases/auth/sessions/get-session';
 
-const NOT_AUTHORIZED_TO_MANAGE_LEAVE_POLICIES_MESSAGE = 'Not authorized to manage leave policies.';
-const HR_SETTINGS_PATH = '/hr/settings';
-
 type LeavePolicyAction = 'create' | 'update' | 'delete';
 
 export async function getLeavePolicySession(action: LeavePolicyAction) {
@@ -24,5 +21,3 @@ export async function getLeavePolicySession(action: LeavePolicyAction) {
         return null;
     }
 }
-
-export { HR_SETTINGS_PATH, NOT_AUTHORIZED_TO_MANAGE_LEAVE_POLICIES_MESSAGE };

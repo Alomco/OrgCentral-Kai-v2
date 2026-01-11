@@ -1,25 +1,18 @@
-import { PrismaInvitationRepository } from '@/server/repositories/prisma/auth/invitations/prisma-invitation-repository';
-import { PrismaMembershipRepository } from '@/server/repositories/prisma/org/membership/prisma-membership-repository';
-import { PrismaOrganizationRepository } from '@/server/repositories/prisma/org/organization/prisma-organization-repository';
-import { PrismaUserRepository } from '@/server/repositories/prisma/org/users/prisma-user-repository';
-import { PrismaEmployeeProfileRepository } from '@/server/repositories/prisma/hr/people/prisma-employee-profile-repository';
-import { PrismaChecklistTemplateRepository } from '@/server/repositories/prisma/hr/onboarding/prisma-checklist-template-repository';
-import { PrismaChecklistInstanceRepository } from '@/server/repositories/prisma/hr/onboarding/prisma-checklist-instance-repository';
-import { invalidateCache } from '@/server/lib/cache-tags';
-import { resolveIdentityCacheScopes } from '@/server/lib/cache-tags/identity';
-import type { BasePrismaRepositoryOptions } from '@/server/repositories/prisma/base-prisma-repository';
-import type { OrgScopedRepositoryOptions } from '@/server/repositories/prisma/org/org-scoped-prisma-repository';
-import { prisma as defaultPrismaClient } from '@/server/lib/prisma';
 import { MembershipService, type MembershipServiceDependencies } from './membership-service';
 import { resolveBillingService } from '@/server/services/billing/billing-service.provider';
 import { getNotificationComposerService } from '@/server/services/platform/notifications/notification-composer.provider';
+import {
+    buildMembershipRepositoryDependencies,
+    type MembershipRepositoryDependencyOptions,
+} from '@/server/repositories/providers/org/membership-service-dependencies';
+import { generateEmployeeNumber } from '@/server/use-cases/shared/builders';
 
 export interface MembershipServiceProviderOptions {
-    prismaOptions?: Pick<BasePrismaRepositoryOptions, 'prisma' | 'trace' | 'onAfterWrite'>;
+    prismaOptions?: MembershipRepositoryDependencyOptions['prismaOptions'];
 }
 
 export class MembershipServiceProvider {
-    private readonly prismaOptions?: Pick<BasePrismaRepositoryOptions, 'prisma' | 'trace' | 'onAfterWrite'>;
+    private readonly prismaOptions?: MembershipRepositoryDependencyOptions['prismaOptions'];
     private readonly defaultDependencies: MembershipServiceDependencies;
     private readonly sharedMembershipService: MembershipService;
 
@@ -49,53 +42,20 @@ export class MembershipServiceProvider {
                 overrides.checklistInstanceRepository ?? deps.checklistInstanceRepository,
             generateEmployeeNumber: overrides.generateEmployeeNumber ?? this.defaultDependencies.generateEmployeeNumber,
             notificationComposer: overrides.notificationComposer ?? deps.notificationComposer,
+            billingService: overrides.billingService ?? deps.billingService,
         });
     }
 
     private createDependencies(
-        prismaOptions?: Pick<BasePrismaRepositoryOptions, 'prisma' | 'trace' | 'onAfterWrite'>,
+        prismaOptions?: MembershipRepositoryDependencyOptions['prismaOptions'],
     ): MembershipServiceDependencies {
-        const prismaClient = prismaOptions?.prisma ?? defaultPrismaClient;
-        const organizationRepo = new PrismaOrganizationRepository({ prisma: prismaClient });
-        const identityInvalidator = prismaOptions?.onAfterWrite ?? this.createIdentityInvalidator(organizationRepo);
-        const repoOptions: OrgScopedRepositoryOptions = {
-            prisma: prismaClient,
-            trace: prismaOptions?.trace,
-            onAfterWrite: identityInvalidator,
-        };
+        const baseDependencies = buildMembershipRepositoryDependencies({ prismaOptions });
 
         return {
-            invitationRepository: new PrismaInvitationRepository(repoOptions),
-            membershipRepository: new PrismaMembershipRepository(repoOptions),
-            userRepository: new PrismaUserRepository(repoOptions),
-            organizationRepository: organizationRepo,
-            employeeProfileRepository: new PrismaEmployeeProfileRepository(repoOptions),
-            checklistTemplateRepository: new PrismaChecklistTemplateRepository(repoOptions),
-            checklistInstanceRepository: new PrismaChecklistInstanceRepository(repoOptions),
+            ...baseDependencies,
             billingService: resolveBillingService(undefined, { prismaOptions }) ?? undefined,
             notificationComposer: getNotificationComposerService(),
-        };
-    }
-
-    private createIdentityInvalidator(
-        organizationRepo: PrismaOrganizationRepository,
-    ): NonNullable<BasePrismaRepositoryOptions['onAfterWrite']> {
-        return async (orgId, scopes = resolveIdentityCacheScopes()) => {
-            const organization = await organizationRepo.getOrganization(orgId);
-            const classification = organization?.dataClassification ?? 'OFFICIAL';
-            const residency = organization?.dataResidency ?? 'UK_ONLY';
-            const scopesToInvalidate = scopes.length > 0 ? scopes : resolveIdentityCacheScopes();
-
-            await Promise.all(
-                scopesToInvalidate.map((scope) =>
-                    invalidateCache({
-                        orgId,
-                        scope,
-                        classification,
-                        residency,
-                    }),
-                ),
-            );
+            generateEmployeeNumber,
         };
     }
 }

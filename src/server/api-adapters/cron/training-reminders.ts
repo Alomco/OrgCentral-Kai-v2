@@ -8,8 +8,8 @@ import {
     resolveOrgActors,
     type CronTriggerSummary,
 } from '@/server/api-adapters/cron/cron-shared';
-import { WORKER_CACHE_SCOPES } from '@/server/workers/constants';
-import { getTrainingReminderQueueClient } from '@/server/workers/hr/training/reminder.queue';
+import { WORKER_CACHE_SCOPES } from '@/server/lib/worker-constants';
+import { getTrainingReminderQueueClient } from '@/server/lib/queues/hr/training-reminder-queue';
 import { trainingReminderEnvelopeSchema } from '@/server/workers/hr/training/reminder.types';
 
 const ROLE_PRIORITY: OrgRoleKey[] = ['orgAdmin', 'compliance', 'owner'];

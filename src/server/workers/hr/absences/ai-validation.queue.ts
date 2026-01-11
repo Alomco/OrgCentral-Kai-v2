@@ -1,6 +1,6 @@
 import type { JobsOptions, Queue } from 'bullmq';
-import { WORKER_QUEUE_NAMES } from '@/server/workers/constants';
-import { getQueue, type QueueRegistryOptions } from '@/server/workers/config/queue-registry';
+import { WORKER_QUEUE_NAMES } from '@/server/lib/worker-constants';
+import { getQueue, type QueueRegistryOptions } from '@/server/lib/queue-registry';
 import type { AbsenceAiValidationJob } from './ai-validation.types';
 
 export const AI_VALIDATION_JOB_NAME = 'hr.absence.ai.validate';

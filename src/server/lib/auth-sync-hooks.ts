@@ -1,8 +1,10 @@
 import type { BetterAuthSessionPayload, BetterAuthUserPayload } from '@/server/lib/auth-sync';
 import { appLogger } from '@/server/logging/structured-logger';
-import { getAuthSyncQueueClient } from '@/server/workers/auth-sync.queue';
 
-type AuthSyncQueueClient = ReturnType<typeof getAuthSyncQueueClient>;
+export interface AuthSyncQueueClient {
+    enqueueUserSync: (user: BetterAuthUserPayload) => Promise<void>;
+    enqueueSessionSync: (session: BetterAuthSessionPayload) => Promise<void>;
+}
 
 async function enqueueAuthSyncSafely(
     enqueue: () => Promise<void>,
@@ -18,8 +20,11 @@ async function enqueueAuthSyncSafely(
     }
 }
 
-export function getAuthSyncQueueClientOrNull(isEnabled: boolean): AuthSyncQueueClient | null {
-    return isEnabled ? getAuthSyncQueueClient() : null;
+export function getAuthSyncQueueClientOrNull(
+    isEnabled: boolean,
+    factory: () => AuthSyncQueueClient,
+): AuthSyncQueueClient | null {
+    return isEnabled ? factory() : null;
 }
 
 export function createAuthDatabaseHooks(authSyncQueue: AuthSyncQueueClient | null) {

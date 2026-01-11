@@ -1,6 +1,6 @@
 import type { JobsOptions, Queue } from 'bullmq';
 import { getSharedQueue } from '@/server/lib/queue';
-import { WORKER_QUEUE_NAMES } from '@/server/workers/constants';
+import { WORKER_QUEUE_NAMES } from '@/server/lib/worker-constants';
 import type { RoleUpdateEnvelope } from './role-worker.types';
 
 export interface RoleQueueClient {

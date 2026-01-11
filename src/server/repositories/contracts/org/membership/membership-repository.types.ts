@@ -1,6 +1,6 @@
 import type { EmploymentType, MembershipStatus, Prisma } from '@prisma/client';
 import type { Membership } from '@/server/types/membership';
-import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
+import type { RepositoryAuthorizationContext } from '@/server/types/repository-authorization';
 
 export interface EmployeeProfilePayload {
     orgId: string;

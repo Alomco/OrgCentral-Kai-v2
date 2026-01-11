@@ -7,9 +7,6 @@ import { PrismaComplianceTemplateRepository } from '@/server/repositories/prisma
 
 import { toFieldErrors } from '../../_components/form-errors';
 import {
-    COMPLIANCE_TEMPLATES_NOT_AUTHORIZED_MESSAGE,
-    COMPLIANCE_TEMPLATES_PATH,
-    FIELD_ERROR_MESSAGE,
     getComplianceTemplateSession,
 } from './compliance-template-action-helpers';
 import {
@@ -23,11 +20,9 @@ import {
     type ComplianceTemplateInlineState,
 } from '../compliance-template-form-utils';
 
-export type {
-    ComplianceTemplateCreateState,
-    ComplianceTemplateInlineState,
-    ComplianceTemplateCreateValues,
-} from '../compliance-template-form-utils';
+const COMPLIANCE_TEMPLATES_NOT_AUTHORIZED_MESSAGE = 'Not authorized to manage compliance templates.';
+const COMPLIANCE_TEMPLATES_PATH = '/hr/compliance';
+const FIELD_ERROR_MESSAGE = 'Check the highlighted fields and try again.';
 
 const complianceTemplateRepository = new PrismaComplianceTemplateRepository();
 

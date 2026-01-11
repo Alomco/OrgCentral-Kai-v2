@@ -1,4 +1,4 @@
-import type { RepositoryAuthorizationContext } from './repository-authorization';
+import type { RepositoryAuthorizationContext } from '@/server/types/repository-authorization';
 
 const CACHE_SAFE_CORRELATION_ID = '00000000-0000-0000-0000-000000000000';
 

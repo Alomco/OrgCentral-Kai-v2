@@ -3,7 +3,7 @@
 import { useActionState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
-import type { InlineRoleActionState } from '../actions';
+import type { InlineRoleActionState } from '../actions.state';
 import { deleteRoleInlineAction, updateRoleInlineAction } from '../actions';
 
 const initialState: InlineRoleActionState = { status: 'idle' };

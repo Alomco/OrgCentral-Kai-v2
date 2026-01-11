@@ -1,7 +1,5 @@
 import { Worker, type WorkerOptions } from 'bullmq';
-import { GeminiAbsenceDocumentValidator } from '@/server/lib/ai/gemini-document-validator';
-import { HttpAttachmentDownloader } from '@/server/lib/storage/http-attachment-downloader';
-import { PrismaAbsenceTypeConfigRepository, PrismaUnplannedAbsenceRepository } from '@/server/repositories/prisma/hr/absences';
+import { buildAbsenceAiValidationDependencies } from '@/server/use-cases/hr/absences/ai-validation.provider';
 import type { AbsenceAiValidationResult } from './ai-validation.types';
 import { AbsenceAiValidationService } from './ai-validation.service';
 import {
@@ -35,12 +33,7 @@ export function registerAbsenceAiWorker(options?: AbsenceAiWorkerOptions): Worke
     const queueClient = getAbsenceAiQueueClient(options?.queue);
     const service: Pick<AbsenceAiValidationService, 'handle'> =
         options?.service ??
-        new AbsenceAiValidationService({
-            absenceRepository: new PrismaUnplannedAbsenceRepository(),
-            typeConfigRepository: new PrismaAbsenceTypeConfigRepository(),
-            attachmentDownloader: new HttpAttachmentDownloader(),
-            aiValidator: new GeminiAbsenceDocumentValidator(),
-        });
+        new AbsenceAiValidationService(buildAbsenceAiValidationDependencies());
 
     const processor = createAbsenceAiProcessor(service);
 

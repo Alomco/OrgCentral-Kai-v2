@@ -49,7 +49,7 @@ describe('ComplianceReminderProcessor', () => {
             markNotificationRead: vi.fn(),
             markAllNotificationsRead: vi.fn(),
             deleteNotification: vi.fn(),
-        } satisfies Partial<HrNotificationServiceContract> as HrNotificationServiceContract;
+        } as unknown as HrNotificationServiceContract;
         notificationDispatcher = {
             dispatchNotification: vi.fn().mockResolvedValue(undefined),
         };

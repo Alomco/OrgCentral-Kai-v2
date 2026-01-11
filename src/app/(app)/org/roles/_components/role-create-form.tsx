@@ -4,7 +4,8 @@ import { useActionState } from 'react';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
-import { createRoleAction, initialRoleCreateState, type RoleCreateState } from '../actions';
+import { createRoleAction } from '../actions';
+import { initialRoleCreateState, type RoleCreateState } from '../actions.state';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';

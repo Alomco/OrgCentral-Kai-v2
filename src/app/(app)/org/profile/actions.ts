@@ -24,14 +24,7 @@ import {
     contactGroupSchema,
     readContactGroup,
 } from './contact-helpers';
-
-export interface OrgProfileActionState {
-    status: 'idle' | 'success' | 'error';
-    message?: string;
-    fieldErrors?: Record<string, string[]>;
-}
-
-export const initialOrgProfileActionState: OrgProfileActionState = { status: 'idle' };
+import type { OrgProfileActionState } from './actions.state';
 
 const ORG_PROFILE_CACHE_SCOPE = 'org:profile';
 const FIELD_ERROR_MESSAGE = 'Please correct the highlighted fields.';

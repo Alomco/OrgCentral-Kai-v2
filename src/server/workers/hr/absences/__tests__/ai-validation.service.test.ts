@@ -55,8 +55,10 @@ vi.mock('@/server/repositories/security', async () => {
         ),
     };
 });
-vi.mock('../ai-validation.cache', async () => {
-    const actual = await vi.importActual<typeof import('../ai-validation.cache')>('../ai-validation.cache');
+vi.mock('@/server/use-cases/hr/absences/ai-validation.cache', async () => {
+    const actual = await vi.importActual<typeof import('@/server/use-cases/hr/absences/ai-validation.cache')>(
+        '@/server/use-cases/hr/absences/ai-validation.cache',
+    );
     return {
         ...actual,
         invalidateAbsenceAiCaches: vi.fn(() => Promise.resolve()),

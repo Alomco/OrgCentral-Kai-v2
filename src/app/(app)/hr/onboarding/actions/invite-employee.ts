@@ -11,7 +11,10 @@ import { PrismaOrganizationRepository } from '@/server/repositories/prisma/org/o
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
 import { getSessionContext } from '@/server/use-cases/auth/sessions/get-session';
 import { sendOnboardingInvite } from '@/server/use-cases/hr/onboarding/send-onboarding-invite';
-import { isInvitationDeliverySuccessful } from '@/server/use-cases/notifications/invitation-email.helpers';
+import {
+    getInvitationDeliveryFailureMessage,
+    isInvitationDeliverySuccessful,
+} from '@/server/use-cases/notifications/invitation-email.helpers';
 import { resendInvitationEmail } from '@/server/use-cases/notifications/resend-invitation-email';
 import { sendInvitationEmail } from '@/server/use-cases/notifications/send-invitation-email';
 import { getInvitationEmailDependencies } from '@/server/use-cases/notifications/invitation-email.provider';
@@ -47,27 +50,33 @@ function readPendingInvitationToken(details?: ErrorDetails): string | null {
 interface InvitationEmailFeedback {
     message: string;
     invitationUrl?: string;
+    emailDelivered?: boolean;
 }
 
 async function buildSendInviteFeedback(
     authorization: RepositoryAuthorizationContext,
     token: string,
 ): Promise<InvitationEmailFeedback> {
-    const fallbackMessage = 'Invitation created. Share the invite link with the employee.';
     try {
         const dependencies = getInvitationEmailDependencies();
         const emailResult = await sendInvitationEmail(dependencies, {
             authorization,
             invitationToken: token,
         });
+
+        const delivered = isInvitationDeliverySuccessful(emailResult.delivery);
         return {
-            message: isInvitationDeliverySuccessful(emailResult.delivery)
-                ? 'Invitation created.'
-                : fallbackMessage,
+            message: delivered
+                ? 'Invitation created. Email sent.'
+                : `Invitation created, but email delivery failed. ${getInvitationDeliveryFailureMessage(emailResult.delivery)} Share the invite link with the employee.`,
             invitationUrl: emailResult.invitationUrl,
+            emailDelivered: delivered,
         };
     } catch {
-        return { message: fallbackMessage };
+        return {
+            message: 'Invitation created, but email delivery failed (unexpected error). Share the invite link with the employee.',
+            emailDelivered: false,
+        };
     }
 }
 
@@ -75,21 +84,26 @@ async function buildResendInviteFeedback(
     authorization: RepositoryAuthorizationContext,
     token: string,
 ): Promise<InvitationEmailFeedback> {
-    const fallbackMessage = 'Invitation already exists. Share the invite link with the employee.';
     try {
         const dependencies = getInvitationEmailDependencies();
         const resendResult = await resendInvitationEmail(dependencies, {
             authorization,
             invitationToken: token,
         });
+
+        const delivered = isInvitationDeliverySuccessful(resendResult.delivery);
         return {
-            message: isInvitationDeliverySuccessful(resendResult.delivery)
+            message: delivered
                 ? 'Invitation already exists. Email resent.'
-                : fallbackMessage,
+                : `Invitation already exists, but resend delivery failed. ${getInvitationDeliveryFailureMessage(resendResult.delivery)} Share the invite link with the employee.`,
             invitationUrl: resendResult.invitationUrl,
+            emailDelivered: delivered,
         };
     } catch {
-        return { message: fallbackMessage };
+        return {
+            message: 'Invitation already exists, but resend delivery failed (unexpected error). Share the invite link with the employee.',
+            emailDelivered: false,
+        };
     }
 }
 
@@ -173,6 +187,7 @@ export async function inviteEmployeeAction(
             message: emailFeedback.message,
             token: result.token,
             invitationUrl: emailFeedback.invitationUrl,
+            emailDelivered: emailFeedback.emailDelivered,
             fieldErrors: undefined,
             values: {
                 ...parsed.data,
@@ -200,6 +215,7 @@ export async function inviteEmployeeAction(
                     message: emailFeedback.message,
                     token: pendingToken,
                     invitationUrl: emailFeedback.invitationUrl,
+                    emailDelivered: emailFeedback.emailDelivered,
                     fieldErrors: undefined,
                     values: {
                         ...parsed.data,

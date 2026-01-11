@@ -9,7 +9,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 import type { EmployeeListResult, EmployeeFilterOptions } from '../types';
 import type { EmployeeSearchParams } from '../schema';
-import { getEmployeeList } from '../actions';
+import { getEmployeeList } from '../actions/list-employees';
 import { EmployeeSearchBar } from './employee-search-bar';
 import { EmployeeDirectoryTable } from './employee-directory-table';
 import { EmployeePagination } from './employee-pagination';

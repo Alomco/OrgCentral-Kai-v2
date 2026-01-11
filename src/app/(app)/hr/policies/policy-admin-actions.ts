@@ -20,12 +20,6 @@ import {
     type PolicyAdminInlineState,
 } from './policy-admin-form-utils';
 
-export type {
-    PolicyAdminCreateState,
-    PolicyAdminInlineState,
-    PolicyAdminCreateValues,
-} from './policy-admin-form-utils';
-
 const policyService = getHrPolicyService();
 const POLICIES_PATH = '/hr/policies';
 const FIELD_ERROR_MESSAGE = 'Check the highlighted fields and try again.';

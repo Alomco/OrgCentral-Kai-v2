@@ -17,10 +17,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 
-import {
-    deletePermissionResourceAction,
-    type PermissionResourceInlineState,
-} from '../permission-resource-actions';
+import { deletePermissionResourceAction } from '../permission-resource-actions';
+import type { PermissionResourceInlineState } from '../permission-resource-form-utils';
 
 const initialInlineState: PermissionResourceInlineState = { status: 'idle' };
 

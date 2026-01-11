@@ -1,7 +1,7 @@
 import { Users, UserCheck, Clock, AlertTriangle, Calendar, TrendingUp } from 'lucide-react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import type { AdminDashboardStats } from '../actions';
+import type { AdminDashboardStats } from '../actions.types';
 
 interface HrAdminStatsRowProps {
     stats: AdminDashboardStats;

@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import type { WorkerJobEnvelope, WorkerJobMetadata, WorkerJobAuthorization } from '@/server/workers/abstract-org-worker';
 import { DATA_CLASSIFICATION_LEVELS, DATA_RESIDENCY_ZONES } from '@/server/types/tenant';
+import type { ComplianceReminderPayload } from '@/server/use-cases/hr/compliance/send-compliance-reminders';
 
 export const COMPLIANCE_REMINDER_JOB_NAME = 'hr.compliance.reminder';
 
@@ -25,13 +26,13 @@ export const jobMetadataSchema: z.ZodType<WorkerJobMetadata | undefined> = z
     .partial()
     .optional();
 
-export const complianceReminderPayloadSchema = z.object({
+export const complianceReminderPayloadSchema: z.ZodType<ComplianceReminderPayload> = z.object({
     referenceDate: z.coerce.date().optional(),
     daysUntilExpiry: z.number().int().positive().max(365).default(30),
     targetUserIds: z.array(z.uuid()).optional(),
 });
 
-export type ComplianceReminderPayload = z.input<typeof complianceReminderPayloadSchema>;
+export type { ComplianceReminderPayload };
 
 export const complianceReminderEnvelopeSchema = z.object({
     orgId: z.uuid(),

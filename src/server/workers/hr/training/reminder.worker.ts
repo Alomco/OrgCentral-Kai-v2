@@ -1,6 +1,6 @@
 import type { WorkerOptions } from 'bullmq';
 import { AbstractOrgWorker } from '@/server/workers/abstract-org-worker';
-import { WORKER_QUEUE_NAMES } from '@/server/workers/constants';
+import { WORKER_QUEUE_NAMES } from '@/server/lib/worker-constants';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
 import {
     TRAINING_REMINDER_JOB_NAME,

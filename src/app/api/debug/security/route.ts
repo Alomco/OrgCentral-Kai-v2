@@ -3,18 +3,12 @@ import { NextResponse, type NextRequest } from 'next/server';
 import type { AbacPolicy } from '@/server/security/abac-types';
 import { getTenantAbacPolicies } from '@/server/security/abac';
 import { createAuth } from '@/server/lib/auth';
-import { prisma } from '@/server/lib/prisma';
 import { isOrgRoleKey } from '@/server/security/access-control';
 import { getSessionContext } from '@/server/use-cases/auth/sessions/get-session';
+import { listSessionOrganizations, type DebugOrgSummary } from '@/server/use-cases/auth/debug-security';
 
 // Note: Removed 'export const dynamic = "force-dynamic"' as it's incompatible with nextConfig.cacheComponents
 // This route should use dynamic rendering by default since it accesses request data
-
-interface DebugOrgSummary {
-    id: string;
-    slug: string;
-    name: string;
-}
 
 type DebugSecurityResponse =
     | {
@@ -78,26 +72,6 @@ function safeIsoString(value: unknown): string | undefined {
         return value;
     }
     return undefined;
-}
-
-async function listSessionOrganizations(userId: string): Promise<DebugOrgSummary[]> {
-    const memberships = await prisma.authOrgMember.findMany({
-        where: { userId },
-        select: {
-            organization: {
-                select: { id: true, slug: true, name: true },
-            },
-        },
-        orderBy: { createdAt: 'desc' },
-        take: 15,
-    });
-
-    return memberships
-        .map((row) => row.organization)
-        .filter((org): org is DebugOrgSummary => {
-            const { id, slug, name } = org;
-            return Boolean(id && slug && name);
-        });
 }
 
 export async function GET(request: NextRequest): Promise<Response> {

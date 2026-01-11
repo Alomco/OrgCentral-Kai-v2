@@ -3,16 +3,20 @@
 import { invalidateOrgCache } from '@/server/lib/cache-tags';
 import { CACHE_SCOPE_ONBOARDING_INVITATIONS } from '@/server/repositories/cache-scopes';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
-import { isInvitationDeliverySuccessful } from '@/server/use-cases/notifications/invitation-email.helpers';
+import {
+    getInvitationDeliveryFailureMessage,
+    isInvitationDeliverySuccessful,
+} from '@/server/use-cases/notifications/invitation-email.helpers';
 import { resendInvitationEmail } from '@/server/use-cases/notifications/resend-invitation-email';
 import { sendInvitationEmail } from '@/server/use-cases/notifications/send-invitation-email';
 import { getInvitationEmailDependencies } from '@/server/use-cases/notifications/invitation-email.provider';
 
 import type { WizardSubmitResult } from './wizard.types';
 
-export interface InvitationDeliverySummary {
+interface InvitationDeliverySummary {
     delivered: boolean;
     invitationUrl?: string;
+    failureMessage?: string;
 }
 
 export async function attemptInvitationEmail(
@@ -25,9 +29,12 @@ export async function attemptInvitationEmail(
             authorization,
             invitationToken: token,
         });
+
+        const delivered = isInvitationDeliverySuccessful(result.delivery);
         return {
-            delivered: isInvitationDeliverySuccessful(result.delivery),
+            delivered,
             invitationUrl: result.invitationUrl,
+            failureMessage: delivered ? undefined : getInvitationDeliveryFailureMessage(result.delivery),
         };
     } catch {
         return {
@@ -62,7 +69,7 @@ export async function resendPendingInvitation(
             emailDelivered: delivered,
             message: delivered
                 ? 'Invitation already exists. Email resent.'
-                : 'Invitation already exists. Share the invite link manually.',
+                : `Invitation already exists, but we couldn't resend the email. ${getInvitationDeliveryFailureMessage(resendResult.delivery)} Share the invite link manually.`,
         };
     } catch (resendError) {
         return {

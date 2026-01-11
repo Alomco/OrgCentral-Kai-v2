@@ -9,8 +9,8 @@ import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
 
-import { createPermissionResourceAction, type PermissionResourceCreateState } from '../permission-resource-actions';
-import { defaultCreateValues } from '../permission-resource-form-utils';
+import { createPermissionResourceAction } from '../permission-resource-actions';
+import { defaultCreateValues, type PermissionResourceCreateState } from '../permission-resource-form-utils';
 import { FieldError } from './field-error';
 
 const initialCreateState: PermissionResourceCreateState = {

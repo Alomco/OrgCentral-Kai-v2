@@ -8,14 +8,7 @@ import { getSessionContext } from '@/server/use-cases/auth/sessions/get-session'
 import { resetOrgBranding } from '@/server/use-cases/org/branding/reset-org-branding';
 import { updateOrgBranding } from '@/server/use-cases/org/branding/update-org-branding';
 
-export interface OrgBrandingState {
-    status: 'idle' | 'success' | 'error';
-    message?: string;
-}
-
-export const initialOrgBrandingState: OrgBrandingState = {
-    status: 'idle',
-};
+import { initialOrgBrandingState, type OrgBrandingState } from './actions.state';
 
 const brandingSchema = z
     .object({

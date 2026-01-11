@@ -1,6 +1,6 @@
 import { AuthorizationError } from '@/server/errors';
 import type { IBrandingRepository } from '@/server/repositories/contracts/org/branding/branding-repository-contract';
-import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
+import type { RepositoryAuthorizationContext } from '@/server/types/repository-authorization';
 import { invalidateOrgCache } from '@/server/lib/cache-tags';
 import { CACHE_SCOPE_BRANDING } from '@/server/repositories/cache-scopes';
 

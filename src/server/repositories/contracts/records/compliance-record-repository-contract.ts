@@ -1,5 +1,4 @@
-import type { ComplianceRecord } from '@prisma/client';
-import type { ComplianceRecordFilters, ComplianceRecordCreationData, ComplianceRecordUpdateData } from '@/server/repositories/prisma/records/compliance/prisma-compliance-record-repository.types';
+import type { ComplianceRecord, ComplianceRecordFilters, ComplianceRecordCreationData, ComplianceRecordUpdateData } from '@/server/types/records/compliance-record';
 
 export interface IComplianceRecordRepository {
     findById(id: string): Promise<ComplianceRecord | null>;

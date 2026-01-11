@@ -1,7 +1,7 @@
 import type { Job, WorkerOptions } from 'bullmq';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
 import { AbstractOrgWorker } from '@/server/workers/abstract-org-worker';
-import { WORKER_QUEUE_NAMES } from '@/server/workers/constants';
+import { WORKER_QUEUE_NAMES } from '@/server/lib/worker-constants';
 import {
     notificationDispatchEnvelopeSchema,
     type NotificationDispatchPayload,

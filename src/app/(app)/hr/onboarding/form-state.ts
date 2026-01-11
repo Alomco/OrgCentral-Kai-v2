@@ -8,6 +8,7 @@ export interface OnboardingInviteFormState {
     message?: string;
     token?: string;
     invitationUrl?: string;
+    emailDelivered?: boolean;
     fieldErrors?: FieldErrors<OnboardingInviteFormValues>;
     values: OnboardingInviteFormValues;
 }

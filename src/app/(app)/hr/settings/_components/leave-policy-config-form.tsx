@@ -12,7 +12,8 @@ import { Spinner } from '@/components/ui/spinner';
 import type { LeavePolicy } from '@/server/types/leave-types';
 
 import { FieldError } from '../../_components/field-error';
-import { createLeavePolicyAction, type LeavePolicyCreateState } from '../leave-policy-actions';
+import { createLeavePolicyAction } from '../leave-policy-actions';
+import type { LeavePolicyCreateState } from '../leave-policy-form-utils';
 import { LeavePolicyRow } from './leave-policy-row';
 
 const initialCreateState: LeavePolicyCreateState = {

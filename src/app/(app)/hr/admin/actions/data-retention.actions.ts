@@ -7,7 +7,7 @@ import { HR_ACTION, HR_RESOURCE } from '@/server/security/authorization/hr-resou
 import { runPeopleRetentionSweepJob } from '@/server/services/hr/people/sar/people-sar.jobs';
 import { scheduleNightlyRetentionSweep } from '@/server/services/hr/people/sar/people-retention.schedule';
 
-export interface RetentionActionState {
+interface RetentionActionState {
     status: 'idle' | 'success' | 'error';
     message?: string;
 }

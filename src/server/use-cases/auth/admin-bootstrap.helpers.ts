@@ -1,5 +1,5 @@
 import { randomUUID, timingSafeEqual } from 'node:crypto';
-import { prisma } from '@/server/lib/prisma';
+import type { PrismaClient } from '@prisma/client';
 import { AuthorizationError, ValidationError } from '@/server/errors';
 import { isOrgRoleKey, type OrgRoleKey } from '@/server/security/access-control';
 
@@ -67,7 +67,11 @@ export function assertUuid(value: string, name: string): void {
     }
 }
 
-async function resolveCanonicalAuthUserId(authUserId: string, email: string): Promise<string> {
+async function resolveCanonicalAuthUserId(
+    prisma: PrismaClient,
+    authUserId: string,
+    email: string,
+): Promise<string> {
     if (isUuid(authUserId)) {
         return authUserId;
     }
@@ -84,8 +88,12 @@ async function resolveCanonicalAuthUserId(authUserId: string, email: string): Pr
     return randomUUID();
 }
 
-export async function ensureAuthUserIdIsUuid(authUserId: string, email: string): Promise<string> {
-    const canonicalUserId = await resolveCanonicalAuthUserId(authUserId, email);
+export async function ensureAuthUserIdIsUuid(
+    prisma: PrismaClient,
+    authUserId: string,
+    email: string,
+): Promise<string> {
+    const canonicalUserId = await resolveCanonicalAuthUserId(prisma, authUserId, email);
 
     if (canonicalUserId === authUserId) {
         return canonicalUserId;
@@ -115,6 +123,7 @@ export async function ensureAuthUserIdIsUuid(authUserId: string, email: string):
 }
 
 export async function ensurePlatformAuthOrganization(
+    prisma: PrismaClient,
     input: PlatformBootstrapConfig,
     organization: { id: string; slug: string; name: string },
 ): Promise<void> {

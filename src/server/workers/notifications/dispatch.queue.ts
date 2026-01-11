@@ -1,6 +1,6 @@
 import type { JobsOptions } from 'bullmq';
-import { WORKER_QUEUE_NAMES } from '@/server/workers/constants';
-import { getQueue, type QueueRegistryOptions } from '@/server/workers/config/queue-registry';
+import { WORKER_QUEUE_NAMES } from '@/server/lib/worker-constants';
+import { getQueue, type QueueRegistryOptions } from '@/server/lib/queue-registry';
 import { NOTIFICATION_DISPATCH_JOB_NAME, type NotificationDispatchEnvelope } from './dispatch.types';
 
 export interface NotificationDispatchQueueClient {

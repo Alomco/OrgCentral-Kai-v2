@@ -1,15 +1,14 @@
-import type { DocumentVault } from '@prisma/client';
-import type { DocumentVaultFilters, DocumentVaultCreationData, DocumentVaultUpdateData } from '@/server/repositories/prisma/records/documents/prisma-document-vault-repository.types';
+import type { DocumentVaultRecord, DocumentVaultFilters, DocumentVaultCreationData, DocumentVaultUpdateData } from '@/server/types/records/document-vault';
 
 export interface IDocumentVaultRepository {
-    findById(id: string): Promise<DocumentVault | null>;
-    findByBlobPointer(blobPointer: string): Promise<DocumentVault | null>;
-    findAll(filters?: DocumentVaultFilters): Promise<DocumentVault[]>;
-    create(data: DocumentVaultCreationData): Promise<DocumentVault>;
-    update(id: string, data: DocumentVaultUpdateData): Promise<DocumentVault>;
-    delete(id: string): Promise<DocumentVault>;
+    findById(id: string): Promise<DocumentVaultRecord | null>;
+    findByBlobPointer(blobPointer: string): Promise<DocumentVaultRecord | null>;
+    findAll(filters?: DocumentVaultFilters): Promise<DocumentVaultRecord[]>;
+    create(data: DocumentVaultCreationData): Promise<DocumentVaultRecord>;
+    update(id: string, data: DocumentVaultUpdateData): Promise<DocumentVaultRecord>;
+    delete(id: string): Promise<DocumentVaultRecord>;
     /**
      * Contract-facing method for retrieving a document by ID for a tenant/user with ABAC checks.
      */
-    getDocument?(tenantId: string, userId: string, id: string): Promise<DocumentVault | null>;
+    getDocument?(tenantId: string, userId: string, id: string): Promise<DocumentVaultRecord | null>;
 }

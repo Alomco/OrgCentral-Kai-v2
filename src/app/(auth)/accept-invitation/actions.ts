@@ -9,12 +9,7 @@ import { PrismaInvitationRepository } from '@/server/repositories/prisma/auth/in
 import { acceptInvitationController } from '@/server/api-adapters/auth/accept-invitation';
 import { completeOnboardingInviteController } from '@/server/api-adapters/hr/onboarding/complete-onboarding-invite';
 
-export type AcceptInvitationActionState =
-    | { status: 'idle' }
-    | { status: 'success'; organizationName: string; alreadyMember: boolean }
-    | { status: 'error'; message: string };
-
-export const initialAcceptInvitationState: AcceptInvitationActionState = { status: 'idle' };
+import type { AcceptInvitationActionState } from './accept-invitation.state';
 
 export async function acceptInvitationAction(
     _previous: AcceptInvitationActionState,

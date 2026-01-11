@@ -6,12 +6,11 @@ import { z } from 'zod';
 import { getSessionContext } from '@/server/use-cases/auth/sessions/get-session';
 import { getInvitationEmailDependencies } from '@/server/use-cases/notifications/invitation-email.provider';
 import { resendInvitationEmail } from '@/server/use-cases/notifications/resend-invitation-email';
-import { isInvitationDeliverySuccessful } from '@/server/use-cases/notifications/invitation-email.helpers';
-
-export type ResendOrgInvitationActionState =
-    | { status: 'idle' }
-    | { status: 'success'; message: string }
-    | { status: 'error'; message: string };
+import {
+    getInvitationDeliveryFailureMessage,
+    isInvitationDeliverySuccessful,
+} from '@/server/use-cases/notifications/invitation-email.helpers';
+import type { ResendOrgInvitationActionState } from './invitation-actions.types';
 
 const payloadSchema = z.object({
     token: z.string().trim().min(1, 'Invitation token is required.'),
@@ -54,9 +53,7 @@ export async function resendOrgInvitationAction(
         if (!isInvitationDeliverySuccessful(result.delivery)) {
             return {
                 status: 'error',
-                message: result.delivery.status === 'skipped'
-                    ? result.delivery.detail ?? 'Email delivery is not configured.'
-                    : 'Invitation email could not be delivered.',
+                message: getInvitationDeliveryFailureMessage(result.delivery),
             };
         }
 

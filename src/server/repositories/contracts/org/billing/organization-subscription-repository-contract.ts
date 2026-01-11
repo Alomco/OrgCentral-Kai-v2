@@ -1,4 +1,4 @@
-import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
+import type { RepositoryAuthorizationContext } from '@/server/types/repository-authorization';
 import type {
   BillingSubscriptionStatus,
   OrganizationSubscriptionData,

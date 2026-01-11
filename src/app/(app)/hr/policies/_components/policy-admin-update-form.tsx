@@ -12,10 +12,8 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import type { HRPolicy } from '@/server/types/hr-ops-types';
 
-import {
-    updatePolicyAdminAction,
-    type PolicyAdminInlineState,
-} from '../policy-admin-actions';
+import { updatePolicyAdminAction } from '../policy-admin-actions';
+import type { PolicyAdminInlineState } from '../policy-admin-form-utils';
 
 const initialInlineState: PolicyAdminInlineState = { status: 'idle' };
 

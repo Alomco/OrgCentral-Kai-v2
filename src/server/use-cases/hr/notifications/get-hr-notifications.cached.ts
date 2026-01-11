@@ -1,9 +1,9 @@
 import { cacheLife, unstable_noStore as noStore } from 'next/cache';
 
 import { CACHE_LIFE_SHORT } from '@/server/repositories/cache-profiles';
-import { getHrNotificationService } from '@/server/services/hr/notifications/hr-notification-service.provider';
+import { getHrNotificationService } from '@/server/use-cases/hr/notifications/notification-composition';
 import { toCacheSafeAuthorizationContext } from '@/server/repositories/security/cache-authorization';
-import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
+import type { RepositoryAuthorizationContext } from '@/server/types/repository-authorization';
 import type { HRNotificationDTO, HRNotificationListFilters } from '@/server/types/hr/notifications';
 
 export interface GetHrNotificationsForUiInput {

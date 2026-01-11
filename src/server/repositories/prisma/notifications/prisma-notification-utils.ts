@@ -3,6 +3,8 @@ import { Prisma, type NotificationMessage, type NotificationUrgency, type Notifi
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
 import type {
     NotificationCreateInput,
+    NotificationCreatePayload,
+    NotificationListFilterInput,
     NotificationListFilters,
     NotificationPriorityCode,
     NotificationRecord,
@@ -61,7 +63,7 @@ const priorityFromPrisma: Record<NotificationUrgency, NotificationPriorityCode> 
 export function normalizeCreateInput(
     authorization: RepositoryAuthorizationContext,
     input: NotificationCreateInput,
-): Result<NotificationCreateInput, Error> {
+): Result<NotificationCreatePayload, Error> {
     if (input.orgId && input.orgId !== authorization.orgId) {
         return err(new RepositoryAuthorizationError('Cross-tenant notification creation blocked'));
     }
@@ -94,7 +96,7 @@ export function normalizeCreateInput(
     return ok(parsed.data);
 }
 
-export function parseNotificationFilters(filters?: NotificationListFilters): Result<NotificationListFilters, Error> {
+export function parseNotificationFilters(filters?: NotificationListFilterInput): Result<NotificationListFilters, Error> {
     if (!filters) {
         return ok({});
     }
@@ -106,7 +108,7 @@ export function parseNotificationFilters(filters?: NotificationListFilters): Res
 }
 
 export function toPrismaCreate(
-    input: NotificationCreateInput,
+    input: NotificationCreatePayload,
 ): Prisma.NotificationMessageUncheckedCreateInput {
     return {
         orgId: input.orgId,

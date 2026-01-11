@@ -1,5 +1,4 @@
-import type { DataSubjectRight } from '@prisma/client';
-import type { DataSubjectRightFilters, DataSubjectRightCreationData, DataSubjectRightUpdateData } from '@/server/repositories/prisma/records/privacy/prisma-data-subject-rights-repository.types';
+import type { DataSubjectRight, DataSubjectRightFilters, DataSubjectRightCreationData, DataSubjectRightUpdateData } from '@/server/types/records/data-subject-right';
 
 export interface IDataSubjectRightsRepository {
     findById(id: string): Promise<DataSubjectRight | null>;

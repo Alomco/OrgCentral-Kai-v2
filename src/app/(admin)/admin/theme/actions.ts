@@ -12,12 +12,7 @@ import { getThemePreset, isThemePresetId } from '@/server/theme/theme-presets';
 import type { ThemeTokenMap } from '@/server/theme/tokens';
 import { appLogger } from '@/server/logging/structured-logger';
 
-export interface UpdateOrgThemeState {
-    status: 'idle' | 'success' | 'error';
-    message?: string;
-}
-
-export const initialThemeState: UpdateOrgThemeState = { status: 'idle' };
+import type { UpdateOrgThemeState } from './actions.state';
 
 const presetSchema = z
     .object({

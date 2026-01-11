@@ -10,11 +10,8 @@ import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
 import type { PermissionResource } from '@/server/types/security-types';
 
-import {
-    updatePermissionResourceAction,
-    type PermissionResourceInlineState,
-} from '../permission-resource-actions';
-import { stringifyActionList } from '../permission-resource-form-utils';
+import { updatePermissionResourceAction } from '../permission-resource-actions';
+import { stringifyActionList, type PermissionResourceInlineState } from '../permission-resource-form-utils';
 import { FieldError } from './field-error';
 
 const initialInlineState: PermissionResourceInlineState = { status: 'idle' };

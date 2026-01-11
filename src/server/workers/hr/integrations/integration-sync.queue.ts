@@ -1,7 +1,7 @@
 import type { JobsOptions } from 'bullmq';
 
-import { WORKER_QUEUE_NAMES } from '@/server/workers/constants';
-import { getQueue, type QueueRegistryOptions } from '@/server/workers/config/queue-registry';
+import { WORKER_QUEUE_NAMES } from '@/server/lib/worker-constants';
+import { getQueue, type QueueRegistryOptions } from '@/server/lib/queue-registry';
 
 import { HR_INTEGRATION_SYNC_JOB_NAME, type IntegrationSyncEnvelope } from './integration-sync.types';
 

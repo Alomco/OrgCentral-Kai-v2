@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 
 import { FieldError } from '../../_components/field-error';
 import { formatCategoryLabel, formatStatusLabel } from './policy-admin-form.state';
-import type { PolicyAdminCreateState } from '../policy-admin-actions';
+import type { PolicyAdminCreateState } from '../policy-admin-form-utils';
 
 interface FormSectionProps {
     state: PolicyAdminCreateState;

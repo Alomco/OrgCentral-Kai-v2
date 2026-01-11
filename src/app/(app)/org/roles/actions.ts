@@ -5,15 +5,7 @@ import { z } from 'zod';
 import { getSessionContext } from '@/server/use-cases/auth/sessions/get-session';
 import { getRoleService } from '@/server/services/org';
 import type { Role } from '@/server/types/hr-types';
-
-export interface RoleCreateState {
-    status: 'idle' | 'success' | 'error';
-    message?: string;
-}
-
-export const initialRoleCreateState: RoleCreateState = {
-    status: 'idle',
-};
+import { initialRoleCreateState, type InlineRoleActionState, type RoleCreateState } from './actions.state';
 
 const createRoleSchema = z.object({
     name: z.string().trim().min(1).max(120),
@@ -64,11 +56,6 @@ const updateRoleInlineSchema = z
         permissionsText: z.string().max(10_000).optional(),
     })
     .strict();
-
-export type InlineRoleActionState =
-    | { status: 'idle' }
-    | { status: 'success'; message: string }
-    | { status: 'error'; message: string };
 
 export async function updateRoleInlineAction(
     _previous: InlineRoleActionState,

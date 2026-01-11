@@ -48,9 +48,14 @@ export class SenderXEmailProvider implements NotificationEmailProvider {
             throw new Error('SenderX API key is not configured.');
         }
 
+        const fromAddress = normalizeEmailAddress(payload.from ?? this.defaultFromAddress);
+        if (!fromAddress) {
+            throw new Error('SenderX from address is invalid. Configure SENDERX_FROM_EMAIL with a valid email address.');
+        }
+
         const requestBody = {
             to: payload.to,
-            from: payload.from ?? this.defaultFromAddress,
+            from: fromAddress,
             subject: payload.subject,
             content: payload.content,
             isHtml: payload.isHtml,
@@ -96,6 +101,19 @@ async function safeParseResponse(response: Response): Promise<SenderXResponse | 
         });
         return undefined;
     }
+}
+
+function normalizeEmailAddress(value: string): string | null {
+    const trimmed = value.trim();
+    if (trimmed.length === 0) {
+        return null;
+    }
+    const bracketMatch = /<([^>]+)>/.exec(trimmed);
+    const candidate = (bracketMatch ? bracketMatch[1] : trimmed).trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(candidate)) {
+        return null;
+    }
+    return candidate;
 }
 
 function fetchNotAvailable(): never {

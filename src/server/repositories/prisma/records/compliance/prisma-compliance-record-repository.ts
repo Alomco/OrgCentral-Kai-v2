@@ -76,9 +76,13 @@ export class PrismaComplianceRecordRepository extends BasePrismaRepository imple
   }
 
   async update(id: string, data: ComplianceRecordUpdateData): Promise<ComplianceRecord> {
+    const updateData = {
+      ...data,
+      metadata: data.metadata !== undefined ? (toPrismaInputJson(data.metadata) as Prisma.InputJsonValue) : undefined,
+    };
     return getModelDelegate(this.prisma, 'complianceRecord').update({
       where: { id },
-      data,
+      data: updateData,
     });
   }
 

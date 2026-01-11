@@ -1,9 +1,6 @@
-import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
-import {
-    getHrNotificationService,
-    type HrNotificationServiceContract,
-} from '@/server/services/hr/notifications/hr-notification-service.provider';
-import type { MarkAllNotificationsReadResult } from '@/server/services/hr/notifications/hr-notification-service';
+import type { RepositoryAuthorizationContext } from '@/server/types/repository-authorization';
+import { getHrNotificationService } from '@/server/use-cases/hr/notifications/notification-composition';
+import type { HrNotificationService, MarkAllNotificationsReadResult } from '@/server/services/hr/notifications/hr-notification-service';
 
 // Use-case: mark all HR notifications as read for a user via HR notification services.
 
@@ -14,7 +11,7 @@ export interface MarkAllHrNotificationsReadInput {
 }
 
 export interface MarkAllHrNotificationsReadDependencies {
-    service?: HrNotificationServiceContract;
+    service?: HrNotificationService;
 }
 
 export async function markAllHrNotificationsRead(

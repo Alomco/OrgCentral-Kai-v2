@@ -1,8 +1,6 @@
-import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
-import {
-    getHrNotificationService,
-    type HrNotificationServiceContract,
-} from '@/server/services/hr/notifications/hr-notification-service.provider';
+import type { RepositoryAuthorizationContext } from '@/server/types/repository-authorization';
+import { getHrNotificationService } from '@/server/use-cases/hr/notifications/notification-composition';
+import type { HrNotificationService } from '@/server/services/hr/notifications/hr-notification-service';
 
 // Use-case: delete an HR notification via HR notification services under tenant guard.
 
@@ -16,7 +14,7 @@ export interface DeleteHrNotificationResult {
 }
 
 export interface DeleteHrNotificationDependencies {
-    service?: HrNotificationServiceContract;
+    service?: HrNotificationService;
 }
 
 export async function deleteHrNotification(

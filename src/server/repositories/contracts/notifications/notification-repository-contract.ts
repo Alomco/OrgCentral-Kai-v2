@@ -1,5 +1,5 @@
 import type { ResultAsync } from 'neverthrow';
-import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
+import type { RepositoryAuthorizationContext } from '@/server/types/repository-authorization';
 import type {
     NotificationCreateInput,
     NotificationEnvelope,

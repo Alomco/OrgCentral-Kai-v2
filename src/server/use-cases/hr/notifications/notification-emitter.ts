@@ -1,9 +1,7 @@
-import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
+import type { RepositoryAuthorizationContext } from '@/server/types/repository-authorization';
 import type { HRNotificationCreateDTO, HRNotificationDTO } from '@/server/types/hr/notifications';
-import {
-    getHrNotificationService,
-    type HrNotificationServiceContract,
-} from '@/server/services/hr/notifications/hr-notification-service.provider';
+import { getHrNotificationService } from '@/server/use-cases/hr/notifications/notification-composition';
+import type { HrNotificationService } from '@/server/services/hr/notifications/hr-notification-service';
 
 export interface EmitHrNotificationInput {
     authorization: RepositoryAuthorizationContext;
@@ -11,16 +9,16 @@ export interface EmitHrNotificationInput {
         HRNotificationCreateDTO,
         'orgId' | 'dataClassification' | 'residencyTag' | 'createdByUserId' | 'correlationId'
     > &
-        Partial<
-            Pick<
-                HRNotificationCreateDTO,
-                'dataClassification' | 'residencyTag' | 'createdByUserId' | 'correlationId'
-            >
-        >;
+    Partial<
+        Pick<
+            HRNotificationCreateDTO,
+            'dataClassification' | 'residencyTag' | 'createdByUserId' | 'correlationId'
+        >
+    >;
 }
 
 export interface EmitHrNotificationDependencies {
-    service?: HrNotificationServiceContract;
+    service?: HrNotificationService;
 }
 
 /**

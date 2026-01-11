@@ -1,7 +1,7 @@
 import type { JobsOptions } from 'bullmq';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
-import type { QueueRegistryOptions } from '@/server/workers/config/queue-registry';
-import { WORKER_CACHE_SCOPES, WORKER_QUEUE_NAMES, DEFAULT_WORKER_TIMEZONE } from '@/server/workers/constants';
+import type { QueueRegistryOptions } from '@/server/lib/queue-registry';
+import { WORKER_CACHE_SCOPES, WORKER_QUEUE_NAMES, DEFAULT_WORKER_TIMEZONE } from '@/server/lib/worker-constants';
 import { SchedulerService, type RepeatExpression } from '@/server/workers/scheduler/scheduler-service';
 import {
     TRAINING_REMINDER_JOB_NAME,

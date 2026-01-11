@@ -1,5 +1,5 @@
 import type { INotificationPreferenceRepository } from '@/server/repositories/contracts/org/notifications/notification-preference-repository-contract';
-import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
+import type { RepositoryAuthorizationContext } from '@/server/types/repository-authorization';
 import type { NotificationPreference } from '@/server/types/hr-types';
 import { registerNotificationPreferenceCacheTag } from './cache-helpers';
 

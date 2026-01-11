@@ -2,7 +2,6 @@
  * TODO: Refactor this file (currently > 250 LOC).
  * Action: Split into smaller modules and ensure adherence to SOLID principles, Dependency Injection, and Design Patterns.
  */
-import type { OrgPermissionMap } from '@/server/security/access-control';
 import {
     assertOrgAccessWithAbac,
     type OrgAccessContext,
@@ -10,31 +9,17 @@ import {
     toTenantScope,
 } from '@/server/security/guards';
 import { RepositoryAuthorizationError } from './repository-errors';
-import type { TenantScope } from '@/server/types/tenant';
 import { authorizeOrgAccessRbacOnly } from '@/server/security/authorization/engine';
 import { mergePermissionMaps, toRepositoryAuthorizationError } from './repository-authorization.helpers';
-
-type GuardEvaluator = (input: OrgAccessInput) => Promise<OrgAccessContext>;
-
-export interface RepositoryAuthorizationDefaults {
-    readonly requiredPermissions?: Readonly<OrgPermissionMap>;
-    readonly expectedClassification?: OrgAccessInput['expectedClassification'];
-    readonly expectedResidency?: OrgAccessInput['expectedResidency'];
-    readonly auditSource?: string;
-}
-
-export interface RepositoryAuthorizerOptions {
-    readonly guard?: GuardEvaluator;
-    readonly defaults?: RepositoryAuthorizationDefaults;
-}
-
-export interface RepositoryAuthorizationContext extends OrgAccessContext {
-    readonly tenantScope: TenantScope;
-}
-
-export type RepositoryAuthorizationHandler<TResult> = (
-    context: RepositoryAuthorizationContext,
-) => Promise<TResult>;
+import type {
+    GuardEvaluator,
+    RepositoryAuthorizationContext,
+    RepositoryAuthorizationDefaults,
+    RepositoryAuthorizationHandler,
+    RepositoryAuthorizerOptions,
+    TenantScopedRecord,
+} from '@/server/types/repository-authorization';
+import { hasOrgId } from '@/server/types/repository-authorization';
 
 export class RepositoryAuthorizer {
     private static singleton: RepositoryAuthorizer | null = null;
@@ -121,14 +106,6 @@ export function enforcePermission(
 
     // Check RBAC using the standard engine
     authorizeOrgAccessRbacOnly(input, context);
-}
-
-export interface TenantScopedRecord {
-    orgId?: string | null;
-}
-
-export function hasOrgId(record: TenantScopedRecord): record is Required<TenantScopedRecord> {
-    return typeof record.orgId === 'string' && record.orgId.length > 0;
 }
 
 // helper functions moved to repository-authorization.helpers.ts

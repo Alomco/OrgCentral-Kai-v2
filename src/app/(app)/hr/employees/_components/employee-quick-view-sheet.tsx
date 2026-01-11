@@ -24,11 +24,11 @@ import {
     formatEmploymentStatus,
     formatEmploymentType,
 } from './employee-formatters';
+import { quickUpdateEmployeeProfileAction } from '../actions/quick-update-employee-profile';
 import {
     EMPLOYEE_QUICK_EDIT_INITIAL_STATE,
-    quickUpdateEmployeeProfileAction,
     type EmployeeQuickEditState,
-} from '../actions';
+} from '../actions/quick-update-employee-profile.state';
 
 import { EMPLOYMENT_STATUS_VALUES, type EmploymentStatusCode, type EmploymentTypeCode } from '@/server/types/hr/people';
 

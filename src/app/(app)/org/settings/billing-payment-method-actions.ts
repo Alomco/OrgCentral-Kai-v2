@@ -9,25 +9,10 @@ import { createBillingSetupIntent } from '@/server/use-cases/billing/create-bill
 import { setDefaultBillingPaymentMethod } from '@/server/use-cases/billing/set-default-billing-payment-method';
 import { removeBillingPaymentMethod } from '@/server/use-cases/billing/remove-billing-payment-method';
 
-export interface BillingPaymentMethodActionState {
-  status: 'idle' | 'success' | 'error';
-  message?: string;
-}
-
-export interface BillingSetupIntentState extends BillingPaymentMethodActionState {
-  clientSecret?: string;
-}
-
-export const initialBillingPaymentMethodActionState: BillingPaymentMethodActionState = {
-  status: 'idle',
-  message: undefined,
-};
-
-export const initialBillingSetupIntentState: BillingSetupIntentState = {
-  status: 'idle',
-  message: undefined,
-  clientSecret: undefined,
-};
+import type {
+  BillingPaymentMethodActionState,
+  BillingSetupIntentState,
+} from './billing-payment-method-actions.state';
 
 const paymentMethodActionSchema = z
   .object({

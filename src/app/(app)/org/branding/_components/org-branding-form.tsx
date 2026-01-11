@@ -9,12 +9,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import type { OrgBranding } from '@/server/types/branding-types';
 
-import {
-    initialOrgBrandingState,
-    resetOrgBrandingAction,
-    updateOrgBrandingAction,
-    type OrgBrandingState,
-} from '../actions';
+import { resetOrgBrandingAction, updateOrgBrandingAction } from '../actions';
+import { initialOrgBrandingState, type OrgBrandingState } from '../actions.state';
 
 export function OrgBrandingForm({ branding }: { branding: OrgBranding | null }) {
     const router = useRouter();

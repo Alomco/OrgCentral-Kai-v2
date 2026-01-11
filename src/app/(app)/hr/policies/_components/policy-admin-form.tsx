@@ -6,10 +6,8 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 
-import {
-    createPolicyAdminAction,
-    type PolicyAdminCreateState,
-} from '../policy-admin-actions';
+import { createPolicyAdminAction } from '../policy-admin-actions';
+import type { PolicyAdminCreateState } from '../policy-admin-form-utils';
 import { PolicyApplicabilityFields, PolicyContentField, PolicyIdentityFields, PolicyScheduleFields } from './policy-admin-form.sections';
 import { buildInitialPolicyAdminState } from './policy-admin-form.state';
 

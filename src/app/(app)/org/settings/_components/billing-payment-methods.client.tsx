@@ -9,11 +9,13 @@ import { Button } from '@/components/ui/button';
 import type { PaymentMethodData } from '@/server/types/billing-types';
 import {
   createSetupIntentAction,
-  initialBillingPaymentMethodActionState,
-  initialBillingSetupIntentState,
   removePaymentMethodAction,
   setDefaultPaymentMethodAction,
 } from '../billing-payment-method-actions';
+import {
+  initialBillingPaymentMethodActionState,
+  initialBillingSetupIntentState,
+} from '../billing-payment-method-actions.state';
 
 interface BillingPaymentMethodsClientProps {
   paymentMethods: PaymentMethodData[];

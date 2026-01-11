@@ -5,7 +5,10 @@ import { z } from 'zod';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
 import { getSessionContext } from '@/server/use-cases/auth/sessions/get-session';
 import { getMembershipService } from '@/server/services/org/membership/membership-service.provider';
-import { isInvitationDeliverySuccessful } from '@/server/use-cases/notifications/invitation-email.helpers';
+import {
+    getInvitationDeliveryFailureMessage,
+    isInvitationDeliverySuccessful,
+} from '@/server/use-cases/notifications/invitation-email.helpers';
 import { sendInvitationEmail } from '@/server/use-cases/notifications/send-invitation-email';
 import { getInvitationEmailDependencies } from '@/server/use-cases/notifications/invitation-email.provider';
 import { type InviteMemberActionState } from './shared';
@@ -72,7 +75,9 @@ export async function inviteMemberAction(
             }),
         );
 
-        let message = result.alreadyInvited ? 'An active invitation already exists for this email.' : 'Invitation created.';
+        let message = result.alreadyInvited
+            ? 'An active invitation already exists for this email.'
+            : 'Invitation created.';
         if (!result.alreadyInvited) {
             try {
                 const dependencies = getInvitationEmailDependencies();
@@ -81,10 +86,10 @@ export async function inviteMemberAction(
                     invitationToken: result.token,
                 });
                 if (!isInvitationDeliverySuccessful(emailResult.delivery)) {
-                    message = 'Invitation created. Share the invite link with the recipient.';
+                    message = `Invitation created. ${getInvitationDeliveryFailureMessage(emailResult.delivery)} Share the invite link with the recipient.`;
                 }
             } catch {
-                message = 'Invitation created. Share the invite link with the recipient.';
+                message = 'Invitation created. Invitation email could not be delivered. Share the invite link with the recipient.';
             }
         }
 

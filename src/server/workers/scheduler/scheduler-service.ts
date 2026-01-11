@@ -1,6 +1,6 @@
 import type { JobsOptions, RepeatOptions } from 'bullmq';
-import type { WorkerQueueName } from '@/server/workers/constants';
-import { getQueue, type QueueRegistryOptions } from '@/server/workers/config/queue-registry';
+import type { WorkerQueueName } from '@/server/lib/worker-constants';
+import { getQueue, type QueueRegistryOptions } from '@/server/lib/queue-registry';
 
 type IntervalUnit = 'ms' | 's' | 'm' | 'h' | 'd';
 

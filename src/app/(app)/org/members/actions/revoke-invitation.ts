@@ -7,11 +7,7 @@ import { ValidationError } from '@/server/errors';
 import { getSessionContext } from '@/server/use-cases/auth/sessions/get-session';
 import { PrismaInvitationRepository } from '@/server/repositories/prisma/auth/invitations';
 import { revokeOrgInvitation } from '@/server/use-cases/auth/invitations/revoke-org-invitation';
-
-export type RevokeOrgInvitationActionState =
-    | { status: 'idle' }
-    | { status: 'success'; message: string }
-    | { status: 'error'; message: string };
+import type { RevokeOrgInvitationActionState } from './invitation-actions.types';
 
 const payloadSchema = z.object({
     token: z.string().trim().min(1, 'Invitation token is required.'),

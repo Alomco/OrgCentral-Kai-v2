@@ -8,17 +8,17 @@ import { HR_ACTION, HR_RESOURCE } from '@/server/security/authorization/hr-resou
 import type { LeaveRequestFormState } from './form-state';
 import type { SessionContext } from './submit-leave-types';
 
-export interface SessionResultOk {
+interface SessionResultOk {
     kind: 'ok';
     session: SessionContext;
 }
 
-export interface SessionResultError {
+interface SessionResultError {
     kind: 'error';
     state: LeaveRequestFormState;
 }
 
-export type SessionResult = SessionResultOk | SessionResultError;
+type SessionResult = SessionResultOk | SessionResultError;
 
 export async function resolveSession(previous: LeaveRequestFormState): Promise<SessionResult> {
     try {

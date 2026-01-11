@@ -9,10 +9,8 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import type { AbsenceTypeConfig } from '@/server/types/hr-ops-types';
 
-import {
-    updateAbsenceTypeAction,
-    type AbsenceTypeInlineState,
-} from '../absence-type-actions';
+import { updateAbsenceTypeAction } from '../absence-type-actions';
+import type { AbsenceTypeInlineState } from '../absence-type-actions.types';
 
 const initialInlineState: AbsenceTypeInlineState = { status: 'idle' };
 

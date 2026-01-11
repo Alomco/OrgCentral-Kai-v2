@@ -35,8 +35,11 @@ export function useInviteEmployeeToast(state: OnboardingInviteFormState, pending
         if (wasPending.current && !pending && state.status === 'success' && state.token) {
             const token = state.token;
             const invitationUrl = state.invitationUrl;
-            toast.success('Invitation ready.', {
-                description: 'Share the invite link with the employee.',
+            const emailDelivered = state.emailDelivered ?? false;
+            toast.success(emailDelivered ? 'Invitation delivered.' : 'Invitation created.', {
+                description: emailDelivered
+                    ? 'Email delivery succeeded.'
+                    : 'Email delivery failed. Copy the invite link to share manually.',
                 action: {
                     label: 'Copy invite link',
                     onClick: () => {
@@ -46,5 +49,5 @@ export function useInviteEmployeeToast(state: OnboardingInviteFormState, pending
             });
         }
         wasPending.current = pending;
-    }, [pending, state.status, state.token, state.invitationUrl]);
+    }, [pending, state.status, state.token, state.invitationUrl, state.emailDelivered]);
 }

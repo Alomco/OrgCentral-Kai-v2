@@ -1,0 +1,551 @@
+
+
+E:\Web Development\studio\orgcentral\src\server\api-adapters\cron\cron-shared.ts
+  6:1  error  '@/server/lib/prisma' import is restricted from being used by a pattern  no-restricted-imports
+
+E:\Web Development\studio\orgcentral\src\server\api-adapters\error-mappers\default-error-mapper.ts
+  3:46  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'repositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\api-adapters\hr\absences\common.ts
+  1:1   error  '@/server/repositories/prisma/hr/absences/prisma-absence-settings-repository' import is restricted from being used by a pattern     no-restricted-imports
+  1:49  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'prismaRepositories'               boundaries/element-types
+  2:1   error  '@/server/repositories/prisma/hr/absences/prisma-absence-type-config-repository' import is restricted from being used by a pattern  no-restricted-imports
+  2:51  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'prismaRepositories'               boundaries/element-types
+  3:1   error  '@/server/repositories/prisma/hr/absences/prisma-unplanned-absence-repository' import is restricted from being used by a pattern    no-restricted-imports
+  3:50  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'prismaRepositories'               boundaries/element-types
+  4:1   error  '@/server/repositories/prisma/hr/leave/prisma-leave-balance-repository' import is restricted from being used by a pattern           no-restricted-imports
+  4:46  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'prismaRepositories'               boundaries/element-types
+  5:1   error  '@/server/repositories/prisma/hr/people' import is restricted from being used by a pattern                                          no-restricted-imports
+  5:49  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'prismaRepositories'               boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\api-adapters\hr\compliance\common.ts
+  2:48  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'contracts'                          boundaries/element-types
+  3:52  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'contracts'                          boundaries/element-types
+  4:52  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'contracts'                          boundaries/element-types
+  5:1   error  '@/server/repositories/prisma/hr/compliance/prisma-compliance-item-repository' import is restricted from being used by a pattern      no-restricted-imports
+  5:48  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'prismaRepositories'                 boundaries/element-types
+  6:1   error  '@/server/repositories/prisma/hr/compliance/prisma-compliance-category-repository' import is restricted from being used by a pattern  no-restricted-imports
+  6:52  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'prismaRepositories'                 boundaries/element-types
+  7:1   error  '@/server/repositories/prisma/hr/compliance/prisma-compliance-template-repository' import is restricted from being used by a pattern  no-restricted-imports
+  7:52  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'prismaRepositories'                 boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\api-adapters\hr\compliance\list-compliance-templates.ts
+  6:1   error  '@/server/repositories/prisma/hr/compliance/prisma-compliance-template-repository' import is restricted from being used by a pattern  no-restricted-imports
+  6:52  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'prismaRepositories'                 boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\api-adapters\hr\compliance\seed-default-templates.ts
+  2:1   error  '@/server/repositories/prisma/hr/compliance/prisma-compliance-template-repository' import is restricted from being used by a pattern  no-restricted-imports
+  2:52  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'prismaRepositories'                 boundaries/element-types
+  3:1   error  '@/server/repositories/prisma/hr/compliance/prisma-compliance-category-repository' import is restricted from being used by a pattern  no-restricted-imports
+  3:52  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'prismaRepositories'                 boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\api-adapters\hr\leave\common.ts
+  2:1   error  '@/server/repositories/prisma/hr/absences' import is restricted from being used by a pattern                           no-restricted-imports
+  2:49  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+  3:49  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'contracts'           boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\api-adapters\hr\notifications\delete-hr-notification.ts
+  1:53  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'repositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\api-adapters\hr\notifications\mark-all-hr-notifications-read.ts
+  1:53  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'repositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\api-adapters\hr\notifications\mark-hr-notification-read.ts
+  1:53  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'repositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\api-adapters\hr\notifications\update-notification-preference.ts
+  1:53  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'repositories'        boundaries/element-types
+  4:1   error  '@/server/repositories/prisma/org/notifications' import is restricted from being used by a pattern                     no-restricted-imports
+  4:56  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\api-adapters\hr\onboarding\complete-onboarding-invite.ts
+   3:1   error  '@/server/repositories/prisma/hr/onboarding' import is restricted from being used by a pattern                                    no-restricted-imports
+   7:8   error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'prismaRepositories'             boundaries/element-types
+   8:1   error  '@/server/repositories/prisma/hr/people' import is restricted from being used by a pattern                                        no-restricted-imports
+   8:85  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'prismaRepositories'             boundaries/element-types
+   9:1   error  '@/server/repositories/prisma/org/membership/prisma-membership-repository' import is restricted from being used by a pattern      no-restricted-imports
+   9:44  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'prismaRepositories'             boundaries/element-types
+  10:1   error  '@/server/repositories/prisma/org/organization/prisma-organization-repository' import is restricted from being used by a pattern  no-restricted-imports
+  10:46  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'prismaRepositories'             boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\api-adapters\hr\onboarding\instances-controller.ts  
+  1:1   error  '@/server/repositories/prisma/hr/onboarding/prisma-checklist-instance-repository' import is restricted from being used by a pattern  no-restricted-imports
+  1:51  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'prismaRepositories'                boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\api-adapters\hr\onboarding\invite-employee.ts       
+  3:1   error  '@/server/repositories/prisma/hr/people/prisma-employee-profile-repository' import is restricted from being used by a pattern     no-restricted-imports
+  3:49  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'prismaRepositories'             boundaries/element-types
+  4:1   error  '@/server/repositories/prisma/hr/onboarding/prisma-invitation-repository' import is restricted from being used by a pattern       no-restricted-imports
+  4:54  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'prismaRepositories'             boundaries/element-types
+  5:1   error  '@/server/repositories/prisma/org/organization/prisma-organization-repository' import is restricted from being used by a pattern  no-restricted-imports
+  5:46  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'prismaRepositories'             boundaries/element-types
+  6:49  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'contracts'                      boundaries/element-types
+  7:54  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'contracts'                      boundaries/element-types
+  8:46  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'contracts'                      boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\api-adapters\hr\onboarding\templates-controller.ts  
+  2:1   error  '@/server/repositories/prisma/hr/onboarding/prisma-checklist-template-repository' import is restricted from being used by a pattern  no-restricted-imports
+  2:51  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'prismaRepositories'                boundaries/element-types
+  4:49  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'repositories'                      boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\api-adapters\hr\settings\common.ts
+  1:44  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'contracts'                     boundaries/element-types
+  2:49  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'contracts'                     boundaries/element-types
+  3:1   error  '@/server/repositories/prisma/hr/settings' import is restricted from being used by a pattern                                     no-restricted-imports
+  3:44  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'prismaRepositories'            boundaries/element-types
+  4:1   error  '@/server/repositories/prisma/hr/absences/prisma-absence-settings-repository' import is restricted from being used by a pattern  no-restricted-imports
+  4:49  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'prismaRepositories'            boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\api-adapters\hr\settings\get-hr-settings.ts
+  4:53  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'repositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\api-adapters\notifications\notifications-controller.ts
+  7:8  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'repositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\api-adapters\org\abac\abac-route-controllers.ts     
+  4:1   error  '@/server/repositories/prisma/org/abac/prisma-abac-policy-repository' import is restricted from being used by a pattern  no-restricted-imports
+  4:44  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'prismaRepositories'    boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\api-adapters\org\invitations\invitation-route-controllers.ts
+  4:1   error  '@/server/repositories/prisma/auth/invitations' import is restricted from being used by a pattern                      no-restricted-imports
+  4:44  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\api-adapters\org\organization\leave-settings-route-controllers.ts
+  10:1   error  '@/server/repositories/prisma/org/organization/prisma-organization-repository' import is restricted from being used by a pattern  no-restricted-imports
+  10:46  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'prismaRepositories'             boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\api-adapters\org\organization\organization-route-controllers.ts
+  11:1   error  '@/server/repositories/prisma/org/organization/prisma-organization-repository' import is restricted from being used by a pattern        no-restricted-imports
+  11:46  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'prismaRepositories'                   boundaries/element-types
+  12:1   error  '@/server/repositories/prisma/org/roles/prisma-role-repository' import is restricted from being used by a pattern                       no-restricted-imports
+  12:38  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'prismaRepositories'                   boundaries/element-types
+  13:1   error  '@/server/repositories/prisma/org/membership/prisma-membership-repository' import is restricted from being used by a pattern            no-restricted-imports
+  13:44  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'prismaRepositories'                   boundaries/element-types
+  14:1   error  '@/server/repositories/prisma/org/abac/prisma-abac-policy-repository' import is restricted from being used by a pattern                 no-restricted-imports
+  14:44  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'prismaRepositories'                   boundaries/element-types
+  15:1   error  '@/server/repositories/prisma/org/permissions/prisma-permission-resource-repository' import is restricted from being used by a pattern  no-restricted-imports
+  15:52  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'prismaRepositories'                   boundaries/element-types
+  16:1   error  '@/server/repositories/prisma/hr/absences/prisma-absence-type-config-repository' import is restricted from being used by a pattern      no-restricted-imports
+  16:51  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'prismaRepositories'                   boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\api-adapters\platform\permissions-controller.ts     
+  1:1   error  '@/server/repositories/prisma/platform/permissions/prisma-app-permission-repository' import is restricted from being used by a pattern  no-restricted-imports
+  1:47  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'prismaRepositories'                   boundaries/element-types
+  6:47  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'contracts'                            boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\api-adapters\platform\settings-controller.ts        
+  1:1   error  '@/server/repositories/prisma/platform/settings/prisma-enterprise-settings-repository' import is restricted from being used by a pattern  no-restricted-imports
+  1:52  error  No rule allowing this dependency was found. File is of type 'apiAdapters'. Dependency is of type 'prismaRepositories'                     boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\repositories\security\repository-authorization.ts   
+  5:15  error  'OrgPermissionMap' is defined but never used  @typescript-eslint/no-unused-vars      
+
+E:\Web Development\studio\orgcentral\src\server\services\auth\invitation-service.ts
+  12:1   error  '@/server/repositories/prisma/auth/invitations' import is restricted from being used by a pattern                                 no-restricted-imports
+  12:44  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'                boundaries/element-types
+  13:1   error  '@/server/repositories/prisma/org/users' import is restricted from being used by a pattern                                        no-restricted-imports
+  13:38  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'                boundaries/element-types
+  14:1   error  '@/server/repositories/prisma/org/organization/prisma-organization-repository' import is restricted from being used by a pattern  no-restricted-imports
+  14:46  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'                boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\services\auth\security-event-service.ts
+  7:1   error  '@/server/repositories/prisma/auth/security/prisma-security-event-repository' import is restricted from being used by a pattern   no-restricted-imports
+  7:47  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'                boundaries/element-types
+  8:1   error  '@/server/repositories/prisma/org/organization/prisma-organization-repository' import is restricted from being used by a pattern  no-restricted-imports
+  8:46  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'                boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\services\auth\session-service.ts
+  14:1   error  '@/server/repositories/prisma/auth/sessions' import is restricted from being used by a pattern                      no-restricted-imports
+  14:45  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\services\auth\waitlist-service.ts
+  10:1   error  '@/server/repositories/prisma/auth/waitlist' import is restricted from being used by a pattern                      no-restricted-imports
+  10:42  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\services\billing\billing-service.provider.ts        
+  1:1   error  '@/server/lib/prisma' import is restricted from being used by a pattern              
+                                             no-restricted-imports
+  2:1   error  '@/server/repositories/prisma/base-prisma-repository' import is restricted from being used by a pattern                           no-restricted-imports
+  2:50  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'                boundaries/element-types
+  3:1   error  '@/server/repositories/prisma/org/organization/prisma-organization-repository' import is restricted from being used by a pattern  no-restricted-imports
+  3:46  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'                boundaries/element-types
+  4:1   error  '@/server/repositories/prisma/org/membership/prisma-membership-repository' import is restricted from being used by a pattern      no-restricted-imports
+  4:44  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'                boundaries/element-types
+  5:1   error  '@/server/repositories/prisma/org/billing' import is restricted from being used by a pattern                                      no-restricted-imports
+  9:8   error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'                boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\services\hr\absences\absence-service.provider.ts    
+   1:1   error  '@/server/lib/prisma' import is restricted from being used by a pattern             
+                                no-restricted-imports
+   2:1   error  '@/server/repositories/prisma/hr/absences' import is restricted from being used by a pattern                        no-restricted-imports
+   6:8   error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+   7:1   error  '@/server/repositories/prisma/hr/leave' import is restricted from being used by a pattern                           no-restricted-imports
+   7:46  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+   8:1   error  '@/server/repositories/prisma/hr/people' import is restricted from being used by a pattern                          no-restricted-imports
+   8:49  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+   9:1   error  '@/server/repositories/prisma/base-prisma-repository' import is restricted from being used by a pattern             no-restricted-imports
+   9:50  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+  10:1   error  '@/server/repositories/prisma/org/org-scoped-prisma-repository' import is restricted from being used by a pattern   no-restricted-imports
+  10:49  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\services\hr\compliance\compliance-assignment.service.provider.ts
+  1:1   error  '@/server/repositories/prisma/hr/compliance/prisma-compliance-item-repository' import is restricted from being used by a pattern  no-restricted-imports
+  1:48  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'                boundaries/element-types
+  2:1   error  '@/server/repositories/prisma/base-prisma-repository' import is restricted from being used by a pattern                           no-restricted-imports
+  2:50  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'                boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\services\hr\compliance\compliance-status.service.provider.ts
+  2:1   error  '@/server/repositories/prisma/hr/compliance' import is restricted from being used by a pattern                      no-restricted-imports
+  2:50  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\services\hr\leave-policies\leave-policy-service.provider.ts
+  1:1   error  '@/server/repositories/prisma/base-prisma-repository' import is restricted from being used by a pattern             no-restricted-imports
+  1:50  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+  2:1   error  '@/server/repositories/prisma/hr/leave' import is restricted from being used by a pattern                           no-restricted-imports
+  6:8   error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\services\hr\leave\leave-balance-service.provider.ts 
+  1:1   error  '@/server/repositories/prisma/hr/leave' import is restricted from being used by a pattern                                      no-restricted-imports
+  1:75  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'             boundaries/element-types
+  2:1   error  '@/server/repositories/prisma/hr/people/prisma-employee-profile-repository' import is restricted from being used by a pattern  no-restricted-imports
+  2:49  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'             boundaries/element-types
+  3:1   error  '@/server/repositories/prisma/org/organization' import is restricted from being used by a pattern                              no-restricted-imports
+  3:46  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'             boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\services\hr\leave\leave-service.provider.ts
+  1:1    error  '@/server/repositories/prisma/hr/leave' import is restricted from being used by a pattern                           no-restricted-imports
+  1:138  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+  2:1    error  '@/server/repositories/prisma/org/organization' import is restricted from being used by a pattern                   no-restricted-imports
+  2:46   error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+  3:1    error  '@/server/repositories/prisma/hr/people' import is restricted from being used by a pattern                          no-restricted-imports
+  3:49   error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\services\hr\notifications\hr-notification-service.provider.ts
+  7:5  error  Prefer using nullish coalescing operator (`??=`) instead of an assignment expression, as it is simpler to read  @typescript-eslint/prefer-nullish-coalescing
+
+E:\Web Development\studio\orgcentral\src\server\services\hr\people\people-orchestration.provider.ts 
+  10:1   error  '@/server/repositories/prisma/hr/onboarding' import is restricted from being used by a pattern                                    no-restricted-imports
+  10:54  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'                boundaries/element-types
+  11:1   error  '@/server/repositories/prisma/org/organization/prisma-organization-repository' import is restricted from being used by a pattern  no-restricted-imports
+  11:46  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'                boundaries/element-types
+  12:1   error  '@/server/repositories/prisma/base-prisma-repository' import is restricted from being used by a pattern                           no-restricted-imports
+  12:50  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'                boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\services\hr\people\people-service.provider.ts       
+  1:1   error  '@/server/repositories/prisma/hr/people' import is restricted from being used by a pattern                          no-restricted-imports
+  1:85  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+  4:1   error  '@/server/repositories/prisma/base-prisma-repository' import is restricted from being used by a pattern             no-restricted-imports
+  4:50  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\services\hr\people\sar\people-sar.provider.ts       
+  1:1   error  '@/server/repositories/prisma/base-prisma-repository' import is restricted from being used by a pattern             no-restricted-imports
+  1:50  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+  2:1   error  '@/server/repositories/prisma/hr/people' import is restricted from being used by a pattern                          no-restricted-imports
+  2:85  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\services\hr\performance\performance-service.provider.ts
+  2:1   error  '@/server/repositories/prisma/hr/performance' import is restricted from being used by a pattern                     no-restricted-imports
+  2:45  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+  3:1   error  '@/server/repositories/prisma/base-prisma-repository' import is restricted from being used by a pattern             no-restricted-imports
+  3:50  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\services\hr\policies\hr-policy-service.provider.ts  
+  1:1   error  '@/server/repositories/prisma/base-prisma-repository' import is restricted from being used by a pattern                           no-restricted-imports
+  1:50  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'                boundaries/element-types
+  2:1   error  '@/server/repositories/prisma/hr/people' import is restricted from being used by a pattern                                        no-restricted-imports
+  2:49  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'                boundaries/element-types
+  3:1   error  '@/server/repositories/prisma/hr/policies' import is restricted from being used by a pattern                                      no-restricted-imports
+  3:80  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'                boundaries/element-types
+  5:1   error  '@/server/repositories/prisma/org/organization/prisma-organization-repository' import is restricted from being used by a pattern  no-restricted-imports
+  5:46  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'                boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\services\hr\time-tracking\time-tracking-service.provider.ts
+  1:1   error  '@/server/repositories/prisma/hr/time-tracking' import is restricted from being used by a pattern                   no-restricted-imports
+  1:43  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\services\hr\training\training-service.provider.ts   
+  1:1   error  '@/server/repositories/prisma/hr/training' import is restricted from being used by a pattern                        no-restricted-imports
+  1:48  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\services\org\departments\department-service.provider.ts
+  1:1   error  '@/server/lib/prisma' import is restricted from being used by a pattern              
+                                          no-restricted-imports
+  2:1   error  '@/server/repositories/prisma/base-prisma-repository' import is restricted from being used by a pattern                        no-restricted-imports
+  2:50  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'             boundaries/element-types
+  3:1   error  '@/server/repositories/prisma/org/departments/prisma-department-repository' import is restricted from being used by a pattern  no-restricted-imports
+  3:44  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'             boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\services\org\membership\membership-service.provider.ts
+   1:1   error  '@/server/repositories/prisma/auth/invitations/prisma-invitation-repository' import is restricted from being used by a pattern       no-restricted-imports
+   1:44  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'                   boundaries/element-types
+   2:1   error  '@/server/repositories/prisma/org/membership/prisma-membership-repository' import is restricted from being used by a pattern         no-restricted-imports
+   2:44  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'                   boundaries/element-types
+   3:1   error  '@/server/repositories/prisma/org/organization/prisma-organization-repository' import is restricted from being used by a pattern     no-restricted-imports
+   3:46  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'                   boundaries/element-types
+   4:1   error  '@/server/repositories/prisma/org/users/prisma-user-repository' import is restricted from being used by a pattern                    no-restricted-imports
+   4:38  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'                   boundaries/element-types
+   5:1   error  '@/server/repositories/prisma/hr/people/prisma-employee-profile-repository' import is restricted from being used by a pattern        no-restricted-imports
+   5:49  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'                   boundaries/element-types
+   6:1   error  '@/server/repositories/prisma/hr/onboarding/prisma-checklist-template-repository' import is restricted from being used by a pattern  no-restricted-imports
+   6:51  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'                   boundaries/element-types
+   7:1   error  '@/server/repositories/prisma/hr/onboarding/prisma-checklist-instance-repository' import is restricted from being used by a pattern  no-restricted-imports
+   7:51  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'                   boundaries/element-types
+  10:1   error  '@/server/repositories/prisma/base-prisma-repository' import is restricted from being used by a pattern                              no-restricted-imports
+  10:50  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'                   boundaries/element-types
+  11:1   error  '@/server/repositories/prisma/org/org-scoped-prisma-repository' import is restricted from being used by a pattern                    no-restricted-imports
+  11:49  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'                   boundaries/element-types
+  12:1   error  '@/server/lib/prisma' import is restricted from being used by a pattern             
+                                                 no-restricted-imports
+
+E:\Web Development\studio\orgcentral\src\server\services\org\permissions\permission-resource-service.provider.ts
+  1:1   error  '@/server/repositories/prisma/org/permissions/prisma-permission-resource-repository' import is restricted from being used by a pattern  no-restricted-imports
+  1:52  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'                      boundaries/element-types
+  2:1   error  '@/server/repositories/prisma/base-prisma-repository' import is restricted from being used by a pattern                                 no-restricted-imports
+  2:50  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'                      boundaries/element-types
+  3:1   error  '@/server/lib/prisma' import is restricted from being used by a pattern              
+                                                   no-restricted-imports
+
+E:\Web Development\studio\orgcentral\src\server\services\org\roles\role-service.provider.ts
+  1:1   error  '@/server/repositories/prisma/org/roles' import is restricted from being used by a pattern                          no-restricted-imports
+  1:38  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+  2:1   error  '@/server/repositories/prisma/base-prisma-repository' import is restricted from being used by a pattern             no-restricted-imports
+  2:50  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+  3:1   error  '@/server/lib/prisma' import is restricted from being used by a pattern              
+                               no-restricted-imports
+
+E:\Web Development\studio\orgcentral\src\server\services\org\settings\org-settings-store.ts
+  3:1  error  '@/server/lib/prisma' import is restricted from being used by a pattern  no-restricted-imports
+
+E:\Web Development\studio\orgcentral\src\server\services\org\users\user-service.provider.ts
+  1:1   error  '@/server/repositories/prisma/org/users/prisma-user-repository' import is restricted from being used by a pattern   no-restricted-imports
+  1:38  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+  2:1   error  '@/server/repositories/prisma/base-prisma-repository' import is restricted from being used by a pattern             no-restricted-imports
+  2:50  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+  3:1   error  '@/server/lib/prisma' import is restricted from being used by a pattern              
+                               no-restricted-imports
+
+E:\Web Development\studio\orgcentral\src\server\services\platform\bootstrap\cold-start-service.ts   
+  11:1   error  '@/server/lib/prisma' import is restricted from being used by a pattern             
+                                     no-restricted-imports
+  12:1   error  '@/server/repositories/prisma/org/abac/prisma-abac-policy-repository' import is restricted from being used by a pattern  no-restricted-imports
+  12:44  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'       boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\services\platform\notifications\notification-composer.provider.ts
+  1:1   error  '@/server/repositories/prisma/notifications/prisma-notification-repository' import is restricted from being used by a pattern  no-restricted-imports
+  1:46  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'             boundaries/element-types
+  2:1   error  '@/server/repositories/prisma/org/notifications' import is restricted from being used by a pattern                             no-restricted-imports
+  2:56  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'             boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\services\security\permission-resolution-service.provider.ts
+  1:1   error  '@/server/repositories/prisma/org/roles' import is restricted from being used by a pattern                          no-restricted-imports
+  1:38  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+  2:1   error  '@/server/repositories/prisma/base-prisma-repository' import is restricted from being used by a pattern             no-restricted-imports
+  2:50  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+  3:1   error  '@/server/lib/prisma' import is restricted from being used by a pattern              
+                               no-restricted-imports
+
+E:\Web Development\studio\orgcentral\src\server\services\seeder\seed-abac.ts
+  4:1   error  '@/server/repositories/prisma/org/abac/prisma-abac-policy-repository' import is restricted from being used by a pattern  no-restricted-imports
+  4:44  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'       boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\services\seeder\seed-absences.ts
+  4:1  error  '@/server/lib/prisma' import is restricted from being used by a pattern  no-restricted-imports
+
+E:\Web Development\studio\orgcentral\src\server\services\seeder\seed-billing.ts
+  3:1  error  '@/server/lib/prisma' import is restricted from being used by a pattern  no-restricted-imports
+
+E:\Web Development\studio\orgcentral\src\server\services\seeder\seed-cleanup.ts
+  2:1  error  '@/server/lib/prisma' import is restricted from being used by a pattern  no-restricted-imports
+
+E:\Web Development\studio\orgcentral\src\server\services\seeder\seed-compliance.ts
+  4:1  error  '@/server/lib/prisma' import is restricted from being used by a pattern  no-restricted-imports
+
+E:\Web Development\studio\orgcentral\src\server\services\seeder\seed-employees.ts
+  4:1  error  '@/server/lib/prisma' import is restricted from being used by a pattern  no-restricted-imports
+
+E:\Web Development\studio\orgcentral\src\server\services\seeder\seed-integrations.ts
+  3:1  error  '@/server/lib/prisma' import is restricted from being used by a pattern  no-restricted-imports
+
+E:\Web Development\studio\orgcentral\src\server\services\seeder\seed-notifications.ts
+  4:1  error  '@/server/lib/prisma' import is restricted from being used by a pattern  no-restricted-imports
+
+E:\Web Development\studio\orgcentral\src\server\services\seeder\seed-org-assets.ts
+  3:1  error  '@/server/lib/prisma' import is restricted from being used by a pattern  no-restricted-imports
+
+E:\Web Development\studio\orgcentral\src\server\services\seeder\seed-performance.ts
+  4:1  error  '@/server/lib/prisma' import is restricted from being used by a pattern  no-restricted-imports
+
+E:\Web Development\studio\orgcentral\src\server\services\seeder\seed-profile.ts
+  4:1  error  '@/server/lib/prisma' import is restricted from being used by a pattern  no-restricted-imports
+
+E:\Web Development\studio\orgcentral\src\server\services\seeder\seed-security.ts
+  3:1  error  '@/server/lib/prisma' import is restricted from being used by a pattern  no-restricted-imports
+
+E:\Web Development\studio\orgcentral\src\server\services\seeder\seed-starter-data.ts
+  3:1   error  '@/server/lib/prisma' import is restricted from being used by a pattern              
+                                               no-restricted-imports
+  5:1   error  '@/server/repositories/prisma/hr/absences/prisma-absence-type-config-repository' import is restricted from being used by a pattern  no-restricted-imports
+  5:51  error  No rule allowing this dependency was found. File is of type 'services'. Dependency is of type 'prismaRepositories'                  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\services\seeder\seed-stats.ts
+  2:1  error  '@/server/lib/prisma' import is restricted from being used by a pattern  no-restricted-imports
+
+E:\Web Development\studio\orgcentral\src\server\services\seeder\seed-time-entries.ts
+  4:1  error  '@/server/lib/prisma' import is restricted from being used by a pattern  no-restricted-imports
+
+E:\Web Development\studio\orgcentral\src\server\services\seeder\seed-training.ts
+  4:1  error  '@/server/lib/prisma' import is restricted from being used by a pattern  no-restricted-imports
+
+E:\Web Development\studio\orgcentral\src\server\services\seeder\utils.ts
+  2:1  error  '@/server/lib/prisma' import is restricted from being used by a pattern  no-restricted-imports
+
+E:\Web Development\studio\orgcentral\src\server\use-cases\auth\admin-bootstrap.ts
+  20:44  error  No rule allowing this dependency was found. File is of type 'useCases'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\use-cases\auth\invitations\resolve-invitation-flow.ts
+   3:44  error  No rule allowing this dependency was found. File is of type 'useCases'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+  31:9   error  Unnecessary conditional, value is always falsy                                      
+                                @typescript-eslint/no-unnecessary-condition
+
+E:\Web Development\studio\orgcentral\src\server\use-cases\auth\login.ts
+  4:46  error  No rule allowing this dependency was found. File is of type 'useCases'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\use-cases\hr\absences\ai-validation.provider.ts     
+  6:8  error  No rule allowing this dependency was found. File is of type 'useCases'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\use-cases\hr\absences\list-absence-type-configs.cached.ts
+  7:51  error  No rule allowing this dependency was found. File is of type 'useCases'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\use-cases\hr\absences\process-ai-validation.ts      
+  26:47  error  'error' may use Object's default stringification format ('[object Object]') when stringified  @typescript-eslint/no-base-to-string
+
+E:\Web Development\studio\orgcentral\src\server\use-cases\hr\compliance\compliance-reminders.helpers.ts
+   72:13  error  Unsafe assignment of an error typed value                            @typescript-eslint/no-unsafe-assignment
+   83:13  error  Unsafe assignment of an error typed value                            @typescript-eslint/no-unsafe-assignment
+  106:9   error  Unsafe assignment of an error typed value                            @typescript-eslint/no-unsafe-assignment
+  137:49  error  Unsafe object destructuring of a property with an error typed value  @typescript-eslint/no-unsafe-assignment
+  161:13  error  Unsafe assignment of an error typed value                            @typescript-eslint/no-unsafe-assignment
+
+E:\Web Development\studio\orgcentral\src\server\use-cases\hr\compliance\list-compliance-categories.cached.ts
+  4:52  error  No rule allowing this dependency was found. File is of type 'useCases'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\use-cases\hr\compliance\list-compliance-items-grouped.cached.ts
+  4:48  error  No rule allowing this dependency was found. File is of type 'useCases'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+  5:52  error  No rule allowing this dependency was found. File is of type 'useCases'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\use-cases\hr\compliance\list-compliance-items.cached.ts
+  4:48  error  No rule allowing this dependency was found. File is of type 'useCases'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\use-cases\hr\compliance\list-compliance-templates.cached.ts
+  4:52  error  No rule allowing this dependency was found. File is of type 'useCases'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\use-cases\hr\compliance\list-pending-review-items.cached.ts
+  4:48  error  No rule allowing this dependency was found. File is of type 'useCases'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\use-cases\hr\compliance\process-document-expiry.ts  
+  6:49  error  No rule allowing this dependency was found. File is of type 'useCases'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\use-cases\hr\compliance\send-compliance-reminders.ts
+   4:15  error  'ComplianceLogItem' is defined but never used                                       
+                                @typescript-eslint/no-unused-vars
+  13:48  error  No rule allowing this dependency was found. File is of type 'useCases'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+  14:52  error  No rule allowing this dependency was found. File is of type 'useCases'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+  16:5   error  'buildMetadata' is defined but never used                                           
+                                @typescript-eslint/no-unused-vars
+
+E:\Web Development\studio\orgcentral\src\server\use-cases\hr\leave-policies\list-leave-policies.cached.ts
+  4:45  error  No rule allowing this dependency was found. File is of type 'useCases'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\use-cases\hr\leave\get-leave-attachment.cached.ts   
+  4:49  error  No rule allowing this dependency was found. File is of type 'useCases'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\use-cases\hr\leave\list-leave-attachments.cached.ts 
+  4:79  error  No rule allowing this dependency was found. File is of type 'useCases'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\use-cases\hr\notifications\notification-composition.ts
+  1:48  error  No rule allowing this dependency was found. File is of type 'useCases'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\use-cases\hr\onboarding\checklists\get-active-checklist.cached.ts
+  4:51  error  No rule allowing this dependency was found. File is of type 'useCases'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\use-cases\hr\onboarding\checklists\list-checklist-instances-for-employee.cached.ts
+  4:51  error  No rule allowing this dependency was found. File is of type 'useCases'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\use-cases\hr\onboarding\instances\get-employee-checklists.cached.ts
+  4:51  error  No rule allowing this dependency was found. File is of type 'useCases'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\use-cases\hr\onboarding\invitations\get-onboarding-invitations.cached.ts
+  8:54  error  No rule allowing this dependency was found. File is of type 'useCases'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\use-cases\hr\onboarding\send-onboarding-reminders.ts
+  6:51  error  No rule allowing this dependency was found. File is of type 'useCases'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+  7:49  error  No rule allowing this dependency was found. File is of type 'useCases'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\use-cases\hr\onboarding\templates\get-checklist-templates.cached.ts
+  7:51  error  No rule allowing this dependency was found. File is of type 'useCases'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\use-cases\hr\people\count-employee-profiles.cached.ts
+  7:49  error  No rule allowing this dependency was found. File is of type 'useCases'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\use-cases\hr\people\employment\get-employment-contract-by-employee.cached.ts
+  4:52  error  No rule allowing this dependency was found. File is of type 'useCases'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\use-cases\hr\people\employment\get-employment-contract.cached.ts
+  4:52  error  No rule allowing this dependency was found. File is of type 'useCases'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\use-cases\hr\people\employment\list-employment-contracts-by-employee.cached.ts
+  4:52  error  No rule allowing this dependency was found. File is of type 'useCases'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\use-cases\hr\people\employment\list-employment-contracts.cached.ts
+  4:52  error  No rule allowing this dependency was found. File is of type 'useCases'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\use-cases\hr\people\get-employee-directory-stats.cached.ts
+  6:49  error  No rule allowing this dependency was found. File is of type 'useCases'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\use-cases\hr\people\get-employee-profile-by-user.cached.ts
+  6:49  error  No rule allowing this dependency was found. File is of type 'useCases'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\use-cases\hr\people\get-employee-profile.cached.ts  
+  6:49  error  No rule allowing this dependency was found. File is of type 'useCases'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\use-cases\hr\people\list-employee-directory.cached.ts
+  6:49  error  No rule allowing this dependency was found. File is of type 'useCases'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\use-cases\hr\people\list-employee-profiles.cached.ts
+  6:49  error  No rule allowing this dependency was found. File is of type 'useCases'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\use-cases\hr\performance\list-performance-goals-by-review.cached.ts
+  4:45  error  No rule allowing this dependency was found. File is of type 'useCases'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\use-cases\hr\policies\get-hr-policy.cached.ts       
+  8:42  error  No rule allowing this dependency was found. File is of type 'useCases'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\use-cases\hr\policies\get-policy-acknowledgment.cached.ts
+   9:42  error  No rule allowing this dependency was found. File is of type 'useCases'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+  10:54  error  No rule allowing this dependency was found. File is of type 'useCases'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\use-cases\hr\policies\list-hr-policies.cached.ts    
+  8:42  error  No rule allowing this dependency was found. File is of type 'useCases'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\use-cases\hr\policies\list-policy-acknowledgments.cached.ts
+   9:42  error  No rule allowing this dependency was found. File is of type 'useCases'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+  10:54  error  No rule allowing this dependency was found. File is of type 'useCases'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\use-cases\hr\settings\get-hr-settings.cached.ts     
+  8:44  error  No rule allowing this dependency was found. File is of type 'useCases'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\use-cases\hr\training\send-training-reminders.ts    
+  3:48  error  No rule allowing this dependency was found. File is of type 'useCases'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\use-cases\notifications\invitation-email.provider.ts
+  2:44  error  No rule allowing this dependency was found. File is of type 'useCases'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\use-cases\notifications\notification-preference-composition.ts
+  1:56  error  No rule allowing this dependency was found. File is of type 'useCases'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\use-cases\org\branding\branding-composition.ts      
+  1:42  error  No rule allowing this dependency was found. File is of type 'useCases'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+
+E:\Web Development\studio\orgcentral\src\server\use-cases\org\branding\branding-service-composition.ts
+  1:42  error  No rule allowing this dependency was found. File is of type 'useCases'. Dependency is of type 'prismaRepositories'  boundaries/element-types
+  2:50  error  No rule allowing this dependency was found. File is of type 'useCases'. Dependency is of type 'prismaRepositories'  boundaries/element-types

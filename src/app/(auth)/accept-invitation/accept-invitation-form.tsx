@@ -6,9 +6,11 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import {
     acceptInvitationAction,
+} from './actions';
+import {
     initialAcceptInvitationState,
     type AcceptInvitationActionState,
-} from './actions';
+} from './accept-invitation.state';
 
 export interface AcceptInvitationFormProps {
     token: string;

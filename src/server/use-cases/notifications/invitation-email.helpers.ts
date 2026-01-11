@@ -7,6 +7,8 @@ import type {
     NotificationDeliveryResult,
 } from '@/server/services/platform/notifications/notification-types';
 
+export { getInvitationDeliveryFailureMessage } from './invitation-email.failure';
+
 export interface InvitationEmailDependencies {
     invitationRepository: IInvitationRepository;
     deliveryAdapters: NotificationDeliveryAdapter[];

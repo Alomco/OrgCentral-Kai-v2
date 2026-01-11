@@ -63,9 +63,14 @@ export class PrismaDocumentVaultRepository extends BasePrismaRepository implemen
   }
 
   async update(id: string, data: DocumentVaultUpdateData): Promise<DocumentVault> {
+    const updateData = {
+      ...data,
+      dataSubject: data.dataSubject !== undefined ? (toPrismaInputJson(data.dataSubject) as Prisma.InputJsonValue) : undefined,
+      metadata: data.metadata !== undefined ? (toPrismaInputJson(data.metadata) as Prisma.InputJsonValue) : undefined,
+    };
     return getModelDelegate(this.prisma, 'documentVault').update({
       where: { id },
-      data,
+      data: updateData,
     });
   }
 

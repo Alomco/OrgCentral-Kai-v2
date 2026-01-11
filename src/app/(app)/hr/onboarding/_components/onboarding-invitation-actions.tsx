@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 
 import { resendOnboardingInvitationAction } from '../actions';
-import type { ResendOnboardingInvitationActionState } from '../actions/onboarding-invitations';
+import type { ResendOnboardingInvitationActionState } from '../actions/onboarding-invitations.types';
 import { RevokeOnboardingInvitationForm } from './revoke-onboarding-invitation-form';
 
 interface OnboardingInvitationActionsProps {

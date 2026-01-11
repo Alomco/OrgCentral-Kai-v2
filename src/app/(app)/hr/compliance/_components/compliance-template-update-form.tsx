@@ -10,10 +10,8 @@ import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
 import type { ComplianceTemplate } from '@/server/types/compliance-types';
 
-import {
-    updateComplianceTemplateAction,
-    type ComplianceTemplateInlineState,
-} from '../actions/compliance-templates';
+import { updateComplianceTemplateAction } from '../actions/compliance-templates';
+import type { ComplianceTemplateInlineState } from '../compliance-template-form-utils';
 
 const initialInlineState: ComplianceTemplateInlineState = { status: 'idle' };
 

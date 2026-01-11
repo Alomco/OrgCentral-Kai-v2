@@ -15,10 +15,8 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
-import {
-    revokeOrgInvitationAction,
-    type RevokeOrgInvitationActionState,
-} from '../actions/revoke-invitation';
+import { revokeOrgInvitationAction } from '../actions/revoke-invitation';
+import type { RevokeOrgInvitationActionState } from '../actions/invitation-actions.types';
 
 const initialState: RevokeOrgInvitationActionState = { status: 'idle' };
 

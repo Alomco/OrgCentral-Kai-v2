@@ -11,7 +11,8 @@ import { Spinner } from '@/components/ui/spinner';
 import { Switch } from '@/components/ui/switch';
 import type { LeavePolicy } from '@/server/types/leave-types';
 
-import { updateLeavePolicyAction, type LeavePolicyInlineState } from '../leave-policy-actions';
+import { updateLeavePolicyAction } from '../leave-policy-actions';
+import type { LeavePolicyInlineState } from '../leave-policy-form-utils';
 import { formatPolicyType, toDateInputValue } from './leave-policy-form-utils';
 
 const initialInlineState: LeavePolicyInlineState = { status: 'idle' };

@@ -1,8 +1,6 @@
 import type { WorkerOptions } from 'bullmq';
 import { AbstractOrgWorker } from '@/server/workers/abstract-org-worker';
-import { WORKER_QUEUE_NAMES } from '@/server/workers/constants';
-import { PrismaComplianceItemRepository } from '@/server/repositories/prisma/hr/compliance/prisma-compliance-item-repository';
-import { PrismaComplianceTemplateRepository } from '@/server/repositories/prisma/hr/compliance/prisma-compliance-template-repository';
+import { WORKER_QUEUE_NAMES } from '@/server/lib/worker-constants';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
 import {
     complianceReminderEnvelopeSchema,
@@ -10,7 +8,6 @@ import {
     COMPLIANCE_REMINDER_JOB_NAME,
 } from './reminder.types';
 import { ComplianceReminderProcessor } from './reminder.processor';
-import { getNotificationService } from '@/server/services/notifications/notification-service.provider';
 
 export interface ComplianceReminderWorkerOptions {
     worker?: WorkerOptions;
@@ -26,12 +23,7 @@ export class ComplianceReminderWorker extends AbstractOrgWorker<ComplianceRemind
             workerName: COMPLIANCE_REMINDER_JOB_NAME,
             schema: complianceReminderEnvelopeSchema,
         });
-        this.processor = options?.processor ??
-            new ComplianceReminderProcessor({
-                complianceItemRepository: new PrismaComplianceItemRepository(),
-                complianceTemplateRepository: new PrismaComplianceTemplateRepository(),
-                notificationDispatcher: getNotificationService(),
-            });
+        this.processor = options?.processor ?? new ComplianceReminderProcessor();
     }
 
     protected async process(

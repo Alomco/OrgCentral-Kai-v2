@@ -15,7 +15,7 @@ const checklistInstanceRepository = new PrismaChecklistInstanceRepository();
 
 const RESOURCE_TYPE = 'hr.onboarding.checklist';
 
-export interface ToggleItemResult {
+interface ToggleItemResult {
     success: boolean;
     error?: string;
 }
@@ -70,7 +70,7 @@ export async function toggleChecklistItemAction(
     }
 }
 
-export interface CompleteChecklistResult {
+interface CompleteChecklistResult {
     success: boolean;
     error?: string;
 }

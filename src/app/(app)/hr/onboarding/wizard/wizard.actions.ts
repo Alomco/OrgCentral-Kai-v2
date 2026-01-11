@@ -98,7 +98,7 @@ export async function submitOnboardingWizardAction(
         const emailResult = await attemptInvitationEmail(session.authorization, result.token);
         const message = emailResult.delivered
             ? 'Invitation created. Email sent.'
-            : 'Invitation created, but the email could not be delivered. Share the invite link manually.';
+            : `Invitation created, but email delivery failed. ${emailResult.failureMessage ?? 'Invitation email delivery failed.'} Share the invite link manually.`;
 
         // Invalidate cache
         await invalidateOrgCache(

@@ -5,6 +5,7 @@ import {
     type DataClassificationLevel,
     type DataResidencyZone,
 } from '@/server/types/tenant';
+import type { JsonValue } from '@/server/types/json';
 
 export const NOTIFICATION_TOPICS = [
     'leave-approval',
@@ -23,6 +24,7 @@ export const NOTIFICATION_PRIORITIES = ['low', 'medium', 'high', 'urgent'] as co
 export const NOTIFICATION_SCHEMA_VERSION = 1;
 
 const timestampSchema = z.coerce.date();
+const jsonValueSchema = z.custom<JsonValue>(() => true);
 
 export const notificationAuditSchema = z.object({
     createdByUserId: z.uuid().optional(),
@@ -54,8 +56,8 @@ export const notificationRecordSchema = z.object({
     correlationId: z.string().nullable().optional(),
     createdByUserId: z.uuid().nullable().optional(),
     auditSource: z.string().min(1),
-    metadata: z.unknown().nullable().optional(),
-    auditTrail: z.record(z.string(), z.any()).nullable().optional(),
+    metadata: jsonValueSchema.nullable().optional(),
+    auditTrail: z.record(z.string(), jsonValueSchema).nullable().optional(),
     createdAt: timestampSchema,
     updatedAt: timestampSchema,
 });
@@ -71,8 +73,8 @@ export const notificationCreateSchema = notificationRecordSchema
     .extend({
         isRead: z.boolean().default(false),
         readAt: timestampSchema.nullable().optional(),
-        metadata: z.unknown().nullable().optional(),
-        auditTrail: z.record(z.string(), z.any()).nullable().optional(),
+        metadata: jsonValueSchema.nullable().optional(),
+        auditTrail: z.record(z.string(), jsonValueSchema).nullable().optional(),
     });
 
 export const notificationListFiltersSchema = z.object({
@@ -108,9 +110,12 @@ export const notificationEnvelopeSchema = z.object({
 export type NotificationTopicCode = (typeof NOTIFICATION_TOPICS)[number];
 export type NotificationPriorityCode = (typeof NOTIFICATION_PRIORITIES)[number];
 export type NotificationRecord = z.infer<typeof notificationRecordSchema>;
-export type NotificationCreateInput = z.infer<typeof notificationCreateSchema>;
+export type NotificationCreateInput = z.input<typeof notificationCreateSchema>;
+export type NotificationCreatePayload = z.infer<typeof notificationCreateSchema>;
+export type NotificationListFilterInput = z.input<typeof notificationListFiltersSchema>;
 export type NotificationListFilters = z.infer<typeof notificationListFiltersSchema>;
 export type NotificationEnvelope = z.infer<typeof notificationEnvelopeSchema>;
+export type NotificationAuditMetadata = z.infer<typeof notificationAuditSchema>;
 
 export interface NotificationValidationContext {
     classification: DataClassificationLevel;

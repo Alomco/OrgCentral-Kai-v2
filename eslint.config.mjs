@@ -80,10 +80,14 @@ const eslintConfig = defineConfig([
     },
     settings: {
       "boundaries/elements": [
+        { type: "apiRoutes", pattern: "src/app/api/**" },
+        { type: "workers", pattern: "src/server/workers/**" },
+        { type: "apiAdapters", pattern: "src/server/api-adapters/**" },
+        { type: "useCases", pattern: "src/server/use-cases/**" },
         { type: "services", pattern: "src/server/services/**" },
         { type: "prismaRepositories", pattern: "src/server/repositories/prisma/**" },
-        { type: "repositories", pattern: "src/server/repositories/**" },
         { type: "contracts", pattern: "src/server/repositories/contracts/**" },
+        { type: "repositories", pattern: "src/server/repositories/**" },
         { type: "lib", pattern: "src/server/lib/**" },
         { type: "types", pattern: "src/server/types/**" },
       ],
@@ -151,12 +155,28 @@ const eslintConfig = defineConfig([
           default: "disallow",
           rules: [
             {
+              from: ["apiRoutes"],
+              allow: ["apiRoutes", "apiAdapters", "useCases", "services", "lib", "types"],
+            },
+            {
+              from: ["workers"],
+              allow: ["workers", "useCases", "services", "repositories", "lib", "types", "contracts"],
+            },
+            {
+              from: ["apiAdapters"],
+              allow: ["apiAdapters", "useCases", "services", "lib", "types", "workers"],
+            },
+            {
+              from: ["useCases"],
+              allow: ["useCases", "services", "repositories", "contracts", "lib", "types"],
+            },
+            {
               from: ["services"],
-              allow: ["services", "repositories", "prismaRepositories", "lib", "types"],
+              allow: ["services", "useCases", "repositories", "contracts", "lib", "types", "workers"],
             },
             {
               from: ["repositories"],
-              allow: ["repositories", "prismaRepositories", "lib", "types"],
+              allow: ["repositories", "prismaRepositories", "contracts", "lib", "types"],
             },
             {
               from: ["prismaRepositories"],
@@ -164,11 +184,11 @@ const eslintConfig = defineConfig([
             },
             {
               from: ["contracts"],
-              allow: ["contracts", "types"],
+              allow: ["contracts", "types", "repositories", "prismaRepositories"],
             },
             {
               from: ["lib"],
-              allow: ["lib", "types"],
+              allow: ["lib", "types", "workers"],
             },
             {
               from: ["types"],
@@ -191,6 +211,50 @@ const eslintConfig = defineConfig([
     files: ["scripts/**/*.{ts,tsx,js,jsx}"],
     rules: {
       "no-console": "off",
+    },
+  },
+  {
+    files: ["src/app/api/**/*.{ts,tsx,js,jsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: ["@/server/lib/prisma", "@/server/repositories/prisma/**"],
+        },
+      ],
+    },
+  },
+  {
+    files: ["src/server/workers/**/*.{ts,tsx,js,jsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: ["@/server/lib/prisma", "@/server/repositories/prisma/**"],
+        },
+      ],
+    },
+  },
+  {
+    files: ["src/server/api-adapters/**/*.{ts,tsx,js,jsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: ["@/server/lib/prisma", "@/server/repositories/prisma/**"],
+        },
+      ],
+    },
+  },
+  {
+    files: ["src/server/services/**/*.{ts,tsx,js,jsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: ["@/server/lib/prisma", "@/server/repositories/prisma/**"],
+        },
+      ],
     },
   },
   globalIgnores([

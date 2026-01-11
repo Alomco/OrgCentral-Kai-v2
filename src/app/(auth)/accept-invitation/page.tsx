@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { headers as nextHeaders } from 'next/headers';
+import { Suspense } from 'react';
 import { z } from 'zod';
 
 import AuthLayout from '@/components/auth/AuthLayout';
@@ -19,11 +20,30 @@ const searchParamsSchema = z.object({
 });
 
 interface AcceptInvitationPageProps {
-    searchParams?: Record<string, string | string[] | undefined> | Promise<Record<string, string | string[] | undefined>>;
+    searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }
 
-export default async function AcceptInvitationPage({ searchParams }: AcceptInvitationPageProps) {
-    const params = await Promise.resolve(searchParams ?? {});
+export default function AcceptInvitationPage({ searchParams }: AcceptInvitationPageProps) {
+    return (
+        <Suspense
+            fallback={(
+                <AuthLayout
+                    title="Loading invitation"
+                    subtitle="We’re preparing your invitation details."
+                >
+                    <div className="space-y-4 text-center text-sm text-slate-600 dark:text-slate-300">
+                        <p>Loading invitation details…</p>
+                    </div>
+                </AuthLayout>
+            )}
+        >
+            <AcceptInvitationContent searchParams={searchParams} />
+        </Suspense>
+    );
+}
+
+async function AcceptInvitationContent({ searchParams }: AcceptInvitationPageProps) {
+    const params = searchParams ? await searchParams : {};
     const parsed = searchParamsSchema.safeParse(params);
     if (!parsed.success) {
         return (

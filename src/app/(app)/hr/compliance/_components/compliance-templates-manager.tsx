@@ -14,10 +14,8 @@ import { Textarea } from '@/components/ui/textarea';
 import type { ComplianceTemplate } from '@/server/types/compliance-types';
 
 import { FieldError } from '../../_components/field-error';
-import {
-    createComplianceTemplateAction,
-    type ComplianceTemplateCreateState,
-} from '../actions/compliance-templates';
+import { createComplianceTemplateAction } from '../actions/compliance-templates';
+import type { ComplianceTemplateCreateState } from '../compliance-template-form-utils';
 import { ComplianceTemplateRow } from './compliance-template-row';
 import { ComplianceTemplateGuideCard } from './compliance-template-guide-card';
 

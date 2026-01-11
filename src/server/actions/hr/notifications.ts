@@ -29,8 +29,6 @@ const emitNotificationInputSchema = z
     })
     .strict();
 
-export type EmitNotificationInput = z.infer<typeof emitNotificationInputSchema>;
-
 export async function emitHrNotificationAction(
     input: unknown,
 ): Promise<ActionState<{ success: true }>> {

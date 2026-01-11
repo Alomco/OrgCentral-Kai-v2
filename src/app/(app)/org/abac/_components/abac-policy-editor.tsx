@@ -3,7 +3,8 @@
 import { useActionState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
-import { initialAbacPolicyEditorState, updateAbacPoliciesAction, type AbacPolicyEditorState } from '../actions';
+import { updateAbacPoliciesAction } from '../actions';
+import { initialAbacPolicyEditorState, type AbacPolicyEditorState } from '../actions.state';
 import { Button } from '@/components/ui/button';
 import type { AbacPolicy } from '@/server/security/abac-types';
 import { useAbacPolicyEditor } from './abac-policy-editor-state';
