@@ -19,14 +19,12 @@ const { listInstancesForEmployee, updateItems } = vi.hoisted(() => ({
     updateItems: vi.fn(),
 }));
 
-vi.mock('@/server/repositories/prisma/hr/onboarding/prisma-checklist-instance-repository', () => {
-    return {
-        PrismaChecklistInstanceRepository: class {
-            listInstancesForEmployee = listInstancesForEmployee;
-            updateItems = updateItems;
-        }
-    };
-});
+vi.mock('@/server/services/hr/onboarding/onboarding-controller-dependencies', () => ({
+    getChecklistInstanceRepository: () => ({
+        listInstancesForEmployee,
+        updateItems,
+    }),
+}));
 
 import { getEmployeeChecklistsController, updateChecklistInstanceController } from '../instances-controller';
 
@@ -73,24 +71,34 @@ describe('instances-controller', () => {
 
     describe('updateChecklistInstanceController', () => {
         it('updates instance items successfully', async () => {
-            const mockInstance = { id: 'inst-1', items: [] };
+            const mockInstance = { id: '33333333-3333-4333-8333-333333333333', items: [] };
             updateItems.mockResolvedValue(mockInstance);
 
             const updates = { items: [{ task: 'Task 1', completed: true }] };
-            const req = createMockRequest('http://localhost/api/hr/onboarding/instances/inst-1', 'PATCH', updates);
+            const req = createMockRequest(
+                'http://localhost/api/hr/onboarding/instances/33333333-3333-4333-8333-333333333333',
+                'PATCH',
+                updates,
+            );
 
-            const result = await updateChecklistInstanceController(req, 'inst-1');
+            const result = await updateChecklistInstanceController(req, '33333333-3333-4333-8333-333333333333');
 
             expect(result.success).toBe(true);
             expect(result.data.instance).toEqual(mockInstance);
-            expect(updateItems).toHaveBeenCalledWith('org-1', 'inst-1', updates);
+            expect(updateItems).toHaveBeenCalledWith('org-1', '33333333-3333-4333-8333-333333333333', updates);
         });
 
         it('throws error for invalid update payload', async () => {
             const updates = { items: 'invalid-array' };
-            const req = createMockRequest('http://localhost/api/hr/onboarding/instances/inst-1', 'PATCH', updates);
+            const req = createMockRequest(
+                'http://localhost/api/hr/onboarding/instances/33333333-3333-4333-8333-333333333333',
+                'PATCH',
+                updates,
+            );
 
-            await expect(updateChecklistInstanceController(req, 'inst-1')).rejects.toThrow();
+            await expect(
+                updateChecklistInstanceController(req, '33333333-3333-4333-8333-333333333333'),
+            ).rejects.toThrow();
         });
     });
 });

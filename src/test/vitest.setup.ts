@@ -27,3 +27,8 @@ vi.mock('@/server/lib/prisma', () => {
 
     return { prisma };
 });
+
+vi.mock('@/server/logging/audit-logger', () => ({
+    recordAuditEvent: vi.fn(async () => undefined),
+    setAuditLogRepository: vi.fn(),
+}));

@@ -1,11 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
+const ORG_ID = '11111111-1111-4111-8111-111111111111';
+const ACTOR_ID = '22222222-2222-4222-8222-222222222222';
+const TARGET_ID = '33333333-3333-4333-8333-333333333333';
+
 vi.mock('@/server/use-cases/auth/sessions/get-session', () => ({
   getSessionContext: vi.fn(() => Promise.resolve({
     authorization: {
-      orgId: 'org-1',
-      userId: 'actor-1',
+      orgId: ORG_ID,
+      userId: ACTOR_ID,
       roleKey: 'member',
       dataResidency: 'UK_ONLY',
       dataClassification: 'OFFICIAL',
@@ -49,9 +53,9 @@ describe('people API adapters', () => {
   it('creates an employee profile via PeopleService', async () => {
     const req = {
       body: {
-        orgId: 'org-1',
-        actorUserId: 'actor-1',
-        targetUserId: 'user-1',
+        orgId: ORG_ID,
+        actorUserId: ACTOR_ID,
+        targetUserId: TARGET_ID,
         dataResidency: 'UK_ONLY',
         dataClassification: 'OFFICIAL',
         changes: {
@@ -68,10 +72,10 @@ describe('people API adapters', () => {
 
     const call = createEmployeeProfile.mock.calls[0][0] as Record<string, unknown>;
     expect(call).toMatchObject({
-      authorization: { orgId: 'org-1', userId: 'actor-1' },
+      authorization: { orgId: ORG_ID, userId: ACTOR_ID },
       payload: {
         profileData: {
-          userId: 'user-1',
+          userId: TARGET_ID,
           employmentType: 'FULL_TIME',
           healthStatus: 'UNDEFINED',
         },

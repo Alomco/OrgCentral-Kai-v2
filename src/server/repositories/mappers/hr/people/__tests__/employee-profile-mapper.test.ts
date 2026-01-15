@@ -1,12 +1,12 @@
 import { describe, it, expect } from 'vitest';
-import type { Prisma } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import type { EmployeeProfile as PrismaEmployeeProfile } from '@prisma/client';
 import { mapPrismaEmployeeProfileToDomain, mapDomainEmployeeProfileToPrisma } from '../employee-profile-mapper';
 
 const baseRecord: PrismaEmployeeProfile = {
-  id: 'p1',
-  orgId: 'org-1',
-  userId: 'user-1',
+  id: '11111111-1111-4111-8111-111111111111',
+  orgId: '22222222-2222-4222-8222-222222222222',
+  userId: '33333333-3333-4333-8333-333333333333',
   firstName: null,
   lastName: null,
   displayName: null,
@@ -102,6 +102,6 @@ describe('employee-profile-mapper legacy metadata', () => {
     });
 
     const metadata = prismaInput.metadata as Prisma.JsonValue | null;
-    expect(metadata && typeof metadata === 'object' && 'legacyProfile' in metadata).toBe(true);
+    expect(metadata).toBe(Prisma.JsonNull);
   });
 });

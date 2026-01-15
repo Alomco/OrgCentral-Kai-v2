@@ -6,12 +6,19 @@ import type { INotificationPreferenceRepository } from '@/server/repositories/co
 import type { NotificationPreference } from '@/server/types/hr-types';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
 import type { AuditEventPayload } from '@/server/logging/audit-logger';
+import { defaultOrgSettings } from '@/server/services/org/settings/org-settings-model';
 import type {
   NotificationDeliveryAdapter,
   NotificationDeliveryPayload,
   NotificationDeliveryResult,
 } from '../notification-types';
 import { NotificationComposerService } from '../notification-composer.service';
+
+vi.mock('@/server/services/security/security-event-service.provider', () => ({
+  getSecurityEventService: () => ({
+    logSecurityEvent: vi.fn().mockResolvedValue(undefined),
+  }),
+}));
 
 const ORG_ID = '11111111-1111-1111-1111-111111111111';
 const USER_ID = '22222222-2222-2222-2222-222222222222';
@@ -86,6 +93,7 @@ describe('NotificationComposerService', () => {
   let adapter: NotificationDeliveryAdapter;
   let repo: INotificationRepository;
   let preferenceRepo: INotificationPreferenceRepository;
+  let orgSettingsLoader: MockedFunction<(orgId: string) => Promise<typeof defaultOrgSettings>>;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -116,6 +124,7 @@ describe('NotificationComposerService', () => {
     preferenceRepo = {
       getNotificationPreferencesByUser: vi.fn(() => Promise.resolve([])),
     } as unknown as INotificationPreferenceRepository;
+    orgSettingsLoader = vi.fn(async () => defaultOrgSettings);
   });
 
   it('creates notification and dispatches adapter respecting guard', async () => {
@@ -125,6 +134,7 @@ describe('NotificationComposerService', () => {
       deliveryAdapters: [adapter],
       guard,
       auditRecorder,
+      orgSettingsLoader,
       defaultRetentionPolicyId: 'retain-1',
     });
 
@@ -178,6 +188,7 @@ describe('NotificationComposerService', () => {
       deliveryAdapters: [adapter],
       guard,
       auditRecorder,
+      orgSettingsLoader,
       defaultRetentionPolicyId: 'retain-1',
     });
 
@@ -217,6 +228,7 @@ describe('NotificationComposerService', () => {
       deliveryAdapters: [adapter],
       guard,
       auditRecorder,
+      orgSettingsLoader,
       defaultRetentionPolicyId: 'retain-1',
     });
 
@@ -233,6 +245,7 @@ describe('NotificationComposerService', () => {
       deliveryAdapters: [adapter],
       guard,
       auditRecorder,
+      orgSettingsLoader,
       defaultRetentionPolicyId: 'retain-1',
     });
 

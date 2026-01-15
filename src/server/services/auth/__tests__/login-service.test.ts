@@ -152,6 +152,7 @@ describe('LoginService', () => {
                 email: input.credentials.email,
                 password: input.credentials.password,
                 rememberMe: input.credentials.rememberMe,
+                callbackURL: 'http://localhost:3000/api/auth/post-login?org=org-central',
             },
         });
         expect(result.ok).toBe(true);

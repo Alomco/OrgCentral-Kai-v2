@@ -7,6 +7,7 @@ import { HrNotificationService } from './hr-notification-service';
 
 vi.mock('@/server/security/guards', () => ({
     assertOrgAccess: vi.fn().mockResolvedValue(undefined),
+    assertOrgAccessWithAbac: vi.fn().mockResolvedValue(undefined),
 }));
 
 const repository: {
@@ -83,7 +84,7 @@ describe('HrNotificationService', () => {
             },
         });
 
-        expect(repository.createNotification).toHaveBeenCalledWith('org-1', expect.objectContaining({
+        expect(repository.createNotification).toHaveBeenCalledWith(authorization, expect.objectContaining({
             orgId: 'org-1',
             userId: 'user-2',
             dataClassification: authorization.dataClassification,
@@ -105,8 +106,8 @@ describe('HrNotificationService', () => {
             filters: { unreadOnly: true },
         });
 
-        expect(repository.listNotifications).toHaveBeenCalledWith('org-1', 'user-9', { unreadOnly: true });
-        expect(repository.getUnreadCount).toHaveBeenCalledWith('org-1', 'user-9');
+        expect(repository.listNotifications).toHaveBeenCalledWith(authorization, 'user-9', { unreadOnly: true });
+        expect(repository.getUnreadCount).toHaveBeenCalledWith(authorization, 'user-9');
         expect(result.unreadCount).toBe(3);
         expect(result.notifications).toHaveLength(1);
     });
@@ -123,7 +124,7 @@ describe('HrNotificationService', () => {
         });
 
         expect(repository.markRead).toHaveBeenCalledWith(
-            'org-1',
+            authorization,
             'notif-1',
             new Date('2024-01-01T00:00:00.000Z'),
         );
@@ -141,7 +142,7 @@ describe('HrNotificationService', () => {
         });
 
         expect(repository.markAllRead).toHaveBeenCalledWith(
-            'org-1',
+            authorization,
             'user-1',
             new Date('2024-02-01T00:00:00.000Z'),
         );
@@ -158,7 +159,7 @@ describe('HrNotificationService', () => {
             notificationId: 'notif-1',
         });
 
-        expect(repository.deleteNotification).toHaveBeenCalledWith('org-1', 'notif-1');
+        expect(repository.deleteNotification).toHaveBeenCalledWith(authorization, 'notif-1');
         expect(result.success).toBe(true);
     });
 });

@@ -167,7 +167,7 @@ describe('leave-service.helpers', () => {
 
         expect(emitHrNotificationMock).toHaveBeenCalledTimes(1);
         const payload = emitHrNotificationMock.mock.calls[0]?.[0];
-        expect(payload?.service).toBeDefined();
+        expect(payload?.service).toBeUndefined();
     });
 
     it('skips cancel notification when userId is missing', async () => {

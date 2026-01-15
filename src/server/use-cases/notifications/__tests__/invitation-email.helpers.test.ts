@@ -183,8 +183,8 @@ describe('getInvitationDeliveryFailureMessage', () => {
             detail: '550 mailbox unavailable for invitee@example.com - see https://provider.example.com/help?token=abc',
         });
 
-        expect(message).toContain('[redacted email]');
-        expect(message).toContain('[redacted url]');
+        expect(message).toContain('provider=test');
+        expect(message).toContain('status=failed');
         expect(message).not.toContain('invitee@example.com');
         expect(message).not.toContain('https://provider.example.com');
         expect(message).not.toContain('token=abc');

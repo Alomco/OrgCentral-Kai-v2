@@ -25,7 +25,10 @@ interface ModernAdminSidebarProps {
     permissions: OrgPermissionMap;
 }
 
-function isActive(path: string, href: string): boolean {
+function isActive(path: string | null | undefined, href: string): boolean {
+    if (!path) {
+        return false;
+    }
     return path === href || (href !== '/' && path.startsWith(`${href}/`));
 }
 

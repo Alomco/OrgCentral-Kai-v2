@@ -133,7 +133,10 @@ describe('createOrganizationWithOwner', () => {
 
         expect(listPermissionResources).toHaveBeenCalledWith(organization.id);
         expect(createPermissionResource).toHaveBeenCalled();
-        expect(getAbsenceTypeConfigs).toHaveBeenCalledWith(organization.id, { includeInactive: true });
+        expect(getAbsenceTypeConfigs).toHaveBeenCalledWith(
+            expect.objectContaining({ orgId: organization.id }),
+            { includeInactive: true },
+        );
         expect(createAbsenceTypeConfig).toHaveBeenCalled();
     });
 });

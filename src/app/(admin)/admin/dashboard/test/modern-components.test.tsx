@@ -1,3 +1,4 @@
+/* @vitest-environment jsdom */
 // Test file to validate the new admin dashboard components
 // This file demonstrates the usage of the new components and validates their accessibility features
 
@@ -44,7 +45,7 @@ describe('Modern Admin Components', () => {
       fireEvent.click(mobileMenuButton);
       
       // Check that the sidebar is now visible
-      const sidebar = screen.getByRole('banner', { hidden: true });
+      const sidebar = screen.getByRole('navigation', { name: 'Admin sidebar navigation' });
       expect(sidebar).not.toBeNull();
     });
   });
@@ -167,7 +168,7 @@ describe('Responsive Design', () => {
     );
     
     // On mobile, sidebar should initially be hidden
-    const sidebar = screen.getByRole('banner');
+    const sidebar = screen.getByRole('navigation', { name: 'Admin sidebar navigation' });
     expect(sidebar.className).toContain('-translate-x-full');
   });
 

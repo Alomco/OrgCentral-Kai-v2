@@ -85,7 +85,7 @@ describe('AbsenceAiValidationService', () => {
         };
         absenceRepository = {
             getAbsence: vi.fn(async () => absence),
-            updateAbsence: vi.fn(async (_orgId: string, _id: string, updates: { metadata: unknown }) => ({
+            updateAbsence: vi.fn(async (_authorization: RepositoryAuthorizationContext, _id: string, updates: { metadata: unknown }) => ({
                 ...absence,
                 metadata: updates.metadata,
             })),
@@ -126,14 +126,20 @@ describe('AbsenceAiValidationService', () => {
             },
         );
 
-        expect(absenceRepository.getAbsence).toHaveBeenCalledWith(ORG_ID, absence.id);
-        expect(typeRepository.getConfig).toHaveBeenCalledWith(ORG_ID, absence.typeId);
+        expect(absenceRepository.getAbsence).toHaveBeenCalledWith(
+            expect.objectContaining({ orgId: ORG_ID }),
+            absence.id,
+        );
+        expect(typeRepository.getConfig).toHaveBeenCalledWith(
+            expect.objectContaining({ orgId: ORG_ID }),
+            absence.typeId,
+        );
         expect(downloader.download).toHaveBeenCalled();
         expect(validator.analyze).toHaveBeenCalled();
         expect(auditEvents).not.toHaveLength(0);
         expect(auditEvents[0]).toMatchObject({ action: 'hr.absence.ai_validation' });
         expect(absenceRepository.updateAbsence).toHaveBeenCalledWith(
-            ORG_ID,
+            expect.objectContaining({ orgId: ORG_ID }),
             absence.id,
             expect.objectContaining({
                 metadata: expect.objectContaining({

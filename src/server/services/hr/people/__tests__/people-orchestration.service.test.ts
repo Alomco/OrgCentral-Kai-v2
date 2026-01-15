@@ -26,17 +26,23 @@ vi.mock('../helpers/people-orchestration.helpers', () => ({
     })),
 }));
 
+const ORG_ID = '11111111-1111-4111-8111-111111111111';
+const USER_ID = '22222222-2222-4222-8222-222222222222';
+const TARGET_USER_ID = '33333333-3333-4333-8333-333333333333';
+const PROFILE_ID = '44444444-4444-4444-8444-444444444444';
+const CORRELATION_ID = '55555555-5555-4555-8555-555555555555';
+
 const authorization: RepositoryAuthorizationContext = {
-    orgId: 'org-1',
-    userId: 'user-1',
+    orgId: ORG_ID,
+    userId: USER_ID,
     roleKey: 'orgAdmin',
     permissions: {},
     dataResidency: 'UK_ONLY',
     dataClassification: 'OFFICIAL',
-    correlationId: 'corr-1',
+    correlationId: CORRELATION_ID,
     auditSource: 'test',
     tenantScope: {
-        orgId: 'org-1',
+        orgId: ORG_ID,
         dataResidency: 'UK_ONLY',
         dataClassification: 'OFFICIAL',
         auditSource: 'test',
@@ -47,10 +53,10 @@ const authorization: RepositoryAuthorizationContext = {
 const timestamp = '2025-01-01T00:00:00.000Z';
 
 const buildLeaveRequest = (overrides: Partial<LeaveRequest> = {}): LeaveRequest => ({
-    id: 'req-1',
-    orgId: 'org-1',
+    id: '66666666-6666-4666-8666-666666666666',
+    orgId: ORG_ID,
     employeeId: 'EMP-1',
-    userId: 'user-1',
+    userId: USER_ID,
     employeeName: 'Test User',
     leaveType: 'annual',
     startDate: '2025-01-10',
@@ -59,7 +65,7 @@ const buildLeaveRequest = (overrides: Partial<LeaveRequest> = {}): LeaveRequest 
     isHalfDay: false,
     status: 'submitted',
     createdAt: timestamp,
-    createdBy: 'user-1',
+    createdBy: USER_ID,
     dataResidency: 'UK_ONLY',
     dataClassification: 'OFFICIAL',
     auditSource: 'test',
@@ -67,8 +73,8 @@ const buildLeaveRequest = (overrides: Partial<LeaveRequest> = {}): LeaveRequest 
 });
 
 const buildLeaveBalance = (overrides: Partial<LeaveBalance> = {}): LeaveBalance => ({
-    id: 'balance-1',
-    orgId: 'org-1',
+    id: '77777777-7777-4777-8777-777777777777',
+    orgId: ORG_ID,
     employeeId: 'EMP-1',
     leaveType: 'annual',
     year: 2025,
@@ -113,7 +119,7 @@ const createService = (overrides?: Partial<{
     const absence = buildAbsence();
 
     const peopleService = {
-        createEmployeeProfile: vi.fn(async () => ({ profileId: 'profile-1' })),
+        createEmployeeProfile: vi.fn(async () => ({ profileId: PROFILE_ID })),
         createEmploymentContract: vi.fn(async () => ({ contractId: 'contract-1' })),
         updateEmployeeProfile: vi.fn(async () => ({})),
         updateEmploymentContract: vi.fn(async () => ({})),
@@ -199,14 +205,14 @@ describe('PeopleOrchestrationService', () => {
         const result = await service.onboardEmployee({
             authorization,
             profileDraft: {
-                userId: 'user-2',
+                userId: TARGET_USER_ID,
                 employeeNumber: 'EMP-2',
                 employmentType: 'FULL_TIME',
             },
             eligibleLeaveTypes: ['annual'],
         });
 
-        expect(result.profileId).toBe('profile-1');
+        expect(result.profileId).toBe(PROFILE_ID);
         expect(deps.peopleService.createEmployeeProfile).toHaveBeenCalled();
         expect(deps.leaveService.ensureEmployeeBalances).toHaveBeenCalledWith({
             authorization,
@@ -221,14 +227,14 @@ describe('PeopleOrchestrationService', () => {
 
         await service.updateEligibility({
             authorization,
-            profileId: 'profile-1',
+            profileId: PROFILE_ID,
             eligibleLeaveTypes: ['annual', 'sick'],
             year: 2025,
         });
 
         expect(deps.peopleService.updateEmployeeProfile).toHaveBeenCalledWith({
             authorization,
-            payload: { profileId: 'profile-1', profileUpdates: { eligibleLeaveTypes: ['annual', 'sick'] } },
+            payload: { profileId: PROFILE_ID, profileUpdates: { eligibleLeaveTypes: ['annual', 'sick'] } },
         });
         expect(deps.leaveService.ensureEmployeeBalances).toHaveBeenCalledWith({
             authorization,
@@ -273,7 +279,7 @@ describe('PeopleOrchestrationService', () => {
 
         await service.terminateEmployee({
             authorization,
-            profileId: 'profile-1',
+            profileId: '55555555-5555-4555-8555-555555555555',
             termination: { reason: 'Reduction', date: new Date('2025-01-01') },
             cancelPendingLeave: true,
         });

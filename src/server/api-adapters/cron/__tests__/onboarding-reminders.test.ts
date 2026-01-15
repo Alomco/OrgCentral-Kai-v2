@@ -4,30 +4,30 @@ import type { OrgActorResolution } from '@/server/api-adapters/cron/cron-shared'
 import { triggerOnboardingReminderCron } from '../onboarding-reminders';
 import { getOnboardingReminderQueueClient } from '@/server/lib/queues/hr/onboarding-reminder-queue';
 import type { OnboardingReminderQueueClient } from '@/server/lib/queues/hr/onboarding-reminder-queue';
-import { resolveOrgActors } from '@/server/api-adapters/cron/cron-shared';
+import {
+    assertCronSecret,
+    parseCronRequestOptions,
+    resolveOrgActors,
+} from '@/server/api-adapters/cron/cron-shared';
 
 vi.mock('@/server/lib/queues/hr/onboarding-reminder-queue', () => ({
     getOnboardingReminderQueueClient: vi.fn(),
 }));
 
-vi.mock('@/server/api-adapters/cron/cron-shared', async () => {
-    const actual = await vi.importActual<typeof import('@/server/api-adapters/cron/cron-shared')>(
-        '@/server/api-adapters/cron/cron-shared',
-    );
-    return {
-        ...actual,
-        resolveOrgActors: vi.fn(),
-    };
-});
+vi.mock('@/server/api-adapters/cron/cron-shared', () => ({
+    assertCronSecret: vi.fn(),
+    parseCronRequestOptions: vi.fn(() => ({ orgIds: undefined, dryRun: false })),
+    resolveOrgActors: vi.fn(),
+}));
 
 describe('triggerOnboardingReminderCron', () => {
     afterEach(() => {
         vi.clearAllMocks();
-        delete process.env.CRON_SECRET;
     });
 
     it('enqueues onboarding reminder jobs with cache scopes', async () => {
-        process.env.CRON_SECRET = 'cron-secret';
+        vi.mocked(assertCronSecret).mockImplementation(() => undefined);
+        vi.mocked(parseCronRequestOptions).mockReturnValue({ orgIds: undefined, dryRun: false });
 
         const enqueueReminderJob = vi.fn<OnboardingReminderQueueClient['enqueueReminderJob']>(async () => undefined);
         vi.mocked(getOnboardingReminderQueueClient).mockReturnValue({
@@ -37,8 +37,8 @@ describe('triggerOnboardingReminderCron', () => {
         const actors: OrgActorResolution = {
             actors: [
                 {
-                    orgId: 'org-1',
-                    userId: 'user-1',
+                    orgId: '11111111-1111-4111-8111-111111111111',
+                    userId: '22222222-2222-4222-8222-222222222222',
                     role: 'owner',
                     dataResidency: 'UK_ONLY',
                     dataClassification: 'OFFICIAL',

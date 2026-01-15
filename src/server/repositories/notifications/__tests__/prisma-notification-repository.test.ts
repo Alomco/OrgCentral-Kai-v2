@@ -5,7 +5,7 @@ import { PrismaNotificationRepository } from '@/server/repositories/prisma/notif
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
 import { RepositoryAuthorizationError } from '@/server/repositories/security';
 
-const invalidateNotificationCache = vi.hoisted(() => vi.fn());
+const invalidateNotificationCache = vi.hoisted(() => vi.fn().mockResolvedValue(undefined));
 const registerNotificationCache = vi.hoisted(() => vi.fn());
 
 vi.mock('@/server/repositories/notifications/notification-cache', () => ({
@@ -14,11 +14,11 @@ vi.mock('@/server/repositories/notifications/notification-cache', () => ({
     NOTIFICATION_CACHE_SCOPE: 'notifications',
 }));
 
-const ORG_ID = '11111111-1111-1111-1111-111111111111';
-const USER_ID = '22222222-2222-2222-2222-222222222222';
+const ORG_ID = '11111111-1111-4111-8111-111111111111';
+const USER_ID = '22222222-2222-4222-8222-222222222222';
 
 const baseRecord: NotificationMessage = {
-    id: 'notif-1',
+    id: '33333333-3333-4333-8333-333333333333',
     orgId: ORG_ID,
     userId: USER_ID,
     title: 'Title',

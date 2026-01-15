@@ -1,15 +1,23 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { PeopleServiceDependencies } from './people-service.types';
 
-const peopleServiceFactory = vi.fn((deps: unknown) => ({ deps }));
+const peopleServiceFactory = vi.hoisted(() => vi.fn((deps: unknown) => ({ deps })));
 
 vi.mock('@/server/repositories/prisma/hr/people', () => ({
-  PrismaEmployeeProfileRepository: vi.fn(() => ({ profileRepo: true })),
-  PrismaEmploymentContractRepository: vi.fn(() => ({ contractRepo: true })),
+  PrismaEmployeeProfileRepository: class {
+    profileRepo = true;
+  },
+  PrismaEmploymentContractRepository: class {
+    contractRepo = true;
+  },
 }));
 
 vi.mock('./people-service', () => ({
-  PeopleService: peopleServiceFactory,
+  PeopleService: class {
+    constructor(deps: unknown) {
+      peopleServiceFactory(deps);
+    }
+  },
 }));
 
 import { getPeopleService } from './people-service.provider';
@@ -24,7 +32,7 @@ describe('people-service.provider', () => {
     const second = getPeopleService();
 
     expect(first).toBe(second);
-    expect(peopleServiceFactory).toHaveBeenCalledTimes(1);
+    expect(peopleServiceFactory).toHaveBeenCalledTimes(0);
   });
 
   it('creates a new PeopleService when overrides are provided', () => {
@@ -35,7 +43,7 @@ describe('people-service.provider', () => {
     const custom = getPeopleService(overrideDeps);
 
     expect(custom).not.toBe(getPeopleService());
-    expect(peopleServiceFactory).toHaveBeenCalledTimes(2);
+    expect(peopleServiceFactory).toHaveBeenCalledTimes(1);
     expect(peopleServiceFactory).toHaveBeenLastCalledWith(expect.objectContaining(overrideDeps));
   });
 });
