@@ -13,8 +13,8 @@ import {
     ROLE_DASHBOARD_PATHS,
 } from '@/server/ui/auth/role-redirect';
 
-import { AdminNavigation } from './_components/admin-navigation';
-import { AdminSidebar } from './_components/admin-sidebar';
+import { ModernAdminNavigation } from './_components/modern-admin-navigation';
+import { ModernAdminSidebar } from './_components/modern-admin-sidebar';
 import { AdminShell } from '../_components/admin-shell';
 
 async function AdminLayoutContent({ children }: { children: ReactNode }) {
@@ -59,30 +59,37 @@ async function AdminLayoutContent({ children }: { children: ReactNode }) {
             <SkipLink targetId="admin-main-content" />
             <AdminShell
                 navigation={
-                    <AdminNavigation
+                    <ModernAdminNavigation
                         organizationId={authorization.orgId}
                         organizationLabel={branding?.companyName ?? null}
                         roleKey={authorization.roleKey}
-                        permissions={authorization.permissions}
                         userEmail={userEmail}
                     />
                 }
                 orbColor="primary"
                 particleCount={6}
                 mainId="admin-main-content"
+                showThemeSwitcher={false}
             >
-                <div className="flex min-h-[calc(100vh-3.5rem)] w-full">
-                    <AdminSidebar
+                <div
+                    className="min-h-[calc(100vh-3.5rem)] w-full"
+                    data-focus-container="admin-layout"
+                >
+                    <ModernAdminSidebar
                         organizationLabel={branding?.companyName ?? null}
                         roleKey={authorization.roleKey}
                         permissions={authorization.permissions}
                     />
-                    <div className="flex-1 min-w-0">
-                        {/* 
-                          We use a plain div here because Admin pages likely have their own specialized containers.
-                          Using PageContainer here might double-pad. 
-                          Future refactors can move individual pages to use local PageContainers.
-                        */}
+                    {/*
+                      We use a plain div here because Admin pages likely have their own specialized containers.
+                      Using PageContainer here might double-pad.
+                      Future refactors can move individual pages to use local PageContainers.
+                    */}
+                    <div
+                        className="ml-64 min-h-[calc(100vh-3.5rem)] px-6 py-6 transition-all duration-300 md:ml-64"
+                        id="admin-main-content"
+                        tabIndex={-1}
+                    >
                         <div className="w-full h-full">
                             {children}
                         </div>

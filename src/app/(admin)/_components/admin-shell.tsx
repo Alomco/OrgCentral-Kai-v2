@@ -54,7 +54,7 @@ export function AdminShell({
 
                 {/* 🎨 Theme Switcher (Floating if not in nav) */}
                 {showThemeSwitcher && (
-                    <div className="fixed bottom-24 left-6 [z-index:var(--z-toast)] animate-in fade-in slide-in-from-bottom-4 duration-700">
+                    <div className="fixed bottom-24 left-6 z-(--z-toast) animate-in fade-in slide-in-from-bottom-4 duration-700">
                         <div className="rounded-full shadow-lg shadow-primary/10 backdrop-blur-md bg-background/50 border border-border/50">
                             <ThemeSwitcher />
                         </div>

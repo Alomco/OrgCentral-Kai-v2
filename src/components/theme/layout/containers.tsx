@@ -65,7 +65,7 @@ export function PageHeader({ title, description, actions, icon, className }: Pag
         <header className={cn('flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between', className)}>
             <div className="flex items-start gap-4">
                 {icon && (
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-accent text-white shadow-lg shadow-primary/25">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-primary to-accent text-white shadow-lg shadow-primary/25">
                         {icon}
                     </div>
                 )}

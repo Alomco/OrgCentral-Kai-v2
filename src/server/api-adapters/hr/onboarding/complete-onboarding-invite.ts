@@ -6,6 +6,7 @@ import {
     type CompleteOnboardingInviteResult,
 } from '@/server/use-cases/hr/onboarding/complete-onboarding-invite';
 import { getCompleteOnboardingInviteDependencies } from '@/server/services/hr/onboarding/onboarding-controller-dependencies';
+import { extractIpAddress, extractUserAgent } from '@/server/use-cases/shared/request-metadata';
 
 const payloadSchema = z
     .union([
@@ -26,6 +27,7 @@ export interface CompleteOnboardingInviteActor {
 export async function completeOnboardingInviteController(
     payload: unknown,
     actor: CompleteOnboardingInviteActor,
+    requestHeaders?: Headers,
     dependencies: CompleteOnboardingInviteDependencies = getCompleteOnboardingInviteDependencies(),
 ): Promise<CompleteOnboardingInviteResult> {
     const { inviteToken } = payloadSchema.parse(payload);
@@ -38,9 +40,17 @@ export async function completeOnboardingInviteController(
         throw new AuthorizationError('Authenticated email is required to accept onboarding invitations.');
     }
 
+    const request = requestHeaders
+        ? {
+            ipAddress: extractIpAddress(requestHeaders),
+            userAgent: extractUserAgent(requestHeaders),
+        }
+        : undefined;
+
     return completeOnboardingInvite(dependencies, {
         inviteToken,
         userId,
         actorEmail: email,
+        request,
     });
 }

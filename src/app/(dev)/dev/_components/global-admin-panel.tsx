@@ -3,7 +3,7 @@
 import { useState, useTransition, useEffect } from 'react';
 import { UserPlus, Users, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { listGlobalAdmins, createGlobalAdmin, bootstrapDefaultAdmins, runDevColdStart } from '../_actions/admin-tools';
+import { listGlobalAdmins, createGlobalAdmin, bootstrapDefaultAdmins, runDevelopmentColdStart } from '../_actions/admin-tools';
 
 interface AdminUser {
     id: string;
@@ -18,7 +18,7 @@ export function GlobalAdminPanel() {
     const [email, setEmail] = useState('');
     const [displayName, setDisplayName] = useState('');
     const [message, setMessage] = useState('');
-    const [failures, setFailures] = useState<Array<{ step: string; message: string }>>([]);
+    const [failures, setFailures] = useState<{ step: string; message: string }[]>([]);
     const [isPending, startTransition] = useTransition();
 
     const loadAdmins = () => {
@@ -63,7 +63,7 @@ export function GlobalAdminPanel() {
 
     const handleColdStart = () => {
         startTransition(async () => {
-            const result = await runDevColdStart();
+            const result = await runDevelopmentColdStart();
             setMessage(result.message);
             setFailures(result.failures ?? []);
             if (result.success) {

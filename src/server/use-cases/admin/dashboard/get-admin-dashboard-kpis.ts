@@ -43,30 +43,10 @@ export async function getAdminDashboardKpis(
         'use cache';
         cacheLife(CACHE_LIFE_SHORT);
 
-        registerOrgCacheTag({
-            orgId: input.orgId,
-            scope: MEMBER_SCOPE,
-            classification: input.dataClassification,
-            residency: input.dataResidency,
-        });
-        registerOrgCacheTag({
-            orgId: input.orgId,
-            scope: INVITATION_SCOPE,
-            classification: input.dataClassification,
-            residency: input.dataResidency,
-        });
-        registerOrgCacheTag({
-            orgId: input.orgId,
-            scope: CACHE_SCOPE_ROLES,
-            classification: input.dataClassification,
-            residency: input.dataResidency,
-        });
-        registerOrgCacheTag({
-            orgId: input.orgId,
-            scope: CACHE_SCOPE_SECURITY_METRICS,
-            classification: input.dataClassification,
-            residency: input.dataResidency,
-        });
+        registerOrgCacheTag(input.orgId, MEMBER_SCOPE, input.dataClassification, input.dataResidency);
+        registerOrgCacheTag(input.orgId, INVITATION_SCOPE, input.dataClassification, input.dataResidency);
+        registerOrgCacheTag(input.orgId, CACHE_SCOPE_ROLES, input.dataClassification, input.dataResidency);
+        registerOrgCacheTag(input.orgId, CACHE_SCOPE_SECURITY_METRICS, input.dataClassification, input.dataResidency);
 
         return buildKpis(input);
     }

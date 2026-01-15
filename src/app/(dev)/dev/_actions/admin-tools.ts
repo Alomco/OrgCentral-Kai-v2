@@ -19,6 +19,8 @@ import { runFullColdStart } from '@/server/services/platform/bootstrap/full-cold
 const PLATFORM_ORG_SLUG = process.env.PLATFORM_ORG_SLUG ?? 'orgcentral-platform';
 const DEFAULT_DEV_ADMIN_EMAIL = 'aant1563@gmail.com';
 const DEFAULT_GLOBAL_ADMIN_EMAIL = 'bdturag01@gmail.com';
+const UNKNOWN_ERROR_MESSAGE = 'Unknown error';
+const DEV_DASHBOARD_PATH = '/dev/dashboard';
 
 interface AdminUser {
     id: string;
@@ -143,10 +145,10 @@ export async function createGlobalAdmin(email: string, displayName?: string): Pr
             },
         });
 
-        revalidatePath('/dev/dashboard');
+        revalidatePath(DEV_DASHBOARD_PATH);
         return { success: true, message: `Created global admin: ${normalizedEmail}`, userId: user.id };
     } catch (error) {
-        const message = error instanceof Error ? error.message : 'Unknown error';
+        const message = error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE;
         return { success: false, message };
     }
 }
@@ -159,29 +161,29 @@ export async function bootstrapDefaultAdmins(): Promise<{
         await createGlobalAdmin(DEFAULT_GLOBAL_ADMIN_EMAIL, 'Global Admin');
         await createGlobalAdmin(DEFAULT_DEV_ADMIN_EMAIL, 'Dev Admin');
 
-        revalidatePath('/dev/dashboard');
+        revalidatePath(DEV_DASHBOARD_PATH);
         return {
             success: true,
             message: `Bootstrapped admins: ${DEFAULT_GLOBAL_ADMIN_EMAIL}, ${DEFAULT_DEV_ADMIN_EMAIL}`
         };
     } catch (error) {
-        const message = error instanceof Error ? error.message : 'Unknown error';
+        const message = error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE;
         return { success: false, message };
     }
 }
 
-export interface DevColdStartFailure {
+export interface DevelopmentColdStartFailure {
     step: string;
     message: string;
 }
 
-export interface DevColdStartResult {
+export interface DevelopmentColdStartResult {
     success: boolean;
     message: string;
-    failures?: DevColdStartFailure[];
+    failures?: DevelopmentColdStartFailure[];
 }
 
-export async function runDevColdStart(): Promise<DevColdStartResult> {
+export async function runDevelopmentColdStart(): Promise<DevelopmentColdStartResult> {
     try {
         assertColdStartEnabled();
         const result = await runFullColdStart({ includeDemoData: true });
@@ -194,7 +196,7 @@ export async function runDevColdStart(): Promise<DevColdStartResult> {
             .join(', ');
 
         revalidatePath('/dev');
-        revalidatePath('/dev/dashboard');
+        revalidatePath(DEV_DASHBOARD_PATH);
         revalidatePath('/admin');
         revalidatePath('/hr');
 

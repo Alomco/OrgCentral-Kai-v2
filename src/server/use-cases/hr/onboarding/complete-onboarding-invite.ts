@@ -14,6 +14,7 @@ import type { IOrganizationRepository } from '@/server/repositories/contracts/or
 import type { IMembershipRepository } from '@/server/repositories/contracts/org/membership';
 import type { BillingServiceContract } from '@/server/services/billing/billing-service.provider';
 import { normalizeToken } from '@/server/use-cases/shared';
+import { recordAuditEvent } from '@/server/logging/audit-logger';
 import {
     createEmployeeProfile,
     type CreateEmployeeProfileTransactionRunner,
@@ -40,6 +41,10 @@ export interface CompleteOnboardingInviteInput {
     inviteToken: string;
     userId: string;
     actorEmail: string;
+    request?: {
+        ipAddress?: string;
+        userAgent?: string;
+    };
 }
 
 export interface CompleteOnboardingInviteDependencies {
@@ -155,6 +160,25 @@ export async function completeOnboardingInvite(
     });
 
     await deps.onboardingInvitationRepository.markAccepted(organization.id, invitation.token, input.userId);
+
+    await recordAuditEvent({
+        orgId: organization.id,
+        userId: input.userId,
+        eventType: 'AUTH',
+        action: 'hr.onboarding.invitation.accepted',
+        resource: 'hr.onboarding.invitation',
+        resourceId: organization.id,
+        residencyZone: organization.dataResidency,
+        classification: organization.dataClassification,
+        auditSource: authorization.auditSource,
+        payload: {
+            alreadyMember: membershipResult.alreadyMember,
+            contractCreated: Boolean(creationResult.contractCreated),
+            checklistCreated: Boolean(creationResult.checklistInstanceId),
+            ipAddress: input.request?.ipAddress,
+            userAgent: input.request?.userAgent,
+        },
+    });
 
     return {
         success: true,

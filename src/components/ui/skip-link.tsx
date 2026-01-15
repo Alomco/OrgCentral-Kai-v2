@@ -21,7 +21,7 @@ export function SkipLink({ targetId, label = 'Skip to content', className }: Ski
             data-slot="skip-link"
             className={cn(
                 'sr-only rounded-md border bg-background px-3 py-2 text-sm font-medium text-foreground',
-                'focus:not-sr-only focus:fixed focus:left-6 focus:top-4 focus:[z-index:var(--z-overlay)]',
+                'focus:not-sr-only focus:fixed focus:left-6 focus:top-4 focus:z-(--z-overlay)',
                 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50',
                 className,
             )}

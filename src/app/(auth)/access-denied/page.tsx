@@ -18,7 +18,7 @@ export default function AccessDeniedPage() {
             title="Access denied"
             subtitle="Your account doesn’t have permission for this area. Try switching accounts or request access."
         >
-            <div className="w-full max-w-3xl rounded-3xl bg-[hsl(var(--card)_/_0.6)] p-8 text-center shadow-[0_20px_70px_-40px_hsl(var(--primary)_/_0.65)] backdrop-blur">
+            <div className="w-full max-w-3xl rounded-3xl bg-[hsl(var(--card)/0.6)] p-8 text-center shadow-[0_20px_70px_-40px_hsl(var(--primary)/0.65)] backdrop-blur">
                 <div className="flex flex-col items-center gap-6">
                     <Image
                         src={accessDeniedImage}

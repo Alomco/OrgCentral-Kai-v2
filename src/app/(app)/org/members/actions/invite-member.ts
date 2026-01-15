@@ -5,6 +5,7 @@ import { z } from 'zod';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
 import { getSessionContext } from '@/server/use-cases/auth/sessions/get-session';
 import { getMembershipService } from '@/server/services/org/membership/membership-service.provider';
+import { buildInvitationRequestSecurityContext } from '@/server/use-cases/shared/request-metadata';
 import {
     getInvitationDeliveryFailureMessage,
     isInvitationDeliverySuccessful,
@@ -64,14 +65,26 @@ export async function inviteMemberAction(
                 authorization: RepositoryAuthorizationContext;
                 email: string;
                 roles: string[];
+                request?: {
+                    ipAddress?: string;
+                    userAgent?: string;
+                    securityContext?: Record<string, unknown>;
+                };
             }): Promise<{ token: string; alreadyInvited: boolean }>;
         };
         const membershipService = getMembershipServiceTyped();
+        const requestContext = buildInvitationRequestSecurityContext({
+            authorization,
+            headers: headerStore,
+            action: 'org.invitation.create',
+            targetEmail: parsed.data.email,
+        });
         const result = inviteResultSchema.parse(
             await membershipService.inviteMember({
                 authorization,
                 email: parsed.data.email,
                 roles: [parsed.data.role],
+                request: requestContext,
             }),
         );
 

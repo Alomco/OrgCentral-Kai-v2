@@ -18,6 +18,7 @@ import {
   ORG_MEMBERSHIP_RESOURCE_TYPE,
   recordMembershipAuditEvent,
 } from './membership-service.policy';
+import { buildMetadata } from '@/server/use-cases/shared/builders';
 
 interface MembershipServiceContext {
   dependencies: MembershipServiceDependencies;
@@ -137,6 +138,11 @@ export async function handleInviteMember(service: MembershipServiceContext, inpu
   authorization: RepositoryAuthorizationContext;
   email: string;
   roles: string[];
+  request?: {
+    ipAddress?: string;
+    userAgent?: string;
+    securityContext?: Record<string, unknown>;
+  };
 }): Promise<{ token: string; alreadyInvited: boolean }> {
   await service.ensureOrgAccess(input.authorization, {
     action: 'org.invitation.create',
@@ -194,6 +200,11 @@ export async function handleInviteMember(service: MembershipServiceContext, inpu
         dataResidency: input.authorization.dataResidency,
         dataClassification: input.authorization.dataClassification,
       },
+      securityContext: input.request?.securityContext
+        ? buildMetadata(input.request.securityContext)
+        : undefined,
+      ipAddress: input.request?.ipAddress,
+      userAgent: input.request?.userAgent,
     });
 
     return { token: invitation.token, alreadyInvited: false };

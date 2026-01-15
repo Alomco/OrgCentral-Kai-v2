@@ -1,15 +1,15 @@
-import { PrismaEnhancedSecurityEventRepository } from '@/server/repositories/prisma/security/prisma-enhanced-security-event-repository';
-import { PrismaSecurityMetricsRepository } from '@/server/repositories/prisma/security/prisma-security-metrics-repository';
+import { createEnhancedSecurityEventRepository } from '@/server/repositories/providers/security/enhanced-security-event-repository-provider';
+import { createSecurityMetricsRepository } from '@/server/repositories/providers/security/security-metrics-repository-provider';
 import { SecurityMetricsService } from '@/server/services/security/security-metrics-service';
 
 export function resolveSecurityMetricsService(): SecurityMetricsService {
     return new SecurityMetricsService({
-        securityMetricsRepository: new PrismaSecurityMetricsRepository(),
+        securityMetricsRepository: createSecurityMetricsRepository(),
     });
 }
 
-export function resolveSecurityEventRepository(): PrismaEnhancedSecurityEventRepository {
-    return new PrismaEnhancedSecurityEventRepository();
+export function resolveSecurityEventRepository() {
+    return createEnhancedSecurityEventRepository();
 }
 
 export function resolveDateRange(daysBack: number): { start: Date; end: Date } {

@@ -6,6 +6,7 @@ import type { IOrganizationRepository } from '@/server/repositories/contracts/or
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
 import { assertNonEmpty } from '@/server/use-cases/shared/validators';
 import { normalizeRoles } from '@/server/use-cases/shared';
+import { buildMetadata } from '@/server/use-cases/shared/builders';
 import type { EmployeeProfileDTO } from '@/server/types/hr/people';
 import { checkExistingOnboardingTarget } from './check-existing-onboarding-target';
 
@@ -25,6 +26,11 @@ export interface SendOnboardingInviteInput {
     eligibleLeaveTypes?: string[];
     onboardingTemplateId?: string | null;
     roles?: string[];
+    request?: {
+        ipAddress?: string;
+        userAgent?: string;
+        securityContext?: Record<string, unknown>;
+    };
 }
 
 export interface SendOnboardingInviteDependencies {
@@ -60,6 +66,7 @@ export async function sendOnboardingInvite(
         {
             authorization: input.authorization,
             email: normalizedEmail,
+            employeeNumber: normalizedEmployeeNumber,
         },
     );
 
@@ -106,6 +113,17 @@ export async function sendOnboardingInvite(
             onboardingTemplateId: input.onboardingTemplateId ?? null,
             roles: roles.length > 0 ? roles : ['member'],
         },
+        metadata: {
+            auditSource: input.authorization.auditSource,
+            correlationId: input.authorization.correlationId,
+            dataResidency: input.authorization.dataResidency,
+            dataClassification: input.authorization.dataClassification,
+        },
+            securityContext: input.request?.securityContext
+                ? buildMetadata(input.request.securityContext)
+                : undefined,
+        ipAddress: input.request?.ipAddress,
+        userAgent: input.request?.userAgent,
     });
 
     return { token: invitation.token };

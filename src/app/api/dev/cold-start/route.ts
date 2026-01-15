@@ -20,9 +20,9 @@ const coldStartConfigSchema = z.object({
     platformOrgName: z.string().min(1).optional(),
     platformTenantId: z.string().min(1).optional(),
     platformRegionCode: z.string().min(1).optional(),
-    globalAdminEmail: z.string().email().optional(),
+    globalAdminEmail: z.email().optional(),
     globalAdminName: z.string().min(1).optional(),
-    developmentAdminEmail: z.string().email().optional(),
+    developmentAdminEmail: z.email().optional(),
     developmentAdminName: z.string().min(1).optional(),
     roleName: z.string().min(1).optional(),
 });

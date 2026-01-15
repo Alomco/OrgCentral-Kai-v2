@@ -3,6 +3,7 @@ import { getMembershipService } from '@/server/services/org/membership/membershi
 import type { MembershipService } from '@/server/services/org/membership/membership-service';
 import type { AcceptInvitationResult } from '@/server/use-cases/auth/accept-invitation';
 import { processInvitationAcceptance } from '@/server/use-cases/auth/accept-invitation-action';
+import { extractIpAddress, extractUserAgent } from '@/server/use-cases/shared/request-metadata';
 
 const AcceptInvitationPayloadSchema = z.object({
     token: z.string().min(1, 'An invitation token is required'),
@@ -21,6 +22,7 @@ export type AcceptInvitationActor = z.infer<typeof AcceptInvitationActorSchema>;
 export async function acceptInvitationController(
     payload: unknown,
     actor: unknown,
+    requestHeaders?: Headers,
     service: MembershipService = membershipService,
 ): Promise<AcceptInvitationResult> {
     const { token } = AcceptInvitationPayloadSchema.parse(payload);
@@ -29,6 +31,12 @@ export async function acceptInvitationController(
         {
             token,
             actor: actorContext,
+            request: requestHeaders
+                ? {
+                    ipAddress: extractIpAddress(requestHeaders),
+                    userAgent: extractUserAgent(requestHeaders),
+                }
+                : undefined,
         },
         { service },
     );

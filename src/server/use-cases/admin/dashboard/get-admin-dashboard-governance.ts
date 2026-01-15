@@ -82,24 +82,9 @@ export async function getAdminDashboardGovernanceAlerts(
         'use cache';
         cacheLife(CACHE_LIFE_SHORT);
 
-        registerOrgCacheTag({
-            orgId: input.orgId,
-            scope: CACHE_SCOPE_SECURITY_EVENTS,
-            classification: input.dataClassification,
-            residency: input.dataResidency,
-        });
-        registerOrgCacheTag({
-            orgId: input.orgId,
-            scope: CACHE_SCOPE_SECURITY_METRICS,
-            classification: input.dataClassification,
-            residency: input.dataResidency,
-        });
-        registerOrgCacheTag({
-            orgId: input.orgId,
-            scope: INVITATION_SCOPE,
-            classification: input.dataClassification,
-            residency: input.dataResidency,
-        });
+        registerOrgCacheTag(input.orgId, CACHE_SCOPE_SECURITY_EVENTS, input.dataClassification, input.dataResidency);
+        registerOrgCacheTag(input.orgId, CACHE_SCOPE_SECURITY_METRICS, input.dataClassification, input.dataResidency);
+        registerOrgCacheTag(input.orgId, INVITATION_SCOPE, input.dataClassification, input.dataResidency);
 
         return buildGovernanceAlerts(input);
     }

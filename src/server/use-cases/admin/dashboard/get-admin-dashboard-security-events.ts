@@ -5,7 +5,7 @@ import { registerOrgCacheTag } from '@/server/lib/cache-tags';
 import { CACHE_SCOPE_SECURITY_EVENTS } from '@/server/repositories/cache-scopes';
 import { toCacheSafeAuthorizationContext } from '@/server/repositories/security/cache-authorization';
 import type { RepositoryAuthorizationContext } from '@/server/types/repository-authorization';
-import type { SecurityEventSummary } from '@/server/types/admin-dashboard';
+import type { SecurityEventSeverity, SecurityEventSummary } from '@/server/types/admin-dashboard';
 import { resolveDateRange, resolveSecurityEventRepository } from './admin-dashboard-helpers';
 
 async function buildSecurityEvents(
@@ -21,11 +21,17 @@ async function buildSecurityEvents(
         offset: 0,
     }).catch(() => []);
 
+    const severityLevels: SecurityEventSeverity[] = ['info', 'low', 'medium', 'high', 'critical'];
+    const resolveSeverity = (severity: string): SecurityEventSeverity =>
+        severityLevels.includes(severity as SecurityEventSeverity)
+            ? (severity as SecurityEventSeverity)
+            : 'info';
+
     return events.map((event) => ({
         id: event.id,
         title: event.eventType,
         description: event.description,
-        severity: event.severity,
+        severity: resolveSeverity(event.severity),
         occurredAt: event.createdAt,
     }));
 }
@@ -37,12 +43,7 @@ export async function getAdminDashboardSecurityEvents(
         'use cache';
         cacheLife(CACHE_LIFE_SHORT);
 
-        registerOrgCacheTag({
-            orgId: input.orgId,
-            scope: CACHE_SCOPE_SECURITY_EVENTS,
-            classification: input.dataClassification,
-            residency: input.dataResidency,
-        });
+        registerOrgCacheTag(input.orgId, CACHE_SCOPE_SECURITY_EVENTS, input.dataClassification, input.dataResidency);
 
         return buildSecurityEvents(input);
     }

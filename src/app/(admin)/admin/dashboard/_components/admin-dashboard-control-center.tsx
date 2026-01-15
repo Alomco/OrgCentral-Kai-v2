@@ -25,14 +25,16 @@ export function AdminDashboardControlCenter({ authorization }: AdminDashboardCon
 
             <AdminDashboardHeader />
 
-            <div className="relative z-10 space-y-8">
+            <div className="relative z-10 space-y-10">
                 <Suspense fallback={<AdminKpiGridSkeleton />}>
                     <AdminKpiGrid authorization={authorization} />
                 </Suspense>
 
-                <AdminQuickActionsGrid />
+                <div className="rounded-3xl border border-border/40 bg-card/40 p-6 shadow-lg backdrop-blur-md">
+                    <AdminQuickActionsGrid />
+                </div>
 
-                <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                     <ShieldCheck className="h-4 w-4" />
                     Governance & security
                 </div>

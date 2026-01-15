@@ -19,6 +19,7 @@ export interface AdminNavItem {
     icon: LucideIcon;
     audience: AdminNavAudience;
     description?: string;
+    ariaLabel?: string; // Accessibility label for screen readers
 }
 
 const ADMIN_NAV_ITEMS: AdminNavItem[] = [
@@ -28,6 +29,7 @@ const ADMIN_NAV_ITEMS: AdminNavItem[] = [
         icon: LayoutDashboard,
         audience: 'admin',
         description: 'Platform overview & insights',
+        ariaLabel: 'Admin Dashboard',
     },
     {
         href: '/org/profile',
@@ -35,6 +37,7 @@ const ADMIN_NAV_ITEMS: AdminNavItem[] = [
         icon: Building2,
         audience: 'admin',
         description: 'Profile, branding, compliance',
+        ariaLabel: 'Organization Profile',
     },
     {
         href: '/org/members',
@@ -42,6 +45,7 @@ const ADMIN_NAV_ITEMS: AdminNavItem[] = [
         icon: Users,
         audience: 'admin',
         description: 'User access & invitations',
+        ariaLabel: 'Organization Members',
     },
     {
         href: '/org/roles',
@@ -49,6 +53,7 @@ const ADMIN_NAV_ITEMS: AdminNavItem[] = [
         icon: KeyRound,
         audience: 'admin',
         description: 'Permissions & policies',
+        ariaLabel: 'Organization Roles',
     },
     {
         href: '/hr/dashboard',
@@ -56,6 +61,7 @@ const ADMIN_NAV_ITEMS: AdminNavItem[] = [
         icon: Briefcase,
         audience: 'admin',
         description: 'People operations',
+        ariaLabel: 'HR Dashboard',
     },
     {
         href: '/dev/dashboard',
@@ -63,6 +69,7 @@ const ADMIN_NAV_ITEMS: AdminNavItem[] = [
         icon: Wrench,
         audience: 'dev',
         description: 'Diagnostics & tooling',
+        ariaLabel: 'Developer Tools',
     },
 ];
 

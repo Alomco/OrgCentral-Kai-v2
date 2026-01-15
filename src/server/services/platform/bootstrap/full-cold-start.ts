@@ -79,9 +79,8 @@ export async function runFullColdStart(options: FullColdStartOptions = {}): Prom
         throw new Error('Cold start failed: platform organization not found after upsert.');
     }
 
-    const roleKey: OrgRoleKey = isOrgRoleKey(options.coldStart?.roleName)
-        ? options.coldStart?.roleName
-        : 'globalAdmin';
+    const roleName = options.coldStart?.roleName;
+    const roleKey: OrgRoleKey = isOrgRoleKey(roleName) ? roleName : 'globalAdmin';
 
     const authorization = buildAuthorizationContext({
         orgId: organization.id,
@@ -175,9 +174,9 @@ async function seedPermissions(
     classification: DataClassificationLevel,
     residency: DataResidencyZone,
 ): Promise<{ success: boolean; message: string; count?: number }> {
-    const { permissionResourceRepository } = buildPermissionResourceServiceDependencies();
-    await seedPermissionResources({ permissionResourceRepository }, { orgId });
-    const resources = await permissionResourceRepository.listResources(orgId);
+    const { permissionRepository } = buildPermissionResourceServiceDependencies();
+    await seedPermissionResources({ permissionResourceRepository: permissionRepository }, { orgId });
+    const resources = await permissionRepository.listResources(orgId);
     await invalidateOrgCache(orgId, CACHE_SCOPE_PERMISSIONS, classification, residency);
     return { success: true, message: 'Seeded permission resources', count: resources.length };
 }

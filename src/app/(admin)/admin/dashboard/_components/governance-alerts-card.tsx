@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { AlertTriangle } from 'lucide-react';
 
 import { ThemeBadge, ThemeButton } from '@/components/theme/primitives/interactive';
 import {

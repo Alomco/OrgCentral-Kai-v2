@@ -34,8 +34,8 @@ export async function acceptInvitationAction(
 
         const useOnboardingFlow = shouldUseOnboardingFlow(invitation.onboardingData);
         const result = useOnboardingFlow
-            ? await completeOnboardingInviteController({ inviteToken: token }, actor)
-            : await acceptInvitationController({ token }, actor);
+            ? await completeOnboardingInviteController({ inviteToken: token }, actor, headerStore)
+            : await acceptInvitationController({ token }, actor, headerStore);
 
         return {
             status: 'success',

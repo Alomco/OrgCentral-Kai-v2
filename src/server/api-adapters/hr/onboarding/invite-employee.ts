@@ -1,6 +1,7 @@
 import { getSessionContext } from '@/server/use-cases/auth/sessions/get-session';
 import { onboardingInviteSchema } from '@/server/types/hr-onboarding-schemas';
 import { sendOnboardingInvite } from '@/server/use-cases/hr/onboarding/send-onboarding-invite';
+import { buildInvitationRequestSecurityContext } from '@/server/use-cases/shared/request-metadata';
 import { readJson } from '@/server/api-adapters/http/request-utils';
 import {
     resolveOnboardingControllerDependencies,
@@ -31,6 +32,13 @@ export async function inviteEmployeeController(
         },
     });
 
+    const requestContext = buildInvitationRequestSecurityContext({
+        authorization,
+        headers: request.headers,
+        action: 'hr.onboarding.invite',
+        targetEmail: payload.email,
+    });
+
     const result = await sendOnboardingInvite(
         {
             profileRepository: resolved.profileRepository,
@@ -47,6 +55,7 @@ export async function inviteEmployeeController(
             eligibleLeaveTypes: payload.eligibleLeaveTypes,
             onboardingTemplateId: payload.onboardingTemplateId,
             roles: payload.roles,
+            request: requestContext,
         },
     );
 

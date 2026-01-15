@@ -1,7 +1,7 @@
 import type { Browser, Page } from 'playwright';
 import { injectAxe } from 'axe-playwright';
 import { a11yLogger } from './logger';
-import type { ScanResult } from './types';
+import type { A11yImpact, ScanResult } from './types';
 import {
     closeBrowser,
     createPage,
@@ -39,7 +39,10 @@ interface AxeRunConfig {
 interface AxeRunResult {
     violations: {
         id: string;
-        impact?: string;
+        impact?: A11yImpact;
+        description: string;
+        help: string;
+        helpUrl: string;
         nodes: {
             html: string;
             target: string[];
@@ -68,10 +71,10 @@ async function runAxeScan(page: Page, url: string): Promise<ScanResult> {
     await injectAxe(page);
 
     const results = await page.evaluate<AxeRunResult, typeof AXE_RULES>((rules) => {
-        const axeWindow = window as Window & {
+        const axeRunner = (globalThis as unknown as {
             axe: { run: (config: AxeRunConfig) => Promise<AxeRunResult> };
-        };
-        return axeWindow.axe.run({
+        }).axe;
+        return axeRunner.run({
             runOnly: {
                 type: 'tag',
                 values: ['wcag2aa', 'wcag21aa', 'wcag2aaa', 'best-practice'],
@@ -80,10 +83,15 @@ async function runAxeScan(page: Page, url: string): Promise<ScanResult> {
         });
     }, AXE_RULES);
 
+    const normalizedViolations = results.violations.map((violation) => ({
+        ...violation,
+        impact: violation.impact ?? 'minor',
+    }));
+
     return {
         url,
         timestamp: new Date().toISOString(),
-        violations: results.violations,
+        violations: normalizedViolations,
         passes: results.passes.length,
         incomplete: results.incomplete.length,
     };

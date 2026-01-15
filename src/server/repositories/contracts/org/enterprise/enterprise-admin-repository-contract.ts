@@ -2,6 +2,7 @@ import type { ManagedOrganizationSummary } from '@/server/types/enterprise-types
 
 export interface EnterpriseOnboardingInput {
     adminUserId: string;
+    orgId?: string;
     orgName: string;
     ownerEmail: string;
     planId: string;

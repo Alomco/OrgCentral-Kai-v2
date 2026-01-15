@@ -9,18 +9,18 @@ import { QUICK_ACTIONS } from '../quick-actions';
 export function AdminQuickActionsGrid() {
     return (
         <div className="space-y-4">
-            <h2 className="text-sm font-medium uppercase tracking-wide text-muted-foreground flex items-center gap-2">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-2">
                 <Zap className="h-4 w-4" />
                 Quick actions
             </h2>
-            <ThemeGrid cols={4} gap="md">
+            <ThemeGrid cols={4} gap="md" className="items-stretch">
                 {QUICK_ACTIONS.map((action) => (
                     <Link key={action.href} href={action.href} className="h-full">
                         <ThemeCard
                             variant="glass"
                             hover="lift"
                             padding="lg"
-                            className="h-full cursor-pointer group"
+                            className="h-full cursor-pointer group border border-border/30"
                         >
                             <div className="flex items-start gap-4">
                                 <GradientAccent

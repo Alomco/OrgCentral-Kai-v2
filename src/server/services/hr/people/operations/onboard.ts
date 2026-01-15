@@ -29,11 +29,14 @@ export async function onboardEmployeeOperation(
         const eligibleLeaveTypes = parsed.eligibleLeaveTypes ?? parsed.profileDraft.eligibleLeaveTypes ?? [];
 
         const profileData = buildProfilePayload(parsed.profileDraft, eligibleLeaveTypes);
+        const enrichedProfileData = parsed.invite
+            ? markPreboardingProfile(profileData, parsed.invite.email)
+            : profileData;
 
         const profileResult = await runtime.deps.peopleService.createEmployeeProfile({
             authorization,
             payload: {
-                profileData,
+                profileData: enrichedProfileData,
             },
         });
 
@@ -120,6 +123,21 @@ async function issueOnboardingInvitation(params: {
     });
 
     return invitation.token;
+}
+
+function markPreboardingProfile(
+    profileData: OnboardEmployeeInput['profileDraft'],
+    inviteEmail: string,
+): OnboardEmployeeInput['profileDraft'] {
+    const metadata = isRecord(profileData.metadata) ? profileData.metadata : {};
+    return {
+        ...profileData,
+        metadata: {
+            ...metadata,
+            preboarding: true,
+            inviteEmail,
+        },
+    } satisfies OnboardEmployeeInput['profileDraft'];
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

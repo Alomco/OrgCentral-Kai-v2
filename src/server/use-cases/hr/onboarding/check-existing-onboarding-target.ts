@@ -8,6 +8,7 @@ import { registerPeopleProfilesTag } from '@/server/lib/cache-tags/hr-people';
 export interface CheckExistingOnboardingTargetInput {
   authorization: RepositoryAuthorizationContext;
   email: string;
+  employeeNumber?: string;
 }
 
 export type ExistingOnboardingTargetResult =
@@ -25,6 +26,7 @@ export async function checkExistingOnboardingTarget(
   input: CheckExistingOnboardingTargetInput,
 ): Promise<ExistingOnboardingTargetResult> {
   const email = input.email.trim().toLowerCase();
+  const employeeNumber = input.employeeNumber?.trim();
 
   const profile = await deps.profileRepository.findByEmail(input.authorization.orgId, email);
   registerPeopleProfilesTag({
@@ -52,6 +54,54 @@ export async function checkExistingOnboardingTarget(
 
   if (invite) {
     return { exists: true, kind: 'pending_invitation', token: invite.token, expiresAt: invite.expiresAt ?? null };
+  }
+
+  if (employeeNumber) {
+    const profileByNumber = await deps.profileRepository.findByEmployeeNumber(
+      input.authorization.orgId,
+      employeeNumber,
+    );
+
+    if (profileByNumber) {
+      return {
+        exists: true,
+        kind: 'profile',
+        profileId: profileByNumber.id,
+        status: (profileByNumber.metadata as Record<string, unknown> | null | undefined)?.complianceStatus as
+          | string
+          | null,
+      };
+    }
+
+    const pendingInvitations = await deps.invitationRepository.listInvitationsByOrg(
+      input.authorization.orgId,
+      { status: 'pending' },
+    );
+    registerOrgCacheTag(
+      input.authorization.orgId,
+      CACHE_SCOPE_ONBOARDING_INVITATIONS,
+      input.authorization.dataClassification,
+      input.authorization.dataResidency,
+    );
+
+    const matchedInvite = pendingInvitations.find((candidate) => {
+      const onboardingData = candidate.onboardingData as Record<string, unknown> | null | undefined;
+      const employeeId = typeof onboardingData?.employeeId === 'string'
+        ? onboardingData.employeeId
+        : typeof onboardingData?.employeeNumber === 'string'
+          ? onboardingData.employeeNumber
+          : undefined;
+      return employeeId?.trim() === employeeNumber;
+    });
+
+    if (matchedInvite) {
+      return {
+        exists: true,
+        kind: 'pending_invitation',
+        token: matchedInvite.token,
+        expiresAt: matchedInvite.expiresAt ?? null,
+      };
+    }
   }
 
   return { exists: false };

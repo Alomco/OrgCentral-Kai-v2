@@ -3,7 +3,7 @@
 import { useSyncExternalStore } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ChevronDown, Building2, User } from 'lucide-react';
+import { ChevronDown, Building2 } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -57,11 +57,11 @@ export function AdminNavigationLinks({ items }: { items: AdminNavItem[] }) {
                         href={item.href}
                         aria-current={active ? 'page' : undefined}
                         className={cn(
-                            'rounded-md px-3 py-1.5 text-sm font-medium motion-safe:transition-colors',
-                            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                            'rounded-lg px-3 py-2 text-sm font-medium motion-safe:transition-colors',
+                            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background',
                             active
-                                ? 'bg-primary/10 text-primary'
-                                : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                                ? 'bg-primary/10 text-primary shadow-[0_0_0_1px_hsl(var(--primary)/0.2)]'
+                                : 'text-muted-foreground hover:bg-muted/80 hover:text-foreground',
                         )}
                     >
                         {item.label}
@@ -71,7 +71,7 @@ export function AdminNavigationLinks({ items }: { items: AdminNavItem[] }) {
             {overflow.length > 0 && (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm" className="gap-1 text-muted-foreground">
+                        <Button variant="ghost" size="sm" className="gap-1 text-muted-foreground hover:text-foreground">
                             More <ChevronDown className="h-4 w-4" />
                         </Button>
                     </DropdownMenuTrigger>
@@ -97,6 +97,8 @@ export function AdminUserInfo({
     userEmail: string | null;
     roleKey: string;
 }) {
+    const userLabel = userEmail ?? 'User';
+    const initial = userLabel.trim().charAt(0).toUpperCase() || 'U';
     const roleLabel = roleKey
         .replace(/([A-Z])/g, ' $1')
         .replace(/^./, (s) => s.toUpperCase())
@@ -105,17 +107,19 @@ export function AdminUserInfo({
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground">
-                    <User className="h-4 w-4" />
+                <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground hover:text-foreground">
+                    <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+                        {initial}
+                    </span>
                     <span className="hidden sm:inline max-w-[150px] truncate">
-                        {userEmail?.split('@')[0] ?? 'User'}
+                        {userLabel.split('@')[0]}
                     </span>
                     <ChevronDown className="h-4 w-4" />
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-64">
                 <div className="px-3 py-2">
-                    <p className="text-sm font-medium">{userEmail ?? 'Unknown'}</p>
+                    <p className="text-sm font-medium">{userLabel}</p>
                     <p className="text-xs text-muted-foreground">{roleLabel}</p>
                 </div>
                 <DropdownMenuSeparator />

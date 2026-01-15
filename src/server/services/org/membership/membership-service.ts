@@ -75,6 +75,11 @@ export class MembershipService extends AbstractOrgService {
         authorization: RepositoryAuthorizationContext;
         email: string;
         roles: string[];
+        request?: {
+            ipAddress?: string;
+            userAgent?: string;
+            securityContext?: Record<string, unknown>;
+        };
     }): Promise<{ token: string; alreadyInvited: boolean }> {
         return handleInviteMember({
             dependencies: this.dependencies,

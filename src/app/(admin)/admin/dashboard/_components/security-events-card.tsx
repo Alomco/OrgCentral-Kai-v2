@@ -1,5 +1,3 @@
-import { ShieldAlert } from 'lucide-react';
-
 import { ThemeBadge } from '@/components/theme/primitives/interactive';
 import {
     ThemeCard,

@@ -10,7 +10,6 @@ export interface MembershipServiceDependencies extends AcceptInvitationDependenc
 }
 
 export interface AcceptInvitationServiceInput extends AcceptInvitationInput {
-    correlationId?: string;
     actor: {
         userId: string;
         email: string;

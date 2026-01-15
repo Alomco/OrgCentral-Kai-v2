@@ -34,7 +34,7 @@ export class PrismaEnterpriseAdminRepository
     }
 
     async onboardOrganization(input: EnterpriseOnboardingInput): Promise<ManagedOrganizationSummary> {
-        const newOrgId = randomUUID();
+        const newOrgId = input.orgId ?? randomUUID();
 
         // Validate module access
         const validatedModuleAccess = moduleAccessSchema.parse(input.moduleAccess);

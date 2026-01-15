@@ -11,6 +11,7 @@ import { PrismaOrganizationRepository } from '@/server/repositories/prisma/org/o
 import { getSessionContext } from '@/server/use-cases/auth/sessions/get-session';
 import { sendOnboardingInvite } from '@/server/use-cases/hr/onboarding/send-onboarding-invite';
 import { checkExistingOnboardingTarget } from '@/server/use-cases/hr/onboarding/check-existing-onboarding-target';
+import { buildInvitationRequestSecurityContext } from '@/server/use-cases/shared/request-metadata';
 
 import { onboardingWizardSchema, type OnboardingWizardValues } from './wizard.schema';
 import type { EmailCheckResult, WizardSubmitResult } from './wizard.types';
@@ -39,8 +40,9 @@ export async function submitOnboardingWizardAction(
     values: OnboardingWizardValues,
 ): Promise<WizardSubmitResult> {
     let session: Awaited<ReturnType<typeof getSessionContext>>;
+    let headerStore: Headers;
     try {
-        const headerStore = await headers();
+        headerStore = await headers();
         session = await getSessionContext(
             {},
             {
@@ -70,6 +72,13 @@ export async function submitOnboardingWizardAction(
             ? (parsed.data.onboardingTemplateId ?? null)
             : null;
 
+        const requestContext = buildInvitationRequestSecurityContext({
+            authorization: session.authorization,
+            headers: headerStore,
+            action: 'hr.onboarding.wizard.invite',
+            targetEmail: parsed.data.email,
+        });
+
         const result = await sendOnboardingInvite(
             {
                 profileRepository,
@@ -92,6 +101,7 @@ export async function submitOnboardingWizardAction(
                 eligibleLeaveTypes: parsed.data.eligibleLeaveTypes ?? [],
                 onboardingTemplateId,
                 roles: [],
+                request: requestContext,
             },
         );
 

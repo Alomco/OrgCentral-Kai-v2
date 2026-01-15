@@ -1,33 +1,24 @@
 import { EntityNotFoundError } from '@/server/errors';
 import type { IInvitationRepository } from '@/server/repositories/contracts/auth/invitations/invitation-repository-contract';
-import type { InvitationRecord } from '@/server/repositories/contracts/auth/invitations/invitation-repository.types';
 import type { IEmployeeProfileRepository } from '@/server/repositories/contracts/hr/people/employee-profile-repository-contract';
 import type { IChecklistTemplateRepository } from '@/server/repositories/contracts/hr/onboarding/checklist-template-repository-contract';
 import type { IChecklistInstanceRepository } from '@/server/repositories/contracts/hr/onboarding/checklist-instance-repository-contract';
 import type { IMembershipRepository } from '@/server/repositories/contracts/org/membership';
 import type { IOrganizationRepository } from '@/server/repositories/contracts/org/organization/organization-repository-contract';
 import type { IUserRepository } from '@/server/repositories/contracts/org/users/user-repository-contract';
-import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
-import { organizationToTenantScope } from '@/server/security/guards';
-import type { OrganizationData } from '@/server/types/leave-types';
+import { recordAuditEvent } from '@/server/logging/audit-logger';
 import {
     normalizeActor,
     normalizeToken,
-    normalizeRoles,
-    assertEmailMatch,
-    assertNotExpired,
-    assertStatus,
-    buildAuthorizationContext,
-    type NormalizedActor,
 } from '@/server/use-cases/shared';
 import {
-    buildEmployeeProfilePayload,
-    buildUserActivationPayload,
-    defaultEmployeeNumberGenerator,
-    resolvePreboardingProfilePayload,
-    maybeInstantiateChecklistInstance,
-    extractEmployeeNumber,
-} from '@/server/use-cases/auth/accept-invitation.helpers';
+    assertInvitationCanBeAccepted,
+    resolveInvitationRoles,
+    resolveOrganization,
+} from '@/server/use-cases/auth/accept-invitation.context';
+import {
+    ensureMembershipAndOnboarding,
+} from '@/server/use-cases/auth/accept-invitation.membership';
 
 export interface AcceptInvitationDependencies {
     invitationRepository: IInvitationRepository;
@@ -45,6 +36,11 @@ export interface AcceptInvitationInput {
     actor: {
         userId: string;
         email: string;
+    };
+    correlationId?: string;
+    request?: {
+        ipAddress?: string;
+        userAgent?: string;
     };
 }
 
@@ -71,13 +67,34 @@ export async function acceptInvitation(
 
     assertInvitationCanBeAccepted(record, actor.email, token);
 
-    const membershipRoles = resolveRoles(record);
+    const membershipRoles = resolveInvitationRoles(record);
     const membershipOutcome = await ensureMembershipAndOnboarding(deps, record, actor, membershipRoles);
 
     await deps.invitationRepository.updateStatus(token, {
         status: 'accepted',
         acceptedAt: new Date(),
         acceptedByUserId: actor.userId,
+    });
+
+    const organization = await resolveOrganization(deps.organizationRepository, record.organizationId);
+
+    await recordAuditEvent({
+        orgId: record.organizationId,
+        userId: actor.userId,
+        eventType: 'AUTH',
+        action: 'org.invitation.accepted',
+        resource: 'org.invitation',
+        resourceId: record.organizationId,
+        residencyZone: organization?.dataResidency,
+        classification: organization?.dataClassification,
+        auditSource: organization ? 'auth.accept-invitation' : undefined,
+        correlationId: input.correlationId,
+        payload: {
+            alreadyMember: membershipOutcome.alreadyMember,
+            roleCount: membershipRoles.length,
+            ipAddress: input.request?.ipAddress,
+            userAgent: input.request?.userAgent,
+        },
     });
 
     return {
@@ -90,136 +107,4 @@ export async function acceptInvitation(
     };
 }
 
-function assertInvitationCanBeAccepted(record: InvitationRecord, actorEmail: string, token: string): void {
-    assertStatus(record.status, 'pending', 'Invitation', { token });
-    assertNotExpired(record.expiresAt, 'Invitation', { token });
-    assertEmailMatch(
-        actorEmail,
-        record.targetEmail,
-        'This invitation was issued to a different email address.',
-    );
-}
 
-function resolveRoles(record: InvitationRecord): string[] {
-    return normalizeRoles(record.onboardingData.roles);
-}
-
-interface MembershipOutcome {
-    alreadyMember: boolean;
-    employeeNumber?: string;
-}
-
-async function ensureMembershipAndOnboarding(
-    deps: AcceptInvitationDependencies,
-    record: InvitationRecord,
-    actor: NormalizedActor,
-    roles: string[],
-): Promise<MembershipOutcome> {
-    const existingUser = await deps.userRepository.getUser(record.organizationId, actor.userId);
-    const alreadyMember = existingUser?.memberOf.includes(record.organizationId) ?? false;
-
-    if (alreadyMember) {
-        return { alreadyMember: true };
-    }
-
-    if (deps.membershipRepository && deps.organizationRepository) {
-        const context = await buildMembershipContext(
-            deps.organizationRepository,
-            record.organizationId,
-            actor.userId,
-        );
-
-        const preboardingProfile = await resolvePreboardingProfilePayload(
-            deps.employeeProfileRepository,
-            record,
-            actor.userId,
-        );
-        const profilePayload =
-            preboardingProfile ??
-            buildEmployeeProfilePayload(
-                record,
-                actor.userId,
-                deps.generateEmployeeNumber ?? defaultEmployeeNumberGenerator,
-            );
-        const userUpdate = buildUserActivationPayload(record);
-
-        await deps.membershipRepository.createMembershipWithProfile(context, {
-            userId: actor.userId,
-            invitedByUserId: record.invitedByUserId ?? record.invitedByUid,
-            roles,
-            profile: profilePayload,
-            userUpdate,
-        });
-
-        await maybeInstantiateChecklistInstance({
-            record,
-            employeeNumber: profilePayload.employeeNumber,
-            templateRepository: deps.checklistTemplateRepository,
-            instanceRepository: deps.checklistInstanceRepository,
-        });
-
-        return { alreadyMember: false, employeeNumber: profilePayload.employeeNumber };
-    }
-
-    const fallbackContext: RepositoryAuthorizationContext = deps.organizationRepository
-        ? await buildMembershipContext(deps.organizationRepository, record.organizationId, actor.userId)
-        : buildAuthorizationContext({
-            orgId: record.organizationId,
-            userId: actor.userId,
-            roleKey: 'custom',
-            dataResidency: 'UK_ONLY',
-            dataClassification: 'OFFICIAL',
-            auditSource: 'accept-invitation:fallback',
-            tenantScope: {
-                orgId: record.organizationId,
-                dataResidency: 'UK_ONLY',
-                dataClassification: 'OFFICIAL',
-                auditSource: 'accept-invitation:fallback',
-            },
-        });
-
-    await deps.userRepository.addUserToOrganization(
-        fallbackContext,
-        actor.userId,
-        record.organizationId,
-        record.organizationName,
-        roles,
-    );
-
-    const fallbackEmployeeNumber = extractEmployeeNumber(record);
-    await maybeInstantiateChecklistInstance({
-        record,
-        employeeNumber: fallbackEmployeeNumber,
-        templateRepository: deps.checklistTemplateRepository,
-        instanceRepository: deps.checklistInstanceRepository,
-    });
-
-    return { alreadyMember: false, employeeNumber: fallbackEmployeeNumber };
-}
-
-async function buildMembershipContext(
-    organizationRepository: IOrganizationRepository,
-    orgId: string,
-    userId: string,
-): Promise<RepositoryAuthorizationContext> {
-    const organization = await organizationRepository.getOrganization(orgId);
-    if (!organization) {
-        throw new EntityNotFoundError('Organization', { orgId });
-    }
-    return mapOrganizationToContext(organization, userId);
-}
-
-function mapOrganizationToContext(
-    organization: OrganizationData,
-    userId: string,
-): RepositoryAuthorizationContext {
-    const tenantScope = organizationToTenantScope(organization);
-    return buildAuthorizationContext({
-        orgId: organization.id,
-        userId,
-        dataResidency: tenantScope.dataResidency,
-        dataClassification: tenantScope.dataClassification,
-        auditSource: 'accept-invitation',
-        tenantScope,
-    });
-}

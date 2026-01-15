@@ -31,8 +31,8 @@ export async function POST(request: Request): Promise<NextResponse> {
         const actor = requireActor(session);
         const useOnboardingFlow = await shouldUseOnboardingFlow(token);
         const result = useOnboardingFlow
-            ? await completeOnboardingInviteController({ inviteToken: token }, actor)
-            : await acceptInvitationController({ token }, actor);
+            ? await completeOnboardingInviteController({ inviteToken: token }, actor, request.headers)
+            : await acceptInvitationController({ token }, actor, request.headers);
         return NextResponse.json(result, { status: 200 });
     } catch (error) {
         return buildErrorResponse(error);
