@@ -3,18 +3,19 @@ import { faker } from '@faker-js/faker';
 import { TimeEntryStatus } from '@/server/types/prisma';
 import { buildTimeTrackingServiceDependencies } from '@/server/repositories/providers/hr/time-tracking-service-dependencies';
 import {
-    buildSeederAuthorization,
-    getDefaultOrg,
+    resolveSeederAuthorization,
+    resolveSeedOrganization,
+    type SeedContextOptions,
     getActiveMembers,
     getSeededMetadata,
     type SeedResult,
     UNKNOWN_ERROR_MESSAGE,
 } from './utils';
 
-export async function seedFakeTimeEntriesInternal(count = 20): Promise<SeedResult> {
+export async function seedFakeTimeEntriesInternal(count = 20, options?: SeedContextOptions): Promise<SeedResult> {
     try {
-        const org = await getDefaultOrg();
-        const authorization = buildSeederAuthorization(org);
+        const org = await resolveSeedOrganization(options);
+        const authorization = resolveSeederAuthorization(org, options);
         const { timeEntryRepository } = buildTimeTrackingServiceDependencies();
         const members = await getActiveMembers(org.id);
         if (!members.length) { return { success: false, message: 'No members.' }; }

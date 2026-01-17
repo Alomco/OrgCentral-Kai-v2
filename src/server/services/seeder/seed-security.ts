@@ -2,17 +2,18 @@
 import { faker } from '@faker-js/faker';
 import { createSecurityEventRepository } from '@/server/repositories/providers/auth/security-event-repository-provider';
 import {
-    buildSeederAuthorization,
-    getDefaultOrg,
+    resolveSeederAuthorization,
+    resolveSeedOrganization,
+    type SeedContextOptions,
     getSeededMetadata,
     type SeedResult,
     UNKNOWN_ERROR_MESSAGE,
 } from './utils';
 
-export async function seedSecurityEventsInternal(count = 20): Promise<SeedResult> {
+export async function seedSecurityEventsInternal(count = 20, options?: SeedContextOptions): Promise<SeedResult> {
     try {
-        const org = await getDefaultOrg();
-        const authorization = buildSeederAuthorization(org);
+        const org = await resolveSeedOrganization(options);
+        const authorization = resolveSeederAuthorization(org, options);
         const repository = createSecurityEventRepository();
         let created = 0;
 

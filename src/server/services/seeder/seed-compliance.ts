@@ -3,17 +3,18 @@ import { faker } from '@faker-js/faker';
 import { buildComplianceRepositoryDependencies } from '@/server/repositories/providers/hr/compliance-repository-dependencies';
 import { buildOnboardingServiceDependencies } from '@/server/repositories/providers/hr/onboarding-service-dependencies';
 import {
-    buildSeederAuthorization,
-    getDefaultOrg,
+    resolveSeederAuthorization,
+    resolveSeedOrganization,
+    type SeedContextOptions,
     getSeededMetadata,
     type SeedResult,
     UNKNOWN_ERROR_MESSAGE,
 } from './utils';
 
-export async function seedComplianceDataInternal(): Promise<SeedResult> {
+export async function seedComplianceDataInternal(options?: SeedContextOptions): Promise<SeedResult> {
     try {
-        const org = await getDefaultOrg();
-        const authorization = buildSeederAuthorization(org);
+        const org = await resolveSeedOrganization(options);
+        const authorization = resolveSeederAuthorization(org, options);
         const { checklistTemplateRepository, checklistInstanceRepository, employeeProfileRepository } =
             buildOnboardingServiceDependencies();
         const { complianceTemplateRepository, complianceItemRepository } = buildComplianceRepositoryDependencies();

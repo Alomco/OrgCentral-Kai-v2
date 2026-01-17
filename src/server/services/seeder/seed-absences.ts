@@ -3,18 +3,19 @@ import { faker } from '@faker-js/faker';
 import { AbsenceStatus } from '@/server/types/prisma';
 import { buildAbsenceServiceDependencies } from '@/server/repositories/providers/hr/absence-service-dependencies';
 import {
-    buildSeederAuthorization,
-    getDefaultOrg,
+    resolveSeederAuthorization,
+    resolveSeedOrganization,
+    type SeedContextOptions,
     getActiveMembers,
     getSeededMetadata,
     type SeedResult,
     UNKNOWN_ERROR_MESSAGE,
 } from './utils';
 
-export async function seedFakeAbsencesInternal(count = 10): Promise<SeedResult> {
+export async function seedFakeAbsencesInternal(count = 10, options?: SeedContextOptions): Promise<SeedResult> {
     try {
-        const org = await getDefaultOrg();
-        const authorization = buildSeederAuthorization(org);
+        const org = await resolveSeedOrganization(options);
+        const authorization = resolveSeederAuthorization(org, options);
         const { typeConfigRepository, absenceRepository } = buildAbsenceServiceDependencies();
         const members = await getActiveMembers(org.id);
         if (!members.length) { return { success: false, message: 'No members.' }; }

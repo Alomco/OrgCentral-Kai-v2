@@ -1,6 +1,77 @@
-import type { HRNotificationCreateDTO, HRNotificationDTO } from '@/server/types/hr/notifications';
+import type {
+  HRNotificationCreateDTO,
+  HRNotificationDTO,
+  HRNotificationPriorityCode,
+  HRNotificationTypeCode,
+} from '@/server/types/hr/notifications';
 import type { DataClassificationLevel, DataResidencyZone } from '@/server/types/tenant';
 import type { HRNotificationType, NotificationPriority, PrismaInputJsonValue } from '@/server/types/prisma';
+
+const typeToPrisma: Record<HRNotificationTypeCode, HRNotificationType> = {
+  'leave-approval': 'leave-approval',
+  'leave-rejection': 'leave-rejection',
+  'document-expiry': 'document-expiry',
+  'policy-update': 'policy-update',
+  'performance-review': 'performance-review',
+  'time-entry': 'time-entry',
+  'training-assigned': 'training-assigned',
+  'training-due': 'training-due',
+  'training-completed': 'training-completed',
+  'training-overdue': 'training-overdue',
+  'system-announcement': 'system-announcement',
+  'compliance-reminder': 'compliance-reminder',
+  other: 'other',
+};
+
+const typeFromPrisma: Record<HRNotificationType, HRNotificationTypeCode> = {
+  'leave-approval': 'leave-approval',
+  'leave-rejection': 'leave-rejection',
+  'document-expiry': 'document-expiry',
+  'policy-update': 'policy-update',
+  'performance-review': 'performance-review',
+  'time-entry': 'time-entry',
+  'training-assigned': 'training-assigned',
+  'training-due': 'training-due',
+  'training-completed': 'training-completed',
+  'training-overdue': 'training-overdue',
+  'system-announcement': 'system-announcement',
+  'compliance-reminder': 'compliance-reminder',
+  other: 'other',
+};
+
+const priorityToPrisma: Record<HRNotificationPriorityCode, NotificationPriority> = {
+  low: 'low',
+  medium: 'medium',
+  high: 'high',
+  urgent: 'urgent',
+};
+
+const priorityFromPrisma: Record<NotificationPriority, HRNotificationPriorityCode> = {
+  low: 'low',
+  medium: 'medium',
+  high: 'high',
+  urgent: 'urgent',
+};
+
+export function toPrismaHRNotificationType(type: HRNotificationTypeCode): HRNotificationType {
+  return typeToPrisma[type];
+}
+
+export function toPrismaHRNotificationPriority(
+  priority: HRNotificationPriorityCode,
+): NotificationPriority {
+  return priorityToPrisma[priority];
+}
+
+export function toDomainHRNotificationType(type: HRNotificationType): HRNotificationTypeCode {
+  return typeFromPrisma[type];
+}
+
+export function toDomainHRNotificationPriority(
+  priority: NotificationPriority,
+): HRNotificationPriorityCode {
+  return priorityFromPrisma[priority];
+}
 
 interface HRNotificationRecord {
   id: string;
@@ -52,8 +123,8 @@ export function mapPrismaHRNotificationToDomain(record: HRNotificationRecord): H
     userId: record.userId,
     title: record.title,
     message: record.message,
-    type: record.type,
-    priority: record.priority,
+    type: toDomainHRNotificationType(record.type),
+    priority: toDomainHRNotificationPriority(record.priority),
     isRead: record.isRead,
     readAt: record.readAt ?? undefined,
     actionUrl: record.actionUrl ?? undefined,
@@ -78,8 +149,8 @@ export function mapDomainHRNotificationToPrismaCreate(
     userId: input.userId,
     title: input.title,
     message: input.message,
-    type: input.type,
-    priority: input.priority,
+    type: toPrismaHRNotificationType(input.type),
+    priority: toPrismaHRNotificationPriority(input.priority),
     isRead: input.isRead ?? false,
     readAt: toNullableDate(input.readAt) ?? null,
     actionUrl: input.actionUrl ?? null,

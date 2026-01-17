@@ -5,8 +5,9 @@ import { buildDepartmentServiceDependencies } from '@/server/repositories/provid
 import { buildMembershipRepositoryDependencies } from '@/server/repositories/providers/org/membership-service-dependencies';
 import { buildUserServiceDependencies } from '@/server/repositories/providers/org/user-service-dependencies';
 import {
-    buildSeederAuthorization,
-    getDefaultOrg,
+    resolveSeederAuthorization,
+    resolveSeedOrganization,
+    type SeedContextOptions,
     getSeededMetadata,
     type SeedResult,
     UNKNOWN_ERROR_MESSAGE,
@@ -14,10 +15,10 @@ import {
 
 const DEFAULT_ROLE = 'employee';
 
-export async function seedFakeEmployeesInternal(count = 5): Promise<SeedResult> {
+export async function seedFakeEmployeesInternal(count = 5, options?: SeedContextOptions): Promise<SeedResult> {
     try {
-        const org = await getDefaultOrg();
-        const authorization = buildSeederAuthorization(org);
+        const org = await resolveSeedOrganization(options);
+        const authorization = resolveSeederAuthorization(org, options);
         const { userRepository } = buildUserServiceDependencies();
         const { membershipRepository, employeeProfileRepository } = buildMembershipRepositoryDependencies();
         const { departmentRepository } = buildDepartmentServiceDependencies();

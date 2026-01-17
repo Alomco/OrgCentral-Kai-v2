@@ -5,8 +5,9 @@ import { buildLeavePolicyServiceDependencies } from '@/server/repositories/provi
 import { buildDepartmentServiceDependencies } from '@/server/repositories/providers/org/department-service-dependencies';
 import { seedDefaultAbsenceTypes } from '@/server/use-cases/hr/absences/seed-default-absence-types';
 import {
-    buildSeederAuthorization,
-    getDefaultOrg,
+    resolveSeederAuthorization,
+    resolveSeedOrganization,
+    type SeedContextOptions,
     getSeededMetadata,
     type SeedResult,
     UNKNOWN_ERROR_MESSAGE,
@@ -15,10 +16,10 @@ import {
 const DEFAULT_ANNUAL_POLICY = 'Annual Leave (Default)';
 const DEFAULT_SICK_POLICY = 'Sick Leave';
 
-export async function seedStarterDataInternal(): Promise<SeedResult> {
+export async function seedStarterDataInternal(options?: SeedContextOptions): Promise<SeedResult> {
     try {
-        const org = await getDefaultOrg();
-        const authorization = buildSeederAuthorization(org);
+        const org = await resolveSeedOrganization(options);
+        const authorization = resolveSeederAuthorization(org, options);
         const tenant = authorization.tenantScope;
         const { typeConfigRepository } = buildAbsenceServiceDependencies();
         const { leavePolicyRepository } = buildLeavePolicyServiceDependencies();
@@ -88,10 +89,10 @@ export async function seedStarterDataInternal(): Promise<SeedResult> {
     }
 }
 
-export async function seedCommonLeavePoliciesInternal(): Promise<SeedResult> {
+export async function seedCommonLeavePoliciesInternal(options?: SeedContextOptions): Promise<SeedResult> {
     try {
-        const org = await getDefaultOrg();
-        const authorization = buildSeederAuthorization(org);
+        const org = await resolveSeedOrganization(options);
+        const authorization = resolveSeederAuthorization(org, options);
         const tenant = authorization.tenantScope;
         const { leavePolicyRepository } = buildLeavePolicyServiceDependencies();
 

@@ -30,7 +30,7 @@ export const metadata: Metadata = {
 };
 
 interface PageProps {
-    searchParams?: { year?: string | string[] };
+    searchParams?: Promise<{ year?: string | string[] }>;
 }
 
 export default async function HrLeaveBalancesPage({ searchParams }: PageProps) {
@@ -65,8 +65,9 @@ export default async function HrLeaveBalancesPage({ searchParams }: PageProps) {
     const profile = profileResult?.profile ?? null;
     const employeeId = profile?.id ?? null;
 
+    const resolvedSearchParams = await searchParams;
     const currentYear = new Date().getFullYear();
-    const resolvedYear = resolveBalanceYear(searchParams?.year, currentYear);
+    const resolvedYear = resolveBalanceYear(resolvedSearchParams?.year, currentYear);
 
     const balanceResult = employeeId
         ? await getLeaveBalanceForUi({ authorization, employeeId, year: resolvedYear })

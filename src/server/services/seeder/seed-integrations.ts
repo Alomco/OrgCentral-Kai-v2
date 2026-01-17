@@ -1,12 +1,18 @@
 // src/server/services/seeder/seed-integrations.ts
 import { faker } from '@faker-js/faker';
 import { buildIntegrationServiceDependencies } from '@/server/repositories/providers/org/integration-service-dependencies';
-import { buildSeederAuthorization, getDefaultOrg, type SeedResult, UNKNOWN_ERROR_MESSAGE } from './utils';
+import {
+    resolveSeederAuthorization,
+    resolveSeedOrganization,
+    type SeedContextOptions,
+    type SeedResult,
+    UNKNOWN_ERROR_MESSAGE,
+} from './utils';
 
-export async function seedIntegrationsInternal(): Promise<SeedResult> {
+export async function seedIntegrationsInternal(options?: SeedContextOptions): Promise<SeedResult> {
     try {
-        const org = await getDefaultOrg();
-        const authorization = buildSeederAuthorization(org);
+        const org = await resolveSeedOrganization(options);
+        const authorization = resolveSeederAuthorization(org, options);
         const { integrationConfigRepository } = buildIntegrationServiceDependencies();
         const providers = ['slack', 'discord', 'google-workspace', 'zoom'];
 

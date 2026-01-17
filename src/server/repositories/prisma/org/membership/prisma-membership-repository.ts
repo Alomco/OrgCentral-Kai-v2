@@ -74,7 +74,7 @@ export class PrismaMembershipRepository extends OrgScopedPrismaRepository implem
                     invitedBy: input.invitedByUserId,
                     invitedAt: new Date(),
                     activatedAt: new Date(),
-                    createdBy: input.invitedByUserId ?? '',
+                    createdBy: input.invitedByUserId ?? context.userId,
                     roleId: primaryRoleId ?? undefined,
                     metadata: toJsonNullInput(baseMetadata),
                 },

@@ -18,6 +18,12 @@ export interface SeedResult {
     count?: number;
 }
 
+export interface SeedContextOptions {
+    orgId?: string;
+    userId?: string;
+    auditSource?: string;
+}
+
 export async function getDefaultOrg() {
     const { organizationRepository } = buildOrganizationServiceDependencies();
     const org = await organizationRepository.getOrganizationBySlug(PLATFORM_ORG_SLUG);
@@ -25,6 +31,19 @@ export async function getDefaultOrg() {
         throw new Error('No organizations found. Please bootstrap the platform org first.');
     }
     return org;
+}
+
+export async function resolveSeedOrganization(options?: SeedContextOptions): Promise<OrganizationData> {
+    if (options?.orgId) {
+        const { organizationRepository } = buildOrganizationServiceDependencies();
+        const org = await organizationRepository.getOrganization(options.orgId);
+        if (!org) {
+            throw new Error('Organization not found for seeding.');
+        }
+        return org;
+    }
+
+    return getDefaultOrg();
 }
 
 export async function getActiveMembers(
@@ -54,6 +73,17 @@ export function buildSeederAuthorization(
             auditSource,
         },
     });
+}
+
+export function resolveSeederAuthorization(
+    org: OrganizationData,
+    options?: SeedContextOptions,
+): RepositoryAuthorizationContext {
+    return buildSeederAuthorization(
+        org,
+        options?.userId ?? DEFAULT_SEEDER_USER_ID,
+        options?.auditSource ?? DEFAULT_SEEDER_AUDIT_SOURCE,
+    );
 }
 
 type SeededMetadata = Record<string, boolean | string | number | null>;

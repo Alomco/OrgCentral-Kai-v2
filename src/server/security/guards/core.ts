@@ -11,6 +11,7 @@ import {
 
 import { getGuardMembershipRepository } from './membership-repository';
 import { getPermissionResolutionService } from '@/server/services/security/permission-resolution-service.provider';
+import { resolveDevAdminMembershipOverride } from './dev-admin-override';
 
 export interface OrgAccessInput {
     orgId: string;
@@ -69,7 +70,9 @@ export async function assertOrgAccess(input: OrgAccessInput): Promise<OrgAccessC
         throw new Error('orgId and userId are required for guard evaluation.');
     }
 
-    const membership = await getGuardMembershipRepository().findMembership(input.orgId, input.userId);
+    const membership =
+        (await getGuardMembershipRepository().findMembership(input.orgId, input.userId)) ??
+        (await resolveDevAdminMembershipOverride(input.orgId, input.userId));
 
     if (!membership) {
         throw new Error('Membership not found for the requested organization.');

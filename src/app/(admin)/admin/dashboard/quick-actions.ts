@@ -1,4 +1,4 @@
-import { FileText, KeyRound, Settings, UserPlus } from 'lucide-react';
+import { Database, FileText, KeyRound, Settings, UserPlus } from 'lucide-react';
 
 export const QUICK_ACTIONS = [
     {
@@ -24,5 +24,11 @@ export const QUICK_ACTIONS = [
         description: 'Update policies and preferences',
         href: '/org/settings',
         icon: Settings,
+    },
+    {
+        title: 'Cold start seeder',
+        description: 'Seed essentials and demo data',
+        href: '/admin/cold-start',
+        icon: Database,
     },
 ] as const;

@@ -1,6 +1,11 @@
 import { BasePrismaRepository } from '@/server/repositories/prisma/base-prisma-repository';
 import type { IHRNotificationRepository } from '@/server/repositories/contracts/hr/notifications/hr-notification-repository-contract';
-import { mapDomainHRNotificationToPrismaCreate, mapPrismaHRNotificationToDomain } from '@/server/repositories/mappers/hr/notifications/hr-notification-mapper';
+import {
+    mapDomainHRNotificationToPrismaCreate,
+    mapPrismaHRNotificationToDomain,
+    toPrismaHRNotificationPriority,
+    toPrismaHRNotificationType,
+} from '@/server/repositories/mappers/hr/notifications/hr-notification-mapper';
 import type {
     HRNotificationCreateDTO,
     HRNotificationDTO,
@@ -17,7 +22,7 @@ const toPrismaNotificationTypes = (
     if (!types?.length) {
         return undefined;
     }
-    return types.map((type) => type as $Enums.HRNotificationType);
+    return types.map((type) => toPrismaHRNotificationType(type));
 };
 
 const toPrismaNotificationPriorities = (
@@ -26,7 +31,7 @@ const toPrismaNotificationPriorities = (
     if (!priorities?.length) {
         return undefined;
     }
-    return priorities.map((priority) => priority as $Enums.NotificationPriority);
+    return priorities.map((priority) => toPrismaHRNotificationPriority(priority));
 };
 
 export class PrismaHRNotificationRepository extends BasePrismaRepository implements IHRNotificationRepository {

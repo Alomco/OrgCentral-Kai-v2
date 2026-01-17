@@ -2,8 +2,9 @@
 import { faker } from '@faker-js/faker';
 import { buildTrainingServiceDependencies } from '@/server/repositories/providers/hr/training-service-dependencies';
 import {
-    buildSeederAuthorization,
-    getDefaultOrg,
+    resolveSeederAuthorization,
+    resolveSeedOrganization,
+    type SeedContextOptions,
     getActiveMembers,
     getSeededMetadata,
     type SeedResult,
@@ -14,10 +15,10 @@ const TRAINING_STATUSES = ['completed', 'in_progress', 'assigned'] as const;
 
 type TrainingStatus = (typeof TRAINING_STATUSES)[number];
 
-export async function seedFakeTrainingInternal(count = 10): Promise<SeedResult> {
+export async function seedFakeTrainingInternal(count = 10, options?: SeedContextOptions): Promise<SeedResult> {
     try {
-        const org = await getDefaultOrg();
-        const authorization = buildSeederAuthorization(org);
+        const org = await resolveSeedOrganization(options);
+        const authorization = resolveSeederAuthorization(org, options);
         const { trainingRepository } = buildTrainingServiceDependencies();
         const members = await getActiveMembers(org.id);
         if (!members.length) { return { success: false, message: 'No members.' }; }

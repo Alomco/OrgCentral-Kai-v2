@@ -3,18 +3,19 @@ import { faker } from '@faker-js/faker';
 import { createHrNotificationRepository } from '@/server/services/hr/notifications/hr-notification-repository.factory';
 import { HR_NOTIFICATION_PRIORITY_VALUES, HR_NOTIFICATION_TYPE_VALUES } from '@/server/types/hr/notifications';
 import {
-    buildSeederAuthorization,
-    getDefaultOrg,
+    resolveSeederAuthorization,
+    resolveSeedOrganization,
+    type SeedContextOptions,
     getActiveMembers,
     getSeededMetadata,
     type SeedResult,
     UNKNOWN_ERROR_MESSAGE,
 } from './utils';
 
-export async function seedFakeNotificationsInternal(count = 10): Promise<SeedResult> {
+export async function seedFakeNotificationsInternal(count = 10, options?: SeedContextOptions): Promise<SeedResult> {
     try {
-        const org = await getDefaultOrg();
-        const authorization = buildSeederAuthorization(org);
+        const org = await resolveSeedOrganization(options);
+        const authorization = resolveSeederAuthorization(org, options);
         const repository = createHrNotificationRepository();
         const members = await getActiveMembers(org.id);
         if (!members.length) { return { success: false, message: 'No members.' }; }

@@ -2,18 +2,19 @@
 import { faker } from '@faker-js/faker';
 import { buildPerformanceServiceDependencies } from '@/server/repositories/providers/hr/performance-service-dependencies';
 import {
-    buildSeederAuthorization,
-    getDefaultOrg,
+    resolveSeederAuthorization,
+    resolveSeedOrganization,
+    type SeedContextOptions,
     getActiveMembers,
     getSeededMetadata,
     type SeedResult,
     UNKNOWN_ERROR_MESSAGE,
 } from './utils';
 
-export async function seedFakePerformanceInternal(count = 5): Promise<SeedResult> {
+export async function seedFakePerformanceInternal(count = 5, options?: SeedContextOptions): Promise<SeedResult> {
     try {
-        const org = await getDefaultOrg();
-        const authorization = buildSeederAuthorization(org);
+        const org = await resolveSeedOrganization(options);
+        const authorization = resolveSeederAuthorization(org, options);
         const { repositoryFactory } = buildPerformanceServiceDependencies();
         const repository = repositoryFactory(authorization);
         const members = await getActiveMembers(org.id);

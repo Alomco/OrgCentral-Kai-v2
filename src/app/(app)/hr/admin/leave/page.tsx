@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 };
 
 interface PageProps {
-    searchParams?: Record<string, string | string[] | undefined>;
+    searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }
 
 export default async function LeaveAdminPage({ searchParams }: PageProps) {
@@ -35,13 +35,16 @@ export default async function LeaveAdminPage({ searchParams }: PageProps) {
         },
     );
 
-    const statusFilter = typeof searchParams?.status === 'string' ? (searchParams.status as 'submitted' | 'approved' | 'rejected' | 'cancelled' | 'all') : 'submitted';
-    const typeFilter = typeof searchParams?.type === 'string' ? searchParams.type : undefined;
-    const employeeQuery = typeof searchParams?.employee === 'string' ? searchParams.employee : undefined;
-    const departmentFilter = typeof searchParams?.department === 'string' ? searchParams.department : undefined;
-    const dateFrom = typeof searchParams?.from === 'string' ? searchParams.from : undefined;
-    const dateTo = typeof searchParams?.to === 'string' ? searchParams.to : undefined;
-    const delegateFor = typeof searchParams?.delegateFor === 'string' ? searchParams.delegateFor : undefined;
+    const resolvedSearchParams = await searchParams;
+    const statusFilter = typeof resolvedSearchParams?.status === 'string'
+        ? (resolvedSearchParams.status as 'submitted' | 'approved' | 'rejected' | 'cancelled' | 'all')
+        : 'submitted';
+    const typeFilter = typeof resolvedSearchParams?.type === 'string' ? resolvedSearchParams.type : undefined;
+    const employeeQuery = typeof resolvedSearchParams?.employee === 'string' ? resolvedSearchParams.employee : undefined;
+    const departmentFilter = typeof resolvedSearchParams?.department === 'string' ? resolvedSearchParams.department : undefined;
+    const dateFrom = typeof resolvedSearchParams?.from === 'string' ? resolvedSearchParams.from : undefined;
+    const dateTo = typeof resolvedSearchParams?.to === 'string' ? resolvedSearchParams.to : undefined;
+    const delegateFor = typeof resolvedSearchParams?.delegateFor === 'string' ? resolvedSearchParams.delegateFor : undefined;
 
     return (
         <div className="space-y-6">
@@ -80,7 +83,7 @@ export default async function LeaveAdminPage({ searchParams }: PageProps) {
                 dateFrom={dateFrom}
                 dateTo={dateTo}
                 delegateFor={delegateFor}
-                searchParams={searchParams}
+                searchParams={resolvedSearchParams}
             />
         </div>
     );

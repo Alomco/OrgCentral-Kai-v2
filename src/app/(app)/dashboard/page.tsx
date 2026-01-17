@@ -21,8 +21,25 @@ export const metadata: Metadata = {
     description: 'Organization overview and quick actions.',
 };
 
+const DEV_ADMIN_EMAIL = process.env.DEV_ADMIN_EMAIL?.toLowerCase() ?? null;
+const GLOBAL_ADMIN_EMAIL = process.env.GLOBAL_ADMIN_EMAIL?.toLowerCase() ?? null;
+const DEV_ADMIN_BYPASS_ENABLED =
+    process.env.NODE_ENV === 'development' || process.env.ENABLE_DEV_ADMIN_BYPASS === 'true';
+
 function resolveUserEmail(value: unknown): string | null {
     return typeof value === 'string' && value.trim().length > 0 ? value : null;
+}
+
+function isDevAdminEmail(value: string | null): boolean {
+    if (!DEV_ADMIN_BYPASS_ENABLED || !value) {
+        return false;
+    }
+
+    const normalized = value.trim().toLowerCase();
+    return (
+        (DEV_ADMIN_EMAIL !== null && normalized === DEV_ADMIN_EMAIL) ||
+        (GLOBAL_ADMIN_EMAIL !== null && normalized === GLOBAL_ADMIN_EMAIL)
+    );
 }
 
 export default function DashboardPage() {
@@ -51,7 +68,7 @@ async function DashboardPageContent() {
         auditSource: 'ui:dashboard',
     });
 
-    if (authorization.roleScope === RoleScope.GLOBAL) {
+    if (authorization.roleScope === RoleScope.GLOBAL && !isDevAdminEmail(session.user.email ?? null)) {
         redirect('/admin/dashboard');
     }
 

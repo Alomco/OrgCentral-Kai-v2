@@ -2,8 +2,9 @@
 import { faker } from '@faker-js/faker';
 import { buildBillingRepositoryDependencies } from '@/server/repositories/providers/billing/billing-service-dependencies';
 import {
-    buildSeederAuthorization,
-    getDefaultOrg,
+    resolveSeederAuthorization,
+    resolveSeedOrganization,
+    type SeedContextOptions,
     getSeededMetadata,
     type SeedResult,
     UNKNOWN_ERROR_MESSAGE,
@@ -17,10 +18,10 @@ function toStringMetadata(metadata: Record<string, boolean | string | number | n
     );
 }
 
-export async function seedBillingDataInternal(): Promise<SeedResult> {
+export async function seedBillingDataInternal(options?: SeedContextOptions): Promise<SeedResult> {
     try {
-        const org = await getDefaultOrg();
-        const authorization = buildSeederAuthorization(org);
+        const org = await resolveSeedOrganization(options);
+        const authorization = resolveSeederAuthorization(org, options);
         const {
             subscriptionRepository,
             billingInvoiceRepository,

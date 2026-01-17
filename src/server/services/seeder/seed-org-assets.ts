@@ -3,17 +3,18 @@ import { faker } from '@faker-js/faker';
 import { buildHrPolicyServiceDependencies } from '@/server/repositories/providers/hr/hr-policy-service-dependencies';
 import { buildLocationServiceDependencies } from '@/server/repositories/providers/hr/location-service-dependencies';
 import {
-    buildSeederAuthorization,
-    getDefaultOrg,
+    resolveSeederAuthorization,
+    resolveSeedOrganization,
+    type SeedContextOptions,
     getSeededMetadata,
     type SeedResult,
     UNKNOWN_ERROR_MESSAGE,
 } from './utils';
 
-export async function seedOrgAssetsInternal(): Promise<SeedResult> {
+export async function seedOrgAssetsInternal(options?: SeedContextOptions): Promise<SeedResult> {
     try {
-        const org = await getDefaultOrg();
-        const authorization = buildSeederAuthorization(org);
+        const org = await resolveSeedOrganization(options);
+        const authorization = resolveSeederAuthorization(org, options);
         const { locationRepository } = buildLocationServiceDependencies();
         const { policyRepository } = buildHrPolicyServiceDependencies();
 
