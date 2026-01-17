@@ -1,7 +1,8 @@
 "use client";
 
+import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Camera, Edit, ShieldCheck } from 'lucide-react';
+import { Camera, Edit, KeyRound, ShieldCheck } from 'lucide-react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -131,6 +132,17 @@ export function ProfileHero({ profile, className, onEdit, userImage }: ProfileHe
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.4 }}
                 >
+                    <Button
+                        asChild
+                        variant="secondary"
+                        size="lg"
+                        className="gap-2"
+                    >
+                        <Link href="/two-factor/setup">
+                            <KeyRound className="h-4 w-4" />
+                            Set up MFA
+                        </Link>
+                    </Button>
                     <Button
                         variant="outline"
                         size="lg"

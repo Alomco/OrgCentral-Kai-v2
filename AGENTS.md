@@ -24,6 +24,7 @@ Provide project-specific rules for Codex to preserve coding conventions, securit
 - Tailwind v4 tokens + class-variance-authority for variants.
 - Tenant theme SSR via `x-org-id`.
 - CSS-first motion with motion tokens and `prefers-reduced-motion` support.
+- optimise states with react query.
 
 ## Tooling and verification
 - Run lint in small parts using cache when working on large error sets.

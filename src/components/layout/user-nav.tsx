@@ -1,6 +1,6 @@
 'use client';
 
-import { LogOut, User, Settings, Shield } from 'lucide-react';
+import { LogOut, User, Settings, Shield, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 
 import type { AuthSession } from '@/server/lib/auth';
@@ -106,6 +106,12 @@ export function UserNav({ session, authorization }: UserNavProps) {
                         <Link href="/hr/profile" className="flex items-center">
                             <User className="mr-2 h-4 w-4" />
                             <span>My Profile</span>
+                        </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild className="cursor-pointer transition-all duration-200 hover:bg-linear-to-r hover:from-blue-50 hover:to-purple-50 dark:hover:from-blue-900/20 dark:hover:to-purple-900/20">
+                        <Link href="/settings/security" className="flex items-center">
+                            <ShieldCheck className="mr-2 h-4 w-4" />
+                            <span>Security & Account</span>
                         </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild className="cursor-pointer transition-all duration-200 hover:bg-linear-to-r hover:from-blue-50 hover:to-purple-50 dark:hover:from-blue-900/20 dark:hover:to-purple-900/20">

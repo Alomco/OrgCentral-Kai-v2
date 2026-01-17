@@ -2,8 +2,8 @@ import type { RepositoryAuthorizationContext } from '@/server/repositories/secur
 import { getAbsencesForUi } from '@/server/use-cases/hr/absences/get-absences.cached';
 
 import { HrDataTable, type HrDataTableColumn } from '../../_components/hr-data-table';
-import { AbsenceRows } from './absence-rows';
-import type { AbsenceRowData } from './absence-row';
+import { AbsenceRows } from '../../absence/_components/absence-rows';
+import type { AbsenceRowData } from '../../absence/_components/absence-row';
 
 export interface AbsencesPanelProps {
     authorization: RepositoryAuthorizationContext;

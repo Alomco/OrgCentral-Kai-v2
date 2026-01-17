@@ -5,8 +5,8 @@ import { revalidatePath } from 'next/cache';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
 import { getAbsenceService } from '@/server/services/hr/absences/absence-service.provider';
 
-import type { CancelAbsenceFormState, ReportAbsenceFormState } from './form-state';
-import { cancelAbsenceSchema, reportAbsenceSchema } from './schema';
+import type { CancelAbsenceFormState, ReportAbsenceFormState } from '../absence/form-state';
+import { cancelAbsenceSchema, reportAbsenceSchema } from '../absence/schema';
 
 const ABSENCES_PATH = '/hr/absence';
 
