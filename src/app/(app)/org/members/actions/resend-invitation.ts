@@ -4,8 +4,7 @@ import { headers } from 'next/headers';
 import { z } from 'zod';
 
 import { getSessionContext } from '@/server/use-cases/auth/sessions/get-session';
-import { getInvitationEmailDependencies } from '@/server/use-cases/notifications/invitation-email.provider';
-import { resendInvitationEmail } from '@/server/use-cases/notifications/resend-invitation-email';
+import { resendInvitation } from '@/server/services/org/invitations/invitation-service';
 import {
     getInvitationDeliveryFailureMessage,
     isInvitationDeliverySuccessful,
@@ -44,11 +43,10 @@ export async function resendOrgInvitationAction(
             },
         );
 
-        const dependencies = getInvitationEmailDependencies();
-        const result = await resendInvitationEmail(dependencies, {
+        const result = await resendInvitation(
             authorization,
-            invitationToken: parsed.data.token,
-        });
+            parsed.data.token,
+        );
 
         if (!isInvitationDeliverySuccessful(result.delivery)) {
             return {

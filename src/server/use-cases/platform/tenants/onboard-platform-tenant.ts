@@ -11,6 +11,7 @@ import type { IInvitationRepository } from '@/server/repositories/contracts/auth
 import type { CreateOrganizationInput } from '@/server/repositories/contracts/org/organization/organization-repository-contract';
 import type { OrganizationData } from '@/server/types/leave-types';
 import { buildAuthorizationContext, buildMetadata } from '@/server/use-cases/shared/builders';
+import { INVITATION_KIND, withInvitationKind } from '@/server/invitations/invitation-kinds';
 import { seedPermissionResources } from '@/server/use-cases/org/permissions/seed-permission-resources';
 import { seedDefaultAbsenceTypes } from '@/server/use-cases/hr/absences/seed-default-absence-types';
 import { createOrganization } from '@/server/use-cases/org/organization/create-organization';
@@ -134,13 +135,16 @@ export async function onboardPlatformTenant(
             displayName,
             roles: [OWNER_ROLE_NAME],
         },
-        metadata: {
-            auditSource: input.authorization.auditSource,
-            correlationId: input.authorization.correlationId,
-            dataResidency: organization.dataResidency,
-            dataClassification: organization.dataClassification,
-            ownerUserId: ownerUserId ?? null,
-        },
+        metadata: withInvitationKind(
+            buildMetadata({
+                auditSource: input.authorization.auditSource,
+                correlationId: input.authorization.correlationId,
+                dataResidency: organization.dataResidency,
+                dataClassification: organization.dataClassification,
+                ownerUserId: ownerUserId ?? null,
+            }),
+            INVITATION_KIND.PLATFORM_OWNER,
+        ),
         securityContext: input.request?.securityContext
             ? buildMetadata(input.request.securityContext)
             : undefined,

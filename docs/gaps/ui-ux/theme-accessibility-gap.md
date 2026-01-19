@@ -23,6 +23,7 @@ Evidence:
 - orgcentral/src/components/landing/components/ThemeToggle.tsx
 - orgcentral/src/components/auth/AuthLayout.tsx
 Gap: Auth pages use a separate theme toggle and fixed palettes, so tenant theme choices are not a single source of truth across the product.
+Status: Design-approved (2026-01-19). Auth pages are intentionally styled and should remain unchanged.
 
 ## WCAG 2.2 AA risks (new project only)
 
@@ -65,14 +66,16 @@ Evidence:
 Gap: Day buttons only announce the day number and do not describe month, year, or absence counts, limiting screen reader usability.
 
 ## TODOs
-- [ ] Analyze theme token SSOT across globals, theme presets, and UI style presets, and define a single source of truth for colors.
-- [ ] Analyze app shell and dashboard surfaces to remove fixed palette overrides that bypass theme tokens.
-- [ ] Analyze auth theming to align the landing theme toggle with tenant presets and UI style selection.
+- [x] Define theme token SSOT across globals, theme presets, and UI style presets.
+	- docs/theme-token-ssot.md
+- [x] Analyze app shell and dashboard surfaces to remove fixed palette overrides that bypass theme tokens.
+- [x] Auth theming alignment deferred; auth pages are approved as-is and should not be modified.
 - [ ] Analyze contrast ratios on fixed palette components to meet WCAG 2.2 AA for text and non-text contrast.
-- [ ] Analyze target sizes for icon-only controls and plan adjustments for 44px minimum touch targets.
-- [ ] Analyze priority and status indicators to add non-color cues and accessible text.
-- [ ] Analyze calendar navigation and day cells to add aria-labels and full date context.
-- [ ] Analyze hover-only controls in notification items to ensure keyboard discoverability.
+	- In progress: docs/a11y-contrast-audit.md
+- [x] Analyze target sizes for icon-only controls and plan adjustments for 44px minimum touch targets.
+- [x] Analyze priority and status indicators to add non-color cues and accessible text.
+- [x] Analyze calendar navigation and day cells to add aria-labels and full date context.
+- [x] Analyze hover-only controls in notification items to ensure keyboard discoverability.
 
 ## Related gaps
 - orgcentral/docs/gaps/ui-ux/theme-ui-switching-gap.md

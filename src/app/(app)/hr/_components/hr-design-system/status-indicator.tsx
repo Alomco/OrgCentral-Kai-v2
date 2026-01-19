@@ -6,34 +6,34 @@ export type StatusVariant = 'success' | 'warning' | 'error' | 'info' | 'pending'
 
 const statusColors: Record<StatusVariant, { bg: string; text: string; glow: string }> = {
     success: {
-        bg: 'bg-emerald-500/15 dark:bg-emerald-500/20',
-        text: 'text-emerald-700 dark:text-emerald-400',
-        glow: 'shadow-emerald-500/30',
+        bg: 'bg-accent/15',
+        text: 'text-foreground',
+        glow: 'shadow-[0_0_12px_oklch(var(--accent)/0.25)]',
     },
     warning: {
-        bg: 'bg-amber-500/15 dark:bg-amber-500/20',
-        text: 'text-amber-700 dark:text-amber-400',
-        glow: 'shadow-amber-500/30',
+        bg: 'bg-secondary/70',
+        text: 'text-secondary-foreground',
+        glow: 'shadow-[0_0_12px_oklch(var(--secondary)/0.25)]',
     },
     error: {
-        bg: 'bg-rose-500/15 dark:bg-rose-500/20',
-        text: 'text-rose-700 dark:text-rose-400',
-        glow: 'shadow-rose-500/30',
+        bg: 'bg-destructive/10',
+        text: 'text-destructive',
+        glow: 'shadow-[0_0_12px_oklch(var(--destructive)/0.25)]',
     },
     info: {
-        bg: 'bg-[hsl(var(--primary)/0.15)]',
-        text: 'text-[hsl(var(--primary))]',
-        glow: 'shadow-[hsl(var(--primary)/0.3)]',
+        bg: 'bg-primary/10',
+        text: 'text-primary',
+        glow: 'shadow-[0_0_12px_oklch(var(--primary)/0.25)]',
     },
     pending: {
-        bg: 'bg-violet-500/15 dark:bg-violet-500/20',
-        text: 'text-violet-700 dark:text-violet-400',
-        glow: 'shadow-violet-500/30',
+        bg: 'bg-muted/60',
+        text: 'text-muted-foreground',
+        glow: 'shadow-[0_0_12px_oklch(var(--muted-foreground)/0.25)]',
     },
     neutral: {
-        bg: 'bg-slate-500/15 dark:bg-slate-500/20',
-        text: 'text-slate-700 dark:text-slate-400',
-        glow: 'shadow-slate-500/30',
+        bg: 'bg-muted/40',
+        text: 'text-muted-foreground',
+        glow: 'shadow-[0_0_12px_oklch(var(--muted-foreground)/0.2)]',
     },
 };
 

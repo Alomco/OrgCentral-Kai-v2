@@ -22,13 +22,13 @@ const buttonVariants = cva(
             variant: {
                 default: 'bg-primary text-primary-foreground shadow-md hover:bg-primary/90 hover:shadow-lg',
                 destructive: 'bg-destructive text-destructive-foreground shadow-md hover:bg-destructive/90',
-                outline: 'bg-transparent shadow-[0_0_0_1px_hsl(var(--border)/0.4)] hover:bg-accent hover:text-accent-foreground hover:shadow-[0_0_0_1px_hsl(var(--primary)/0.35),0_12px_24px_-20px_hsl(var(--primary)/0.25)]',
+                outline: 'bg-transparent shadow-[0_0_0_1px_oklch(var(--border)/0.4)] hover:bg-accent hover:text-accent-foreground hover:shadow-[0_0_0_1px_oklch(var(--primary)/0.35),0_12px_24px_-20px_oklch(var(--primary)/0.25)]',
                 secondary: 'bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80',
                 ghost: 'hover:bg-accent hover:text-accent-foreground',
                 link: 'text-primary underline-offset-4 hover:underline',
-                gradient: 'bg-gradient-to-br from-primary via-accent to-primary/80 text-primary-foreground shadow-lg hover:shadow-xl hover:shadow-primary/30',
-                glass: 'bg-card/50 backdrop-blur-md shadow-[0_0_0_1px_hsl(var(--border)/0.25)] hover:bg-card/70 hover:shadow-[0_0_0_1px_hsl(var(--border)/0.4),0_10px_20px_-16px_hsl(var(--foreground)/0.25)]',
-                neon: 'bg-primary/20 text-primary shadow-[0_0_0_1px_hsl(var(--primary)/0.4),0_12px_28px_-20px_hsl(var(--primary)/0.35)] hover:bg-primary hover:text-primary-foreground hover:shadow-[0_0_0_1px_hsl(var(--primary)/0.55),0_18px_36px_-24px_hsl(var(--primary)/0.45)]',
+                gradient: 'bg-primary text-primary-foreground shadow-lg hover:shadow-xl',
+                glass: 'bg-card/50 backdrop-blur-md shadow-[0_0_0_1px_oklch(var(--border)/0.25)] hover:bg-card/70 hover:shadow-[0_0_0_1px_oklch(var(--border)/0.4),0_10px_20px_-16px_oklch(var(--foreground)/0.25)]',
+                neon: 'bg-primary/20 text-primary shadow-[0_0_0_1px_oklch(var(--primary)/0.4),0_12px_28px_-20px_oklch(var(--primary)/0.35)] hover:bg-primary hover:text-primary-foreground hover:shadow-[0_0_0_1px_oklch(var(--primary)/0.55),0_18px_36px_-24px_oklch(var(--primary)/0.45)]',
             },
             size: {
                 sm: 'h-8 px-3 text-xs',
@@ -42,7 +42,7 @@ const buttonVariants = cva(
             animation: {
                 none: '',
                 pulse: 'hover:animate-pulse-glow',
-                shimmer: 'relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent before:translate-x-[-200%] hover:before:translate-x-[200%] before:transition-transform before:duration-700',
+                shimmer: 'relative overflow-hidden before:absolute before:inset-0 before:bg-white/10 before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-300',
             },
         },
         defaultVariants: {
@@ -109,15 +109,15 @@ const badgeVariants = cva(
     {
         variants: {
             variant: {
-                default: 'bg-primary/10 text-primary shadow-[0_0_0_1px_hsl(var(--primary)/0.2)]',
+                default: 'bg-primary/10 text-primary shadow-[0_0_0_1px_oklch(var(--primary)/0.2)]',
                 secondary: 'bg-secondary text-secondary-foreground',
-                destructive: 'bg-destructive/10 text-destructive shadow-[0_0_0_1px_hsl(var(--destructive)/0.2)]',
-                outline: 'bg-transparent shadow-[0_0_0_1px_hsl(var(--border)/0.4)]',
-                success: 'bg-green-500/10 text-green-600 shadow-[0_0_0_1px_rgba(16,185,129,0.25)] dark:text-green-400',
-                warning: 'bg-yellow-500/10 text-yellow-600 shadow-[0_0_0_1px_rgba(234,179,8,0.25)] dark:text-yellow-400',
-                info: 'bg-blue-500/10 text-blue-600 shadow-[0_0_0_1px_rgba(59,130,246,0.25)] dark:text-blue-400',
-                gradient: 'bg-gradient-to-r from-primary/80 to-accent/80 text-primary-foreground',
-                glow: 'bg-primary/20 text-primary shadow-[0_0_0_1px_hsl(var(--primary)/0.35),0_10px_20px_-16px_hsl(var(--primary)/0.3)]',
+                destructive: 'bg-destructive/10 text-destructive shadow-[0_0_0_1px_oklch(var(--destructive)/0.2)]',
+                outline: 'bg-transparent shadow-[0_0_0_1px_oklch(var(--border)/0.4)]',
+                success: 'bg-accent/15 text-foreground shadow-[0_0_0_1px_oklch(var(--accent)/0.2)]',
+                warning: 'bg-secondary/70 text-secondary-foreground shadow-[0_0_0_1px_oklch(var(--secondary)/0.25)]',
+                info: 'bg-primary/10 text-primary shadow-[0_0_0_1px_oklch(var(--primary)/0.2)]',
+                gradient: 'bg-primary/80 text-primary-foreground',
+                glow: 'bg-primary/20 text-primary shadow-[0_0_0_1px_oklch(var(--primary)/0.35),0_10px_20px_-16px_oklch(var(--primary)/0.3)]',
             },
             size: {
                 sm: 'text-[10px] px-2 py-0.5',

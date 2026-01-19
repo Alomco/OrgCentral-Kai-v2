@@ -13,6 +13,8 @@ import type {
   MembershipServiceDependencies,
 } from './membership-service.types';
 import { invalidateIdentityCache } from './membership-service.helpers';
+import { resolveDisplayName } from '@/server/invitations/onboarding-data';
+import { INVITATION_KIND, withInvitationKind } from '@/server/invitations/invitation-kinds';
 import {
   enforceInviteRolePolicy,
   ORG_MEMBERSHIP_RESOURCE_TYPE,
@@ -160,6 +162,7 @@ export async function handleInviteMember(service: MembershipServiceContext, inpu
 
   const normalizedEmail = input.email.trim().toLowerCase();
   const normalizedRoles = normalizeInviteRoles(input.roles);
+  const displayName = resolveDisplayName(normalizedEmail);
   enforceInviteRolePolicy(input.authorization, normalizedRoles);
 
   const existing = await invitationRepository.getActiveInvitationByEmail(
@@ -191,15 +194,18 @@ export async function handleInviteMember(service: MembershipServiceContext, inpu
       invitedByUserId: input.authorization.userId,
       onboardingData: {
         email: normalizedEmail,
-        displayName: '',
+        displayName,
         roles: normalizedRoles,
       },
-      metadata: {
-        auditSource: input.authorization.auditSource,
-        correlationId: input.authorization.correlationId,
-        dataResidency: input.authorization.dataResidency,
-        dataClassification: input.authorization.dataClassification,
-      },
+      metadata: withInvitationKind(
+        buildMetadata({
+          auditSource: input.authorization.auditSource,
+          correlationId: input.authorization.correlationId,
+          dataResidency: input.authorization.dataResidency,
+          dataClassification: input.authorization.dataClassification,
+        }),
+        INVITATION_KIND.ORG_MEMBER,
+      ),
       securityContext: input.request?.securityContext
         ? buildMetadata(input.request.securityContext)
         : undefined,

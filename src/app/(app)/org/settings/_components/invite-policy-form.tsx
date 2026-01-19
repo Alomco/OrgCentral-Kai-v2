@@ -25,11 +25,11 @@ export function InvitePolicyForm({
     const [state, formAction] = useActionState(action, { ...initialInvitePolicyState, open: defaultOpen });
 
     return (
-        <form action={formAction} className="space-y-4 rounded-2xl bg-[hsl(var(--card)/0.12)] p-6 backdrop-blur">
+        <form action={formAction} className="space-y-4 rounded-2xl bg-card/10 p-6 backdrop-blur">
             <div className="flex items-center justify-between gap-4">
                 <div>
-                    <p className="text-sm font-semibold text-[hsl(var(--foreground))]">Allow invite links</p>
-                    <p className="text-xs text-[hsl(var(--muted-foreground))]">
+                    <p className="text-sm font-semibold text-foreground">Allow invite links</p>
+                    <p className="text-xs text-muted-foreground">
                         When enabled, admins can share invite links without pre-approving emails.
                     </p>
                 </div>
@@ -42,19 +42,19 @@ export function InvitePolicyForm({
                         aria-label="Allow invite links"
                         className="peer sr-only"
                     />
-                    <div className="h-6 w-11 rounded-full bg-[hsl(var(--muted))] transition peer-checked:bg-[hsl(var(--primary))]" />
+                    <div className="h-6 w-11 rounded-full bg-muted transition peer-checked:bg-primary" />
                     <div className="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-background transition peer-checked:translate-x-5" />
                 </label>
             </div>
-            <div className="flex items-center gap-2 text-xs text-[hsl(var(--muted-foreground))]">
-                <span className="inline-flex h-2 w-2 rounded-full bg-[hsl(var(--primary))]" />
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <span className="inline-flex h-2 w-2 rounded-full bg-primary" />
                 <span>{state.status === 'success' ? state.message ?? 'Saved' : 'Changes apply immediately'}</span>
             </div>
             <Button type="submit" size="sm" className="px-4">
                 Save
             </Button>
             {state.status === 'error' ? (
-                <p className="text-xs text-red-500" role="alert">
+                <p className="text-xs text-destructive" role="alert">
                     {state.message ?? 'Unable to save'}
                 </p>
             ) : null}

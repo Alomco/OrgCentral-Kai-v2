@@ -94,15 +94,9 @@ export async function checkExistingOnboardingTarget(
       input.authorization.dataResidency,
     );
 
-    const matchedInvite = pendingInvitations.find((candidate) => {
-      const onboardingData = candidate.onboardingData as Record<string, unknown> | null | undefined;
-      const employeeId = typeof onboardingData?.employeeId === 'string'
-        ? onboardingData.employeeId
-        : typeof onboardingData?.employeeNumber === 'string'
-          ? onboardingData.employeeNumber
-          : undefined;
-      return employeeId?.trim() === employeeNumber;
-    });
+    const matchedInvite = pendingInvitations.find(
+      (candidate) => candidate.onboardingData.employeeId?.trim() === employeeNumber,
+    );
 
     if (matchedInvite) {
       return {

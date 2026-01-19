@@ -55,8 +55,8 @@ function ActivityItem({ notification, isLast }: { notification: HRNotificationDT
     // Determine icon based on type (assuming 'type' exists or inference from title/message)
     // For now, default to Info. If notification has type, use it.
     let Icon = Info;
-    let iconColor = "text-blue-500";
-    let iconBg = "bg-blue-500/10";
+    let iconColor = "text-primary";
+    let iconBg = "bg-primary/10";
 
     if (
         notification.priority === 'high' ||
@@ -67,16 +67,16 @@ function ActivityItem({ notification, isLast }: { notification: HRNotificationDT
         notification.type === 'compliance-reminder'
     ) {
         Icon = AlertTriangle;
-        iconColor = "text-amber-500";
-        iconBg = "bg-amber-500/10";
+        iconColor = "text-secondary-foreground";
+        iconBg = "bg-secondary/70";
     } else if (
         notification.type === 'leave-approval' ||
         notification.type === 'training-completed' ||
         notification.readAt
     ) {
         Icon = CheckCircle;
-        iconColor = "text-emerald-500";
-        iconBg = "bg-emerald-500/10";
+        iconColor = "text-foreground";
+        iconBg = "bg-accent/20";
     }
 
     return (

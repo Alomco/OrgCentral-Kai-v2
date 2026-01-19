@@ -14,8 +14,8 @@ export async function BillingOverviewPanel({
 
   if (!subscription) {
     return (
-      <div className="rounded-2xl border border-[hsl(var(--border))] bg-[hsl(var(--card)/0.35)] p-5 text-sm text-[hsl(var(--muted-foreground))]">
-        <p className="text-[hsl(var(--foreground))]">No active subscription detected.</p>
+      <div className="rounded-2xl border border-border bg-card/35 p-5 text-sm text-muted-foreground">
+        <p className="text-foreground">No active subscription detected.</p>
         <p className="mt-1 text-xs">
           Start a subscription from the billing portal or complete checkout.
         </p>
@@ -32,36 +32,36 @@ export async function BillingOverviewPanel({
     : '--';
 
   return (
-    <div className="rounded-2xl border border-[hsl(var(--border))] bg-[hsl(var(--card)/0.35)] p-5 shadow-sm">
+    <div className="rounded-2xl border border-border bg-card/35 p-5 shadow-sm">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-sm font-semibold text-[hsl(var(--foreground))]">Subscription status</p>
-          <p className="text-xs text-[hsl(var(--muted-foreground))]">
+          <p className="text-sm font-semibold text-foreground">Subscription status</p>
+          <p className="text-xs text-muted-foreground">
             Live subscription details for the current billing cycle.
           </p>
         </div>
         <Badge variant={statusTone}>{formatStatus(subscription.status)}</Badge>
       </div>
       <div className="mt-4 grid gap-3 text-sm sm:grid-cols-3">
-        <div className="rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--background))] p-3">
-          <p className="text-xs uppercase tracking-wide text-[hsl(var(--muted-foreground))]">Next billing</p>
-          <p className="mt-1 text-base font-semibold text-[hsl(var(--foreground))]">{periodEnd}</p>
+        <div className="rounded-xl border border-border bg-background p-3">
+          <p className="text-xs uppercase tracking-wide text-muted-foreground">Next billing</p>
+          <p className="mt-1 text-base font-semibold text-foreground">{periodEnd}</p>
         </div>
-        <div className="rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--background))] p-3">
-          <p className="text-xs uppercase tracking-wide text-[hsl(var(--muted-foreground))]">Active users</p>
-          <p className="mt-1 text-base font-semibold text-[hsl(var(--foreground))]">
+        <div className="rounded-xl border border-border bg-background p-3">
+          <p className="text-xs uppercase tracking-wide text-muted-foreground">Active users</p>
+          <p className="mt-1 text-base font-semibold text-foreground">
             {subscription.seatCount}
           </p>
         </div>
-        <div className="rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--background))] p-3">
-          <p className="text-xs uppercase tracking-wide text-[hsl(var(--muted-foreground))]">Est. charge</p>
-          <p className="mt-1 text-base font-semibold text-[hsl(var(--foreground))]">
+        <div className="rounded-xl border border-border bg-background p-3">
+          <p className="text-xs uppercase tracking-wide text-muted-foreground">Est. charge</p>
+          <p className="mt-1 text-base font-semibold text-foreground">
             {estimatedCharge}
           </p>
         </div>
       </div>
       {subscription.status === 'PAST_DUE' ? (
-        <div className="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-2 text-xs text-red-200">
+        <div className="mt-4 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-2 text-xs text-destructive">
           Payment failed. Update your payment method to avoid service interruption.
         </div>
       ) : null}

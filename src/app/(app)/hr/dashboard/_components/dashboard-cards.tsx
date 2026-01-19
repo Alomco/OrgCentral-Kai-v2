@@ -72,7 +72,7 @@ export async function WelcomeCard({
     }
 
     return (
-        <Card className="bg-linear-to-br from-primary/5 via-background to-background border-primary/20">
+        <Card className="border border-border/60 bg-card">
             <CardHeader>
                 <CardDescription>Welcome back</CardDescription>
                 <CardTitle className="text-2xl">Hello, {displayName}!</CardTitle>

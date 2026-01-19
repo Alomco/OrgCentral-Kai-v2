@@ -10,7 +10,7 @@ import type {
 import { resolveIdentityCacheScopes } from '@/server/lib/cache-tags/identity';
 import { toPrismaInputJson } from '@/server/repositories/prisma/helpers/prisma-utils';
 import { RepositoryAuthorizationError } from '@/server/repositories/security';
-import { onboardingDataSchema } from '@/server/validators/auth/invitation-validators';
+import { onboardingDataSchema, toInvitationJson } from '@/server/invitations/onboarding-data';
 
 type InvitationEntity = PrismaInvitation;
 
@@ -72,6 +72,7 @@ export class PrismaInvitationRepository extends BasePrismaRepository implements 
 
         // Validate onboarding data
         const validatedOnboardingData = onboardingDataSchema.parse(input.onboardingData);
+        const onboardingData = toInvitationJson(validatedOnboardingData);
 
         const record = await getInvitationDelegate(this.prisma).create({        
             data: {
@@ -81,7 +82,7 @@ export class PrismaInvitationRepository extends BasePrismaRepository implements 
                 targetEmail,
                 onboardingData:
                     toJsonNullInput(
-                        validatedOnboardingData as unknown as Prisma.InputJsonValue,
+                        onboardingData as unknown as Prisma.InputJsonValue,
                     ),
                 status: 'pending',
                 invitedByUserId: input.invitedByUserId ?? null,

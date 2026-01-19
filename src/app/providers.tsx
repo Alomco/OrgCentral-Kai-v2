@@ -49,13 +49,13 @@ class SimpleErrorBoundary extends Component<{ onReset: () => void; children: Rea
     render() {
         if (this.state.error) {
             return (
-                <div className="m-4 rounded-xl bg-[hsl(var(--card)/0.9)] p-4 text-sm shadow-lg shadow-black/10 backdrop-blur">
-                    <p className="font-semibold text-[hsl(var(--foreground))]">Something went wrong.</p>
-                    <p className="mt-1 text-[hsl(var(--foreground))] opacity-70">{this.state.error.message}</p>
+                <div className="m-4 rounded-xl bg-card/90 p-4 text-sm shadow-lg backdrop-blur">
+                    <p className="font-semibold text-foreground">Something went wrong.</p>
+                    <p className="mt-1 text-foreground/70">{this.state.error.message}</p>
                     <button
                         type="button"
                         onClick={this.handleReset}
-                        className="mt-3 inline-flex items-center rounded-lg bg-[hsl(var(--primary))] px-3 py-1.5 text-[hsl(var(--primary-foreground))] text-xs font-semibold shadow hover:opacity-90"
+                        className="mt-3 inline-flex items-center rounded-lg bg-primary px-3 py-1.5 text-primary-foreground text-xs font-semibold shadow hover:opacity-90"
                     >
                         Try again
                     </button>

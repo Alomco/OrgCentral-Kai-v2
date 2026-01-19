@@ -13,8 +13,6 @@ import {
     coerceNumber,
     coerceString,
     extractStringArray,
-    isJsonValue,
-    isRecord,
     normalizeSalaryBasis,
     normalizePaySchedule,
     resolveContractType,
@@ -48,34 +46,26 @@ export interface OnboardingPayload {
 }
 
 export function extractOnboardingPayload(invitation: OnboardingInvitation): OnboardingPayload {
-    const data = invitation.onboardingData;
-    if (!isRecord(data)) {
-        return {};
-    }
     return {
-        email: coerceString(data.email),
-        displayName: coerceString(data.displayName),
-        firstName: coerceString(data.firstName),
-        lastName: coerceString(data.lastName),
-        employeeId: coerceString(data.employeeId),
-        employeeNumber: coerceString(data.employeeNumber),
-        employmentType: coerceString(data.employmentType),
-        jobTitle: coerceString(data.jobTitle ?? data.position),
-        departmentId: coerceString(data.departmentId),
-        startDate: coerceString(data.startDate),
-        managerEmployeeNumber: coerceString(data.managerEmployeeNumber),
-        annualSalary: coerceNumber(data.annualSalary ?? data.salary),
-        hourlyRate: coerceNumber(data.hourlyRate),
-        salaryCurrency: coerceString(data.salaryCurrency ?? data.currency),
-        salaryBasis: coerceString(data.salaryBasis),
-        paySchedule: coerceString(data.paySchedule),
-        eligibleLeaveTypes: extractStringArray(data.eligibleLeaveTypes),
-        onboardingTemplateId: coerceString(data.onboardingTemplateId),
-        roles: extractStringArray(data.roles),
-        contractType: coerceString(data.contractType),
-        location: coerceString(data.location),
-        workingPattern: isJsonValue(data.workingPattern) ? data.workingPattern : undefined,
-        benefits: isJsonValue(data.benefits) ? data.benefits : undefined,
+        email: coerceString(invitation.onboardingData.email),
+        displayName: coerceString(invitation.onboardingData.displayName),
+        firstName: coerceString(invitation.onboardingData.firstName),
+        lastName: coerceString(invitation.onboardingData.lastName),
+        employeeId: coerceString(invitation.onboardingData.employeeId),
+        employeeNumber: coerceString(invitation.onboardingData.employeeId),
+        employmentType: coerceString(invitation.onboardingData.employmentType),
+        jobTitle: coerceString(invitation.onboardingData.position),
+        departmentId: coerceString(invitation.onboardingData.departmentId),
+        startDate: coerceString(invitation.onboardingData.startDate),
+        managerEmployeeNumber: coerceString(invitation.onboardingData.managerEmployeeNumber),
+        annualSalary: coerceNumber(invitation.onboardingData.annualSalary),
+        hourlyRate: coerceNumber(invitation.onboardingData.hourlyRate),
+        salaryCurrency: coerceString(invitation.onboardingData.salaryCurrency),
+        salaryBasis: coerceString(invitation.onboardingData.salaryBasis),
+        paySchedule: coerceString(invitation.onboardingData.paySchedule),
+        eligibleLeaveTypes: extractStringArray(invitation.onboardingData.eligibleLeaveTypes),
+        onboardingTemplateId: coerceString(invitation.onboardingData.onboardingTemplateId),
+        roles: extractStringArray(invitation.onboardingData.roles),
     } satisfies OnboardingPayload;
 }
 

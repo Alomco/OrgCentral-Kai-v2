@@ -172,7 +172,7 @@ export function SidebarMenuSub({
             data-slot="sidebar-menu-sub"
             data-sidebar="menu-sub"
             className={cn(
-                "mx-3.5 flex min-w-0 translate-x-px flex-col gap-1 px-2.5 py-0.5 relative before:absolute before:inset-y-1 before:left-0 before:w-px before:bg-linear-to-b before:from-sidebar-border/60 before:via-sidebar-border/20 before:to-transparent",
+                "mx-3.5 flex min-w-0 translate-x-px flex-col gap-1 px-2.5 py-0.5 relative before:absolute before:inset-y-1 before:left-0 before:w-px before:bg-sidebar-border/40",
                 "group-data-[collapsible=icon]:hidden",
                 className
             )}
@@ -215,7 +215,7 @@ export function SidebarMenuSubButton({
             data-size={size}
             data-active={isActive}
             className={cn(
-                "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground active:bg-sidebar-accent active:text-sidebar-accent-foreground [&>svg]:text-sidebar-accent-foreground flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2 outline-hidden focus-visible:shadow-[0_0_0_1px_hsl(var(--sidebar-ring)/0.45),0_0_0_4px_hsl(var(--sidebar-ring)/0.2)] disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
+                "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground active:bg-sidebar-accent active:text-sidebar-accent-foreground [&>svg]:text-sidebar-accent-foreground flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2 outline-hidden focus-visible:shadow-[0_0_0_1px_oklch(var(--sidebar-ring)/0.45),0_0_0_4px_oklch(var(--sidebar-ring)/0.2)] disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
                 "data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground",
                 size === "sm" && "text-xs",
                 size === "md" && "text-sm",

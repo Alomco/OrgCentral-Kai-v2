@@ -1,6 +1,8 @@
 import type { IInvitationRepository } from '@/server/repositories/contracts/auth/invitations/invitation-repository-contract';
 import type { InvitationRecord } from '@/server/repositories/contracts/auth/invitations/invitation-repository.types';
 import { createInvitationRepository } from '@/server/repositories/providers/auth/invitation-repository-provider';
+import { hasOnboardingFingerprint } from '@/server/invitations/invitation-fingerprint';
+import { toInvitationJson } from '@/server/invitations/onboarding-data';
 
 export interface InvitationFlowDependencies {
     invitationRepository: IInvitationRepository;
@@ -27,12 +29,5 @@ export async function shouldUseOnboardingFlow(
 }
 
 function hasOnboardingData(invitation: InvitationRecord): boolean {
-    const payload = invitation.onboardingData;
-    const employeeId = 'employeeId' in payload ? payload.employeeId : undefined;
-    const onboardingTemplateId = 'onboardingTemplateId' in payload ? payload.onboardingTemplateId : undefined;
-
-    const hasEmployeeId = typeof employeeId === 'string' && employeeId.trim().length > 0;
-    const hasTemplateId = typeof onboardingTemplateId === 'string' && onboardingTemplateId.trim().length > 0;
-
-    return hasEmployeeId || hasTemplateId;
+    return hasOnboardingFingerprint(toInvitationJson(invitation.onboardingData));
 }

@@ -40,11 +40,11 @@ const TYPE_LABELS: Record<string, { label: string; emoji: string }> = {
 };
 
 const STATUS_STYLES: Record<string, string> = {
-    REPORTED: 'bg-amber-500/15 text-amber-600 dark:text-amber-400',
-    APPROVED: 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400',
-    REJECTED: 'bg-rose-500/15 text-rose-600 dark:text-rose-400',
-    CANCELLED: 'bg-slate-500/15 text-slate-600 dark:text-slate-400',
-    CLOSED: 'bg-sky-500/15 text-sky-600 dark:text-sky-400',
+    REPORTED: 'bg-secondary/70 text-secondary-foreground',
+    APPROVED: 'bg-accent/20 text-foreground',
+    REJECTED: 'bg-destructive/10 text-destructive',
+    CANCELLED: 'bg-muted/60 text-muted-foreground',
+    CLOSED: 'bg-primary/10 text-primary',
 };
 
 function formatDate(date: Date): string {
@@ -76,7 +76,7 @@ export function AbsenceDetailDialog({
     open,
     onOpenChange,
 }: AbsenceDetailDialogProps) {
-    if (!absence) {return null;}
+    if (!absence) { return null; }
 
     const typeInfo = TYPE_LABELS[absence.typeId] ?? {
         label: absence.typeId,

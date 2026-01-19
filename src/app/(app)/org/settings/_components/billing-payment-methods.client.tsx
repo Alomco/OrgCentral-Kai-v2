@@ -65,19 +65,19 @@ export function BillingPaymentMethodsClient({
           {paymentMethods.map((method) => (
             <div
               key={method.stripePaymentMethodId}
-              className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--background))] p-4"
+              className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-background p-4"
             >
               <div className="flex items-center gap-3">
                 <div>
                   <div className="flex items-center gap-2">
-                    <p className="text-sm font-semibold text-[hsl(var(--foreground))]">
+                    <p className="text-sm font-semibold text-foreground">
                       {formatPaymentMethodTitle(method)}
                     </p>
                     {method.isDefault ? (
                       <Badge variant="secondary">Default</Badge>
                     ) : null}
                   </div>
-                  <p className="text-xs text-[hsl(var(--muted-foreground))]">
+                  <p className="text-xs text-muted-foreground">
                     {formatPaymentMethodMeta(method)}
                   </p>
                 </div>
@@ -102,26 +102,22 @@ export function BillingPaymentMethodsClient({
           ))}
         </div>
       ) : (
-        <p className="text-sm text-[hsl(var(--muted-foreground))]">
-          No payment methods saved yet.
-        </p>
+        <p className="text-sm text-muted-foreground">No payment methods saved yet.</p>
       )}
 
-      {feedback ? (
-        <p className="text-xs text-[hsl(var(--muted-foreground))]">{feedback}</p>
-      ) : null}
+      {feedback ? <p className="text-xs text-muted-foreground">{feedback}</p> : null}
 
       <form action={setupAction} className="flex flex-wrap items-center gap-3">
         <Button type="submit" size="sm" disabled={!canManage || setupPending || !publishableKey}>
           Add payment method
         </Button>
         {!publishableKey ? (
-          <span className="text-xs text-[hsl(var(--muted-foreground))]">
+          <span className="text-xs text-muted-foreground">
             Stripe publishable key missing.
           </span>
         ) : null}
         {!canManage ? (
-          <span className="text-xs text-[hsl(var(--muted-foreground))]">
+          <span className="text-xs text-muted-foreground">
             Subscribe to enable payment methods.
           </span>
         ) : null}
@@ -138,9 +134,7 @@ export function BillingPaymentMethodsClient({
         </Elements>
       ) : null}
       {completedClientSecret === setupState.clientSecret && setupState.clientSecret ? (
-        <p className="text-xs text-[hsl(var(--muted-foreground))]">
-          Payment method added. Refreshing details...
-        </p>
+        <p className="text-xs text-muted-foreground">Payment method added. Refreshing details...</p>
       ) : null}
     </div>
   );
@@ -178,14 +172,14 @@ function PaymentMethodSetupForm({ onComplete }: { onComplete: () => void }) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-3 rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--background))] p-4"
+      className="space-y-3 rounded-xl border border-border bg-background p-4"
     >
       <PaymentElement options={{ layout: 'tabs' }} />
       <div className="flex flex-wrap items-center gap-3">
         <Button type="submit" size="sm" disabled={status === 'saving' || !stripe || !elements}>
           Save payment method
         </Button>
-        {message ? <span className="text-xs text-red-400">{message}</span> : null}
+        {message ? <span className="text-xs text-destructive">{message}</span> : null}
       </div>
     </form>
   );

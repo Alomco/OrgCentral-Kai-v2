@@ -14,20 +14,20 @@ export interface HrStatCardProps {
 
 const accentStyles = {
     primary: {
-        icon: 'from-[hsl(var(--primary))] to-[hsl(var(--primary)/0.7)]',
-        bar: 'bg-linear-to-b from-[hsl(var(--primary))] to-[hsl(var(--accent)/0.6)] shadow-[0_0_12px_hsl(var(--primary)/0.35)]',
+        icon: 'bg-primary text-primary-foreground',
+        bar: 'bg-primary/60 shadow-[0_0_12px_oklch(var(--primary)/0.25)]',
     },
     accent: {
-        icon: 'from-[hsl(var(--accent))] to-[hsl(var(--accent)/0.7)]',
-        bar: 'bg-linear-to-b from-[hsl(var(--accent))] to-[hsl(var(--primary)/0.6)] shadow-[0_0_12px_hsl(var(--accent)/0.35)]',
+        icon: 'bg-accent text-accent-foreground',
+        bar: 'bg-accent/60 shadow-[0_0_12px_oklch(var(--accent)/0.25)]',
     },
     success: {
-        icon: 'from-emerald-500 to-emerald-400',
-        bar: 'bg-linear-to-b from-emerald-500 to-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.35)]',
+        icon: 'bg-accent text-accent-foreground',
+        bar: 'bg-accent/60 shadow-[0_0_12px_oklch(var(--accent)/0.25)]',
     },
     warning: {
-        icon: 'from-amber-500 to-amber-400',
-        bar: 'bg-linear-to-b from-amber-500 to-amber-300 shadow-[0_0_12px_rgba(245,158,11,0.35)]',
+        icon: 'bg-secondary text-secondary-foreground',
+        bar: 'bg-secondary/60 shadow-[0_0_12px_oklch(var(--secondary)/0.25)]',
     },
 } as const;
 
@@ -53,7 +53,7 @@ export function HrStatCard({
                     {trend ? (
                         <p className={cn(
                             'mt-1 text-xs font-medium',
-                            trend.value >= 0 ? 'text-emerald-600' : 'text-rose-600',
+                            trend.value >= 0 ? 'text-primary' : 'text-destructive',
                         )}>
                             {trend.value >= 0 ? '↑' : '↓'} {Math.abs(trend.value)}% {trend.label}
                         </p>
@@ -63,7 +63,7 @@ export function HrStatCard({
                     <div
                         className={cn(
                             'flex items-center justify-center rounded-lg p-2',
-                            'bg-linear-to-br text-white',
+                            'text-white',
                             accent.icon,
                         )}
                     >

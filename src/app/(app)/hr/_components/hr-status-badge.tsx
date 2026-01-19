@@ -3,36 +3,36 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
-const STATUS_BLUE = 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
-const STATUS_GREEN = 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
-const STATUS_GRAY = 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400';
-const STATUS_YELLOW = 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
-const STATUS_RED = 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
+const STATUS_INFO = 'bg-primary/10 text-primary';
+const STATUS_SUCCESS = 'bg-accent/15 text-foreground';
+const STATUS_NEUTRAL = 'bg-muted/60 text-muted-foreground';
+const STATUS_WARNING = 'bg-secondary/70 text-secondary-foreground';
+const STATUS_ERROR = 'bg-destructive/10 text-destructive';
 
 /** CVA-based status badge variants for HR module consistency. */
 const hrStatusBadgeVariants = cva('', {
     variants: {
         status: {
             // Absence statuses
-            REPORTED: STATUS_YELLOW,
-            APPROVED: STATUS_GREEN,
-            REJECTED: STATUS_RED,
-            CANCELLED: STATUS_GRAY,
-            CLOSED: STATUS_BLUE,
+            REPORTED: STATUS_WARNING,
+            APPROVED: STATUS_SUCCESS,
+            REJECTED: STATUS_ERROR,
+            CANCELLED: STATUS_NEUTRAL,
+            CLOSED: STATUS_INFO,
             // Time tracking statuses
-            ACTIVE: STATUS_BLUE,
-            COMPLETED: STATUS_GREEN,
+            ACTIVE: STATUS_INFO,
+            COMPLETED: STATUS_SUCCESS,
             // Training statuses
-            ENROLLED: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
-            IN_PROGRESS: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-            PASSED: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-            FAILED: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-            EXPIRED: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400',
+            ENROLLED: STATUS_WARNING,
+            IN_PROGRESS: STATUS_INFO,
+            PASSED: STATUS_SUCCESS,
+            FAILED: STATUS_ERROR,
+            EXPIRED: STATUS_NEUTRAL,
             // Performance statuses
-            DRAFT: STATUS_GRAY,
-            PENDING_REVIEW: STATUS_YELLOW,
-            SUBMITTED: STATUS_BLUE,
-            FINALIZED: STATUS_GREEN,
+            DRAFT: STATUS_NEUTRAL,
+            PENDING_REVIEW: STATUS_WARNING,
+            SUBMITTED: STATUS_INFO,
+            FINALIZED: STATUS_SUCCESS,
             // Generic fallback
             default: '',
         },

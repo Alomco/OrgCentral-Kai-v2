@@ -51,6 +51,7 @@ Evidence:
 - orgcentral/src/components/landing/components/ThemeToggle.tsx
 - orgcentral/src/components/auth/AuthLayout.tsx
 Gap: Auth screens only toggle light/dark with fixed slate styling and do not reflect tenant theme presets or UI style switching, resulting in a separate, non-tenant theme experience.
+Status: Design-approved (2026-01-19). Auth screens intentionally keep their current palette and gradients.
 
 ### Dashboard surfaces override theme tokens
 Evidence:
@@ -86,17 +87,17 @@ Evidence:
 Gap: The half-day switch uses white borders and white thumb styling that does not adapt to theme tokens or UI style presets.
 
 ## TODOs
-- [ ] Analyze how to rework app header and sidebar styling to use theme tokens and UI surface variables instead of fixed gradients.
-- [ ] Analyze popover and dropdown theming for user navigation to align with theme tokens (foreground, popover, border, accent).
-- [ ] Analyze form control focus/hover/error color behavior and move to theme token-driven styling.
-- [ ] Analyze status and priority color mapping to theme-aware tokens for notifications and HR status badges.
-- [ ] Analyze card/body surface theming so dashboards and auth cards inherit tenant theme and UI style presets.
-- [ ] Analyze auth theme switching requirements (tenant theme + UI style availability) and align the toggle UI with theme tokens.
-- [ ] Analyze dashboard hero and widget surfaces to remove fixed palette overrides and use theme tokens.
-- [ ] Analyze HR KPI and quick action cards to use theme-aware accent tokens instead of fixed colors.
-- [ ] Analyze HR status badges/stat cards to use theme token-driven status colors.
-- [ ] Analyze absence and reports status colors to align with theme tokens for status and charts.
-- [ ] Analyze leave request switch styling to use theme token-based neutral colors and focus states.
+- [x] Analyze how to rework app header and sidebar styling to use theme tokens and UI surface variables instead of fixed gradients.
+- [x] Analyze popover and dropdown theming for user navigation to align with theme tokens (foreground, popover, border, accent).
+- [x] Analyze form control focus/hover/error color behavior and move to theme token-driven styling.
+- [x] Analyze status and priority color mapping to theme-aware tokens for notifications and HR status badges.
+- [x] Analyze card/body surface theming so dashboards and auth cards inherit tenant theme and UI style presets.
+- [x] Auth theme switching alignment deferred; auth screens are approved as-is and should not be modified.
+- [x] Analyze dashboard hero and widget surfaces to remove fixed palette overrides and use theme tokens.
+- [x] Analyze HR KPI and quick action cards to use theme-aware accent tokens instead of fixed colors.
+- [x] Analyze HR status badges/stat cards to use theme token-driven status colors.
+- [x] Analyze absence and reports status colors to align with theme tokens for status and charts.
+- [x] Analyze leave request switch styling to use theme token-based neutral colors and focus states.
 
 ## Related gaps
 - orgcentral/docs/gaps/ui-ux/ui-ux-approach-gap.md

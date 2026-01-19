@@ -21,6 +21,10 @@ interface BootstrapErrorPayload {
     };
 }
 
+interface BootstrapSuccessPayload {
+    readonly redirectTo?: string;
+}
+
 function isBootstrapErrorPayload(value: object): value is BootstrapErrorPayload {
     return 'error' in value;
 }
@@ -36,6 +40,19 @@ function extractErrorMessage(payload: object | null): string | null {
 
     const message = payload.error.message;
     return typeof message === 'string' && message.trim().length > 0 ? message : null;
+}
+
+function extractRedirectTarget(payload: object | null): string | null {
+    if (!payload) {
+        return null;
+    }
+
+    if (!('redirectTo' in payload)) {
+        return null;
+    }
+
+    const redirectTo = (payload as BootstrapSuccessPayload).redirectTo;
+    return typeof redirectTo === 'string' && redirectTo.trim().length > 0 ? redirectTo : null;
 }
 
 export function AdminBootstrapComplete() {
@@ -79,9 +96,11 @@ export function AdminBootstrapComplete() {
                     return;
                 }
 
+                const successPayload = await response.json().catch(() => null) as object | null;
+                const redirectTo = extractRedirectTarget(successPayload) ?? '/admin/dashboard';
                 sessionStorage.removeItem(ADMIN_BOOTSTRAP_SECRET_STORAGE_KEY);
                 setState({ status: 'success' });
-                router.replace('/dashboard');
+                router.replace(redirectTo);
             } catch (error) {
                 if (error instanceof DOMException && error.name === 'AbortError') {
                     return;

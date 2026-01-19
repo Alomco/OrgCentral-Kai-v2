@@ -25,12 +25,12 @@ interface AppHeaderProps {
     unreadCount: number;
 }
 
-export function AppHeader({ 
-    session, 
-    authorization, 
-    branding, 
-    notifications, 
-    unreadCount 
+export function AppHeader({
+    session,
+    authorization,
+    branding,
+    notifications,
+    unreadCount
 }: AppHeaderProps) {
     const [isSearchOpen, setIsSearchOpen] = useState(false);
 
@@ -45,7 +45,7 @@ export function AppHeader({
     };
 
     return (
-        <header className={styles.header}>
+        <header className={styles.header} data-ui-surface="container">
             <SidebarTrigger className="lg:hidden" />
 
             <div className={styles.headerContent}>
@@ -94,9 +94,9 @@ export function AppHeader({
                 </Popover>
 
                 {/* Notifications */}
-                <NotificationBell 
-                    notifications={notifications} 
-                    unreadCount={unreadCount} 
+                <NotificationBell
+                    notifications={notifications}
+                    unreadCount={unreadCount}
                 />
 
                 {/* Theme & Style Switcher */}

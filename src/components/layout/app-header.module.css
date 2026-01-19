@@ -11,40 +11,20 @@
     padding: 0 1.5rem;
     overflow: hidden;
     isolation: isolate;
-    border-bottom: 1px solid hsl(var(--border) / 0.3);
-    background-color: hsl(var(--background) / 0.95);
-    background: 
-        linear-gradient(135deg, 
-            hsl(262 83% 58% / 0.15) 0%,
-            hsl(262 83% 58% / 0.08) 25%,
-            transparent 50%,
-            hsl(330 81% 60% / 0.08) 75%,
-            hsl(330 81% 60% / 0.15) 100%
-        ),
-        radial-gradient(ellipse at 20% 50%, hsl(262 83% 58% / 0.12) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 50%, hsl(330 81% 60% / 0.12) 0%, transparent 50%),
-        linear-gradient(to bottom, hsl(var(--background) / 0.92), hsl(var(--background) / 0.95));
+    border-bottom: 1px solid oklch(var(--border) / 0.3);
+    background-color: var(--ui-surface-container-fill);
     -webkit-backdrop-filter: blur(16px) saturate(180%);
     backdrop-filter: blur(16px) saturate(180%);
-    box-shadow: 
-        0 1px 3px hsl(var(--primary) / 0.1),
-        inset 0 1px 0 hsl(var(--primary) / 0.1);
+    box-shadow: var(--ui-surface-container-shadow);
 }
 
 .header::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: 
-        linear-gradient(90deg,
-            hsl(262 83% 58% / 0.15) 0%,
-            hsl(330 81% 60% / 0.08) 25%,
-            transparent 50%,
-            hsl(262 83% 58% / 0.08) 75%,
-            hsl(330 81% 60% / 0.15) 100%
-        );
+    background: none;
     pointer-events: none;
-    animation: meshShift 15s ease-in-out infinite alternate;
+    animation: none;
 }
 
 @keyframes meshShift {
@@ -67,11 +47,7 @@
     inset-inline: 0;
     bottom: 0;
     height: 1px;
-    background: linear-gradient(90deg, 
-        transparent 0%, 
-        hsl(var(--border) / 0.7) 50%, 
-        transparent 100%
-    );
+    background-color: oklch(var(--border) / 0.7);
 }
 
 .headerContent {
@@ -95,10 +71,7 @@
 
 .logoText {
     display: none;
-    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--sidebar-primary)));
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+    color: oklch(var(--primary));
     font-weight: 700;
 }
 

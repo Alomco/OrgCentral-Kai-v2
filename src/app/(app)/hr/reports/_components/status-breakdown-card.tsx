@@ -50,10 +50,10 @@ export function StatusBreakdownCard({ title, description, total, rows }: StatusB
 
 function toneClass(tone: 'warning' | 'success' | 'neutral'): string {
     if (tone === 'warning') {
-        return 'bg-amber-500';
+        return 'bg-secondary';
     }
     if (tone === 'success') {
-        return 'bg-emerald-500';
+        return 'bg-accent';
     }
-    return 'bg-slate-400';
+    return 'bg-muted-foreground';
 }

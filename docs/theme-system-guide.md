@@ -255,6 +255,9 @@ await updateOrgBranding({
 
 ## 🎯 Best Practices
 
+### Theme Token SSOT
+See docs/theme-token-ssot.md for the single source of truth rules and UI style preset guidance.
+
 ### 1. Server Components First
 
 ```tsx

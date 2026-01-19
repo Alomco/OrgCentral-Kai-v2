@@ -8,6 +8,7 @@ import type { RepositoryAuthorizationContext } from '@/server/repositories/secur
 import { assertNonEmpty } from '@/server/use-cases/shared/validators';
 import { normalizeRoles } from '@/server/use-cases/shared';
 import { buildMetadata } from '@/server/use-cases/shared/builders';
+import { INVITATION_KIND, withInvitationKind } from '@/server/invitations/invitation-kinds';
 import type { EmployeeProfileDTO } from '@/server/types/hr/people';
 import { checkExistingOnboardingTarget } from './check-existing-onboarding-target';
 
@@ -107,32 +108,35 @@ export async function sendOnboardingInvite(
         onboardingData: {
             email: normalizedEmail,
             displayName: input.displayName,
-            firstName: input.firstName ?? null,
-            lastName: input.lastName ?? null,
+            firstName: input.firstName,
+            lastName: input.lastName,
             employeeId: normalizedEmployeeNumber,
-            employmentType: input.employmentType ?? null,
-            jobTitle: input.jobTitle ?? null,
-            departmentId: input.departmentId ?? null,
-            startDate: input.startDate ?? null,
-            managerEmployeeNumber: input.managerEmployeeNumber ?? null,
-            annualSalary: input.annualSalary ?? null,
-            hourlyRate: input.hourlyRate ?? null,
-            salaryCurrency: input.salaryCurrency ?? null,
-            salaryBasis: input.salaryBasis ?? null,
-            paySchedule: input.paySchedule ?? null,
-            eligibleLeaveTypes: input.eligibleLeaveTypes ?? [],
-            onboardingTemplateId: input.onboardingTemplateId ?? null,
+            employmentType: input.employmentType,
+            position: input.jobTitle,
+            departmentId: input.departmentId,
+            startDate: input.startDate,
+            managerEmployeeNumber: input.managerEmployeeNumber,
+            annualSalary: input.annualSalary,
+            hourlyRate: input.hourlyRate,
+            salaryCurrency: input.salaryCurrency,
+            salaryBasis: input.salaryBasis,
+            paySchedule: input.paySchedule,
+            eligibleLeaveTypes: input.eligibleLeaveTypes,
+            onboardingTemplateId: input.onboardingTemplateId ?? undefined,
             roles: roles.length > 0 ? roles : ['member'],
         },
-        metadata: {
-            auditSource: input.authorization.auditSource,
-            correlationId: input.authorization.correlationId,
-            dataResidency: input.authorization.dataResidency,
-            dataClassification: input.authorization.dataClassification,
-        },
-            securityContext: input.request?.securityContext
-                ? buildMetadata(input.request.securityContext)
-                : undefined,
+        metadata: withInvitationKind(
+            buildMetadata({
+                auditSource: input.authorization.auditSource,
+                correlationId: input.authorization.correlationId,
+                dataResidency: input.authorization.dataResidency,
+                dataClassification: input.authorization.dataClassification,
+            }),
+            INVITATION_KIND.HR_ONBOARDING,
+        ),
+        securityContext: input.request?.securityContext
+            ? buildMetadata(input.request.securityContext)
+            : undefined,
         ipAddress: input.request?.ipAddress,
         userAgent: input.request?.userAgent,
     });

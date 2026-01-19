@@ -74,24 +74,18 @@ export async function KpiGrid({ authorization, employeeId }: KpiGridProps) {
                 value={`${leaveBalance.toLocaleString()} days`}
                 icon={Briefcase}
                 href="/hr/leave/balances"
-                color="text-blue-500"
-                gradient="from-blue-500/10"
             />
             <KpiCard
                 title="Pending Requests"
                 value={pendingRequests.toString()}
                 icon={Clock}
                 href="/hr/leave/requests"
-                color="text-amber-500"
-                gradient="from-amber-500/10"
             />
             <KpiCard
                 title="Absent Today"
                 value={absentToday.toString()}
                 icon={Calendar}
                 href="/hr/absence"
-                color="text-rose-500"
-                gradient="from-rose-500/10"
             />
             {isAdmin && (
                 <KpiCard
@@ -99,30 +93,25 @@ export async function KpiGrid({ authorization, employeeId }: KpiGridProps) {
                     value={totalEmployees.toString()}
                     icon={Users}
                     href="/hr/employees"
-                    color="text-purple-500"
-                    gradient="from-purple-500/10"
                 />
             )}
         </div>
     );
 }
 
-function KpiCard({ title, value, icon: Icon, href, color, gradient }: {
+function KpiCard({ title, value, icon: Icon, href }: {
     title: string;
     value: string;
     icon: LucideIcon;
     href: string;
-    color: string;
-    gradient: string;
 }) {
     return (
         <Link href={href}>
-            <Card className={`group relative overflow-hidden border-border/50 bg-background/50 hover:bg-background/80 transition-all hover:scale-[1.02] hover:shadow-lg backdrop-blur-md`}>
-                <div className={`absolute inset-0 bg-linear-to-br ${gradient} to-transparent opacity-50 transition-opacity group-hover:opacity-100`} />
-                <CardContent className="p-6 relative z-10">
+            <Card className="group border-border/60 bg-card text-card-foreground transition-all hover:bg-card/80 hover:shadow-sm">
+                <CardContent className="p-6">
                     <div className="flex items-center justify-between space-y-0 pb-2">
                         <p className="text-sm font-medium text-muted-foreground">{title}</p>
-                        <Icon className={`h-4 w-4 ${color}`} />
+                        <Icon className="h-4 w-4 text-foreground" />
                     </div>
                     <div className="text-2xl font-bold">{value}</div>
                 </CardContent>

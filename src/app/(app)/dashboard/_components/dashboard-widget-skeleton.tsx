@@ -3,9 +3,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 export function DashboardWidgetSkeleton() {
     return (
-        <article className="glass-card-wrapper h-full">
-            <Card className="glass-card flex h-full flex-col rounded-lg shadow-lg relative z-20 bg-linear-to-br from-white via-blue-50/30 to-purple-50/30 dark:from-slate-900/90 dark:via-blue-950/50 dark:to-purple-950/50 border-none overflow-hidden">
-                <div className="absolute inset-0 bg-linear-to-br from-blue-500/5 via-transparent to-purple-500/5 pointer-events-none" />
+        <article className="h-full">
+            <Card className="flex h-full flex-col rounded-lg border border-border/60 bg-card text-card-foreground shadow-sm">
                 <CardHeader className="flex flex-row items-start justify-between gap-4 space-y-0 p-6 relative z-10">
                     <div className="space-y-2 flex-1">
                         <Skeleton className="h-4 w-32" />

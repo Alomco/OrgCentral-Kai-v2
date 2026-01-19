@@ -35,7 +35,7 @@ export function CustomSelectField<TValue extends string>({
     return (
         <div className="space-y-2">
             <Label htmlFor={id} className="flex items-center gap-2 text-sm font-medium text-foreground">
-                <span className="flex h-5 w-5 items-center justify-center rounded-md bg-linear-to-br from-indigo-500 to-purple-600 text-primary-foreground shadow-sm">
+                <span className="flex h-5 w-5 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-sm">
                     {icon}
                 </span>
                 {label}
@@ -43,7 +43,7 @@ export function CustomSelectField<TValue extends string>({
             <Select value={value} onValueChange={onValueChange} name={id}>
                 <SelectTrigger
                     id={id}
-                    className="h-11 w-full rounded-xl border border-input bg-background/50 text-sm font-medium text-foreground shadow-sm transition-all duration-200 hover:border-indigo-300 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/20"
+                    className="h-11 w-full rounded-xl border border-input bg-background/50 text-sm font-medium text-foreground shadow-sm transition-all duration-200 hover:border-border/80 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
                 >
                     <SelectValue />
                 </SelectTrigger>
@@ -59,7 +59,7 @@ export function CustomSelectField<TValue extends string>({
                     ))}
                 </SelectContent>
             </Select>
-            {error && <p className="text-xs text-rose-500">{error}</p>}
+            {error && <p className="text-xs text-destructive">{error}</p>}
         </div>
     );
 }
@@ -88,13 +88,13 @@ export function InputField({ label, error, icon, className, ...rest }: InputFiel
                     {...rest}
                     id={inputId}
                     className={cn(
-                        "h-11 rounded-xl border-input bg-background/50 text-sm text-foreground shadow-sm transition-all duration-200 placeholder:text-muted-foreground focus-visible:border-indigo-400 focus-visible:ring-2 focus-visible:ring-indigo-400/20",
+                        "h-11 rounded-xl border-input bg-background/50 text-sm text-foreground shadow-sm transition-all duration-200 placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20",
                         icon && "pl-10",
                         className,
                     )}
                 />
             </div>
-            {error && <p className="text-xs text-rose-500">{error}</p>}
+            {error && <p className="text-xs text-destructive">{error}</p>}
         </div>
     );
 }

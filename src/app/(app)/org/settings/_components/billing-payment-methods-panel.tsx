@@ -13,11 +13,11 @@ export async function BillingPaymentMethodsPanel({
   ]);
 
   return (
-    <div className="rounded-2xl border border-[hsl(var(--border))] bg-[hsl(var(--card)/0.35)] p-5">
+    <div className="rounded-2xl border border-border bg-card/35 p-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-sm font-semibold text-[hsl(var(--foreground))]">Payment methods</p>
-          <p className="text-xs text-[hsl(var(--muted-foreground))]">
+          <p className="text-sm font-semibold text-foreground">Payment methods</p>
+          <p className="text-xs text-muted-foreground">
             Manage cards or direct debit mandates for this subscription.
           </p>
         </div>

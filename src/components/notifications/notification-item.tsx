@@ -2,13 +2,13 @@
 
 import { useTransition } from 'react';
 import { formatDistanceToNow } from 'date-fns';
-import { 
-  Bell, 
-  CheckCircle, 
-  AlertTriangle, 
-  FileText, 
-  Calendar, 
-  Clock, 
+import {
+  Bell,
+  CheckCircle,
+  AlertTriangle,
+  FileText,
+  Calendar,
+  Clock,
   Info,
   X
 } from 'lucide-react';
@@ -43,10 +43,17 @@ const TYPE_ICONS: Record<HRNotificationTypeCode, React.ElementType> = {
 };
 
 const PRIORITY_STYLES = {
-  low: 'border-l-2 border-l-slate-300',
-  medium: 'border-l-2 border-l-blue-500',
-  high: 'border-l-2 border-l-orange-500',
-  urgent: 'border-l-2 border-l-red-500',
+  low: 'border-l-2 border-l-border/60',
+  medium: 'border-l-2 border-l-primary/60',
+  high: 'border-l-2 border-l-secondary/70',
+  urgent: 'border-l-2 border-l-destructive/70',
+};
+
+const PRIORITY_LABELS = {
+  low: 'Low',
+  medium: 'Medium',
+  high: 'High',
+  urgent: 'Urgent',
 };
 
 export function NotificationItem({ notification, compact = false, onRead }: NotificationItemProps) {
@@ -70,7 +77,7 @@ export function NotificationItem({ notification, compact = false, onRead }: Noti
   };
 
   return (
-    <div 
+    <div
       className={cn(
         "relative flex gap-3 p-3 transition-colors hover:bg-muted/50 group",
         !notification.isRead && "bg-muted/20",
@@ -81,19 +88,24 @@ export function NotificationItem({ notification, compact = false, onRead }: Noti
       <div className={cn("mt-1 shrink-0", !notification.isRead && "text-primary")}>
         <Icon className="h-5 w-5" />
       </div>
-      
+
       <div className="flex-1 min-w-0 space-y-1">
         <div className="flex items-start justify-between gap-2">
-          <p className={cn("font-medium leading-none", !notification.isRead && "font-semibold")}>
-            {notification.title}
-          </p>
+          <div className="flex flex-wrap items-center gap-2">
+            <p className={cn("font-medium leading-none", !notification.isRead && "font-semibold")}>
+              {notification.title}
+            </p>
+            <span className="rounded border border-border/60 px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
+              {PRIORITY_LABELS[notification.priority]}
+            </span>
+          </div>
           {!compact && (
             <span className="text-xs text-muted-foreground whitespace-nowrap">
               {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
             </span>
           )}
         </div>
-        
+
         <p className={cn("text-muted-foreground line-clamp-2", compact && "text-xs")}>
           {notification.message}
         </p>
@@ -104,11 +116,11 @@ export function NotificationItem({ notification, compact = false, onRead }: Noti
           </p>
         )}
 
-        <div className="flex items-center gap-2 pt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="flex items-center gap-2 pt-1 opacity-100 transition-opacity">
           {!notification.isRead && (
-            <Button 
-              variant="ghost" 
-              size="sm" 
+            <Button
+              variant="ghost"
+              size="sm"
               className="h-6 px-2 text-xs"
               onClick={handleMarkRead}
               disabled={isPending}

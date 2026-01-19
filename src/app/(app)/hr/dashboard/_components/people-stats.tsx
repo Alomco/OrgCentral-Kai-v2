@@ -38,24 +38,24 @@ export async function PeopleStats({ authorization }: PeopleStatsProps) {
             <CardContent>
                 <div className="space-y-4">
                     <StatRow label="Total Employees" value={stats.total} icon={Users} color="text-primary" />
-                    <StatRow label="Active" value={stats.active} icon={UserCheck} color="text-emerald-500" />
-                    <StatRow label="On Leave" value={stats.onLeave} icon={UserMinus} color="text-amber-500" />
-                    <StatRow label="New this Month" value={stats.newThisMonth} icon={UserPlus} color="text-blue-500" />
+                    <StatRow label="Active" value={stats.active} icon={UserCheck} color="text-accent" />
+                    <StatRow label="On Leave" value={stats.onLeave} icon={UserMinus} color="text-secondary" />
+                    <StatRow label="New this Month" value={stats.newThisMonth} icon={UserPlus} color="text-primary" />
 
                     {/* Simple Bar Visualization */}
                     <div className="pt-4 space-y-2">
                         <div className="flex h-2 w-full overflow-hidden rounded-full bg-muted/50">
-                            <div className={cn('basis-0 bg-emerald-500 transition-all', activeFlexClass)} />
-                            <div className={cn('basis-0 bg-amber-500 transition-all', onLeaveFlexClass)} />
+                            <div className={cn('basis-0 bg-accent transition-all', activeFlexClass)} />
+                            <div className={cn('basis-0 bg-secondary transition-all', onLeaveFlexClass)} />
                         </div>
                         <div className="flex justify-between text-xs text-muted-foreground">
                             <div className="flex items-center gap-1">
-                                <div className="h-2 w-2 rounded-full bg-emerald-500" />
+                                <div className="h-2 w-2 rounded-full bg-accent" />
                                 <span>Active</span>
                                 <span className="text-[11px] text-muted-foreground">{activePercent}%</span>
                             </div>
                             <div className="flex items-center gap-1">
-                                <div className="h-2 w-2 rounded-full bg-amber-500" />
+                                <div className="h-2 w-2 rounded-full bg-secondary" />
                                 <span>On Leave</span>
                                 <span className="text-[11px] text-muted-foreground">{onLeavePercent}%</span>
                             </div>

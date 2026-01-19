@@ -116,7 +116,7 @@ export function assertPeopleProfileReader(
         action: request.action ?? HR_ACTION.READ,
         resourceType: HR_RESOURCE.HR_EMPLOYEE_PROFILE,
         resourceAttributes: request.resourceAttributes,
-        requiredPermissions: { employeeProfile: ['read'] },
+        requiredPermissions: { [HR_RESOURCE.HR_EMPLOYEE_PROFILE]: [HR_ACTION.READ] },
     });
 }
 
@@ -127,7 +127,7 @@ export function assertPeopleProfileEditor(
         action: request.action ?? HR_ACTION.UPDATE,
         resourceType: HR_RESOURCE.HR_EMPLOYEE_PROFILE,
         resourceAttributes: request.resourceAttributes,
-        requiredPermissions: { employeeProfile: ['update'] },
+        requiredPermissions: { [HR_RESOURCE.HR_EMPLOYEE_PROFILE]: [HR_ACTION.UPDATE] },
     });
 }
 
@@ -138,7 +138,7 @@ export function assertEmploymentContractReader(
         action: request.action ?? HR_ACTION.READ,
         resourceType: HR_RESOURCE.HR_EMPLOYMENT_CONTRACT,
         resourceAttributes: request.resourceAttributes,
-        requiredPermissions: { employmentContract: ['read'] },
+        requiredPermissions: { [HR_RESOURCE.HR_EMPLOYMENT_CONTRACT]: [HR_ACTION.READ] },
     });
 }
 
@@ -149,6 +149,6 @@ export function assertEmploymentContractEditor(
         action: request.action ?? HR_ACTION.UPDATE,
         resourceType: HR_RESOURCE.HR_EMPLOYMENT_CONTRACT,
         resourceAttributes: request.resourceAttributes,
-        requiredPermissions: { employmentContract: ['update'] },
+        requiredPermissions: { [HR_RESOURCE.HR_EMPLOYMENT_CONTRACT]: [HR_ACTION.UPDATE] },
     });
 }

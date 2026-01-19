@@ -102,10 +102,10 @@ export async function DashboardHero(props: DashboardViewerContext) {
 
     return (
         <div className="grid gap-4 lg:grid-cols-3">
-            <Card className="relative overflow-hidden border-none bg-linear-to-br from-blue-600 via-indigo-600 to-sky-600 text-white shadow-xl">
+            <Card className="relative overflow-hidden border border-border/60 bg-card text-card-foreground shadow-sm">
                 <CardHeader className="space-y-2">
                     <CardTitle className="text-lg font-semibold">Workforce pulse</CardTitle>
-                    <CardDescription className="text-blue-100">
+                    <CardDescription className="text-muted-foreground">
                         Live headcount and quick links for people ops.
                     </CardDescription>
                 </CardHeader>
@@ -114,57 +114,57 @@ export async function DashboardHero(props: DashboardViewerContext) {
                         <span className="text-4xl font-bold tracking-tight">
                             {employees.value ?? '—'}
                         </span>
-                        <Badge variant="secondary" className="bg-white/20 text-white hover:bg-white/30">
+                        <Badge variant="secondary" className="bg-muted/60 text-foreground">
                             {employees.hint}
                         </Badge>
                     </div>
-                    <div className="text-sm text-blue-50">
+                    <div className="text-sm text-muted-foreground">
                         {employees.state === 'locked' && 'Access is restricted for your role.'}
                         {employees.state === 'error' && employees.hint}
                         {employees.state === 'ready' && 'Track active workforce and onboarding progress.'}
                     </div>
                     <div className="flex flex-wrap gap-2">
-                        <Button asChild size="sm" variant="secondary" className="bg-white text-blue-700 hover:bg-blue-50">
+                        <Button asChild size="sm" variant="default">
                             <Link href="/hr/employees">Open directory</Link>
                         </Button>
-                        <Button asChild size="sm" variant="outline" className="border-white/40 text-white hover:bg-white/10">
+                        <Button asChild size="sm" variant="outline">
                             <Link href="/hr/onboarding/new">Onboard new hire</Link>
                         </Button>
                     </div>
                 </CardContent>
             </Card>
 
-            <Card className="border-none bg-linear-to-br from-emerald-50 via-white to-slate-50 shadow-lg dark:from-emerald-950/50 dark:via-slate-950/40 dark:to-slate-900/60">
+            <Card className="border border-border/60 bg-card text-card-foreground shadow-sm">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0">
                     <div className="space-y-1">
-                        <CardTitle className="text-base font-semibold text-emerald-900 dark:text-emerald-100">Compliance health</CardTitle>
-                        <CardDescription className="text-sm text-emerald-700 dark:text-emerald-200/80">
+                        <CardTitle className="text-base font-semibold">Compliance health</CardTitle>
+                        <CardDescription className="text-sm text-muted-foreground">
                             Your assigned items and status.
                         </CardDescription>
                     </div>
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 shadow-inner dark:bg-emerald-900/50 dark:text-emerald-200">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted/60 text-foreground shadow-inner">
                         <ShieldCheck className="h-5 w-5" />
                     </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="flex items-baseline gap-3">
-                        <span className="text-3xl font-semibold text-emerald-900 dark:text-white">
+                        <span className="text-3xl font-semibold">
                             {compliance.value ?? '—'}
                         </span>
-                        <Badge variant="outline" className="border-emerald-200 text-emerald-800 dark:border-emerald-800/80 dark:text-emerald-100">
+                        <Badge variant="outline" className="border-border/60 text-foreground">
                             {compliance.statusLabel}
                         </Badge>
                     </div>
-                    <p className="text-sm text-emerald-800 dark:text-emerald-200/80">{compliance.hint}</p>
+                    <p className="text-sm text-muted-foreground">{compliance.hint}</p>
                     <div className="flex gap-2">
-                        <Button asChild size="sm" variant="outline" className="border-emerald-200 text-emerald-800 hover:bg-emerald-50 dark:border-emerald-800/70 dark:text-emerald-100 dark:hover:bg-emerald-900/50">
+                        <Button asChild size="sm" variant="outline">
                             <Link href="/hr/compliance">Review items</Link>
                         </Button>
                     </div>
                 </CardContent>
             </Card>
 
-            <Card className="border-none bg-linear-to-br from-white via-slate-50 to-indigo-50 shadow-lg dark:from-slate-900/70 dark:via-slate-900 dark:to-indigo-900/40">
+            <Card className="border border-border/60 bg-card text-card-foreground shadow-sm">
                 <CardHeader className="flex flex-row items-start justify-between space-y-0">
                     <div className="space-y-1">
                         <CardTitle className="text-base font-semibold">Actions</CardTitle>
@@ -172,7 +172,7 @@ export async function DashboardHero(props: DashboardViewerContext) {
                             Move quickly between HR flows.
                         </CardDescription>
                     </div>
-                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 text-indigo-700 shadow-inner dark:bg-indigo-900/50 dark:text-indigo-200">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted/60 text-foreground shadow-inner">
                         <CalendarCheck className="h-4 w-4" />
                     </div>
                 </CardHeader>

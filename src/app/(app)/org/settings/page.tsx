@@ -33,17 +33,17 @@ export default async function OrgSettingsPage() {
     return (
         <div className="space-y-6 p-6">
             <div>
-                <p className="text-xs uppercase tracking-[0.18em] text-[hsl(var(--muted-foreground))]">Settings</p>
-                <h1 className="text-2xl font-semibold text-[hsl(var(--foreground))]">Organization settings</h1>
-                <p className="text-sm text-[hsl(var(--muted-foreground))]">
+                <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Settings</p>
+                <h1 className="text-2xl font-semibold text-foreground">Organization settings</h1>
+                <p className="text-sm text-muted-foreground">
                     Manage security, notifications, and billing preferences for {authorization.orgId}.
                 </p>
             </div>
             <div className="space-y-6">
                 <section className="space-y-3">
                     <div>
-                        <h2 className="text-lg font-semibold text-[hsl(var(--foreground))]">Access & invites</h2>
-                        <p className="text-sm text-[hsl(var(--muted-foreground))]">
+                        <h2 className="text-lg font-semibold text-foreground">Access & invites</h2>
+                        <p className="text-sm text-muted-foreground">
                             Control how people can join your organization.
                         </p>
                     </div>
@@ -53,8 +53,8 @@ export default async function OrgSettingsPage() {
                 </section>
                 <section className="space-y-3">
                     <div>
-                        <h2 className="text-lg font-semibold text-[hsl(var(--foreground))]">Security</h2>
-                        <p className="text-sm text-[hsl(var(--muted-foreground))]">
+                        <h2 className="text-lg font-semibold text-foreground">Security</h2>
+                        <p className="text-sm text-muted-foreground">
                             Set defaults for MFA and session controls.
                         </p>
                     </div>
@@ -64,8 +64,8 @@ export default async function OrgSettingsPage() {
                 </section>
                 <section className="space-y-3">
                     <div>
-                        <h2 className="text-lg font-semibold text-[hsl(var(--foreground))]">Notifications</h2>
-                        <p className="text-sm text-[hsl(var(--muted-foreground))]">
+                        <h2 className="text-lg font-semibold text-foreground">Notifications</h2>
+                        <p className="text-sm text-muted-foreground">
                             Configure admin digests and critical alerts.
                         </p>
                     </div>
@@ -75,8 +75,8 @@ export default async function OrgSettingsPage() {
                 </section>
                 <section className="space-y-3">
                     <div>
-                        <h2 className="text-lg font-semibold text-[hsl(var(--foreground))]">Billing</h2>
-                        <p className="text-sm text-[hsl(var(--muted-foreground))]">
+                        <h2 className="text-lg font-semibold text-foreground">Billing</h2>
+                        <p className="text-sm text-muted-foreground">
                             Manage billing contacts and renewal preferences.
                         </p>
                     </div>
@@ -137,5 +137,5 @@ async function BillingSettingsPanel({
 }
 
 function SettingsSkeleton() {
-    return <div className="h-28 w-full animate-pulse rounded-2xl bg-[hsl(var(--muted))]" />;
+    return <div className="h-28 w-full animate-pulse rounded-2xl bg-muted" />;
 }

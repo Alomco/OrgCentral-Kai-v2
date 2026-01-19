@@ -18,7 +18,7 @@ import {
 } from './org-profile-form-fields';
 
 const panelVariants = cva(
-    'rounded-2xl bg-[hsl(var(--card)/0.6)] p-6 backdrop-blur transition-smooth motion-reduce:transition-none',
+    'rounded-2xl bg-card/60 p-6 backdrop-blur transition-smooth motion-reduce:transition-none',
 );
 
 export function OrgProfileForm({ organization }: { organization: OrganizationData }) {
@@ -91,8 +91,8 @@ export function OrgProfileForm({ organization }: { organization: OrganizationDat
         <form action={formAction} className={panelVariants()}>
             <fieldset disabled={pending} className="grid gap-6">
                 <div>
-                    <p className="text-sm font-semibold text-[hsl(var(--foreground))]">Profile settings</p>
-                    <p className="text-xs text-[hsl(var(--muted-foreground))]">
+                    <p className="text-sm font-semibold text-foreground">Profile settings</p>
+                    <p className="text-xs text-muted-foreground">
                         Update the organization details used across the platform.
                     </p>
                 </div>
@@ -126,8 +126,8 @@ export function OrgProfileForm({ organization }: { organization: OrganizationDat
 
                 <div className="grid gap-4">
                     <div>
-                        <p className="text-sm font-semibold text-[hsl(var(--foreground))]">Contacts</p>
-                        <p className="text-xs text-[hsl(var(--muted-foreground))]">
+                        <p className="text-sm font-semibold text-foreground">Contacts</p>
+                        <p className="text-xs text-muted-foreground">
                             Leave blank to clear contact records.
                         </p>
                     </div>
@@ -186,7 +186,7 @@ export function OrgProfileForm({ organization }: { organization: OrganizationDat
                     <Button type="submit" size="sm" className="px-4" disabled={pending}>
                         {pending ? 'Saving...' : 'Save changes'}
                     </Button>
-                    {formSuccess ? <p className="text-xs text-[hsl(var(--muted-foreground))]">{formSuccess}</p> : null}
+                    {formSuccess ? <p className="text-xs text-muted-foreground">{formSuccess}</p> : null}
                 </div>
 
                 {formError ? (

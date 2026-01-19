@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils'
 import type { NavItem } from './app-sidebar-nav'
 
 const activeIconTileClassName =
-    'bg-sidebar-primary/20 text-sidebar-primary-foreground shadow-[0_0_0_1px_hsl(var(--primary)/0.35),0_10px_22px_-16px_hsl(var(--primary)/0.45)]'
+    'bg-sidebar-primary/20 text-sidebar-primary-foreground shadow-[0_0_0_1px_oklch(var(--primary)/0.35),0_10px_22px_-16px_oklch(var(--primary)/0.45)]'
 
 export function StandardNavItem({ item, isActive, open, isSubItem = false }: {
     item: NavItem
@@ -31,7 +31,7 @@ export function StandardNavItem({ item, isActive, open, isSubItem = false }: {
                 'hover:translate-x-1 hover:scale-[1.02] group-data-[collapsible=icon]:hover:translate-x-0 group-data-[collapsible=icon]:hover:scale-105',
                 isSubItem && 'hover:translate-x-1 hover:scale-[1.02]',
                 isActive &&
-                'relative bg-sidebar-accent/50 shadow-[0_0_0_1px_hsl(var(--sidebar-border)/0.55),0_12px_24px_-20px_hsl(var(--primary)/0.35)] before:absolute before:inset-y-2 before:left-2 before:w-1 before:rounded-full before:bg-linear-to-b before:from-primary/80 before:via-primary/30 before:to-transparent before:shadow-[0_0_10px_hsl(var(--primary)/0.4)]',
+                'relative bg-sidebar-accent/50 shadow-[0_0_0_1px_oklch(var(--sidebar-border)/0.55),0_12px_24px_-20px_oklch(var(--primary)/0.35)] before:absolute before:inset-y-2 before:left-2 before:w-1 before:rounded-full before:bg-primary/40 before:shadow-[0_0_10px_oklch(var(--primary)/0.3)]',
                 !isActive &&
                 'hover:bg-sidebar-accent/30'
             )}

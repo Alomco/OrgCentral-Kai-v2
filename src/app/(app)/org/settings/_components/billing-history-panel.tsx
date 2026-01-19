@@ -11,10 +11,10 @@ export async function BillingHistoryPanel({
   const invoices = await getBillingInvoicesForUi(authorization);
 
   return (
-    <div className="rounded-2xl border border-[hsl(var(--border))] bg-[hsl(var(--card)/0.35)] p-5">
+    <div className="rounded-2xl border border-border bg-card/35 p-5">
       <div>
-        <p className="text-sm font-semibold text-[hsl(var(--foreground))]">Billing history</p>
-        <p className="text-xs text-[hsl(var(--muted-foreground))]">
+        <p className="text-sm font-semibold text-foreground">Billing history</p>
+        <p className="text-xs text-muted-foreground">
           Recent invoices for your subscription.
         </p>
       </div>
@@ -24,7 +24,7 @@ export async function BillingHistoryPanel({
             <InvoiceRow key={invoice.id} invoice={invoice} />
           ))
         ) : (
-          <p className="text-sm text-[hsl(var(--muted-foreground))]">
+          <p className="text-sm text-muted-foreground">
             No invoices yet. Your first charge will appear here.
           </p>
         )}
@@ -40,20 +40,20 @@ function InvoiceRow({ invoice }: { invoice: BillingInvoiceData }) {
   const invoiceLink = invoice.invoicePdf ?? invoice.invoiceUrl;
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--background))] p-3 text-sm">
+    <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-background p-3 text-sm">
       <div>
-        <p className="font-semibold text-[hsl(var(--foreground))]">{period}</p>
-        <p className="text-xs text-[hsl(var(--muted-foreground))]">
+        <p className="font-semibold text-foreground">{period}</p>
+        <p className="text-xs text-muted-foreground">
           {formatDate(invoice.periodStart)} - {formatDate(invoice.periodEnd)}
         </p>
       </div>
       <div className="flex items-center gap-3">
-        <span className="text-sm font-semibold text-[hsl(var(--foreground))]">{amount}</span>
+        <span className="text-sm font-semibold text-foreground">{amount}</span>
         <Badge variant={statusTone}>{formatStatus(invoice.status)}</Badge>
         {invoiceLink ? (
           <a
             href={invoiceLink}
-            className="text-xs font-medium text-[hsl(var(--primary))] hover:underline"
+            className="text-xs font-medium text-primary hover:underline"
             target="_blank"
             rel="noreferrer"
           >

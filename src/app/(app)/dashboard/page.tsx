@@ -44,11 +44,8 @@ function isDevelopmentAdminEmail(value: string | null): boolean {
 
 export default function DashboardPage() {
     return (
-        <div className="min-h-screen bg-linear-to-br from-blue-50 via-indigo-50/50 to-purple-50 dark:from-slate-950 dark:via-blue-950/30 dark:to-purple-950/30 relative overflow-hidden">
-            {/* Ambient glow effects */}
-            <div className="absolute top-20 left-10 w-96 h-96 bg-blue-400/20 dark:bg-blue-500/10 rounded-full blur-3xl" />
-            <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-400/20 dark:bg-purple-500/10 rounded-full blur-3xl" />
-            <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8 relative z-10">
+        <div className="min-h-screen bg-background">
+            <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
                 <div className="space-y-8">
                     <Suspense fallback={<DashboardPageFallback />}>
                         <DashboardPageContent />

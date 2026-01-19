@@ -41,7 +41,7 @@ export function TextField({
     const errorId = error ? `${name}-error` : undefined;
     return (
         <label className="grid gap-1">
-            <span className="text-xs font-medium text-[hsl(var(--muted-foreground))]">{label}</span>
+            <span className="text-xs font-medium text-muted-foreground">{label}</span>
             <Input
                 name={name}
                 type={type}
@@ -74,7 +74,7 @@ export function TextAreaField({
     const errorId = error ? `${name}-error` : undefined;
     return (
         <label className="grid gap-1">
-            <span className="text-xs font-medium text-[hsl(var(--muted-foreground))]">{label}</span>
+            <span className="text-xs font-medium text-muted-foreground">{label}</span>
             <Textarea
                 name={name}
                 defaultValue={defaultValue}
@@ -101,8 +101,8 @@ export function ContactCard({
     errorFor: (name: string) => string | undefined;
 }) {
     return (
-        <div className="grid gap-3 rounded-xl bg-[hsl(var(--muted)/0.25)] p-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[hsl(var(--muted-foreground))]">
+        <div className="grid gap-3 rounded-xl bg-muted/25 p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                 {title}
             </p>
             {fields.map((field) => (

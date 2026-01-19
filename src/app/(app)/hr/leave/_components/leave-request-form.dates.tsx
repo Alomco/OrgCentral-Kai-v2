@@ -85,7 +85,7 @@ export function LeaveDateRangeFields({
                         aria-label="Half day"
                         aria-describedby="isHalfDay-help"
                         disabled={pending}
-                        className={`relative h-9 w-16 border border-white/25 ${focusRingClass} data-[state=checked]:bg-primary data-[state=checked]:border-primary/80 data-[state=unchecked]:bg-muted shadow-[inset_0_0_0_1px_rgba(255,255,255,0.12)] after:absolute after:left-1 after:top-1 after:h-7 after:w-7 after:rounded-full after:bg-white after:transition-transform data-[state=checked]:after:translate-x-7 data-[state=unchecked]:after:translate-x-0`}
+                        className={`relative h-9 w-16 border border-border/60 ${focusRingClass} data-[state=checked]:bg-primary data-[state=checked]:border-primary/80 data-[state=unchecked]:bg-muted shadow-[inset_0_0_0_1px_oklch(var(--border)/0.25)] after:absolute after:left-1 after:top-1 after:h-7 after:w-7 after:rounded-full after:bg-background after:shadow-sm after:transition-transform data-[state=checked]:after:translate-x-7 data-[state=unchecked]:after:translate-x-0`}
                     />
                 </div>
                 <div className="mt-3 rounded-md border bg-muted/60 px-3 py-2 text-xs text-muted-foreground">

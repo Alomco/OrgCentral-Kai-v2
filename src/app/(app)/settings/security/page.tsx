@@ -40,11 +40,9 @@ export default async function SecuritySettingsPage() {
     return (
         <div className="space-y-6 p-6">
             <header className="space-y-2">
-                <p className="text-xs uppercase tracking-[0.18em] text-[hsl(var(--muted-foreground))]">
-                    Settings
-                </p>
-                <h1 className="text-2xl font-semibold text-[hsl(var(--foreground))]">Security & account</h1>
-                <p className="text-sm text-[hsl(var(--muted-foreground))]">
+                <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Settings</p>
+                <h1 className="text-2xl font-semibold text-foreground">Security & account</h1>
+                <p className="text-sm text-muted-foreground">
                     Review sign-in protection, sessions, recovery, and notification controls for your account.
                 </p>
             </header>

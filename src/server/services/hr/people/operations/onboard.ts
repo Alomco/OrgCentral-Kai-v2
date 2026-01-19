@@ -12,6 +12,8 @@ import type {
 } from '@/server/repositories/contracts/hr/onboarding/invitation-repository-contract';
 import type { IOrganizationRepository } from '@/server/repositories/contracts/org/organization/organization-repository-contract';
 import type { OrganizationData } from '@/server/types/leave-types';
+import { INVITATION_KIND, withInvitationKind } from '@/server/invitations/invitation-kinds';
+import { buildMetadata } from '@/server/use-cases/shared/builders';
 
 export async function onboardEmployeeOperation(
     runtime: PeopleOrchestrationRuntime,
@@ -103,10 +105,10 @@ async function issueOnboardingInvitation(params: {
         email: params.inviteEmail,
         displayName,
         employeeId: params.profileDraft.employeeNumber,
-        employmentType: params.profileDraft.employmentType ?? null,
-        position: params.profileDraft.jobTitle ?? null,
-        startDate: toIsoString(params.profileDraft.startDate),
-        onboardingTemplateId: params.onboardingTemplateId ?? null,
+        employmentType: params.profileDraft.employmentType ?? undefined,
+        position: params.profileDraft.jobTitle ?? undefined,
+        startDate: toIsoString(params.profileDraft.startDate) ?? undefined,
+        onboardingTemplateId: params.onboardingTemplateId ?? undefined,
         roles: params.profileDraft.roles ?? [],
     };
 
@@ -116,10 +118,13 @@ async function issueOnboardingInvitation(params: {
         targetEmail: params.inviteEmail,
         invitedByUserId: params.authorization.userId,
         onboardingData,
-        metadata: {
-            correlationId: params.authorization.correlationId,
-            auditSource: params.authorization.auditSource,
-        },
+        metadata: withInvitationKind(
+            buildMetadata({
+                correlationId: params.authorization.correlationId,
+                auditSource: params.authorization.auditSource,
+            }),
+            INVITATION_KIND.HR_ONBOARDING,
+        ),
     });
 
     return invitation.token;

@@ -10,6 +10,10 @@ import { CACHE_SCOPE_ONBOARDING_INVITATIONS } from '@/server/repositories/cache-
 import { RepositoryAuthorizationError } from '@/server/repositories/security';
 import { registerOrgCacheTag } from '@/server/lib/cache-tags';
 import { toPrismaInputJson } from '@/server/repositories/prisma/helpers/prisma-utils';
+import { coerceOnboardingData, onboardingDataSchema, toInvitationJson } from '@/server/invitations/onboarding-data';
+import { hasOnboardingFingerprint, isJsonRecord } from '@/server/invitations/invitation-fingerprint';
+import { getInvitationKind, INVITATION_KIND, withInvitationKind } from '@/server/invitations/invitation-kinds';
+import type { JsonRecord, JsonValue } from '@/server/types/json';
 import type { DataClassificationLevel, DataResidencyZone } from '@/server/types/tenant';
 
 type InvitationDelegate = PrismaClient['invitation'];
@@ -27,6 +31,9 @@ export class PrismaOnboardingInvitationRepository
   }
 
   async createInvitation(payload: OnboardingInvitationCreateInput): Promise<OnboardingInvitation> {
+    const onboardingData = onboardingDataSchema.parse(payload.onboardingData);
+    const onboardingJson = toInvitationJson(onboardingData);
+    const metadata = withInvitationKind(payload.metadata, INVITATION_KIND.HR_ONBOARDING);
     const record = await this.invitation.create({
       data: {
         token: `${payload.orgId}-${randomUUID()}`,
@@ -34,13 +41,13 @@ export class PrismaOnboardingInvitationRepository
         organizationName: payload.organizationName,
         targetEmail: payload.targetEmail,
         onboardingData: toJsonNullInput(
-          payload.onboardingData as Prisma.InputJsonValue | Prisma.JsonValue | null | undefined,
+          onboardingJson as Prisma.InputJsonValue | Prisma.JsonValue | null | undefined,
         ),
         status: 'pending',
         invitedByUserId: payload.invitedByUserId ?? null,
         expiresAt: payload.expiresAt ?? null,
         metadata: toJsonNullInput(
-          payload.metadata as Prisma.InputJsonValue | Prisma.JsonValue | null | undefined,
+          metadata as Prisma.InputJsonValue | Prisma.JsonValue | null | undefined,
         ),
         securityContext: toJsonNullInput(
           payload.securityContext as Prisma.InputJsonValue | Prisma.JsonValue | null | undefined,
@@ -68,11 +75,13 @@ export class PrismaOnboardingInvitationRepository
       take: limit,
     });
 
-    return records.map((record) => this.mapToDomain(record));
+    return records
+      .filter((record) => isOnboardingInvitation(record))
+      .map((record) => this.mapToDomain(record));
   }
 
   async getActiveInvitationByEmail(orgId: string, email: string): Promise<OnboardingInvitation | null> {
-    const record = await this.invitation.findFirst({
+    const records = await this.invitation.findMany({
       where: {
         orgId,
         targetEmail: { equals: email, mode: 'insensitive' },
@@ -80,9 +89,11 @@ export class PrismaOnboardingInvitationRepository
         OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
       },
       orderBy: { createdAt: 'desc' },
+      take: 10,
     });
 
-    if (record) {
+    const match = records.find((record) => isOnboardingInvitation(record));
+    if (match) {
       registerOrgCacheTag(
         orgId,
         CACHE_SCOPE_ONBOARDING_INVITATIONS,
@@ -91,12 +102,12 @@ export class PrismaOnboardingInvitationRepository
       );
     }
 
-    return record ? this.mapToDomain(record) : null;
+    return match ? this.mapToDomain(match) : null;
   }
 
   async getInvitationByToken(token: string): Promise<OnboardingInvitation | null> {
     const record = await this.invitation.findUnique({ where: { token } });
-    if (record) {
+    if (record && isOnboardingInvitation(record)) {
       registerOrgCacheTag(
         record.orgId,
         CACHE_SCOPE_ONBOARDING_INVITATIONS,
@@ -104,11 +115,11 @@ export class PrismaOnboardingInvitationRepository
         PrismaOnboardingInvitationRepository.DEFAULT_RESIDENCY,
       );
     }
-    return record ? this.mapToDomain(record) : null;
+    return record && isOnboardingInvitation(record) ? this.mapToDomain(record) : null;
   }
 
   async markAccepted(orgId: string, token: string, acceptedByUserId: string): Promise<void> {
-    await this.assertOrgScope(orgId, token);
+    await this.assertOnboardingScope(orgId, token);
     await this.invitation.update({
       where: { token },
       data: {
@@ -121,9 +132,9 @@ export class PrismaOnboardingInvitationRepository
   }
 
   async revokeInvitation(orgId: string, token: string, revokedByUserId: string, reason?: string): Promise<void> {
-    const record = await this.assertOrgScope(orgId, token);
-    const metadata = (record.metadata ?? {}) as Record<string, unknown>;
-    const nextMetadata = {
+    const record = await this.assertOnboardingScope(orgId, token);
+    const metadata = toJsonRecord(record.metadata) ?? {};
+    const nextMetadata: JsonRecord = {
       ...metadata,
       revocationReason: reason ?? metadata.revocationReason,
     };
@@ -150,9 +161,9 @@ export class PrismaOnboardingInvitationRepository
       targetEmail: record.targetEmail,
       status: record.status as OnboardingInvitation['status'],
       invitedByUserId: record.invitedByUserId,
-      onboardingData: record.onboardingData,
-      metadata: record.metadata ?? undefined,
-      securityContext: record.securityContext ?? undefined,
+      onboardingData: coerceOnboardingData(record.onboardingData, record.targetEmail),
+      metadata: toJsonRecord(record.metadata),
+      securityContext: toJsonRecord(record.securityContext),
       ipAddress: record.ipAddress ?? undefined,
       userAgent: record.userAgent ?? undefined,
       expiresAt: record.expiresAt ?? undefined,
@@ -165,13 +176,26 @@ export class PrismaOnboardingInvitationRepository
     };
   }
 
-  private async assertOrgScope(orgId: string, token: string): Promise<PrismaInvitation> {
+  private async assertOnboardingScope(orgId: string, token: string): Promise<PrismaInvitation> {
     const record = await this.invitation.findUnique({ where: { token } });
-    if (record?.orgId !== orgId) {
+    if (record?.orgId !== orgId || !isOnboardingInvitation(record)) {
       throw new RepositoryAuthorizationError('Invitation not found for this organization.');
     }
     return record;
   }
+}
+
+function isOnboardingInvitation(record: PrismaInvitation): boolean {
+  const metadata = toJsonRecord(record.metadata);
+  const kind = getInvitationKind(metadata);
+  if (kind) {
+    return kind === INVITATION_KIND.HR_ONBOARDING;
+  }
+  return hasOnboardingFingerprint(record.onboardingData as JsonValue);
+}
+
+function toJsonRecord(value: Prisma.JsonValue | null | undefined): JsonRecord | undefined {
+  return isJsonRecord(value as JsonValue | null | undefined) ? (value as JsonRecord) : undefined;
 }
 
 function toJsonNullInput(

@@ -50,9 +50,10 @@ export function AppSidebar({ authorization, organizationLabel }: AppSidebarProps
         <Sidebar
             collapsible="icon"
             className={styles.sidebar}
+            data-ui-surface="container"
         >
             <nav aria-label="Primary" className="flex h-full flex-col">
-                <SidebarHeader className={styles.sidebarHeader}>
+                <SidebarHeader className={styles.sidebarHeader} data-ui-surface="container">
                     <div className={styles.headerInner} data-collapsed={!open}>
                         <SidebarTrigger className={styles.sidebarTrigger} />
                         <Link
@@ -79,7 +80,7 @@ export function AppSidebar({ authorization, organizationLabel }: AppSidebarProps
                     </Accordion>
                 </SidebarContent>
 
-                <SidebarFooter className={styles.sidebarFooter}>
+                <SidebarFooter className={styles.sidebarFooter} data-ui-surface="container">
                     <SidebarMenu>
                         <SidebarMenuItem>
                             <DropdownMenu>

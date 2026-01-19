@@ -56,9 +56,9 @@ export function ThemeSwitcher() {
                     aria-label="Open theme and style switcher"
                     className={cn(
                         'flex items-center gap-2 px-3 py-2 rounded-lg',
-                        'bg-linear-to-r from-primary/10 to-accent/10',
-                        'border-primary/20',
-                        'hover:from-primary/20 hover:to-accent/20',
+                        'bg-muted/50',
+                        'border-border/60',
+                        'hover:bg-muted/70',
                         'transition-all duration-300',
                         'text-sm font-medium'
                     )}
@@ -68,7 +68,7 @@ export function ThemeSwitcher() {
                 </Button>
             </PopoverTrigger>
             <PopoverContent
-                className="w-80 p-0 overflow-hidden rounded-xl border bg-popover backdrop-blur-xl shadow-2xl"
+                className="w-80 overflow-hidden rounded-xl border border-border/60 bg-popover/95 p-0 text-popover-foreground shadow-xl backdrop-blur-md"
                 align="start"
                 sideOffset={10}
             >

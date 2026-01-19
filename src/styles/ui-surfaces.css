@@ -6,30 +6,36 @@
     --ui-surface-interactive-opacity: clamp(0.92, calc(var(--ui-card-opacity) + 0.03), 1);
     --ui-popup-opacity-min: 0.9;
     --ui-surface-popover-opacity: clamp(var(--ui-popup-opacity-min), calc(var(--ui-card-opacity) + 0.02), 1);
-    --ui-surface-container-fill: hsl(var(--card) / var(--ui-surface-container-opacity));
-    --ui-surface-item-fill: hsl(var(--card) / var(--ui-surface-item-opacity));
-    --ui-surface-interactive-fill: hsl(var(--card) / var(--ui-surface-interactive-opacity));
-    --ui-surface-popover-fill: hsl(var(--popover) / var(--ui-surface-popover-opacity));
+    --ui-surface-container-fill: oklch(var(--card) / var(--ui-surface-container-opacity));
+    --ui-surface-item-fill: oklch(var(--card) / var(--ui-surface-item-opacity));
+    --ui-surface-interactive-fill: oklch(var(--card) / var(--ui-surface-interactive-opacity));
+    --ui-surface-popover-fill: oklch(var(--popover) / var(--ui-surface-popover-opacity));
+    --ui-surface-container-bg: var(--ui-surface-container-fill);
+    --ui-surface-item-bg: var(--ui-surface-item-fill);
+    --ui-surface-interactive-bg: var(--ui-surface-interactive-fill);
+    --ui-surface-popover-bg: var(--ui-surface-popover-fill);
     --ui-surface-blur: var(--ui-backdrop-blur);
     --ui-surface-item-blur: clamp(0px, calc(var(--ui-backdrop-blur) - 8px), 10px);
     --ui-surface-interactive-blur: clamp(0px, calc(var(--ui-backdrop-blur) - 6px), 12px);
-    --ui-surface-outline-weak: 0 0 0 1px hsl(var(--ui-surface-tint) / clamp(0.12, calc(var(--ui-border-opacity) - 0.06), 0.3));
-    --ui-surface-outline: 0 0 0 1px hsl(var(--ui-surface-tint) / clamp(0.18, calc(var(--ui-border-opacity) + 0.02), 0.45));
-    --ui-surface-outline-strong: 0 0 0 1px hsl(var(--ui-surface-tint) / clamp(0.26, calc(var(--ui-border-opacity) + 0.1), 0.6));
-    --ui-surface-depth-sm: 0 8px 16px -14px hsl(var(--ui-surface-depth-color) / 0.18);
-    --ui-surface-depth-md: 0 14px 26px -18px hsl(var(--ui-surface-depth-color) / 0.24);
-    --ui-surface-depth-lg: 0 22px 44px -30px hsl(var(--ui-surface-depth-color) / 0.3);
+    --ui-surface-outline-weak: 0 0 0 1px oklch(var(--ui-surface-tint) / clamp(0.12, calc(var(--ui-border-opacity) - 0.06), 0.3));
+    --ui-surface-outline: 0 0 0 1px oklch(var(--ui-surface-tint) / clamp(0.18, calc(var(--ui-border-opacity) + 0.02), 0.45));
+    --ui-surface-outline-strong: 0 0 0 1px oklch(var(--ui-surface-tint) / clamp(0.26, calc(var(--ui-border-opacity) + 0.1), 0.6));
+    --ui-surface-depth-sm: 0 8px 16px -14px oklch(var(--ui-surface-depth-color) / 0.18);
+    --ui-surface-depth-md: 0 14px 26px -18px oklch(var(--ui-surface-depth-color) / 0.24);
+    --ui-surface-depth-lg: 0 22px 44px -30px oklch(var(--ui-surface-depth-color) / 0.3);
     --ui-surface-container-shadow: var(--ui-surface-outline), var(--ui-card-shadow), var(--ui-surface-depth-lg);
     --ui-surface-item-shadow: var(--ui-surface-outline-weak), var(--shadow-md), var(--ui-surface-depth-md);
     --ui-surface-interactive-shadow: var(--ui-surface-outline), var(--shadow-sm), var(--ui-surface-depth-sm);
-    --ui-surface-interactive-shadow-hover: var(--ui-surface-outline-strong), 0 14px 30px -18px hsl(var(--primary) / clamp(0.08, calc(0.1 + var(--ui-glow-intensity)), 0.45)), 0 22px 44px -30px hsl(var(--ui-surface-depth-color) / 0.32);
+    --ui-surface-interactive-shadow-hover: var(--ui-surface-outline-strong), 0 14px 30px -18px oklch(var(--primary) / clamp(0.08, calc(0.1 + var(--ui-glow-intensity)), 0.45)), 0 22px 44px -30px oklch(var(--ui-surface-depth-color) / 0.32);
     --ui-surface-shadow: var(--ui-surface-container-shadow);
     --ui-surface-fill: var(--ui-surface-container-fill);
+    --ui-surface-bg: var(--ui-surface-container-bg);
 }
 
 [data-ui-surface="container"] {
     --ui-surface-fill: var(--ui-surface-container-fill);
     --ui-surface-shadow: var(--ui-surface-container-shadow);
+    --ui-surface-bg: var(--ui-surface-container-bg);
     --ui-border-glow-opacity: var(--ui-border-glow-opacity);
     --ui-border-glow-opacity-hover: var(--ui-border-glow-opacity-hover);
 }
@@ -38,9 +44,10 @@
     --ui-surface-fill: var(--ui-surface-item-fill);
     --ui-surface-shadow: var(--ui-surface-item-shadow);
     --ui-surface-blur: var(--ui-surface-item-blur);
+    --ui-surface-bg: var(--ui-surface-item-bg);
     --ui-border-glow-opacity: 0;
     --ui-border-glow-opacity-hover: 0;
-    --ui-border-gradient: linear-gradient(135deg, transparent, transparent);
+    --ui-border-gradient: none;
     --ui-border-animation: none;
 }
 
@@ -48,8 +55,9 @@
     --ui-surface-fill: var(--ui-surface-interactive-fill);
     --ui-surface-shadow: var(--ui-surface-interactive-shadow);
     --ui-surface-blur: var(--ui-surface-interactive-blur);
+    --ui-surface-bg: var(--ui-surface-interactive-bg);
     --ui-border-glow-opacity: 0;
-    --ui-border-gradient: linear-gradient(135deg, hsl(var(--primary) / 0.45), hsl(var(--accent) / 0.4));
+    --ui-border-gradient: none;
     --ui-border-animation: none;
 }
 

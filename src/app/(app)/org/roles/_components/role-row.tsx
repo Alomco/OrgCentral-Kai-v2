@@ -12,10 +12,10 @@ export function RoleRow({ role }: { role: OrgRoleRow }) {
     const permissionsText = serializePermissionsToText(role.permissions);
 
     return (
-        <div className="rounded-xl bg-[hsl(var(--muted)/0.35)] p-3">
+        <div className="rounded-xl bg-muted/35 p-3">
             <div className="flex flex-col gap-1">
-                <p className="text-sm font-semibold text-[hsl(var(--foreground))]">{role.name}</p>
-                <p className="text-xs text-[hsl(var(--muted-foreground))]">{role.description ?? 'No description'}</p>
+                <p className="text-sm font-semibold text-foreground">{role.name}</p>
+                <p className="text-xs text-muted-foreground">{role.description ?? 'No description'}</p>
             </div>
 
             <RoleEditor

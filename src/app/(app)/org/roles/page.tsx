@@ -25,19 +25,19 @@ export default async function OrgRolesPage() {
     return (
         <div className="space-y-6 p-6">
             <div>
-                <p className="text-xs uppercase tracking-[0.18em] text-[hsl(var(--muted-foreground))]">Roles</p>
-                <h1 className="text-2xl font-semibold text-[hsl(var(--foreground))]">Organization roles</h1>
-                <p className="text-sm text-[hsl(var(--muted-foreground))]">
+                <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Roles</p>
+                <h1 className="text-2xl font-semibold text-foreground">Organization roles</h1>
+                <p className="text-sm text-muted-foreground">
                     Manage custom roles and permissions for your organization.
                 </p>
             </div>
 
             <RoleCreateForm />
 
-            <div className="rounded-2xl bg-[hsl(var(--card)/0.6)] p-6 backdrop-blur">
+            <div className="rounded-2xl bg-card/60 p-6 backdrop-blur">
                 <div className="grid gap-3">
                     {roles.length === 0 ? (
-                        <p className="text-sm text-[hsl(var(--muted-foreground))]">No roles found.</p>
+                        <p className="text-sm text-muted-foreground">No roles found.</p>
                     ) : (
                         roles.map((role) => (
                             <RoleRow

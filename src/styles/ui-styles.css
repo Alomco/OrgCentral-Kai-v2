@@ -19,7 +19,7 @@
     --ui-surface-tint: var(--border);
     --ui-surface-depth-color: var(--foreground);
     /* Strict Card Backgrounds - Never fully transparent */
-    --ui-surface-fill: hsl(var(--card) / 0.85); /* Default fallback */
+    --ui-surface-fill: oklch(var(--card) / 0.85); /* Default fallback */
 
     /* Interactive State Tokens */
     --ui-hover-scale: 1.02;
@@ -36,74 +36,74 @@
     --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
     --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
     --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-    --shadow-glow: 0 8px 24px -4px hsl(var(--primary) / 0.25);
+    --shadow-glow: 0 8px 24px -4px oklch(var(--primary) / 0.25);
 
     /* Mapped Variables */
     --ui-card-shadow: var(--shadow-glow);
     --ui-border-radius: var(--radius-lg);
-    --ui-input-shadow: inset 0 0 0 1px hsl(var(--border) / 0.35), 0 6px 14px -12px hsl(var(--foreground) / 0.3);
-    --ui-control-shadow: 0 0 0 1px hsl(var(--border) / var(--ui-border-opacity));
-    --ui-focus-shadow: 0 0 0 1px hsl(var(--primary) / 0.45), 0 0 0 6px hsl(var(--primary) / 0.2);
+    --ui-input-shadow: inset 0 0 0 1px oklch(var(--border) / 0.35), 0 6px 14px -12px oklch(var(--foreground) / 0.3);
+    --ui-control-shadow: 0 0 0 1px oklch(var(--border) / var(--ui-border-opacity));
+    --ui-focus-shadow: 0 0 0 1px oklch(var(--primary) / 0.45), 0 0 0 6px oklch(var(--primary) / 0.2);
     --ui-border-glow-opacity: 0;
     --ui-border-glow-opacity-hover: 0;
     --ui-border-glow-blur: 2px;
-    --ui-border-gradient: linear-gradient(135deg, transparent, transparent);
+    --ui-border-gradient: none;
     --ui-border-animation: none;
 }
 
 [data-ui-style="glass-neon"] {
     --ui-surface-tint: var(--primary);
-    --ui-surface-fill: hsl(var(--card) / 0.3); /* Restore deep vibrancy */
+    --ui-surface-fill: oklch(var(--card) / 0.3); /* Restore deep vibrancy */
+    --ui-surface-container-bg: linear-gradient(135deg in oklab,
+        oklch(var(--card) / 0.52),
+        oklch(var(--primary) / 0.22) 55%,
+        oklch(var(--accent) / 0.16));
     --ui-surface-depth-color: var(--primary);
-    --ui-surface-depth-md: 0 16px 32px -22px hsl(var(--primary) / 0.32);
-    --ui-surface-depth-lg: 0 20px 42px -28px hsl(var(--primary) / 0.4);
-    --ui-input-shadow: inset 0 0 0 1px hsl(var(--primary) / 0.25), 0 10px 20px -14px hsl(var(--primary) / 0.35);
-    --ui-control-shadow: 0 0 0 1px hsl(var(--primary) / 0.35);
-    --ui-focus-shadow: 0 0 0 1px hsl(var(--primary) / 0.55), 0 0 0 8px hsl(var(--primary) / 0.25);
+    --ui-surface-depth-md: 0 16px 32px -22px oklch(var(--primary) / 0.32);
+    --ui-surface-depth-lg: 0 20px 42px -28px oklch(var(--primary) / 0.4);
+    --ui-input-shadow: inset 0 0 0 1px oklch(var(--primary) / 0.25), 0 10px 20px -14px oklch(var(--primary) / 0.35);
+    --ui-control-shadow: 0 0 0 1px oklch(var(--primary) / 0.35);
+    --ui-focus-shadow: 0 0 0 1px oklch(var(--primary) / 0.55), 0 0 0 8px oklch(var(--primary) / 0.25);
     --ui-border-width: 3px;
     --ui-border-glow-opacity: 0.18;
     --ui-border-glow-opacity-hover: 0.35;
     --ui-border-glow-blur: 4px;
-    --ui-border-gradient: conic-gradient(
-        from var(--border-angle-1),
-        transparent 0deg,
-        hsl(var(--primary) / 0.7) 90deg,
-        transparent 180deg,
-        hsl(var(--accent) / 0.7) 270deg,
-        transparent 360deg
-    );
-    --ui-border-animation: rotateBorderAngles 6s linear infinite;
+    --ui-border-gradient: none;
+    --ui-border-animation: none;
 }
 
 [data-ui-style="clean-corporate"] {
     --ui-surface-tint: var(--border);
-    --ui-surface-fill: hsl(var(--card)); /* Solid, professional */
+    --ui-surface-fill: oklch(var(--card)); /* Solid, professional */
     --ui-surface-depth-color: var(--foreground);
-    --ui-surface-outline-weak: inset 0 0 0 1px hsl(var(--border) / 0.3), inset 0 1px 0 hsl(var(--background) / 0.5);
-    --ui-surface-outline: inset 0 0 0 1px hsl(var(--border) / 0.4), inset 0 1px 0 hsl(var(--background) / 0.6);
-    --ui-input-shadow: inset 0 0 0 1px hsl(var(--border) / 0.5);
-    --ui-control-shadow: inset 0 0 0 1px hsl(var(--border) / 0.5);
-    --ui-focus-shadow: 0 0 0 1px hsl(var(--primary) / 0.45), 0 0 0 4px hsl(var(--primary) / 0.15);
+    --ui-surface-outline-weak: inset 0 0 0 1px oklch(var(--border) / 0.3), inset 0 1px 0 oklch(var(--background) / 0.5);
+    --ui-surface-outline: inset 0 0 0 1px oklch(var(--border) / 0.4), inset 0 1px 0 oklch(var(--background) / 0.6);
+    --ui-input-shadow: inset 0 0 0 1px oklch(var(--border) / 0.5);
+    --ui-control-shadow: inset 0 0 0 1px oklch(var(--border) / 0.5);
+    --ui-focus-shadow: 0 0 0 1px oklch(var(--primary) / 0.45), 0 0 0 4px oklch(var(--primary) / 0.15);
     --ui-border-glow-opacity-hover: 0;
 }
 
 [data-ui-style="soft-neutral"] {
     --ui-surface-tint: var(--border);
-    --ui-surface-fill: hsl(var(--card) / 0.85); /* Proper glass feel */
+    --ui-surface-fill: oklch(var(--card) / 0.85); /* Proper glass feel */
     --ui-surface-depth-color: var(--foreground);
-    --ui-input-shadow: inset 0 0 0 1px hsl(var(--border) / 0.25), 0 10px 18px -16px hsl(var(--foreground) / 0.2);
-    --ui-control-shadow: 0 0 0 1px hsl(var(--border) / 0.22);
-    --ui-focus-shadow: 0 0 0 1px hsl(var(--primary) / 0.4), 0 0 0 7px hsl(var(--accent) / 0.18);
+    --ui-input-shadow: inset 0 0 0 1px oklch(var(--border) / 0.25), 0 10px 18px -16px oklch(var(--foreground) / 0.2);
+    --ui-control-shadow: 0 0 0 1px oklch(var(--border) / 0.22);
+    --ui-focus-shadow: 0 0 0 1px oklch(var(--primary) / 0.4), 0 0 0 7px oklch(var(--accent) / 0.18);
     --ui-border-glow-opacity-hover: 0.08;
 }
 
 [data-ui-style="bold-amoled"] {
     --ui-surface-tint: var(--primary);
-    --ui-surface-fill: hsl(var(--card) / 0.6); /* More visible background */
+    --ui-surface-fill: oklch(var(--card) / 0.6); /* More visible background */
+    --ui-surface-container-bg: radial-gradient(140% 120% at 20% 0% in oklab,
+        oklch(var(--card) / 0.7),
+        oklch(var(--background) / 0.95) 70%);
     --ui-surface-depth-color: var(--background);
-    --ui-input-shadow: inset 0 0 0 1px hsl(var(--primary) / 0.35), 0 12px 22px -16px hsl(var(--primary) / 0.4);
-    --ui-control-shadow: 0 0 0 1px hsl(var(--primary) / 0.45);
-    --ui-focus-shadow: 0 0 0 1px hsl(var(--primary) / 0.65), 0 0 0 9px hsl(var(--primary) / 0.3);
+    --ui-input-shadow: inset 0 0 0 1px oklch(var(--primary) / 0.35), 0 12px 22px -16px oklch(var(--primary) / 0.4);
+    --ui-control-shadow: 0 0 0 1px oklch(var(--primary) / 0.45);
+    --ui-focus-shadow: 0 0 0 1px oklch(var(--primary) / 0.65), 0 0 0 9px oklch(var(--primary) / 0.3);
     --ui-border-glow-opacity: 0.22;
     --ui-border-glow-opacity-hover: 0.45;
     --ui-border-glow-blur: 3px;
@@ -111,13 +111,13 @@
 
 [data-ui-style="material-motion"] {
     --ui-surface-tint: var(--border);
-    --ui-surface-fill: hsl(var(--card)); /* Solid material */
+    --ui-surface-fill: oklch(var(--card)); /* Solid material */
     --ui-surface-depth-color: var(--foreground);
-    --ui-surface-outline-weak: inset 0 0 0 1px hsl(var(--border) / 0.14);
-    --ui-surface-outline: inset 0 0 0 1px hsl(var(--border) / 0.2);
-    --ui-input-shadow: inset 0 0 0 1px hsl(var(--border) / 0.25), 0 8px 16px -14px hsl(var(--foreground) / 0.2);
-    --ui-control-shadow: inset 0 0 0 1px hsl(var(--border) / 0.2);
-    --ui-focus-shadow: 0 0 0 1px hsl(var(--primary) / 0.4), 0 0 0 6px hsl(var(--primary) / 0.2);
+    --ui-surface-outline-weak: inset 0 0 0 1px oklch(var(--border) / 0.14);
+    --ui-surface-outline: inset 0 0 0 1px oklch(var(--border) / 0.2);
+    --ui-input-shadow: inset 0 0 0 1px oklch(var(--border) / 0.25), 0 8px 16px -14px oklch(var(--foreground) / 0.2);
+    --ui-control-shadow: inset 0 0 0 1px oklch(var(--border) / 0.2);
+    --ui-focus-shadow: 0 0 0 1px oklch(var(--primary) / 0.4), 0 0 0 6px oklch(var(--primary) / 0.2);
     --ui-border-glow-opacity-hover: 0;
 }
 
@@ -132,7 +132,7 @@
     border: 0;
     outline: none;
     border-radius: var(--ui-border-radius);
-    background-color: var(--ui-surface-fill);
+    background: var(--ui-surface-bg);
     -webkit-backdrop-filter: blur(var(--ui-surface-blur));
     backdrop-filter: blur(var(--ui-surface-blur));
     box-shadow: var(--ui-surface-shadow);
@@ -152,6 +152,7 @@
     [data-slot="context-menu-content"], [data-slot="context-menu-sub-content"], [data-slot="menubar-content"], [data-slot="menubar-sub-content"],
     [data-slot="navigation-menu-content"], [data-slot="navigation-menu-viewport"], [data-slot="tooltip-content"], [data-slot="command"]) {
     --ui-surface-fill: var(--ui-surface-popover-fill);
+    --ui-surface-bg: var(--ui-surface-popover-bg);
 }
 
 :is([data-slot="card"], [data-slot="alert"], [data-slot="popover-content"], [data-slot="dialog-content"],
@@ -166,10 +167,8 @@
     border-radius: inherit;
     padding: var(--ui-border-width);
     background: var(--ui-border-gradient);
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask-composite: exclude;
+    -webkit-mask: none;
+    mask: none;
     opacity: var(--ui-border-glow-opacity);
     filter: blur(var(--ui-border-glow-blur));
     animation: var(--ui-border-animation);
@@ -230,8 +229,8 @@
     backdrop-filter: blur(var(--ui-backdrop-blur));
     box-shadow: var(--ui-card-shadow);
     border-radius: var(--ui-border-radius);
-    background-color: hsl(var(--card) / var(--ui-card-opacity));
-    border-color: hsl(var(--border) / var(--ui-border-opacity));
+    background: var(--ui-surface-bg);
+    border-color: oklch(var(--border) / var(--ui-border-opacity));
     border-width: var(--ui-border-width);
 }
 
@@ -250,8 +249,8 @@
     backdrop-filter: blur(var(--ui-backdrop-blur));
     box-shadow: var(--ui-card-shadow);
     border-radius: var(--ui-border-radius);
-    background-color: var(--ui-surface-popover-fill) !important;
-    border-color: hsl(var(--border) / var(--ui-border-opacity));
+    background: var(--ui-surface-popover-bg) !important;
+    border-color: oklch(var(--border) / var(--ui-border-opacity));
 }
 
 /* Dropdown Menus - SOLID backgrounds */
@@ -262,8 +261,8 @@
     backdrop-filter: blur(var(--ui-backdrop-blur));
     box-shadow: var(--ui-card-shadow);
     border-radius: var(--ui-border-radius);
-    background-color: var(--ui-surface-popover-fill) !important;
-    border-color: hsl(var(--border) / var(--ui-border-opacity));
+    background: var(--ui-surface-popover-bg) !important;
+    border-color: oklch(var(--border) / var(--ui-border-opacity));
 }
 
 /* Select Content - SOLID backgrounds */
@@ -274,7 +273,7 @@
     box-shadow: var(--ui-card-shadow);
     border-radius: var(--ui-border-radius);
     background-color: var(--ui-surface-popover-fill) !important;
-    border-color: hsl(var(--border) / var(--ui-border-opacity));
+    border-color: oklch(var(--border) / var(--ui-border-opacity));
 }
 
 /* Context Menu - SOLID backgrounds */
@@ -286,7 +285,7 @@
     box-shadow: var(--ui-card-shadow);
     border-radius: var(--ui-border-radius);
     background-color: var(--ui-surface-popover-fill) !important;
-    border-color: hsl(var(--border) / var(--ui-border-opacity));
+    border-color: oklch(var(--border) / var(--ui-border-opacity));
 }
 
 /* Menubar Content - SOLID backgrounds */
@@ -298,7 +297,7 @@
     box-shadow: var(--ui-card-shadow);
     border-radius: var(--ui-border-radius);
     background-color: var(--ui-surface-popover-fill) !important;
-    border-color: hsl(var(--border) / var(--ui-border-opacity));
+    border-color: oklch(var(--border) / var(--ui-border-opacity));
 }
 
 /* Navigation Menu Content - SOLID backgrounds */
@@ -320,7 +319,7 @@
     box-shadow: var(--shadow-md);
     border-radius: calc(var(--ui-border-radius) / 2);
     background-color: var(--ui-surface-popover-fill) !important;
-    border-color: hsl(var(--border) / var(--ui-border-opacity));
+    border-color: oklch(var(--border) / var(--ui-border-opacity));
 }
 
 /* Hover Card - SOLID backgrounds */
@@ -331,7 +330,7 @@
     box-shadow: var(--ui-card-shadow);
     border-radius: var(--ui-border-radius);
     background-color: var(--ui-surface-popover-fill) !important;
-    border-color: hsl(var(--border) / var(--ui-border-opacity));
+    border-color: oklch(var(--border) / var(--ui-border-opacity));
 }
 
 /* Command Palette - SOLID backgrounds */
@@ -342,7 +341,7 @@
     box-shadow: var(--ui-card-shadow);
     border-radius: var(--ui-border-radius);
     background-color: var(--ui-surface-popover-fill) !important;
-    border-color: hsl(var(--border) / var(--ui-border-opacity));
+    border-color: oklch(var(--border) / var(--ui-border-opacity));
 }
 
 /* Drawer Content - SOLID backgrounds */
@@ -351,8 +350,8 @@
     -webkit-backdrop-filter: blur(var(--ui-backdrop-blur));
     backdrop-filter: blur(var(--ui-backdrop-blur));
     box-shadow: var(--ui-card-shadow);
-    background-color: hsl(var(--card)) !important;
-    border-color: hsl(var(--border) / var(--ui-border-opacity));
+    background-color: oklch(var(--card)) !important;
+    border-color: oklch(var(--border) / var(--ui-border-opacity));
 }
 
 /* Alert Dialog Content - SOLID backgrounds */
@@ -362,8 +361,8 @@
     backdrop-filter: blur(var(--ui-backdrop-blur));
     box-shadow: var(--ui-card-shadow);
     border-radius: var(--ui-border-radius);
-    background-color: hsl(var(--card)) !important;
-    border-color: hsl(var(--border) / var(--ui-border-opacity));
+    background-color: oklch(var(--card)) !important;
+    border-color: oklch(var(--border) / var(--ui-border-opacity));
 }
 
 /* Specific overrides for Glass Neon Glow */
@@ -371,7 +370,7 @@
 [data-ui-style="glass-neon"] [data-slot="dropdown-menu-content"],
 [data-ui-style="glass-neon"] [data-slot="select-content"],
 [data-ui-style="glass-neon"] [data-slot="popover-content"] {
-    border-color: hsl(var(--primary) / var(--ui-border-opacity));
+    border-color: oklch(var(--primary) / var(--ui-border-opacity));
 }
 
 /* ============================================================================
@@ -395,46 +394,46 @@
 [data-slot="input"]:focus-visible,
 [data-slot="textarea"]:focus-visible,
 .focus-ring-theme:focus-visible {
-    box-shadow: 0 0 0 var(--ui-focus-ring-width) hsl(var(--primary) / var(--ui-glow-intensity));
+    box-shadow: 0 0 0 var(--ui-focus-ring-width) oklch(var(--primary) / var(--ui-glow-intensity));
     outline: none;
     transition: box-shadow var(--ui-transition);
 }
 
 /* Select Trigger */
 [data-slot="select-trigger"]:focus-visible {
-    box-shadow: 0 0 0 var(--ui-focus-ring-width) hsl(var(--primary) / var(--ui-glow-intensity));
+    box-shadow: 0 0 0 var(--ui-focus-ring-width) oklch(var(--primary) / var(--ui-glow-intensity));
     outline: none;
     transition: box-shadow var(--ui-transition);
 }
 
 /* Checkbox */
 [data-slot="checkbox"]:focus-visible {
-    box-shadow: 0 0 0 3px hsl(var(--primary) / var(--ui-glow-intensity));
+    box-shadow: 0 0 0 3px oklch(var(--primary) / var(--ui-glow-intensity));
     transition: box-shadow var(--ui-transition);
 }
 
 /* Switch */
 [data-slot="switch"]:focus-visible {
-    box-shadow: 0 0 0 3px hsl(var(--primary) / var(--ui-glow-intensity));
+    box-shadow: 0 0 0 3px oklch(var(--primary) / var(--ui-glow-intensity));
     transition: box-shadow var(--ui-transition);
 }
 
 /* Radio Group Item */
 [data-slot="radio-group-item"]:focus-visible {
-    box-shadow: 0 0 0 3px hsl(var(--primary) / var(--ui-glow-intensity));
+    box-shadow: 0 0 0 3px oklch(var(--primary) / var(--ui-glow-intensity));
     transition: box-shadow var(--ui-transition);
 }
 
 /* Slider */
 [data-slot="slider"]:focus-visible,
 [data-slot="slider-thumb"]:focus-visible {
-    box-shadow: 0 0 0 3px hsl(var(--primary) / var(--ui-glow-intensity));
+    box-shadow: 0 0 0 3px oklch(var(--primary) / var(--ui-glow-intensity));
     transition: box-shadow var(--ui-transition);
 }
 
 /* Input OTP */
 [data-slot="input-otp-slot"]:focus-visible {
-    box-shadow: 0 0 0 3px hsl(var(--primary) / var(--ui-glow-intensity));
+    box-shadow: 0 0 0 3px oklch(var(--primary) / var(--ui-glow-intensity));
     transition: box-shadow var(--ui-transition);
 }
 
@@ -459,7 +458,7 @@
 }
 
 [data-slot="button"]:focus-visible {
-    outline: var(--ui-focus-ring-width) solid hsl(var(--primary) / var(--ui-glow-intensity));
+    outline: var(--ui-focus-ring-width) solid oklch(var(--primary) / var(--ui-glow-intensity));
     outline-offset: var(--ui-focus-ring-offset);
 }
 

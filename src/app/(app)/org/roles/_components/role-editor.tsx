@@ -43,42 +43,42 @@ export function RoleEditor(props: {
             <form action={updateAction} className="grid gap-2">
                 <input type="hidden" name="roleId" value={props.roleId} />
                 <label className="grid gap-1">
-                    <span className="text-[11px] font-medium text-[hsl(var(--muted-foreground))]">Name</span>
+                    <span className="text-[11px] font-medium text-muted-foreground">Name</span>
                     <input
                         name="name"
                         defaultValue={props.initialName}
-                        className="h-9 w-full rounded-md border border-[hsl(var(--border))] bg-[hsl(var(--background))] px-3 text-sm text-[hsl(var(--foreground))]"
+                        className="h-9 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground"
                     />
                 </label>
                 <label className="grid gap-1">
-                    <span className="text-[11px] font-medium text-[hsl(var(--muted-foreground))]">Description</span>
+                    <span className="text-[11px] font-medium text-muted-foreground">Description</span>
                     <input
                         name="description"
                         defaultValue={props.initialDescription}
-                        className="h-9 w-full rounded-md border border-[hsl(var(--border))] bg-[hsl(var(--background))] px-3 text-sm text-[hsl(var(--foreground))]"
+                        className="h-9 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground"
                     />
                 </label>
                 <label className="grid gap-1">
-                    <span className="text-[11px] font-medium text-[hsl(var(--muted-foreground))]">Permissions</span>
+                    <span className="text-[11px] font-medium text-muted-foreground">Permissions</span>
                     <textarea
                         name="permissionsText"
                         defaultValue={props.initialPermissionsText}
                         rows={4}
-                        className="w-full rounded-md border border-[hsl(var(--border))] bg-[hsl(var(--background))] px-3 py-2 text-sm text-[hsl(var(--foreground))]"
+                        className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground"
                     />
-                    <span className="text-[11px] text-[hsl(var(--muted-foreground))]">
+                    <span className="text-[11px] text-muted-foreground">
                         One per line: <span className="font-mono">resource: perm1,perm2</span>
                     </span>
                 </label>
 
                 {message ? (
-                    <p className="text-xs text-[hsl(var(--muted-foreground))]">{message.message}</p>
+                    <p className="text-xs text-muted-foreground">{message.message}</p>
                 ) : null}
 
                 <button
                     type="submit"
                     disabled={updatePending}
-                    className="h-9 w-fit rounded-md bg-[hsl(var(--primary))] px-3 text-sm font-medium text-[hsl(var(--primary-foreground))] disabled:opacity-70"
+                    className="h-9 w-fit rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground disabled:opacity-70"
                 >
                     Save changes
                 </button>
@@ -89,7 +89,7 @@ export function RoleEditor(props: {
                 <button
                     type="submit"
                     disabled={deletePending}
-                    className="h-9 w-fit rounded-md border border-[hsl(var(--border))] bg-[hsl(var(--background))] px-3 text-sm font-medium text-[hsl(var(--foreground))] disabled:opacity-70"
+                    className="h-9 w-fit rounded-md border border-border bg-background px-3 text-sm font-medium text-foreground disabled:opacity-70"
                 >
                     Delete role
                 </button>

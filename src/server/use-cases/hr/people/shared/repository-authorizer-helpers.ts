@@ -1,4 +1,5 @@
 import type { RepositoryAuthorizationDefaults } from '@/server/repositories/security';
+import { HR_ACTION, HR_RESOURCE_TYPE } from '@/server/security/authorization/hr-permissions';
 
 /**
  * Helper to create RepositoryAuthorizer defaults for HR People flows
@@ -15,7 +16,7 @@ export function createHrPeopleAuthorizationDefaults(
     expectedClassification: DEFAULT_CLASSIFICATION,
     expectedResidency: DEFAULT_RESIDENCY,
     auditSource: 'hr:people',
-    requiredPermissions: { organization: ['read'] },
+    requiredPermissions: { [HR_RESOURCE_TYPE.ORG_SETTINGS]: [HR_ACTION.READ] },
     ...overrides,
   };
 }
@@ -25,7 +26,10 @@ export function createHrPeopleEditorRepositoryDefaults(
 ): RepositoryAuthorizationDefaults {
   return createHrPeopleAuthorizationDefaults({
     auditSource: 'hr:people:edit',
-    requiredPermissions: { employeeProfile: ['update'], employmentContract: ['update'] },
+    requiredPermissions: {
+      [HR_RESOURCE_TYPE.EMPLOYEE_PROFILE]: [HR_ACTION.UPDATE],
+      [HR_RESOURCE_TYPE.EMPLOYMENT_CONTRACT]: [HR_ACTION.UPDATE],
+    },
     ...overrides,
   });
 }

@@ -134,6 +134,7 @@
     "axe-playwright": "^2.2.2",
     "baseline-browser-mapping": "^2.9.14",
     "chrome-launcher": "^1.2.1",
+    "culori": "^4.0.0",
     "depcheck": "^1.4.7",
     "eslint": "^9",
     "eslint-config-next": "16.0.7",

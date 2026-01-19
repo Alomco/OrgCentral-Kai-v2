@@ -1,4 +1,5 @@
-import type { JsonValue } from '@/server/types/hr/people';
+import type { JsonRecord } from '@/server/types/json';
+import type { InvitationOnboardingData } from '@/server/invitations/onboarding-data';
 
 export type OnboardingInvitationStatus = 'pending' | 'accepted' | 'expired' | 'declined' | 'revoked';
 
@@ -7,10 +8,10 @@ export interface OnboardingInvitationCreateInput {
   organizationName: string;
   targetEmail: string;
   invitedByUserId?: string | null;
-  onboardingData: JsonValue;
+  onboardingData: InvitationOnboardingData;
   expiresAt?: Date | null;
-  metadata?: JsonValue;
-  securityContext?: JsonValue;
+  metadata?: JsonRecord;
+  securityContext?: JsonRecord;
   ipAddress?: string | null;
   userAgent?: string | null;
 }
@@ -22,9 +23,9 @@ export interface OnboardingInvitation {
   targetEmail: string;
   status: OnboardingInvitationStatus;
   invitedByUserId?: string | null;
-  onboardingData: JsonValue;
-  metadata?: JsonValue;
-  securityContext?: JsonValue;
+  onboardingData: InvitationOnboardingData;
+  metadata?: JsonRecord;
+  securityContext?: JsonRecord;
   ipAddress?: string | null;
   userAgent?: string | null;
   expiresAt?: Date | null;

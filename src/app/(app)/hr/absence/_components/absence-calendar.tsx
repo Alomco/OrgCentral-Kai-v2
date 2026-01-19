@@ -54,15 +54,15 @@ function getDaysInMonth(year: number, month: number): Date[] {
 function getStatusColor(status: AbsenceItem['status']): string {
     switch (status) {
         case 'approved':
-            return 'bg-emerald-500';
+            return 'bg-accent';
         case 'pending':
-            return 'bg-amber-500';
+            return 'bg-secondary';
         case 'rejected':
-            return 'bg-red-500';
+            return 'bg-destructive';
         case 'cancelled':
-            return 'bg-gray-400';
+            return 'bg-muted-foreground';
         default:
-            return 'bg-blue-500';
+            return 'bg-primary';
     }
 }
 
@@ -108,10 +108,22 @@ export function AbsenceCalendar({ absences, onDayClick }: AbsenceCalendarProps) 
                     {MONTHS[month]} {year}
                 </CardTitle>
                 <div className="flex gap-1">
-                    <Button variant="outline" size="icon" className="h-8 w-8" onClick={previousMonth}>
+                    <Button
+                        variant="outline"
+                        size="icon"
+                        className="h-11 w-11"
+                        onClick={previousMonth}
+                        aria-label="Previous month"
+                    >
                         <ChevronLeft className="h-4 w-4" />
                     </Button>
-                    <Button variant="outline" size="icon" className="h-8 w-8" onClick={nextMonth}>
+                    <Button
+                        variant="outline"
+                        size="icon"
+                        className="h-11 w-11"
+                        onClick={nextMonth}
+                        aria-label="Next month"
+                    >
                         <ChevronRight className="h-4 w-4" />
                     </Button>
                 </div>
@@ -147,6 +159,7 @@ export function AbsenceCalendar({ absences, onDayClick }: AbsenceCalendarProps) 
                                     !isCurrentMonth && 'text-muted-foreground/50 bg-muted/30',
                                 )}
                                 onClick={() => onDayClick?.(day)}
+                                aria-label={`${day.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}${dayAbsences.length ? `, ${String(dayAbsences.length)} absences` : ''}`}
                             >
                                 <span
                                     className={cn(
@@ -183,15 +196,15 @@ export function AbsenceCalendar({ absences, onDayClick }: AbsenceCalendarProps) 
                 {/* Legend */}
                 <div className="flex gap-4 mt-4 text-xs text-muted-foreground">
                     <div className="flex items-center gap-1">
-                        <div className="h-2 w-2 rounded-full bg-emerald-500" />
+                        <div className="h-2 w-2 rounded-full bg-accent" />
                         Approved
                     </div>
                     <div className="flex items-center gap-1">
-                        <div className="h-2 w-2 rounded-full bg-amber-500" />
+                        <div className="h-2 w-2 rounded-full bg-secondary" />
                         Pending
                     </div>
                     <div className="flex items-center gap-1">
-                        <div className="h-2 w-2 rounded-full bg-red-500" />
+                        <div className="h-2 w-2 rounded-full bg-destructive" />
                         Rejected
                     </div>
                 </div>
