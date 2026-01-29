@@ -14,7 +14,7 @@ import { extractLegacyKeys } from '../permission-resource-utils';
 import { PermissionResourceDeleteForm } from './permission-resource-delete-form';
 import { PermissionResourceUpdateForm } from './permission-resource-update-form';
 
-export function PermissionResourceRow(props: { resource: PermissionResource }) {
+export function PermissionResourceRow(props: { orgId: string; resource: PermissionResource }) {
     const [open, setOpen] = useState(false);
     const actions = Array.isArray(props.resource.actions) ? [...props.resource.actions] : [];
     actions.sort((left, right) => left.localeCompare(right));
@@ -109,8 +109,8 @@ export function PermissionResourceRow(props: { resource: PermissionResource }) {
             </div>
 
             <CollapsibleContent className="mt-3 space-y-3 border-t pt-3">
-                <PermissionResourceUpdateForm resource={props.resource} />
-                <PermissionResourceDeleteForm resourceId={props.resource.id} />
+                <PermissionResourceUpdateForm orgId={props.orgId} resource={props.resource} />
+                <PermissionResourceDeleteForm orgId={props.orgId} resourceId={props.resource.id} />
             </CollapsibleContent>
         </Collapsible>
     );
@@ -124,3 +124,4 @@ function formatRelativeTime(value: Date | string): string | null {
 
     return formatDistanceToNow(dateValue, { addSuffix: true });
 }
+

@@ -20,18 +20,11 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
-import { getStatusDetails } from './compliance-item-utils';
 import { buildTemplateItemLookup } from '../_components/compliance-template-lookup';
-import {
-    ComplianceItemActivityCard,
-    ComplianceItemAssignmentCard,
-    ComplianceItemDetailsCard,
-    ComplianceItemEvidenceCard,
-} from './compliance-item-sections';
+import { ComplianceItemDetailCards } from './compliance-item-detail-cards';
+import { ComplianceItemDetailHeader } from './compliance-item-detail-header';
 
 interface ComplianceItemDetailPageProps {
     params: Promise<{ itemId: string }>;
@@ -112,9 +105,6 @@ export default async function ComplianceItemDetailPage({
         notFound();
     }
 
-    const statusDetails = getStatusDetails(complianceItem.status);
-    const StatusIcon = statusDetails.icon;
-
     const assignedProfile = profileResult.profile;
     const assignedName = resolveAssignedName(assignedProfile, complianceItem.userId);
 
@@ -147,47 +137,25 @@ export default async function ComplianceItemDetailPage({
                 </Link>
             </Button>
 
-            <Card>
-                <CardHeader>
-                    <div className="flex items-start justify-between">
-                        <div className="space-y-1">
-                            <div className="flex items-center gap-2">
-                                <CardTitle>{itemTitle}</CardTitle>
-                                <Badge variant={statusDetails.variant}>
-                                    <StatusIcon className="h-3 w-3 mr-1" />
-                                    {statusDetails.label}
-                                </Badge>
-                                {isInternalOnly ? (
-                                    <Badge variant="outline">Internal only</Badge>
-                                ) : null}
-                            </div>
-                            <CardDescription>{itemGuidance ?? 'Compliance item details and evidence.'}</CardDescription>
-                        </div>
-                    </div>
-                </CardHeader>
-            </Card>
+            <ComplianceItemDetailHeader
+                itemId={itemId}
+                userId={targetUserId}
+                initialItem={complianceItem}
+                itemTitle={itemTitle}
+                itemGuidance={itemGuidance ?? undefined}
+                isInternalOnly={isInternalOnly}
+            />
 
             <div className="grid gap-6 md:grid-cols-2">
-                <ComplianceItemDetailsCard
+                <ComplianceItemDetailCards
+                    itemId={itemId}
+                    userId={targetUserId}
+                    initialItem={complianceItem}
                     categoryLabel={categoryLabel}
-                    statusLabel={statusDetails.label}
                     itemType={itemType}
-                    dueDate={complianceItem.dueDate}
-                    createdAt={complianceItem.createdAt}
-                    completedAt={complianceItem.completedAt}
-                />
-                <ComplianceItemAssignmentCard
                     assignedName={assignedName}
-                    userId={complianceItem.userId}
-                />
-                <ComplianceItemEvidenceCard
-                    complianceItem={complianceItem}
                     templateItem={templateMeta?.item ?? null}
                     canEdit={isSelfView}
-                />
-                <ComplianceItemActivityCard
-                    createdAt={complianceItem.createdAt}
-                    completedAt={complianceItem.completedAt}
                 />
             </div>
         </div>

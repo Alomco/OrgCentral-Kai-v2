@@ -22,11 +22,11 @@ export async function BillingPaymentMethodsPanel({
           </p>
         </div>
       </div>
-      <BillingPaymentMethodsClient
-        paymentMethods={paymentMethods}
+      <BillingPaymentMethodsClient orgId={authorization.orgId} paymentMethods={paymentMethods}
         canManage={Boolean(subscription)}
         publishableKey={process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? ''}
       />
     </div>
   );
 }
+

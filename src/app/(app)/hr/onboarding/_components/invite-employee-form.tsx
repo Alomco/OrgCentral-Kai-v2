@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useEffect, useMemo, useRef, useState } from 'react';
+import { useActionState, useEffect, useRef, useState } from 'react';
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -81,11 +81,10 @@ export function InviteEmployeeForm({ initialState, templates, canManageTemplates
 
     useInviteEmployeeToast(state, pending);
 
-    const initialIncludeTemplate = useMemo(
-        () => state.values.includeTemplate ?? Boolean(state.values.onboardingTemplateId),
-        [state.values.includeTemplate, state.values.onboardingTemplateId],
-    );
-    const [includeTemplate, setIncludeTemplate] = useState<boolean>(initialIncludeTemplate);
+    const [includeTemplate, setIncludeTemplate] = useState<boolean>(() => (
+        initialState.values.includeTemplate ?? Boolean(initialState.values.onboardingTemplateId)
+    ));
+
 
     const templateOptions = templates;
 

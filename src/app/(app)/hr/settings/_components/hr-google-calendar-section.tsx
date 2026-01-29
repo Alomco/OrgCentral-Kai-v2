@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import type { RefObject } from 'react';
 import { CalendarDays } from 'lucide-react';
@@ -59,6 +59,7 @@ export function GoogleCalendarSection({ pending, state, enabledReference }: Inte
                     />
                     <Switch
                         id="googleEnabled"
+                        aria-describedby="googleEnabled-help"
                         key={state.values.googleEnabled ? 'google-on' : 'google-off'}
                         defaultChecked={state.values.googleEnabled}
                         onCheckedChange={(checked) => {
@@ -69,6 +70,7 @@ export function GoogleCalendarSection({ pending, state, enabledReference }: Inte
                         aria-label="Enable Google Calendar connector"
                         disabled={pending}
                     />
+                    <p id="googleEnabled-help" className="sr-only">Toggle Google Calendar integration for HR.</p>
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
                     <div className="space-y-2">

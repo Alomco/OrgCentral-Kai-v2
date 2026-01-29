@@ -1,83 +1,129 @@
 'use client';
-
-import { useTransition } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useIsMutating, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { Loader2 } from 'lucide-react';
 
-import { Switch } from '@/components/ui/switch';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import type { NotificationPreference } from '@/server/types/hr-types';
+import { Spinner } from '@/components/ui/spinner';
 import { HR_NOTIFICATION_TYPE_VALUES } from '@/server/types/hr/notifications';
+import type { NotificationPreference } from '@/server/types/hr-types';
 import { updateNotificationPreference } from './actions';
+import { NotificationSettingsErrorSummary } from './notification-settings-error-summary';
+import { NotificationChannelCard } from './notification-channel-card';
+import {
+  applyPreferenceUpdate,
+  getDisabledTypesFromMetadata,
+  getPreferenceMetadataObject,
+  getPreferenceRetryDelay,
+  type NotificationSettingsFormProps,
+  NOTIFICATION_PREFERENCES_QUERY_KEY,
+  type PreferenceMutationContext,
+  fetchNotificationPreferences,
+  type UpdatePreferenceInput,
+} from './notification-settings-helpers';
 
-interface NotificationSettingsFormProps {
-  preferences: NotificationPreference[];
-}
+export function NotificationSettingsForm({ preferences: initialPreferences }: NotificationSettingsFormProps) {
+  const queryClient = useQueryClient();
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const errorSummaryReference = useRef<HTMLDivElement | null>(null);
+  const { data: preferences = initialPreferences } = useQuery({
+    queryKey: NOTIFICATION_PREFERENCES_QUERY_KEY,
+    queryFn: fetchNotificationPreferences,
+    initialData: initialPreferences,
+  });
+  const updatePreferenceMutation = useMutation({
+    mutationKey: NOTIFICATION_PREFERENCES_QUERY_KEY,
+    retry: (attempt, error) => {
+      if (error instanceof Error && error.message.toLowerCase().includes('not authorized')) {
+        return false;
+      }
+      return attempt < 2;
+    },
+    retryDelay: getPreferenceRetryDelay,
+    onMutate: async (input: UpdatePreferenceInput): Promise<PreferenceMutationContext> => {
+      setErrorMessage(null);
+      await queryClient.cancelQueries({ queryKey: NOTIFICATION_PREFERENCES_QUERY_KEY });
+      const previous = queryClient.getQueryData<NotificationPreference[]>(NOTIFICATION_PREFERENCES_QUERY_KEY);
+      const optimistic = applyPreferenceUpdate(previous, input);
+      if (optimistic) {
+        queryClient.setQueryData(NOTIFICATION_PREFERENCES_QUERY_KEY, optimistic);
+      }
+      return { previous };
+    },
+    mutationFn: async (input: UpdatePreferenceInput) => {
+      const result = await updateNotificationPreference(input);
+      if (!result.success) {
+        throw new Error(result.error.message);
+      }
+      return result.data.preference;
+    },
+    onError: (error, _input, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(NOTIFICATION_PREFERENCES_QUERY_KEY, context.previous);
+      }
+      setErrorMessage(error instanceof Error ? error.message : 'Failed to update preference.');
+    },
+    onSuccess: (preference) => {
+      if (!preference) {
+        return;
+      }
+      setErrorMessage(null);
+      queryClient.setQueryData<NotificationPreference[]>(NOTIFICATION_PREFERENCES_QUERY_KEY, (current) => {
+        if (!current || current.length === 0) {
+          return [preference];
+        }
+        return current.map((item) => (item.id === preference.id ? preference : item));
+      });
+    },
+  });
+  const activeMutations = useIsMutating({ mutationKey: NOTIFICATION_PREFERENCES_QUERY_KEY });
+  const isPending = updatePreferenceMutation.isPending || activeMutations > 0;
 
-type JsonValue = string | number | boolean | null | JsonObject | JsonValue[];
-interface JsonObject {
-  readonly [key: string]: JsonValue;
-}
-
-export function NotificationSettingsForm({ preferences }: NotificationSettingsFormProps) {
-  const [isPending, startTransition] = useTransition();
-
-  // Helper to find preference by channel
-  const getPreference = (channel: 'EMAIL' | 'IN_APP') => 
-    preferences.find(p => p.channel === channel);
-
-  const emailPreference = getPreference('EMAIL');
-  const inAppPreference = getPreference('IN_APP');
-  const emailEnabled = emailPreference?.enabled ?? true;
-  const inAppEnabled = inAppPreference?.enabled ?? true;
-
-  const metadataObject = (preference: NotificationPreference): JsonObject => {
-    const metadata = preference.metadata;
-    if (!metadata || typeof metadata !== 'object' || Array.isArray(metadata)) {
-      return {};
+  useEffect(() => {
+    if (errorMessage) {
+      errorSummaryReference.current?.focus();
     }
-    return metadata as JsonObject;
-  };
+  }, [errorMessage]);
 
-  const disabledTypesFromMetadata = (metadata: JsonObject): string[] => {
-    const value = metadata.disabledTypes;
-    if (!Array.isArray(value)) {
-      return [];
-    }
-    return value.filter((item): item is string => typeof item === 'string');
-  };
+  const preferencesByChannel = useMemo(() => {
+    const emailPreference = preferences.find((pref) => pref.channel === 'EMAIL');
+    const inAppPreference = preferences.find((pref) => pref.channel === 'IN_APP');
+    return { emailPreference, inAppPreference };
+  }, [preferences]);
+
+  const emailEnabled = preferencesByChannel.emailPreference?.enabled ?? true;
+  const inAppEnabled = preferencesByChannel.inAppPreference?.enabled ?? true;
 
   const handleToggleChannel = (channel: 'EMAIL' | 'IN_APP', enabled: boolean) => {
-    const pref = getPreference(channel);
+    const pref = channel === 'EMAIL' ? preferencesByChannel.emailPreference : preferencesByChannel.inAppPreference;
     if (!pref) {
       return;
-    } // Should not happen if seeded
+    }
 
-    startTransition(async () => {
-      const result = await updateNotificationPreference({
-        preferenceId: pref.id,
-        enabled,
-      });
-
-      if (result.success) {
-        toast.success(`${channel === 'EMAIL' ? 'Email' : 'In-app'} notifications ${enabled ? 'enabled' : 'disabled'}`);
-      } else {
-        toast.error('Failed to update preference');
-      }
-    });
+    updatePreferenceMutation.mutate(
+      { preferenceId: pref.id, enabled },
+      {
+        onSuccess: () => {
+          toast.success(
+            `${channel === 'EMAIL' ? 'Email' : 'In-app'} notifications ${enabled ? 'enabled' : 'disabled'}`,
+          );
+        },
+        onError: () => {
+          toast.error('Failed to update preference');
+        },
+      },
+    );
   };
 
   const handleTypeToggle = (channel: 'EMAIL' | 'IN_APP', type: string, enabled: boolean) => {
-    const pref = getPreference(channel);
+    const pref = channel === 'EMAIL' ? preferencesByChannel.emailPreference : preferencesByChannel.inAppPreference;
     if (!pref) {
       return;
     }
 
     // We store disabled types in metadata to save space (assume enabled by default)
-    const currentMetadata = metadataObject(pref);
-    const disabledTypes = disabledTypesFromMetadata(currentMetadata);
-    
+    const currentMetadata = getPreferenceMetadataObject(pref);
+    const disabledTypes = getDisabledTypesFromMetadata(currentMetadata);
+
     let newDisabledTypes;
     if (enabled) {
       newDisabledTypes = disabledTypes.filter(t => t !== type);
@@ -85,23 +131,24 @@ export function NotificationSettingsForm({ preferences }: NotificationSettingsFo
       newDisabledTypes = [...disabledTypes, type];
     }
 
-    startTransition(async () => {
-      const result = await updateNotificationPreference({
+    updatePreferenceMutation.mutate(
+      {
         preferenceId: pref.id,
         metadata: {
           ...currentMetadata,
           disabledTypes: newDisabledTypes,
         },
-      });
-
-      if (!result.success) {
-        toast.error('Failed to update preference');
-      }
-    });
+      },
+      {
+        onError: () => {
+          toast.error('Failed to update preference');
+        },
+      },
+    );
   };
 
   const isTypeEnabled = (channel: 'EMAIL' | 'IN_APP', type: string) => {
-    const pref = getPreference(channel);
+    const pref = channel === 'EMAIL' ? preferencesByChannel.emailPreference : preferencesByChannel.inAppPreference;
     if (!pref) {
       return true;
     } // Default to enabled
@@ -109,88 +156,47 @@ export function NotificationSettingsForm({ preferences }: NotificationSettingsFo
       return false;
     } // Parent switch overrides
 
-    const metadata = metadataObject(pref);
-    const disabledTypes = disabledTypesFromMetadata(metadata);
+    const metadata = getPreferenceMetadataObject(pref);
+    const disabledTypes = getDisabledTypesFromMetadata(metadata);
     return !disabledTypes.includes(type);
   };
 
   return (
-    <div className="space-y-6">
-      {/* Email Settings */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <CardTitle>Email Notifications</CardTitle>
-              <CardDescription>
-                Receive notifications via email
-              </CardDescription>
-            </div>
-            <Switch
-              checked={emailEnabled}
-              onCheckedChange={(checked) => handleToggleChannel('EMAIL', checked)}
-              disabled={isPending}
-            />
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {HR_NOTIFICATION_TYPE_VALUES.map((type) => (
-              <div key={`email-${type}`} className="flex items-center space-x-2">
-                <Switch
-                  id={`email-${type}`}
-                  checked={isTypeEnabled('EMAIL', type)}
-                  onCheckedChange={(checked) => handleTypeToggle('EMAIL', type, checked)}
-                  disabled={isPending || !emailEnabled}
-                />
-                <Label htmlFor={`email-${type}`} className="text-sm font-normal">
-                  {type.replace(/-/g, ' ')}
-                </Label>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+    <div className="space-y-6" aria-busy={isPending}>
+      {errorMessage ? (
+        <NotificationSettingsErrorSummary ref={errorSummaryReference} message={errorMessage} />
+      ) : null}
+      <NotificationChannelCard
+        channel="EMAIL"
+        title="Email Notifications"
+        description="Receive notifications via email"
+        helpId="email-notification-types-help"
+        helpText="Toggle individual notification types. Disabled types are stored per channel."
+        enabled={emailEnabled}
+        isPending={isPending}
+        types={HR_NOTIFICATION_TYPE_VALUES}
+        onToggleChannel={(checked) => handleToggleChannel('EMAIL', checked)}
+        isTypeEnabled={(type) => isTypeEnabled('EMAIL', type)}
+        onTypeToggle={(type, checked) => handleTypeToggle('EMAIL', type, checked)}
+      />
 
-      {/* In-App Settings */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <CardTitle>In-App Notifications</CardTitle>
-              <CardDescription>
-                Receive notifications within the application
-              </CardDescription>
-            </div>
-            <Switch
-              checked={inAppEnabled}
-              onCheckedChange={(checked) => handleToggleChannel('IN_APP', checked)}
-              disabled={isPending}
-            />
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {HR_NOTIFICATION_TYPE_VALUES.map((type) => (
-              <div key={`inapp-${type}`} className="flex items-center space-x-2">
-                <Switch
-                  id={`inapp-${type}`}
-                  checked={isTypeEnabled('IN_APP', type)}
-                  onCheckedChange={(checked) => handleTypeToggle('IN_APP', type, checked)}
-                  disabled={isPending || !inAppEnabled}
-                />
-                <Label htmlFor={`inapp-${type}`} className="text-sm font-normal">
-                  {type.replace(/-/g, ' ')}
-                </Label>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      <NotificationChannelCard
+        channel="IN_APP"
+        title="In-App Notifications"
+        description="Receive notifications within the application"
+        helpId="inapp-notification-types-help"
+        helpText="Toggle individual notification types for in-app delivery."
+        enabled={inAppEnabled}
+        isPending={isPending}
+        types={HR_NOTIFICATION_TYPE_VALUES}
+        onToggleChannel={(checked) => handleToggleChannel('IN_APP', checked)}
+        isTypeEnabled={(type) => isTypeEnabled('IN_APP', type)}
+        onTypeToggle={(type, checked) => handleTypeToggle('IN_APP', type, checked)}
+      />
 
       {isPending && (
         <div className="fixed bottom-4 right-4 bg-primary text-primary-foreground px-4 py-2 rounded-lg shadow-lg flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2">
-          <Loader2 className="h-4 w-4 animate-spin" />
+          <Spinner className="h-4 w-4" />
           Saving changes...
         </div>
       )}

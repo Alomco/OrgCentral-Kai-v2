@@ -33,7 +33,8 @@ export default async function OrgBrandingPage() {
                 <p className="text-sm text-[oklch(var(--muted-foreground))]">Set your organization name, colors, and assets.</p>
             </div>
 
-            <OrgBrandingForm branding={branding} />
+            <OrgBrandingForm orgId={authorization.orgId} branding={branding} />
         </div>
     );
 }
+

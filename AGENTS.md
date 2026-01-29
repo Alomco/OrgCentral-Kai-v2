@@ -1,4 +1,4 @@
-# AGENTS.md
+﻿# AGENTS.md
 
 ## Purpose
 Provide project-specific rules for Codex to preserve coding conventions, security posture, and strict linting.
@@ -36,3 +36,24 @@ Provide project-specific rules for Codex to preserve coding conventions, securit
 - Use explicit allowlists for tenant-scoped queries.
 - Log security-relevant events without leaking secrets.
 - Keep changes minimal, reversible, and well-typed.
+
+## API Routes (adapters)
+- Route handlers must be thin and delegate to adapter controllers in src/server/api-adapters/**.
+- Use export async function METHOD(request, { params }: { params: Promise<{ orgId: string }> }) and const { orgId } = await params for org routes.
+- Always return NextResponse.json(result) from controllers; never call services or repositories directly in route files.
+- Validate all inputs with Zod in controllers; enforce orgId and data-classification guards before data access.
+- Prefer React Query for client mutations/queries; avoid outer.refresh() in client flows; invalidate typed query keys.
+- Use Zustand only for client-local storage (persist/localStorage) via src/lib/stores/storage.ts.
+
+## Interaction Decision Framework (HRM)
+- Default: use useActionState for ~90% of forms; reserve React Query useMutation for highly interactive/optimistic UI.
+- Choose useActionState when:
+  - Form-heavy data entry; server validation + redirects/revalidate; auditing/tenancy checks (ISO27001 boundaries).
+  - Examples: Hiring/Onboarding “Add Candidate”, Payroll/Compliance monthly submissions, Leave requests via standard form.
+- Choose useMutation when:
+  - Instant UI and optimistic updates; bulk actions; infinite lists or live polling.
+  - Examples: Drag-and-drop candidate stage changes, real-time tax preview tweaks, “Check-in” button, infinite employee lists.
+- Implementation notes:
+  - Always validate at the boundary with Zod (adapters/actions), and enforce orgId/residency/classification guards.
+  - For useMutation: compose typed keys; invalidate narrowly; use onMutate for optimistic UI and rollback on error.
+  - For SSR -> CSR continuity: provide initialData to queries and keep filters in the URL; do not use outer.refresh() in client flows.

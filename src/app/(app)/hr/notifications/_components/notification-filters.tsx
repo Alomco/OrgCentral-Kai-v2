@@ -5,6 +5,7 @@ import { useCallback, useTransition } from 'react';
 import { X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
@@ -47,10 +48,14 @@ export function NotificationFilters() {
     });
   };
 
+  const q = searchParams.get('q') ?? '';
   const hasFilters = Boolean(currentType) || Boolean(currentPriority) || unreadOnly;
 
   return (
     <div className="flex flex-wrap items-center gap-4 mb-6">
+      <div className="w-64">
+        <Input aria-label="Search notifications" placeholder="Search" defaultValue={q} onChange={(e)=>updateFilters('q', e.target.value.trim().length>0 ? e.target.value : null)} disabled={isPending} className="h-9" />
+      </div>
       <div className="flex items-center space-x-2">
         <Switch
           id="unread-mode"

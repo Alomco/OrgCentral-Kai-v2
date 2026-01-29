@@ -11,7 +11,7 @@ import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { ThemeSwitcher } from '@/components/theme/theme-switcher';
 import { NotificationBell } from '@/components/notifications/notification-bell';
-import type { HRNotificationDTO } from '@/server/types/hr/notifications';
+import type { NotificationSummary } from '@/components/notifications/notification-item';
 import { UserNav } from './user-nav';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
 import type { OrgBranding } from '@/server/types/branding-types';
@@ -21,7 +21,7 @@ interface AppHeaderProps {
     session: NonNullable<AuthSession>;
     authorization: RepositoryAuthorizationContext;
     branding?: OrgBranding | null;
-    notifications: HRNotificationDTO[];
+    notifications: NotificationSummary[];
     unreadCount: number;
 }
 

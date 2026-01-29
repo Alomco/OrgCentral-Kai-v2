@@ -1,6 +1,7 @@
 'use client';
 
 import { useActionState, useEffect, useRef } from 'react';
+import { useQuery } from '@tanstack/react-query';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,13 +11,21 @@ import { Spinner } from '@/components/ui/spinner';
 import type { HrIntegrationsDefaults } from '../integrations-schema';
 import { buildInitialHrIntegrationsFormState } from '../integrations-form-state';
 import { updateHrIntegrationsAction } from '../integrations-actions';
+import { fetchHrIntegrationsDefaults, HR_INTEGRATIONS_QUERY_KEY } from '../integrations-query';
 import { GoogleCalendarSection } from './hr-google-calendar-section';
 import { LmsIntegrationSection } from './hr-lms-integration-section';
 import { MicrosoftCalendarSection } from './hr-m365-calendar-section';
 
 export function HrIntegrationsForm(props: { defaults: HrIntegrationsDefaults }) {
-    const initialState = buildInitialHrIntegrationsFormState(props.defaults);
+    const { data: defaults } = useQuery({
+        queryKey: HR_INTEGRATIONS_QUERY_KEY,
+        queryFn: fetchHrIntegrationsDefaults,
+        initialData: props.defaults,
+    });
+    const resolvedDefaults = defaults ?? props.defaults;
+    const initialState = buildInitialHrIntegrationsFormState(resolvedDefaults);
     const [state, formAction, pending] = useActionState(updateHrIntegrationsAction, initialState);
+    const integrationStatus = defaults?.status ?? state.integrationStatus;
 
     const googleEnabledReference = useRef<HTMLInputElement | null>(null);
     const m365EnabledReference = useRef<HTMLInputElement | null>(null);
@@ -45,7 +54,7 @@ export function HrIntegrationsForm(props: { defaults: HrIntegrationsDefaults }) 
                 <CardContent className="space-y-8">
                     <GoogleCalendarSection
                         pending={pending}
-                        state={state}
+                        state={{ ...state, integrationStatus }}
                         enabledReference={googleEnabledReference}
                     />
 
@@ -53,7 +62,7 @@ export function HrIntegrationsForm(props: { defaults: HrIntegrationsDefaults }) 
 
                     <MicrosoftCalendarSection
                         pending={pending}
-                        state={state}
+                        state={{ ...state, integrationStatus }}
                         enabledReference={m365EnabledReference}
                     />
 
@@ -61,7 +70,7 @@ export function HrIntegrationsForm(props: { defaults: HrIntegrationsDefaults }) 
 
                     <LmsIntegrationSection
                         pending={pending}
-                        state={state}
+                        state={{ ...state, integrationStatus }}
                         enabledReference={lmsEnabledReference}
                     />
                 </CardContent>

@@ -246,6 +246,51 @@ Constraints: ≤250 LOC per file (split early), Server Components first, minimal
 
 ---
 
+## Next 10 TODOs (161–170)
+
+- [x] 161) Refactor HR notification settings to use React Query for server state
+- [x] 162) Add mutation-driven updates for notification channel toggles
+- [x] 163) Update notification preferences cache on success
+- [x] 164) Enforce HR notification permissions on settings actions
+- [x] 165) Show pending UI using shared `Spinner` in notification settings
+- [x] 166) Add `aria-busy` on notification settings container
+- [x] 167) Add audit metadata for HR settings update action
+- [x] 168) Reduce time-tracking auth waterfall by starting manager auth early
+- [x] 169) Add notification preferences query key constant
+- [x] 170) Ensure notification toggles respect pending state
+
+---
+
+## Next 10 TODOs (171–180)
+
+- [x] 171) Add optimistic rollback for notification toggles on failure
+- [x] 172) Add notification settings error summary region for failed saves
+- [x] 173) Add Suspense-friendly loading shell for notification settings
+- [x] 174) Wire cache tags for notification settings route preferences
+- [ ] 175) Add unit coverage for notification preference action auth
+- [x] 176) Add mutation retry policy for HR notification preferences
+- [ ] 177) Add reduced-motion safeguards for notification settings transitions
+- [x] 178) Add `aria-describedby` help text for notification type switches
+- [ ] 179) Add server action rate limiting for notification preference updates
+- [ ] 180) Add analytics-safe audit event for notification preference changes
+
+---
+
+## Next 10 TODOs (181–190)
+
+- [ ] 181) Audit remaining HR forms for unused client state and remove
+- [ ] 182) Parallelize independent data fetches on HR dashboard
+- [ ] 183) Add memoized derived state for HR settings form errors
+- [ ] 184) Normalize notification metadata shape at action boundary
+- [ ] 185) Add reduced-motion safeguards for HR notification status banner
+- [ ] 186) Add tests for time tracking manager auth gating
+- [ ] 187) Add React Query retries for HR settings query endpoints
+- [ ] 188) Add server action guard for notification preference list route
+- [ ] 189) Add audit metadata for notification preference deletion actions
+- [x] 190) Re-run lint after this tranche
+
+---
+
 ## Implementation Checklist (File-Scoped)
 
 ### 1) Tenant theme SSR (High)

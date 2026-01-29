@@ -4,7 +4,7 @@ import { headers } from 'next/headers';
 
 import { getSessionContext } from '@/server/use-cases/auth/sessions/get-session';
 
-type LeavePolicyAction = 'create' | 'update' | 'delete';
+type LeavePolicyAction = 'create' | 'update' | 'delete' | 'list';
 
 export async function getLeavePolicySession(action: LeavePolicyAction) {
     try {

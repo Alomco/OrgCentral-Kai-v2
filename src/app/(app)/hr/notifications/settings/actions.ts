@@ -5,13 +5,12 @@ import type { Prisma } from '@prisma/client';
 
 import { toActionState, type ActionState } from '@/server/actions/action-state';
 import { authAction } from '@/server/actions/auth-action';
+import { HR_ACTION, HR_RESOURCE } from '@/server/security/authorization/hr-resource-registry';
 import { getNotificationPreferencesAction } from '@/server/api-adapters/hr/notifications/get-notification-preferences';
 import { updateNotificationPreferenceAction } from '@/server/api-adapters/hr/notifications/update-notification-preference';
 import type { NotificationPreference } from '@/server/types/hr-types';
 
 const AUDIT_PREFIX = 'action:hr:notifications:settings';
-const RESOURCE_TYPE = 'hr.notification-preference';
-
 function isPrismaJsonValue(value: unknown): value is Prisma.JsonValue {
   if (
     value === null ||
@@ -48,8 +47,10 @@ export async function getNotificationPreferences(): Promise<ActionState<{ prefer
     authAction(
       {
         auditSource: `${AUDIT_PREFIX}:list`,
-        action: 'read',
-        resourceType: RESOURCE_TYPE,
+        action: HR_ACTION.READ,
+        resourceType: HR_RESOURCE.HR_NOTIFICATION,
+        requiredPermissions: { [HR_RESOURCE.HR_NOTIFICATION]: [HR_ACTION.READ] },
+        resourceAttributes: { view: 'preferences' },
       },
       async ({ authorization }) => {
         return getNotificationPreferencesAction({ authorization });
@@ -67,8 +68,9 @@ export async function updateNotificationPreference(
     authAction(
       {
         auditSource: `${AUDIT_PREFIX}:update`,
-        action: 'update',
-        resourceType: RESOURCE_TYPE,
+        action: HR_ACTION.UPDATE,
+        resourceType: HR_RESOURCE.HR_NOTIFICATION,
+        requiredPermissions: { [HR_RESOURCE.HR_NOTIFICATION]: [HR_ACTION.UPDATE] },
         resourceAttributes: { preferenceId: parsed.preferenceId },
       },
       async ({ authorization }) => {

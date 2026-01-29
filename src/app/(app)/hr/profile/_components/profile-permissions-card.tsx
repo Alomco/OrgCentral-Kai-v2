@@ -29,9 +29,9 @@ export function ProfilePermissionsCard({
         .filter(([, actions]) => Array.isArray(actions) && actions.length > 0)
         .map(([resource, actions]) => ({
             resource,
-            actions: Array.from(new Set(actions)).sort(),
+            actions: Array.from(new Set(actions)).toSorted(),
         }))
-        .sort((a, b) => a.resource.localeCompare(b.resource));
+        .toSorted((a, b) => a.resource.localeCompare(b.resource));
 
     return (
         <Card className={cn("glass-card", className)} data-ui-surface="container">

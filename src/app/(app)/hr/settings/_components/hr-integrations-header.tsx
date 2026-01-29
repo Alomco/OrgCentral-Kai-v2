@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react';
 import { useState, useTransition } from 'react';
-import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
@@ -11,6 +11,7 @@ import { HrStatusIndicator, type StatusVariant } from '@/app/(app)/hr/_component
 import type { HrIntegrationsStatus } from '../integrations-schema';
 import { triggerIntegrationSyncAction } from '../integrations-actions';
 import type { IntegrationProvider } from '@/server/workers/hr/integrations/integration-sync.types';
+import { HR_INTEGRATIONS_QUERY_KEY } from '../integrations-query';
 
 export interface IntegrationSectionHeaderProps {
     title: string;
@@ -81,7 +82,7 @@ function formatLastSync(value: string | null): string {
 }
 
 function IntegrationSyncButton(props: { provider: IntegrationProvider; disabled: boolean }) {
-    const router = useRouter();
+    const queryClient = useQueryClient();
     const [message, setMessage] = useState<string | null>(null);
     const [isPending, startTransition] = useTransition();
 
@@ -92,7 +93,7 @@ function IntegrationSyncButton(props: { provider: IntegrationProvider; disabled:
                 .then((result) => {
                     setMessage(result.message);
                     if (result.status === 'success') {
-                        router.refresh();
+                        void queryClient.invalidateQueries({ queryKey: HR_INTEGRATIONS_QUERY_KEY }).catch(() => null);
                     }
                 })
                 .catch(() => setMessage('Unable to queue sync.'));

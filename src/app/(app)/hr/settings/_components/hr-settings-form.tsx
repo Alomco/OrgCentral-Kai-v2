@@ -25,6 +25,15 @@ function readFieldError(fieldErrors: unknown, key: string): string | undefined {
     return typeof value === 'string' ? value : undefined;
 }
 
+const SETTINGS_HEADER = (
+    <CardHeader>
+        <CardTitle>Working hours</CardTitle>
+        <CardDescription>
+            Standard defaults used for leave, time tracking, and absence calculations.
+        </CardDescription>
+    </CardHeader>
+);
+
 export function HrSettingsForm(props: {
     defaults: HrSettingsFormValues;
 }) {
@@ -58,12 +67,7 @@ export function HrSettingsForm(props: {
     return (
         <form ref={formReference} action={formAction}>
             <Card>
-                <CardHeader>
-                    <CardTitle>Working hours</CardTitle>
-                    <CardDescription>
-                        Standard defaults used for leave, time tracking, and absence calculations.
-                    </CardDescription>
-                </CardHeader>
+                {SETTINGS_HEADER}
 
                 <CardContent className="space-y-6">
                     <fieldset disabled={pending} className="space-y-6">

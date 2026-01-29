@@ -1,15 +1,17 @@
 
 'use client';
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useSyncExternalStore, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, type ReactNode } from 'react';
 import { useTheme as useNextTheme } from 'next-themes';
 import { converter, parse } from 'culori';
-import { ORG_SCOPE_CHANGE_EVENT, readOrgScope } from './org-scope';
+import { ORG_SCOPE_CHANGE_EVENT } from './org-scope';
+import { subscribeGlobalEventListener } from '@/lib/dom/global-event-listeners';
+import { useThemeStore, type ThemeId } from './theme-store';
 
-import { getThemePreset, themePresets, type ThemePresetId } from '@/server/theme/theme-presets';
+import { getThemePreset, themePresets } from '@/server/theme/theme-presets';
 import { themeTokenKeys } from '@/server/theme/tokens';
 
-export type ThemeId = ThemePresetId;
+export type { ThemeId };
 
 interface ThemeContextValue {
     /** Local preview override. When null, the org/server theme is in effect. */
@@ -25,9 +27,6 @@ interface ThemeContextValue {
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
-const THEME_STORAGE_KEY_PREFIX = 'orgcentral-theme:';
-const THEME_CHANGE_EVENT = 'orgcentral-theme-change';
-
 interface OklchColor {
     l?: number;
     c?: number;
@@ -35,10 +34,6 @@ interface OklchColor {
 }
 
 const toOklch = converter('oklch');
-
-function getThemeStorageKey(): string {
-    return `${THEME_STORAGE_KEY_PREFIX}${readOrgScope()}`;
-}
 
 function formatOklchToken(color: OklchColor): string | null {
     if (typeof color.l !== 'number' || typeof color.c !== 'number') {
@@ -71,40 +66,11 @@ export const THEME_PRESETS = Object.values(themePresets).map((preset) => ({
     color: toCssOklch(preset.tokens.primary),
 })) as readonly { id: ThemeId; name: string; color: string }[];
 
-function isThemeId(value: string | null): value is ThemeId {
-    return Boolean(value && Object.prototype.hasOwnProperty.call(themePresets, value));
-}
-
-function readStoredTheme(): ThemeId | null {
-    try {
-        const value = localStorage.getItem(getThemeStorageKey());
-        return isThemeId(value) ? value : null;
-    } catch {
-        return null;
-    }
-}
-
-function subscribeToThemeChanges(onStoreChange: () => void) {
-    const handler = () => onStoreChange();
-
-    window.addEventListener('storage', handler);
-    window.addEventListener(THEME_CHANGE_EVENT, handler);
-    window.addEventListener(ORG_SCOPE_CHANGE_EVENT, handler);
-
-    return () => {
-        window.removeEventListener('storage', handler);
-        window.removeEventListener(THEME_CHANGE_EVENT, handler);
-        window.removeEventListener(ORG_SCOPE_CHANGE_EVENT, handler);
-    };
-}
-
 export function ThemeProvider({ children }: { children: ReactNode }) {
     const { theme: mode, resolvedTheme } = useNextTheme();
-    const storedTheme = useSyncExternalStore(
-        subscribeToThemeChanges,
-        readStoredTheme,
-        () => null,
-    );
+    const storedTheme = useThemeStore((state) => state.themeId);
+    const setThemeId = useThemeStore((state) => state.setThemeId);
+    const clearThemeId = useThemeStore((state) => state.clearThemeId);
 
     const themes = useMemo(() => THEME_PRESETS, []);
 
@@ -150,6 +116,30 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     }, [applyThemeDataAttributes]);
 
     useEffect(() => {
+        const handleRehydrate = () => {
+            Promise.resolve(useThemeStore.persist.rehydrate()).catch(() => null);
+        };
+
+        const unsubscribeStorage = subscribeGlobalEventListener({
+            key: 'window:storage:theme',
+            target: window,
+            type: 'storage',
+            handler: handleRehydrate,
+        });
+        const unsubscribeOrgScope = subscribeGlobalEventListener({
+            key: `window:${ORG_SCOPE_CHANGE_EVENT}:theme`,
+            target: window,
+            type: ORG_SCOPE_CHANGE_EVENT,
+            handler: handleRehydrate,
+        });
+
+        return () => {
+            unsubscribeStorage();
+            unsubscribeOrgScope();
+        };
+    }, []);
+
+    useEffect(() => {
         // Only override tenant-provided theme when a user has explicitly picked one.
         if (!storedTheme) {
             clearThemeFromDOM(activeMode);
@@ -160,14 +150,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     }, [activeMode, storedTheme, applyThemeToDOM, clearThemeFromDOM]);
 
     const setTheme = (themeId: ThemeId) => {
-        localStorage.setItem(getThemeStorageKey(), themeId);
-        window.dispatchEvent(new Event(THEME_CHANGE_EVENT));
+        setThemeId(themeId);
         applyThemeToDOM(themeId, activeMode);
     };
 
     const clearTheme = () => {
-        localStorage.removeItem(getThemeStorageKey());
-        window.dispatchEvent(new Event(THEME_CHANGE_EVENT));
+        clearThemeId();
         clearThemeFromDOM(activeMode);
     };
 

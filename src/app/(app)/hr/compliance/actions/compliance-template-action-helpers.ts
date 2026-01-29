@@ -8,7 +8,7 @@ const COMPLIANCE_TEMPLATES_AUDIT_SOURCE_PREFIX = 'ui:hr:compliance:templates';
 const COMPLIANCE_TEMPLATE_RESOURCE_TYPE = 'hr.compliance.template';
 const ORG_PERMISSION_UPDATE = 'update' as const;
 
-type ComplianceTemplateAction = 'create' | 'update' | 'delete';
+type ComplianceTemplateAction = 'create' | 'update' | 'delete' | 'list';
 
 export async function getComplianceTemplateSession(action: ComplianceTemplateAction) {
     try {

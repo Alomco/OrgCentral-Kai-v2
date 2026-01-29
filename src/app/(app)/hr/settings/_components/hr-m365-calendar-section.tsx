@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import type { RefObject } from 'react';
 import { Cloud } from 'lucide-react';
@@ -59,6 +59,7 @@ export function MicrosoftCalendarSection({ pending, state, enabledReference }: I
                     />
                     <Switch
                         id="m365Enabled"
+                        aria-describedby="m365Enabled-help"
                         key={state.values.m365Enabled ? 'm365-on' : 'm365-off'}
                         defaultChecked={state.values.m365Enabled}
                         onCheckedChange={(checked) => {
@@ -69,6 +70,7 @@ export function MicrosoftCalendarSection({ pending, state, enabledReference }: I
                         aria-label="Enable Microsoft 365 connector"
                         disabled={pending}
                     />
+                    <p id="m365Enabled-help" className="sr-only">Toggle Microsoft 365 calendar integration for HR.</p>
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
                     <div className="space-y-2">

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState, useTransition } from 'react';
 import { CheckCircle, XCircle, Loader2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -37,17 +37,24 @@ interface AbsenceApprovalDialogProps {
     onReject?: (id: string, reason: string) => Promise<void>;
 }
 
+const DATE_RANGE_FORMATTER = new Intl.DateTimeFormat('en-US', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+});
+
+const DIALOG_HEADER = (
+    <DialogHeader>
+        <DialogTitle>Absence Request Review</DialogTitle>
+        <DialogDescription>
+            Review and respond to this absence request
+        </DialogDescription>
+    </DialogHeader>
+);
+
 function formatDateRange(start: Date, end: Date): string {
-    const startString = start.toLocaleDateString('en-US', {
-        weekday: 'short',
-        month: 'short',
-        day: 'numeric',
-    });
-    const endString = end.toLocaleDateString('en-US', {
-        weekday: 'short',
-        month: 'short',
-        day: 'numeric',
-    });
+    const startString = DATE_RANGE_FORMATTER.format(start);
+    const endString = DATE_RANGE_FORMATTER.format(end);
     if (startString === endString) { return startString; }
     return startString + ' - ' + endString;
 }
@@ -61,32 +68,41 @@ export function AbsenceApprovalDialog({
 }: AbsenceApprovalDialogProps) {
     const [action, setAction] = useState<'approve' | 'reject' | null>(null);
     const [comments, setComments] = useState('');
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isPending, startTransition] = useTransition();
+    const approveReference = useRef(onApprove);
+    const rejectReference = useRef(onReject);
 
-    const handleApprove = async () => {
-        if (!request || !onApprove) { return; }
-        setIsSubmitting(true);
-        try {
-            await onApprove(request.id, comments);
-            handleClose();
-        } finally {
-            setIsSubmitting(false);
-        }
+    useEffect(() => {
+        approveReference.current = onApprove;
+        rejectReference.current = onReject;
+    }, [onApprove, onReject]);
+
+    const handleApprove = () => {
+        if (!request || !approveReference.current) { return; }
+        startTransition(() => {
+            const promise = approveReference.current?.(request.id, comments);
+            if (promise) {
+                promise
+                    .then(() => handleClose())
+                    .catch(() => null);
+            }
+        });
     };
 
-    const handleReject = async () => {
-        if (!request || !onReject) { return; }
+    const handleReject = () => {
+        if (!request || !rejectReference.current) { return; }
         if (!comments.trim()) {
             setAction('reject');
             return;
         }
-        setIsSubmitting(true);
-        try {
-            await onReject(request.id, comments);
-            handleClose();
-        } finally {
-            setIsSubmitting(false);
-        }
+        startTransition(() => {
+            const promise = rejectReference.current?.(request.id, comments);
+            if (promise) {
+                promise
+                    .then(() => handleClose())
+                    .catch(() => null);
+            }
+        });
     };
 
     const handleClose = () => {
@@ -107,12 +123,7 @@ export function AbsenceApprovalDialog({
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-[450px]">
-                <DialogHeader>
-                    <DialogTitle>Absence Request Review</DialogTitle>
-                    <DialogDescription>
-                        Review and respond to this absence request
-                    </DialogDescription>
-                </DialogHeader>
+                {DIALOG_HEADER}
 
                 <div className="space-y-4 py-4">
                     {/* Request Details */}
@@ -122,7 +133,9 @@ export function AbsenceApprovalDialog({
                             <Badge variant="secondary">{request.type}</Badge>
                         </div>
                         <div className="text-sm text-muted-foreground">
-                            <p>{formatDateRange(request.startDate, request.endDate)}</p>
+                            <p suppressHydrationWarning>
+                                {formatDateRange(request.startDate, request.endDate)}
+                            </p>
                             <p className="text-xs">
                                 {durationDisplay.label}
                                 {durationDisplay.timeRange ? ` · ${durationDisplay.timeRange}` : ''}
@@ -164,24 +177,24 @@ export function AbsenceApprovalDialog({
                     <Button
                         variant="outline"
                         onClick={handleClose}
-                        disabled={isSubmitting}
+                        disabled={isPending}
                     >
                         Cancel
                     </Button>
                     <Button
                         variant="destructive"
                         onClick={handleReject}
-                        disabled={isSubmitting || (action === 'reject' && !comments.trim())}
+                        disabled={isPending || (action === 'reject' && !comments.trim())}
                     >
-                        {isSubmitting && action === 'reject' ? (
+                        {isPending && action === 'reject' ? (
                             <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                         ) : (
                             <XCircle className="h-4 w-4 mr-2" />
                         )}
                         Reject
                     </Button>
-                    <Button onClick={handleApprove} disabled={isSubmitting}>
-                        {isSubmitting && action === 'approve' ? (
+                    <Button onClick={handleApprove} disabled={isPending}>
+                        {isPending && action === 'approve' ? (
                             <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                         ) : (
                             <CheckCircle className="h-4 w-4 mr-2" />

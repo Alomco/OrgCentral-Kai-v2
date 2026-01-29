@@ -10,9 +10,11 @@
 
 'use client';
 
-import { createContext, useContext, useEffect, useMemo, useSyncExternalStore, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { uiStylePresets, uiStyleKeys, defaultUiStyle, getUiStyleCssVariables, isUiStyleKey, type UiStyleKey } from '@/server/theme/ui-style-presets';
-import { ORG_SCOPE_CHANGE_EVENT, readOrgScope } from './org-scope';
+import { ORG_SCOPE_CHANGE_EVENT } from './org-scope';
+import { useUiStyleStore } from './ui-style-store';
+import { subscribeGlobalEventListener } from '@/lib/dom/global-event-listeners';
 
 // ============================================================================
 // Types
@@ -43,14 +45,6 @@ const UiStyleContext = createContext<UiStyleContextValue | undefined>(undefined)
 const UI_STYLE_STORAGE_KEY_PREFIX = 'orgcentral-ui-style:';
 const UI_STYLE_CHANGE_EVENT = 'orgcentral-ui-style-change';
 
-// ============================================================================
-// Storage & Events
-// ============================================================================
-
-function getUiStyleStorageKey(): string {
-    return `${UI_STYLE_STORAGE_KEY_PREFIX}${readOrgScope()}`;
-}
-
 function readServerStyle(): UiStyleKey {
     try {
         const value = document.documentElement.dataset.uiStyle ?? null;
@@ -58,27 +52,6 @@ function readServerStyle(): UiStyleKey {
     } catch {
         return defaultUiStyle;
     }
-}
-
-function readStoredStyle(): UiStyleKey {
-    try {
-        const value = localStorage.getItem(getUiStyleStorageKey());
-        return isUiStyleKey(value) ? value : readServerStyle();
-    } catch {
-        return readServerStyle();
-    }
-}
-
-function subscribeToStyleChanges(onStoreChange: () => void) {
-    const handler = () => onStoreChange();
-    window.addEventListener('storage', handler);
-    window.addEventListener(UI_STYLE_CHANGE_EVENT, handler);
-    window.addEventListener(ORG_SCOPE_CHANGE_EVENT, handler);
-    return () => {
-        window.removeEventListener('storage', handler);
-        window.removeEventListener(UI_STYLE_CHANGE_EVENT, handler);
-        window.removeEventListener(ORG_SCOPE_CHANGE_EVENT, handler);
-    };
 }
 
 // ============================================================================
@@ -116,10 +89,23 @@ try {
     var orgId = root.dataset.orgId || 'default';
     var storageKey = STORAGE_KEY_PREFIX + orgId;
 
-    // Read from localStorage
+    // Read from localStorage (zustand persist)
     var stored = null;
+    var storedStyle = null;
     try { stored = localStorage.getItem(storageKey); } catch(e) {}
-    var styleKey = (stored && VALID_KEYS.indexOf(stored) !== -1) ? stored : null;
+    if (stored) {
+        try {
+            var parsed = JSON.parse(stored);
+            if (parsed && parsed.state && typeof parsed.state.overrideStyle === 'string') {
+                storedStyle = parsed.state.overrideStyle;
+            } else if (typeof parsed === 'string') {
+                storedStyle = parsed;
+            }
+        } catch(e) {
+            storedStyle = stored;
+        }
+    }
+    var styleKey = (storedStyle && VALID_KEYS.indexOf(storedStyle) !== -1) ? storedStyle : null;
     var serverStyle = root.dataset.uiStyle;
     if (!styleKey && serverStyle && VALID_KEYS.indexOf(serverStyle) !== -1) {
         styleKey = serverStyle;
@@ -152,11 +138,11 @@ try {
 // ============================================================================
 
 export function UiStyleProvider({ children }: { children: ReactNode }) {
-    const storedStyle = useSyncExternalStore(
-        subscribeToStyleChanges,
-        readStoredStyle,
-        () => defaultUiStyle,
-    );
+    const [serverStyle, setServerStyle] = useState<UiStyleKey>(() => readServerStyle());
+    const overrideStyle = useUiStyleStore((state) => state.overrideStyle);
+    const setOverrideStyle = useUiStyleStore((state) => state.setOverrideStyle);
+    const clearOverrideStyle = useUiStyleStore((state) => state.clearOverrideStyle);
+    const resolvedStyle = overrideStyle ?? serverStyle;
 
     // Generate blocking script for SSR
     const blockingScript = useMemo(() => generateBlockingScript(), []);
@@ -177,24 +163,58 @@ export function UiStyleProvider({ children }: { children: ReactNode }) {
 
     // Apply style to DOM on mount and change
     useEffect(() => {
-        applyStyleToDOM(storedStyle);
-    }, [storedStyle]);
+        const handleUpdate = () => {
+            Promise.resolve(useUiStyleStore.persist.rehydrate()).catch(() => {
+                // ignore hydration errors
+            });
+            setServerStyle(readServerStyle());
+        };
+
+        const unsubscribeStorage = subscribeGlobalEventListener({
+            key: 'window:storage:ui-style',
+            target: window,
+            type: 'storage',
+            handler: handleUpdate,
+        });
+        const unsubscribeUiStyle = subscribeGlobalEventListener({
+            key: `window:${UI_STYLE_CHANGE_EVENT}:ui-style`,
+            target: window,
+            type: UI_STYLE_CHANGE_EVENT,
+            handler: handleUpdate,
+        });
+        const unsubscribeOrgScope = subscribeGlobalEventListener({
+            key: `window:${ORG_SCOPE_CHANGE_EVENT}:ui-style`,
+            target: window,
+            type: ORG_SCOPE_CHANGE_EVENT,
+            handler: handleUpdate,
+        });
+
+        return () => {
+            unsubscribeStorage();
+            unsubscribeUiStyle();
+            unsubscribeOrgScope();
+        };
+    }, []);
+
+    useEffect(() => {
+        applyStyleToDOM(resolvedStyle);
+    }, [resolvedStyle]);
 
     const setStyle = (styleKey: UiStyleKey) => {
-        localStorage.setItem(getUiStyleStorageKey(), styleKey);
+        setOverrideStyle(styleKey);
         applyStyleToDOM(styleKey);
-        window.dispatchEvent(new Event(UI_STYLE_CHANGE_EVENT));
     };
 
     const clearStyle = () => {
-        localStorage.removeItem(getUiStyleStorageKey());
-        applyStyleToDOM(readServerStyle());
-        window.dispatchEvent(new Event(UI_STYLE_CHANGE_EVENT));
+        clearOverrideStyle();
+        const nextStyle = readServerStyle();
+        setServerStyle(nextStyle);
+        applyStyleToDOM(nextStyle);
     };
 
     return (
         <UiStyleContext.Provider value={{
-            currentStyle: storedStyle,
+            currentStyle: resolvedStyle,
             setStyle,
             clearStyle,
             styles: UI_STYLE_OPTIONS,
@@ -220,4 +240,3 @@ export function useUiStyle() {
     }
     return context;
 }
-

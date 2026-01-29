@@ -42,8 +42,7 @@ export default async function OrgAbacPoliciesPage() {
             </div>
 
             <Suspense fallback={<PolicyEditorSkeleton />}>
-                <AbacPolicyEditorPanel
-                    policiesPromise={policiesPromise}
+                <AbacPolicyEditorPanel policiesPromise={policiesPromise} orgId={authorization.orgId}
                     actionOptions={actionOptions}
                     resourceOptions={resourceOptions}
                 />
@@ -91,19 +90,7 @@ async function loadPolicies(
     return policies;
 }
 
-async function AbacPolicyEditorPanel({
-    policiesPromise,
-    actionOptions,
-    resourceOptions,
-}: {
-    policiesPromise: Promise<AbacPolicy[]>;
-    actionOptions: string[];
-    resourceOptions: string[];
-}) {
-    const policies = await policiesPromise;
-
-    return (
-        <AbacPolicyEditor
+async function AbacPolicyEditorPanel({ policiesPromise, actionOptions, resourceOptions, orgId }: { policiesPromise: Promise<AbacPolicy[]>; actionOptions: string[]; resourceOptions: string[]; orgId: string }) { const policies = await policiesPromise; return (<AbacPolicyEditor orgId={orgId}
             initialPolicies={policies}
             defaultPolicies={DEFAULT_BOOTSTRAP_POLICIES}
             actionOptions={actionOptions}
@@ -179,3 +166,5 @@ function PolicyEditorSkeleton() {
 function PolicySummarySkeleton() {
     return <div className="h-48 w-full animate-pulse rounded-2xl bg-[oklch(var(--muted))] motion-reduce:animate-none" />;
 }
+
+

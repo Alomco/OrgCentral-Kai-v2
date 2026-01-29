@@ -1,7 +1,7 @@
-'use client';
+﻿'use client';
 
 import { useActionState, useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 
 import {
     AlertDialog,
@@ -15,46 +15,40 @@ import {
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
-import { Spinner } from '@/components/ui/spinner';
 
+import { permissionKeys } from './permissions.api';
 import { deletePermissionResourceAction } from '../permission-resource-actions';
 import type { PermissionResourceInlineState } from '../permission-resource-form-utils';
 
-const initialInlineState: PermissionResourceInlineState = { status: 'idle' };
-
-export function PermissionResourceDeleteForm(props: { resourceId: string }) {
-    const router = useRouter();
-    const [state, action, pending] = useActionState(deletePermissionResourceAction, initialInlineState);
+export function PermissionResourceDeleteForm(props: { orgId: string; resourceId: string }) {
     const [confirmOpen, setConfirmOpen] = useState(false);
     const formReference = useRef<HTMLFormElement | null>(null);
+    const queryClient = useQueryClient();
+    const [state, formAction, pending] = useActionState<PermissionResourceInlineState, FormData>(
+        deletePermissionResourceAction,
+        { status: 'idle' },
+    );
 
     useEffect(() => {
         if (state.status === 'success') {
-            router.refresh();
+            queryClient.invalidateQueries({ queryKey: permissionKeys.list(props.orgId) }).catch(() => null);
         }
-    }, [router, state.status]);
-
-    useEffect(() => {
-        formReference.current?.setAttribute('aria-busy', pending ? 'true' : 'false');
-    }, [pending]);
+    }, [props.orgId, queryClient, state.status]);
 
     return (
-        <form ref={formReference} action={action} className="flex flex-wrap items-center justify-end gap-2">
+        <form ref={formReference} action={formAction} className="flex flex-wrap items-center justify-end gap-2" aria-busy={pending}>
             <input type="hidden" name="resourceId" value={props.resourceId} />
-
             <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
                 <AlertDialogTrigger asChild>
                     <Button type="button" size="sm" variant="destructive" disabled={pending}>
-                        {pending ? <Spinner className="mr-2" /> : null}
-                        {pending ? 'Deleting...' : 'Delete'}
+                        {pending ? 'Deleting…' : 'Delete'}
                     </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>Delete permission resource?</AlertDialogTitle>
                         <AlertDialogDescription>
-                            This cannot be undone. Roles and policies referencing this resource will
-                            need to be updated.
+                            This cannot be undone. Roles and policies referencing this resource will need to be updated.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -66,8 +60,7 @@ export function PermissionResourceDeleteForm(props: { resourceId: string }) {
                                 formReference.current?.requestSubmit();
                             }}
                         >
-                            {pending ? <Spinner className="mr-2" /> : null}
-                            {pending ? 'Deleting...' : 'Delete resource'}
+                            {pending ? 'Deleting…' : 'Delete resource'}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

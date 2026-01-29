@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { LANDING_NAV_LINKS } from "@/components/landing/config/landing-content";
 import { landingFont } from "@/components/landing/config/landing-typography";
 import type { NavLinkConfig } from "@/components/landing/config/landing-content";
+import { subscribeGlobalEventListener } from "@/lib/dom/global-event-listeners";
 
 export default function LandingNav() {
     const [isScrolled, setIsScrolled] = useState(false);
@@ -19,8 +20,14 @@ export default function LandingNav() {
         };
 
         handleScroll();
-        window.addEventListener("scroll", handleScroll);
-        return () => window.removeEventListener("scroll", handleScroll);
+        const unsubscribe = subscribeGlobalEventListener({
+            key: "window:scroll:landing",
+            target: window,
+            type: "scroll",
+            handler: handleScroll,
+            options: { passive: true },
+        });
+        return () => unsubscribe();
     }, []);
 
     const scrollToSection = useCallback((target: string) => {

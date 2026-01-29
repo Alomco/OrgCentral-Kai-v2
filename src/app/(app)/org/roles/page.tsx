@@ -2,7 +2,7 @@ import { unstable_noStore as noStore } from 'next/cache';
 import { headers } from 'next/headers';
 
 import { RoleCreateForm } from './_components/role-create-form';
-import { RoleRow } from './_components/role-row';
+import { RolesListClient } from './_components/roles-list.client';
 import { getSessionContextOrRedirect } from '@/server/ui/auth/session-redirect';
 import { getRoleService } from '@/server/services/org';
 
@@ -32,26 +32,10 @@ export default async function OrgRolesPage() {
                 </p>
             </div>
 
-            <RoleCreateForm />
+            <RoleCreateForm orgId={authorization.orgId} />
 
             <div className="rounded-2xl bg-card/60 p-6 backdrop-blur">
-                <div className="grid gap-3">
-                    {roles.length === 0 ? (
-                        <p className="text-sm text-muted-foreground">No roles found.</p>
-                    ) : (
-                        roles.map((role) => (
-                            <RoleRow
-                                key={role.id}
-                                role={{
-                                    id: role.id,
-                                    name: role.name,
-                                    description: role.description ?? null,
-                                    permissions: role.permissions,
-                                }}
-                            />
-                        ))
-                    )}
-                </div>
+                <RolesListClient orgId={authorization.orgId} initial={roles} />
             </div>
         </div>
     );

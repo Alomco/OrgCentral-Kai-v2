@@ -4,13 +4,13 @@ import { type Metadata } from 'next';
 import { headers as nextHeaders } from 'next/headers';
 
 import { getSessionContextOrRedirect } from '@/server/ui/auth/session-redirect';
-import { getHrNotificationsAction } from '@/server/api-adapters/hr/notifications/get-hr-notifications';
 import { NotificationList } from './_components/notification-list';
 const NotificationFilters = dynamic(
   () => import('./_components/notification-filters').then((module) => module.NotificationFilters),
   { loading: () => <Skeleton className="h-10 w-full rounded-lg" /> },
 );
-import { notificationFilterSchema } from './_schemas/filter-schema';
+import { notificationFilterSchema, type NotificationFilters } from './_schemas/filter-schema';
+import { listHrNotifications } from './actions';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export const metadata: Metadata = {
@@ -24,7 +24,7 @@ interface PageProps {
 
 export default async function NotificationsPage({ searchParams }: PageProps) {
   const headerStore = await nextHeaders();
-  const { authorization, session } = await getSessionContextOrRedirect({}, {
+  await getSessionContextOrRedirect({}, {
     headers: headerStore,
     requiredPermissions: { organization: ['read'] },
     auditSource: 'page:hr:notifications',
@@ -32,17 +32,10 @@ export default async function NotificationsPage({ searchParams }: PageProps) {
 
   const resolvedParams = await searchParams;
   const parseResult = notificationFilterSchema.safeParse(resolvedParams);
-  
-  const filters = parseResult.success ? parseResult.data : {};
-  
-  const notificationsPromise = getHrNotificationsAction({
-    authorization,
-    userId: session.user.id,
-    filters: {
-      ...filters,
-      limit: 50, // Page size
-    },
-  });
+
+  const filters = parseResult.success ? parseResult.data : notificationFilterSchema.parse({});
+
+  const notificationsPromise = listHrNotifications(filters);
 
   return (
     <div className="flex flex-col h-full space-y-6">
@@ -56,7 +49,7 @@ export default async function NotificationsPage({ searchParams }: PageProps) {
       <NotificationFilters />
 
       <Suspense fallback={<NotificationsLoading />}>
-        <NotificationListSection notificationsPromise={notificationsPromise} />
+        <NotificationListSection notificationsPromise={notificationsPromise} filters={filters} />
       </Suspense>
     </div>
   );
@@ -64,11 +57,19 @@ export default async function NotificationsPage({ searchParams }: PageProps) {
 
 async function NotificationListSection({
   notificationsPromise,
+  filters,
 }: {
-  notificationsPromise: ReturnType<typeof getHrNotificationsAction>;
+  notificationsPromise: ReturnType<typeof listHrNotifications>;
+  filters: NotificationFilters;
 }) {
-  const { notifications } = await notificationsPromise;
-  return <NotificationList notifications={notifications} />;
+  const { notifications, unreadCount } = await notificationsPromise;
+  return (
+    <NotificationList
+      initialNotifications={notifications}
+      initialUnreadCount={unreadCount}
+      filters={filters}
+    />
+  );
 }
 
 function NotificationsLoading() {

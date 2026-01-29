@@ -10,7 +10,7 @@ import { TenantThemeRegistry } from '@/components/theme/tenant-theme-registry';
 import { DevelopmentThemeWidget } from '@/components/dev/DevelopmentThemeWidget';
 import { AppClientProviders } from '@/app/(app)/_components/app-client-providers';
 import { getOrgBranding } from '@/server/branding/get-org-branding';
-import { getHrNotificationsAction } from '@/server/api-adapters/hr/notifications/get-hr-notifications';
+import { listHrNotifications } from '@/app/(app)/hr/notifications/actions';
 import { buildAppSessionSnapshot, buildOrgBrandingSnapshot } from '@/server/ui/app-context-snapshots';
 import { getSessionContextOrRedirect } from '@/server/ui/auth/session-redirect';
 import { FloatingParticles } from '@/components/theme/decorative/particles';
@@ -36,11 +36,7 @@ export async function AppLayoutShell({ children }: { children: ReactNode }) {
             classification: authorization.dataClassification,
             residency: authorization.dataResidency,
         }),
-        getHrNotificationsAction({
-            authorization,
-            userId: session.user.id,
-            filters: { limit: 5 },
-        }),
+        listHrNotifications({ limit: 5 }),
     ]);
 
     const branding = brandingResult.status === 'fulfilled' ? brandingResult.value : null;

@@ -9,47 +9,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { TwoFactorPasswordSetupPanel, type PasswordSetupStatus } from '@/components/auth/TwoFactorPasswordSetupPanel';
-
-interface PasswordStatusResponse {
-    hasPassword: boolean;
-    providers: string[];
-    message?: string;
-}
+import { fetchPasswordStatus, passwordKeys, setPassword, type PasswordStatusResponse } from '../password.api';
 
 const PASSWORD_MIN_LENGTH = 12;
-const PASSWORD_STATUS_QUERY_KEY = ['settings', 'security', 'password-status'] as const;
 const EMPTY_PROVIDERS: string[] = [];
-
-async function fetchPasswordStatus(): Promise<PasswordStatusResponse> {
-    const response = await fetch('/api/auth/password-status', { method: 'GET', cache: 'no-store' });
-    const data = (await response.json()) as PasswordStatusResponse;
-
-    if (!response.ok) {
-        throw new Error(data.message ?? 'Unable to load password status.');
-    }
-
-    return {
-        hasPassword: data.hasPassword,
-        providers: Array.isArray(data.providers) ? data.providers : [],
-        message: data.message,
-    };
-}
-
-async function setPassword(newPassword: string): Promise<{ message?: string }> {
-    const response = await fetch('/api/auth/set-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        cache: 'no-store',
-        body: JSON.stringify({ newPassword }),
-    });
-    const data = (await response.json()) as { message?: string };
-
-    if (!response.ok) {
-        throw new Error(data.message ?? 'Unable to set password.');
-    }
-
-    return { message: data.message };
-}
 
 export function PasswordManagementPanel() {
     const queryClient = useQueryClient();
@@ -58,7 +21,7 @@ export function PasswordManagementPanel() {
     const [confirmPassword, setConfirmPassword] = useState('');
 
     const { data, isLoading, isError, error } = useQuery({
-        queryKey: PASSWORD_STATUS_QUERY_KEY,
+        queryKey: passwordKeys.status(),
         queryFn: fetchPasswordStatus,
         staleTime: 0,
         gcTime: 0,
@@ -71,7 +34,7 @@ export function PasswordManagementPanel() {
         mutationFn: setPassword,
         onSuccess: () => {
             setStatus({ tone: 'success', message: 'Password saved. You can enable MFA next.' });
-            queryClient.setQueryData<PasswordStatusResponse>(PASSWORD_STATUS_QUERY_KEY, (previous) => {
+            queryClient.setQueryData<PasswordStatusResponse>(passwordKeys.status(), (previous) => {
                 if (!previous) {
                     return { hasPassword: true, providers: [], message: undefined };
                 }
@@ -89,7 +52,7 @@ export function PasswordManagementPanel() {
             });
         },
         onSettled: async () => {
-            await queryClient.invalidateQueries({ queryKey: PASSWORD_STATUS_QUERY_KEY });
+            await queryClient.invalidateQueries({ queryKey: passwordKeys.status() });
         },
     });
 

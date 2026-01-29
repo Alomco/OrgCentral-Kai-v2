@@ -1,7 +1,7 @@
 'use client';
 
 import { useActionState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,20 +11,21 @@ import type { AbsenceTypeConfig } from '@/server/types/hr-ops-types';
 
 import { updateAbsenceTypeAction } from '../absence-type-actions';
 import type { AbsenceTypeInlineState } from '../absence-type-actions.types';
+import { ABSENCE_TYPES_QUERY_KEY } from '../absence-type-query';
 
 const initialInlineState: AbsenceTypeInlineState = { status: 'idle' };
 
 export function AbsenceTypeRow(props: { type: AbsenceTypeConfig }) {
-    const router = useRouter();
+    const queryClient = useQueryClient();
     const [state, action, pending] = useActionState(updateAbsenceTypeAction, initialInlineState);
     const tracksBalanceReference = useRef<HTMLInputElement | null>(null);
     const isActiveReference = useRef<HTMLInputElement | null>(null);
 
     useEffect(() => {
         if (state.status === 'success') {
-            router.refresh();
+            void queryClient.invalidateQueries({ queryKey: ABSENCE_TYPES_QUERY_KEY }).catch(() => null);
         }
-    }, [router, state.status]);
+    }, [queryClient, state.status]);
 
     const message = state.status === 'idle' ? null : state.message;
 
@@ -67,11 +68,13 @@ export function AbsenceTypeRow(props: { type: AbsenceTypeConfig }) {
                                 tracksBalanceReference.current.value = checked ? 'on' : 'off';
                             }
                         }}
+                        aria-describedby={`absence-type-tracks-help-${props.type.id}`}
                         disabled={pending}
                     />
                     <Label htmlFor={`absence-type-tracks-${props.type.id}`} className="text-xs text-muted-foreground">
                         Tracks balance
                     </Label>
+                    <span id={`absence-type-tracks-help-${props.type.id}`} className="sr-only">Toggle whether this absence type affects balances.</span>
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -91,11 +94,13 @@ export function AbsenceTypeRow(props: { type: AbsenceTypeConfig }) {
                                 isActiveReference.current.value = checked ? 'on' : 'off';
                             }
                         }}
+                        aria-describedby={`absence-type-active-help-${props.type.id}`}
                         disabled={pending}
                     />
                     <Label htmlFor={`absence-type-active-${props.type.id}`} className="text-xs text-muted-foreground">
                         Active
                     </Label>
+                    <span id={`absence-type-active-help-${props.type.id}`} className="sr-only">Toggle whether this absence type can be used by employees.</span>
                 </div>
 
                 <div className="flex items-center justify-start sm:justify-end">

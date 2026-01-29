@@ -1,20 +1,26 @@
 'use server';
 
-import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
-import { getTimeTrackingService } from '@/server/services/hr/time-tracking/time-tracking-service.provider';
 import { revalidatePath } from 'next/cache';
 import { after } from 'next/server';
+import { headers } from 'next/headers';
+
+import { authAction } from '@/server/actions/auth-action';
+import { getTimeTrackingService } from '@/server/services/hr/time-tracking/time-tracking-service.provider';
 import { calculateTotalHours } from '@/server/use-cases/hr/time-tracking/utils';
+import { getSessionContext } from '@/server/use-cases/auth/sessions/get-session';
 
 import type { TimeEntryFormState } from './form-state';
 import { createTimeEntrySchema } from './schema';
+import { buildPendingTimeEntries, type PendingTimeEntry } from './pending-entries';
+
+const AUDIT_PREFIX = 'action:hr:time-tracking';
+const RESOURCE_TYPE = 'hr.time-entry';
 
 function formDataString(value: FormDataEntryValue | null): string {
     return typeof value === 'string' ? value : '';
 }
 
 export async function createTimeEntryAction(
-    authorization: RepositoryAuthorizationContext,
     _previousState: TimeEntryFormState,
     formData: FormData,
 ): Promise<TimeEntryFormState> {
@@ -77,26 +83,36 @@ export async function createTimeEntryAction(
             : undefined;
         const overtimeHours = totalHours ? Math.max(0, totalHours - 8) : 0;
 
-        await service.createTimeEntry({
-            authorization,
-            payload: {
-                userId: authorization.userId,
-                date: new Date(dateString),
-                clockIn: clockInTime,
-                clockOut: clockOutTime,
-                breakDuration: breakDurationHours,
-                totalHours,
-                project: parsed.data.project,
-                tasks,
-                notes: parsed.data.notes,
-                metadata: {
-                    billable: parsed.data.billable === 'on',
-                    projectCode: parsed.data.projectCode ?? null,
-                    overtimeHours: overtimeHours > 0 ? Number(overtimeHours.toFixed(2)) : null,
-                    overtimeReason: parsed.data.overtimeReason ?? null,
-                },
+        await authAction(
+            {
+                auditSource: `${AUDIT_PREFIX}:create`,
+                requiredPermissions: { employeeProfile: ['read'] },
+                action: 'create',
+                resourceType: RESOURCE_TYPE,
             },
-        });
+            async ({ authorization }) => {
+                await service.createTimeEntry({
+                    authorization,
+                    payload: {
+                        userId: authorization.userId,
+                        date: new Date(dateString),
+                        clockIn: clockInTime,
+                        clockOut: clockOutTime,
+                        breakDuration: breakDurationHours,
+                        totalHours,
+                        project: parsed.data.project,
+                        tasks,
+                        notes: parsed.data.notes,
+                        metadata: {
+                            billable: parsed.data.billable === 'on',
+                            projectCode: parsed.data.projectCode ?? null,
+                            overtimeHours: overtimeHours > 0 ? Number(overtimeHours.toFixed(2)) : null,
+                            overtimeReason: parsed.data.overtimeReason ?? null,
+                        },
+                    },
+                });
+            },
+        );
 
         return {
             status: 'success',
@@ -124,20 +140,52 @@ export async function createTimeEntryAction(
     }
 }
 
+export async function getPendingTimeEntriesAction(): Promise<PendingTimeEntry[]> {
+    const headerStore = await headers();
+
+    try {
+        const { authorization } = await getSessionContext(
+            {},
+            {
+                headers: headerStore,
+                requiredPermissions: { organization: ['read'] },
+                auditSource: `${AUDIT_PREFIX}:pending`,
+                action: 'list',
+                resourceType: RESOURCE_TYPE,
+                resourceAttributes: { view: 'team' },
+            },
+        );
+
+        return await buildPendingTimeEntries(authorization);
+    } catch {
+        return [];
+    }
+}
+
 export async function approveTimeEntryAction(
-    authorization: RepositoryAuthorizationContext,
     entryId: string,
     comments?: string,
 ): Promise<void> {
     const service = getTimeTrackingService();
-    await service.approveTimeEntry({
-        authorization,
-        entryId,
-        payload: {
-            status: 'APPROVED',
-            comments: comments?.trim() ? comments.trim() : undefined,
+    await authAction(
+        {
+            auditSource: `${AUDIT_PREFIX}:approve`,
+            requiredPermissions: { organization: ['read'] },
+            action: 'update',
+            resourceType: RESOURCE_TYPE,
+            resourceAttributes: { entryId },
         },
-    });
+        async ({ authorization }) => {
+            await service.approveTimeEntry({
+                authorization,
+                entryId,
+                payload: {
+                    status: 'APPROVED',
+                    comments: comments?.trim() ? comments.trim() : undefined,
+                },
+            });
+        },
+    );
 
     after(() => {
         revalidatePath('/hr/time-tracking');
@@ -145,19 +193,29 @@ export async function approveTimeEntryAction(
 }
 
 export async function rejectTimeEntryAction(
-    authorization: RepositoryAuthorizationContext,
     entryId: string,
     comments?: string,
 ): Promise<void> {
     const service = getTimeTrackingService();
-    await service.approveTimeEntry({
-        authorization,
-        entryId,
-        payload: {
-            status: 'REJECTED',
-            comments: comments?.trim() ? comments.trim() : undefined,
+    await authAction(
+        {
+            auditSource: `${AUDIT_PREFIX}:reject`,
+            requiredPermissions: { organization: ['read'] },
+            action: 'update',
+            resourceType: RESOURCE_TYPE,
+            resourceAttributes: { entryId },
         },
-    });
+        async ({ authorization }) => {
+            await service.approveTimeEntry({
+                authorization,
+                entryId,
+                payload: {
+                    status: 'REJECTED',
+                    comments: comments?.trim() ? comments.trim() : undefined,
+                },
+            });
+        },
+    );
 
     after(() => {
         revalidatePath('/hr/time-tracking');

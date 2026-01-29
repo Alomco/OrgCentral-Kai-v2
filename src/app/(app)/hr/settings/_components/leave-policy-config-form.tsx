@@ -1,7 +1,7 @@
 'use client';
 
-import { useActionState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useActionState, useEffect, useEffectEvent, useRef } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,6 +15,7 @@ import { FieldError } from '../../_components/field-error';
 import { createLeavePolicyAction } from '../leave-policy-actions';
 import type { LeavePolicyCreateState } from '../leave-policy-form-utils';
 import { LeavePolicyRow } from './leave-policy-row';
+import { fetchLeavePolicies, LEAVE_POLICIES_QUERY_KEY } from '../leave-policy-query';
 
 const initialCreateState: LeavePolicyCreateState = {
     status: 'idle',
@@ -37,19 +38,27 @@ export function LeavePolicyConfigForm(props: {
     policies: LeavePolicy[];
     policyTypes: readonly string[];
 }) {
-    const router = useRouter();
+    const queryClient = useQueryClient();
     const [createState, createAction, createPending] = useActionState(
         createLeavePolicyAction,
         initialCreateState,
     );
+    const { data: policies = props.policies } = useQuery({
+        queryKey: LEAVE_POLICIES_QUERY_KEY,
+        queryFn: fetchLeavePolicies,
+        initialData: props.policies,
+    });
     const formReference = useRef<HTMLFormElement | null>(null);
+    const handleSuccess = useEffectEvent(() => {
+        void queryClient.invalidateQueries({ queryKey: LEAVE_POLICIES_QUERY_KEY }).catch(() => null);
+        formReference.current?.reset();
+    });
 
     useEffect(() => {
         if (!createPending && createState.status === 'success') {
-            router.refresh();
-            formReference.current?.reset();
+            handleSuccess();
         }
-    }, [createPending, createState.status, router]);
+    }, [createPending, createState.status]);
 
     const nameError = createState.fieldErrors?.name;
     const typeError = createState.fieldErrors?.type;
@@ -171,11 +180,11 @@ export function LeavePolicyConfigForm(props: {
                     <CardDescription>Review balances, approvals, and compliance requirements.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                    {props.policies.length === 0 ? (
+                    {policies.length === 0 ? (
                         <p className="text-sm text-muted-foreground">No leave policies configured yet.</p>
                     ) : (
                         <div className="space-y-3">
-                            {props.policies.map((policy) => (
+                            {policies.map((policy) => (
                                 <LeavePolicyRow key={policy.id} policy={policy} policyTypes={props.policyTypes} />
                             ))}
                         </div>

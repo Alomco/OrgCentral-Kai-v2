@@ -4,6 +4,8 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
 import { PrismaComplianceTemplateRepository } from '@/server/repositories/prisma/hr/compliance/prisma-compliance-template-repository';
+import { listComplianceTemplates } from '@/server/use-cases/hr/compliance/list-compliance-templates';
+import type { ComplianceTemplate } from '@/server/types/compliance-types';
 
 import { toFieldErrors } from '../../_components/form-errors';
 import {
@@ -220,4 +222,16 @@ export async function deleteComplianceTemplateAction(
             message: error instanceof Error ? error.message : 'Unable to delete compliance template.',
         };
     }
+}
+
+export async function listComplianceTemplatesAction(): Promise<ComplianceTemplate[]> {
+    const session = await getComplianceTemplateSession('list');
+    if (!session) {
+        return [];
+    }
+
+    return listComplianceTemplates(
+        { complianceTemplateRepository },
+        { authorization: session.authorization },
+    );
 }

@@ -1,68 +1,85 @@
 "use client";
 
-import { useActionState, useEffect, useMemo, useState, type FormEvent } from 'react';
-import { useRouter } from 'next/navigation';
+import { useMemo, useState, type FormEvent } from 'react';
 import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import { loadStripe, type StripeElementsOptions } from '@stripe/stripe-js';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Spinner } from '@/components/ui/spinner';
 import type { PaymentMethodData } from '@/server/types/billing-types';
 import {
-  createSetupIntentAction,
-  removePaymentMethodAction,
-  setDefaultPaymentMethodAction,
-} from '../billing-payment-method-actions';
-import {
-  initialBillingPaymentMethodActionState,
-  initialBillingSetupIntentState,
-} from '../billing-payment-method-actions.state';
+  billingKeys,
+  createSetupIntent,
+  listPaymentMethodsQuery,
+  removePaymentMethod,
+  setDefaultPaymentMethod,
+} from './billing-payment-methods.api';
 
 interface BillingPaymentMethodsClientProps {
+  orgId: string;
   paymentMethods: PaymentMethodData[];
   canManage: boolean;
   publishableKey: string;
 }
 
 export function BillingPaymentMethodsClient({
+  orgId,
   paymentMethods,
   canManage,
   publishableKey,
 }: BillingPaymentMethodsClientProps) {
-  const router = useRouter();
-  const [setupState, setupAction, setupPending] = useActionState(
-    createSetupIntentAction,
-    initialBillingSetupIntentState,
-  );
-  const [defaultState, defaultAction, defaultPending] = useActionState(
-    setDefaultPaymentMethodAction,
-    initialBillingPaymentMethodActionState,
-  );
-  const [removeState, removeAction, removePending] = useActionState(
-    removePaymentMethodAction,
-    initialBillingPaymentMethodActionState,
-  );
+  const queryClient = useQueryClient();
+
+  // Query payment methods with initial SSR data
+  const { data } = useQuery({ ...listPaymentMethodsQuery(orgId), initialData: paymentMethods });
+  const methods = data;
+
   const stripePromise = useMemo(
     () => (publishableKey ? loadStripe(publishableKey) : null),
     [publishableKey],
   );
   const [completedClientSecret, setCompletedClientSecret] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (defaultState.status === 'success' || removeState.status === 'success') {
-      router.refresh();
-    }
-  }, [defaultState.status, removeState.status, router]);
+  const setupIntent = useMutation({
+    mutationFn: () => createSetupIntent(orgId),
+  });
 
-  const feedback = [setupState, defaultState, removeState]
-    .filter((state) => state.status !== 'idle' && state.message)
-    .map((state) => state.message)
+  const setDefault = useMutation({
+    mutationFn: (pmId: string) => setDefaultPaymentMethod(orgId, pmId),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: billingKeys.paymentMethods(orgId) });
+    },
+  });
+
+  const remove = useMutation({
+    mutationFn: (pmId: string) => removePaymentMethod(orgId, pmId),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: billingKeys.paymentMethods(orgId) });
+    },
+  });
+
+  const feedback = [setupIntent.error?.message, setDefault.error?.message, remove.error?.message]
+    .filter(Boolean)
     .join(' ');
+
+  const clientSecret = setupIntent.data?.clientSecret ?? null;
+  const showSetupForm = Boolean(
+    clientSecret && stripePromise && completedClientSecret !== clientSecret,
+  );
+
+  const handleCreateSetupIntent = () => {
+    setupIntent.mutate(undefined, {
+      onSuccess: () => setCompletedClientSecret(null),
+    });
+  };
 
   return (
     <div className="mt-4 space-y-4">
-      {paymentMethods.length ? (
+      {methods.length ? (
         <div className="space-y-2">
-          {paymentMethods.map((method) => (
+          {methods.map((method) => (
             <div
               key={method.stripePaymentMethodId}
               className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-background p-4"
@@ -73,30 +90,38 @@ export function BillingPaymentMethodsClient({
                     <p className="text-sm font-semibold text-foreground">
                       {formatPaymentMethodTitle(method)}
                     </p>
-                    {method.isDefault ? (
-                      <Badge variant="secondary">Default</Badge>
-                    ) : null}
+                    {method.isDefault ? <Badge variant="secondary">Default</Badge> : null}
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    {formatPaymentMethodMeta(method)}
-                  </p>
+                  <p className="text-xs text-muted-foreground">{formatPaymentMethodMeta(method)}</p>
                 </div>
               </div>
               <div className="flex flex-wrap items-center gap-2">
                 {!method.isDefault ? (
-                  <form action={defaultAction}>
-                    <input type="hidden" name="paymentMethodId" value={method.stripePaymentMethodId} />
-                    <Button type="submit" size="sm" variant="outline" disabled={defaultPending}>
-                      Set default
-                    </Button>
-                  </form>
-                ) : null}
-                <form action={removeAction}>
-                  <input type="hidden" name="paymentMethodId" value={method.stripePaymentMethodId} />
-                  <Button type="submit" size="sm" variant="ghost" disabled={removePending}>
-                    Remove
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    disabled={setDefault.isPending}
+                    onClick={async () => {
+                      await setDefault.mutateAsync(method.stripePaymentMethodId);
+                    }}
+                  >
+                    {setDefault.isPending ? <Spinner className="mr-2" /> : null}
+                    Set default
                   </Button>
-                </form>
+                ) : null}
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  disabled={remove.isPending}
+                  onClick={async () => {
+                    await remove.mutateAsync(method.stripePaymentMethodId);
+                  }}
+                >
+                  {remove.isPending ? <Spinner className="mr-2" /> : null}
+                  Remove
+                </Button>
               </div>
             </div>
           ))}
@@ -107,40 +132,42 @@ export function BillingPaymentMethodsClient({
 
       {feedback ? <p className="text-xs text-muted-foreground">{feedback}</p> : null}
 
-      <form action={setupAction} className="flex flex-wrap items-center gap-3">
-        <Button type="submit" size="sm" disabled={!canManage || setupPending || !publishableKey}>
+      <div className="flex flex-wrap items-center gap-3">
+        <Button
+          type="button"
+          size="sm"
+          disabled={!canManage || setupIntent.isPending || !publishableKey}
+          onClick={handleCreateSetupIntent}
+        >
+          {setupIntent.isPending ? <Spinner className="mr-2" /> : null}
           Add payment method
         </Button>
         {!publishableKey ? (
-          <span className="text-xs text-muted-foreground">
-            Stripe publishable key missing.
-          </span>
+          <span className="text-xs text-muted-foreground">Stripe publishable key missing.</span>
         ) : null}
         {!canManage ? (
-          <span className="text-xs text-muted-foreground">
-            Subscribe to enable payment methods.
-          </span>
+          <span className="text-xs text-muted-foreground">Subscribe to enable payment methods.</span>
         ) : null}
-      </form>
+      </div>
 
-      {setupState.clientSecret && stripePromise && completedClientSecret !== setupState.clientSecret ? (
-        <Elements stripe={stripePromise} options={buildStripeOptions(setupState.clientSecret)}>
+      {showSetupForm && clientSecret ? (
+        <Elements stripe={stripePromise} options={buildStripeOptions(clientSecret)}>
           <PaymentMethodSetupForm
-            onComplete={() => {
-              setCompletedClientSecret(setupState.clientSecret ?? null);
-              router.refresh();
+            onComplete={async () => {
+              setCompletedClientSecret(clientSecret);
+              await queryClient.invalidateQueries({ queryKey: billingKeys.paymentMethods(orgId) });
             }}
           />
         </Elements>
       ) : null}
-      {completedClientSecret === setupState.clientSecret && setupState.clientSecret ? (
+      {clientSecret && completedClientSecret === clientSecret ? (
         <p className="text-xs text-muted-foreground">Payment method added. Refreshing details...</p>
       ) : null}
     </div>
   );
 }
 
-function PaymentMethodSetupForm({ onComplete }: { onComplete: () => void }) {
+function PaymentMethodSetupForm({ onComplete }: { onComplete: () => Promise<void> }) {
   const stripe = useStripe();
   const elements = useElements();
   const [status, setStatus] = useState<'idle' | 'saving'>('idle');
@@ -166,14 +193,11 @@ function PaymentMethodSetupForm({ onComplete }: { onComplete: () => void }) {
     }
 
     setStatus('idle');
-    onComplete();
+    await onComplete();
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="space-y-3 rounded-xl border border-border bg-background p-4"
-    >
+    <form onSubmit={handleSubmit} className="space-y-3 rounded-xl border border-border bg-background p-4">
       <PaymentElement options={{ layout: 'tabs' }} />
       <div className="flex flex-wrap items-center gap-3">
         <Button type="submit" size="sm" disabled={status === 'saving' || !stripe || !elements}>
@@ -188,9 +212,7 @@ function PaymentMethodSetupForm({ onComplete }: { onComplete: () => void }) {
 function buildStripeOptions(clientSecret: string): StripeElementsOptions {
   return {
     clientSecret,
-    appearance: {
-      theme: 'stripe',
-    },
+    appearance: { theme: 'stripe' },
   };
 }
 

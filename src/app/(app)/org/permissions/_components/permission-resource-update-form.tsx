@@ -1,7 +1,7 @@
 'use client';
 
 import { useActionState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,88 +10,74 @@ import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
 import type { PermissionResource } from '@/server/types/security-types';
 
-import { updatePermissionResourceAction } from '../permission-resource-actions';
 import { stringifyActionList, type PermissionResourceInlineState } from '../permission-resource-form-utils';
 import { FieldError } from './field-error';
+import { permissionKeys } from './permissions.api';
+import { updatePermissionResourceAction } from '../permission-resource-actions';
 
-const initialInlineState: PermissionResourceInlineState = { status: 'idle' };
-
-export function PermissionResourceUpdateForm(props: { resource: PermissionResource }) {
-    const router = useRouter();
-    const [state, action, pending] = useActionState(updatePermissionResourceAction, initialInlineState);
+export function PermissionResourceUpdateForm(props: { orgId: string; resource: PermissionResource }) {
     const formReference = useRef<HTMLFormElement | null>(null);
+    const qc = useQueryClient();
     const actionsText = stringifyActionList(props.resource.actions);
+
+    const [state, formAction, pending] = useActionState<PermissionResourceInlineState, FormData>(
+        updatePermissionResourceAction,
+        { status: 'idle' },
+    );
 
     useEffect(() => {
         if (state.status === 'success') {
-            router.refresh();
+            Promise.all([
+                qc.invalidateQueries({ queryKey: permissionKeys.list(props.orgId) }),
+                qc.invalidateQueries({ queryKey: permissionKeys.detail(props.orgId, props.resource.id) }),
+            ]).catch(() => null);
         }
-    }, [router, state.status]);
+    }, [props.orgId, props.resource.id, qc, state.status]);
 
-    useEffect(() => {
-        formReference.current?.setAttribute('aria-busy', pending ? 'true' : 'false');
-    }, [pending]);
+    const message = state.status === 'error'
+        ? state.message
+        : state.status === 'success'
+            ? state.message ?? 'Permission resource updated.'
+            : null;
 
-    const message = state.status === 'idle' ? null : state.message;
     const resourceError = state.fieldErrors?.resource;
     const actionsError = state.fieldErrors?.actions;
     const descriptionError = state.fieldErrors?.description;
 
     return (
-        <form ref={formReference} action={action} className="space-y-3">
+        <form ref={formReference} action={formAction} className="space-y-3" aria-busy={pending}>
             <input type="hidden" name="resourceId" value={props.resource.id} />
-
             <fieldset disabled={pending} className="space-y-3">
                 <div className="grid gap-3 sm:grid-cols-2">
                     <div className="space-y-1">
-                        <Label htmlFor={`permission-resource-name-${props.resource.id}`}>
-                            Resource key
-                        </Label>
+                        <Label htmlFor={`permission-resource-name-${props.resource.id}`}>Resource key</Label>
                         <Input
                             id={`permission-resource-name-${props.resource.id}`}
                             name="resource"
                             defaultValue={props.resource.resource}
                             className="font-mono"
                             aria-invalid={Boolean(resourceError)}
-                            aria-describedby={
-                                resourceError
-                                    ? `permission-resource-name-${props.resource.id}-error`
-                                    : undefined
-                            }
+                            aria-describedby={resourceError ? `permission-resource-name-${props.resource.id}-error` : undefined}
                         />
-                        <FieldError
-                            id={`permission-resource-name-${props.resource.id}-error`}
-                            message={resourceError}
-                        />
+                        <FieldError id={`permission-resource-name-${props.resource.id}-error`} message={resourceError} />
                     </div>
 
                     <div className="space-y-1">
-                        <Label htmlFor={`permission-resource-description-${props.resource.id}`}>
-                            Description
-                        </Label>
+                        <Label htmlFor={`permission-resource-description-${props.resource.id}`}>Description</Label>
                         <Textarea
                             id={`permission-resource-description-${props.resource.id}`}
                             name="description"
                             rows={3}
                             defaultValue={props.resource.description ?? ''}
                             aria-invalid={Boolean(descriptionError)}
-                            aria-describedby={
-                                descriptionError
-                                    ? `permission-resource-description-${props.resource.id}-error`
-                                    : undefined
-                            }
+                            aria-describedby={descriptionError ? `permission-resource-description-${props.resource.id}-error` : undefined}
                         />
-                        <FieldError
-                            id={`permission-resource-description-${props.resource.id}-error`}
-                            message={descriptionError}
-                        />
+                        <FieldError id={`permission-resource-description-${props.resource.id}-error`} message={descriptionError} />
                     </div>
                 </div>
 
                 <div className="space-y-1">
-                    <Label htmlFor={`permission-resource-actions-${props.resource.id}`}>
-                        Allowed actions
-                    </Label>
+                    <Label htmlFor={`permission-resource-actions-${props.resource.id}`}>Allowed actions</Label>
                     <Textarea
                         id={`permission-resource-actions-${props.resource.id}`}
                         name="actions"
@@ -99,16 +85,9 @@ export function PermissionResourceUpdateForm(props: { resource: PermissionResour
                         defaultValue={actionsText}
                         className="font-mono text-xs"
                         aria-invalid={Boolean(actionsError)}
-                        aria-describedby={
-                            actionsError
-                                ? `permission-resource-actions-${props.resource.id}-error`
-                                : undefined
-                        }
+                        aria-describedby={actionsError ? `permission-resource-actions-${props.resource.id}-error` : undefined}
                     />
-                    <FieldError
-                        id={`permission-resource-actions-${props.resource.id}-error`}
-                        message={actionsError}
-                    />
+                    <FieldError id={`permission-resource-actions-${props.resource.id}-error`} message={actionsError} />
                 </div>
             </fieldset>
 
@@ -118,13 +97,7 @@ export function PermissionResourceUpdateForm(props: { resource: PermissionResour
                     {pending ? 'Saving...' : 'Save'}
                 </Button>
                 {message ? (
-                    <p
-                        className={
-                            state.status === 'error'
-                                ? 'text-xs text-destructive'
-                                : 'text-xs text-muted-foreground'
-                        }
-                    >
+                    <p className={state.status === 'error' ? 'text-xs text-destructive' : 'text-xs text-muted-foreground'}>
                         {message}
                     </p>
                 ) : null}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useEffect, useId, useRef } from 'react';
+import { useActionState, useEffect, useEffectEvent, useId, useRef } from 'react';
 import { toast } from 'sonner';
 
 import { updateSelfProfileAction } from '../actions';
@@ -20,11 +20,9 @@ export function ProfileEditForm({ initialState, onSuccess, onCancel, formId }: P
     const [state, formAction, pending] = useActionState(updateSelfProfileAction, initialState);
     const successTimeoutReference = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-    // Use a ref to store the latest onSuccess callback to avoid stale closures
-    const onSuccessReference = useRef(onSuccess);
-    useEffect(() => {
-        onSuccessReference.current = onSuccess;
-    }, [onSuccess]);
+    const onSuccessEvent = useEffectEvent(() => {
+        onSuccess?.();
+    });
 
     // Track previous state to only react to actual changes
     const previousStatusReference = useRef<string | null>(null);
@@ -43,7 +41,7 @@ export function ProfileEditForm({ initialState, onSuccess, onCancel, formId }: P
                 clearTimeout(successTimeoutReference.current);
             }
             successTimeoutReference.current = setTimeout(() => {
-                onSuccessReference.current?.();
+                onSuccessEvent();
             }, 100);
         } else if (state.status === 'error') {
             toast.error(state.message ?? 'Failed to save profile');

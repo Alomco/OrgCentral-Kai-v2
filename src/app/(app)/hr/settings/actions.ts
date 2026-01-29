@@ -5,6 +5,7 @@ import type { Prisma } from '@prisma/client';
 import { z } from 'zod';
 
 import { getSessionContext } from '@/server/use-cases/auth/sessions/get-session';
+import { HR_ACTION, HR_RESOURCE } from '@/server/security/authorization/hr-resource-registry';
 import { PrismaHRSettingsRepository } from '@/server/repositories/prisma/hr/settings';
 import { updateHrSettings } from '@/server/use-cases/hr/settings/update-hr-settings';
 import { invalidateHrSettingsCacheTag } from '@/server/use-cases/hr/settings/cache-helpers';
@@ -52,6 +53,9 @@ export async function updateHrSettingsAction(
                 headers: headerStore,
                 requiredPermissions: { organization: ['update'] },
                 auditSource: 'ui:hr-settings:update',
+                action: HR_ACTION.UPDATE,
+                resourceType: HR_RESOURCE.HR_SETTINGS,
+                resourceAttributes: { scope: 'global' },
             },
         );
     } catch {

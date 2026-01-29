@@ -1,0 +1,27 @@
+﻿import { queryOptions } from '@tanstack/react-query';
+import type { HRPolicy } from '@/server/types/hr-ops-types';
+
+export const policyKeys = {
+  // Include q and nocat in the cache key so filtered lists are cached separately
+  list: (q?: string, nocat?: boolean) => ['hr', 'policies', q ?? '', nocat ? 'nocat' : ''] as const,
+  detail: (policyId: string) => ['hr', 'policies', policyId] as const,
+} as const;
+
+export function listPoliciesQuery(q?: string, nocat?: boolean) {
+  return queryOptions({
+    queryKey: policyKeys.list(q, nocat),
+    queryFn: async (): Promise<HRPolicy[]> => {
+      const usp = new URLSearchParams();
+      if (q && q.trim().length > 0) {usp.set('q', q.trim());}
+      if (nocat) {usp.set('nocat', '1');}
+      const qs = usp.toString();
+      const url = qs.length > 0 ? `/api/hr/policies?${qs}` : '/api/hr/policies';
+      const res = await fetch(url, { cache: 'no-store' });
+      if (!res.ok) {throw new Error('Failed to load policies');}
+      const data = (await res.json()) as unknown as { policies?: HRPolicy[] };
+      const items = Array.isArray(data?.policies) ? data.policies : [];
+      return items;
+    },
+    staleTime: 30_000,
+  });
+}

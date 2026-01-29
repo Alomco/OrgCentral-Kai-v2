@@ -25,6 +25,12 @@ const MONTHS = [
     'January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December',
 ];
+const DAY_ARIA_FORMATTER = new Intl.DateTimeFormat('en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+});
 
 function getDaysInMonth(year: number, month: number): Date[] {
     const days: Date[] = [];
@@ -148,6 +154,10 @@ export function AbsenceCalendar({ absences, onDayClick }: AbsenceCalendarProps) 
                         const dateKey = day.toISOString().slice(0, 10);
                         const isToday = dateKey === todayKey;
                         const dayAbsences = absencesByDate.get(dateKey) ?? [];
+                        const dayAbsencesCount = dayAbsences.length;
+                        const ariaLabel = dayAbsencesCount > 0
+                            ? `${DAY_ARIA_FORMATTER.format(day)}, ${String(dayAbsencesCount)} absences`
+                            : DAY_ARIA_FORMATTER.format(day);
 
                         return (
                             <button
@@ -159,7 +169,7 @@ export function AbsenceCalendar({ absences, onDayClick }: AbsenceCalendarProps) 
                                     !isCurrentMonth && 'text-muted-foreground/50 bg-muted/30',
                                 )}
                                 onClick={() => onDayClick?.(day)}
-                                aria-label={`${day.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}${dayAbsences.length ? `, ${String(dayAbsences.length)} absences` : ''}`}
+                                aria-label={ariaLabel}
                             >
                                 <span
                                     className={cn(
@@ -169,7 +179,7 @@ export function AbsenceCalendar({ absences, onDayClick }: AbsenceCalendarProps) 
                                 >
                                     {day.getDate()}
                                 </span>
-                                {dayAbsences.length > 0 && (
+                                {dayAbsencesCount > 0 && (
                                     <div className="flex gap-0.5 mt-1 flex-wrap">
                                         {dayAbsences.slice(0, 3).map((absence) => (
                                             <div
@@ -181,9 +191,9 @@ export function AbsenceCalendar({ absences, onDayClick }: AbsenceCalendarProps) 
                                                 title={`${absence.type} (${absence.status})`}
                                             />
                                         ))}
-                                        {dayAbsences.length > 3 && (
+                                        {dayAbsencesCount > 3 && (
                                             <span className="text-[10px] text-muted-foreground">
-                                                +{dayAbsences.length - 3}
+                                                +{dayAbsencesCount - 3}
                                             </span>
                                         )}
                                     </div>

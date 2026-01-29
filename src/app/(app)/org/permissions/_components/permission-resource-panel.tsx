@@ -3,9 +3,7 @@ import type { PermissionResource } from '@/server/types/security-types';
 
 import { PermissionResourceManager } from './permission-resource-manager';
 
-export async function PermissionResourcePanel(props: {
-    resourcesPromise: Promise<PermissionResource[]>;
-}) {
+export async function PermissionResourcePanel(props: { orgId: string; resourcesPromise: Promise<PermissionResource[]>; }) {
     const resources = await props.resourcesPromise;
 
     return (
@@ -17,8 +15,9 @@ export async function PermissionResourcePanel(props: {
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                <PermissionResourceManager resources={resources} />
+                <PermissionResourceManager orgId={props.orgId} resources={resources} />
             </CardContent>
         </Card>
     );
 }
+

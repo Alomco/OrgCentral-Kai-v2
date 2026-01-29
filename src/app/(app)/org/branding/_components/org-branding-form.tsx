@@ -1,38 +1,36 @@
 'use client';
 
-import { useActionState } from 'react';
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useActionState, useEffect } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import type { OrgBranding } from '@/server/types/branding-types';
-
+import { brandingKeys } from '../branding.api';
+import { initialOrgBrandingState } from '../actions.state';
 import { resetOrgBrandingAction, updateOrgBrandingAction } from '../actions';
-import { initialOrgBrandingState, type OrgBrandingState } from '../actions.state';
 
-export function OrgBrandingForm({ branding }: { branding: OrgBranding | null }) {
-    const router = useRouter();
-    const [updateState, updateAction] = useActionState<OrgBrandingState, FormData>(
+export function OrgBrandingForm({ branding, orgId }: { branding: OrgBranding | null; orgId: string }) {
+    const queryClient = useQueryClient();
+    const [updateState, updateAction, updatePending] = useActionState(
         updateOrgBrandingAction,
         initialOrgBrandingState,
     );
-
-    const [resetState, resetAction] = useActionState<OrgBrandingState, FormData>(
+    const [resetState, resetAction, resetPending] = useActionState(
         resetOrgBrandingAction,
         initialOrgBrandingState,
     );
 
     useEffect(() => {
         if (updateState.status === 'success' || resetState.status === 'success') {
-            router.refresh();
+            queryClient.invalidateQueries({ queryKey: brandingKeys.detail(orgId) }).catch(() => null);
         }
-    }, [resetState.status, router, updateState.status]);
+    }, [orgId, queryClient, resetState.status, updateState.status]);
 
     return (
         <div className="space-y-4">
-            <form action={updateAction} className="space-y-4 rounded-2xl bg-[oklch(var(--card)/0.6)] p-6 backdrop-blur">
+            <form action={updateAction} className="space-y-4 rounded-2xl bg-[oklch(var(--card)/0.6)] p-6 backdrop-blur" aria-busy={updatePending}>
                 <div>
                     <p className="text-sm font-semibold text-[oklch(var(--foreground))]">Branding settings</p>
                     <p className="text-xs text-[oklch(var(--muted-foreground))]">Updates apply to this organization.</p>
@@ -76,7 +74,7 @@ export function OrgBrandingForm({ branding }: { branding: OrgBranding | null }) 
                 </label>
 
                 <div className="flex items-center gap-3">
-                    <Button type="submit" size="sm" className="px-4">
+                    <Button type="submit" size="sm" className="px-4" disabled={updatePending}>
                         Save
                     </Button>
                     {updateState.status === 'success' ? (
@@ -85,19 +83,17 @@ export function OrgBrandingForm({ branding }: { branding: OrgBranding | null }) 
                 </div>
 
                 {updateState.status === 'error' ? (
-                    <p className="text-xs text-red-500" role="alert">
-                        {updateState.message ?? 'Unable to save'}
-                    </p>
+                    <p className="text-xs text-red-500" role="alert">{updateState.message ?? 'Unable to save'}</p>
                 ) : null}
             </form>
 
-            <form action={resetAction} className="rounded-2xl bg-[oklch(var(--card)/0.6)] p-6 backdrop-blur">
+            <form action={resetAction} className="rounded-2xl bg-[oklch(var(--card)/0.6)] p-6 backdrop-blur" aria-busy={resetPending}>
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <p className="text-sm font-semibold text-[oklch(var(--foreground))]">Reset branding</p>
                         <p className="text-xs text-[oklch(var(--muted-foreground))]">Clears all organization overrides.</p>
                     </div>
-                    <Button type="submit" variant="outline" size="sm">
+                    <Button type="submit" variant="outline" size="sm" disabled={resetPending}>
                         Reset
                     </Button>
                 </div>
@@ -107,9 +103,7 @@ export function OrgBrandingForm({ branding }: { branding: OrgBranding | null }) 
                 ) : null}
 
                 {resetState.status === 'error' ? (
-                    <p className="mt-3 text-xs text-red-500" role="alert">
-                        {resetState.message ?? 'Unable to reset'}
-                    </p>
+                    <p className="mt-3 text-xs text-red-500" role="alert">{resetState.message ?? 'Unable to reset'}</p>
                 ) : null}
             </form>
         </div>

@@ -1,47 +1,68 @@
 'use client';
 
-import { useState, useTransition } from 'react';
-import { useRouter } from 'next/navigation';
+import { memo, useCallback, useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { CheckCircle, XCircle, Clock } from 'lucide-react';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
+import { approveTimeEntryAction, getPendingTimeEntriesAction, rejectTimeEntryAction } from '../actions';
+import type { PendingTimeEntry } from '../pending-entries';
 
-import { approveTimeEntryAction, rejectTimeEntryAction } from '../actions';
-
-export interface PendingTimeEntry {
-    id: string;
-    employeeName: string;
-    date: Date;
-    clockIn: Date;
-    clockOut?: Date | null;
-    totalHours?: number | null;
-    project?: string | null;
-}
+const pendingEntriesQueryKey = ['hr', 'time-tracking', 'pending'] as const;
+const EMPTY_ENTRIES: PendingTimeEntry[] = [];
+const DATE_FORMATTER = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' });
 
 export function TimeEntryApprovalPanel({
-    authorization,
-    entries,
+    entries = EMPTY_ENTRIES,
 }: {
-    authorization: RepositoryAuthorizationContext;
-    entries: PendingTimeEntry[];
+    entries?: PendingTimeEntry[];
 }) {
-    const router = useRouter();
+    const queryClient = useQueryClient();
     const [activeEntryId, setActiveEntryId] = useState<string | null>(null);
-    const [isPending, startTransition] = useTransition();
 
-    const handleDecision = (entryId: string, decision: 'approve' | 'reject') => {
-        setActiveEntryId(entryId);
-        startTransition(() => {
+    const { data: pendingEntries = entries } = useQuery({
+        queryKey: pendingEntriesQueryKey,
+        queryFn: getPendingTimeEntriesAction,
+        initialData: entries,
+    });
+
+    const decisionMutation = useMutation({
+        mutationFn: async ({
+            entryId,
+            decision,
+        }: {
+            entryId: string;
+            decision: 'approve' | 'reject';
+        }) => {
             const action = decision === 'approve' ? approveTimeEntryAction : rejectTimeEntryAction;
-            void action(authorization, entryId)
-                .then(() => router.refresh())
-                .catch(() => null)
-                .finally(() => setActiveEntryId(null));
-        });
-    };
+            await action(entryId);
+            return entryId;
+        },
+        onSuccess: (entryId) => {
+            queryClient.setQueryData<PendingTimeEntry[]>(
+                pendingEntriesQueryKey,
+                (current) => current?.filter((entry) => entry.id !== entryId) ?? current,
+            );
+            void queryClient.invalidateQueries({ queryKey: pendingEntriesQueryKey }).catch(() => null);
+        },
+    });
+
+    const handleDecision = useCallback(
+        (entryId: string, decision: 'approve' | 'reject') => {
+            setActiveEntryId(entryId);
+            decisionMutation.mutate(
+                { entryId, decision },
+                {
+                    onSettled: () => {
+                        setActiveEntryId(null);
+                    },
+                },
+            );
+        },
+        [decisionMutation],
+    );
 
     return (
         <Card>
@@ -53,47 +74,18 @@ export function TimeEntryApprovalPanel({
                     </CardTitle>
                     <CardDescription>Completed entries awaiting review.</CardDescription>
                 </div>
-                {entries.length > 0 ? <Badge variant="secondary">{entries.length}</Badge> : null}
+                {pendingEntries.length > 0 ? <Badge variant="secondary">{pendingEntries.length}</Badge> : null}
             </CardHeader>
             <CardContent className="space-y-3">
-                {entries.length > 0 ? (
-                    entries.map((entry) => (
-                        <div key={entry.id} className="flex items-start justify-between gap-3 rounded-lg border p-3">
-                            <div className="min-w-0 flex-1">
-                                <div className="flex items-center gap-2">
-                                    <p className="font-medium text-sm truncate">{entry.employeeName}</p>
-                                    {entry.project ? (
-                                        <Badge variant="outline" className="text-xs">
-                                            {entry.project}
-                                        </Badge>
-                                    ) : null}
-                                </div>
-                                <p className="text-xs text-muted-foreground mt-1">
-                                    {entry.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                                    {entry.totalHours ? ` | ${entry.totalHours.toFixed(2)}h` : ''}
-                                </p>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <Button
-                                    variant="outline"
-                                    size="icon"
-                                    className="h-8 w-8"
-                                    disabled={isPending && activeEntryId === entry.id}
-                                    onClick={() => handleDecision(entry.id, 'reject')}
-                                >
-                                    <XCircle className="h-4 w-4 text-red-500" />
-                                </Button>
-                                <Button
-                                    variant="outline"
-                                    size="icon"
-                                    className="h-8 w-8"
-                                    disabled={isPending && activeEntryId === entry.id}
-                                    onClick={() => handleDecision(entry.id, 'approve')}
-                                >
-                                    <CheckCircle className="h-4 w-4 text-emerald-500" />
-                                </Button>
-                            </div>
-                        </div>
+                {pendingEntries.length > 0 ? (
+                    pendingEntries.map((entry) => (
+                        <TimeEntryApprovalRow
+                            key={entry.id}
+                            entry={entry}
+                            isPending={decisionMutation.isPending}
+                            activeEntryId={activeEntryId}
+                            onDecision={handleDecision}
+                        />
                     ))
                 ) : (
                     <div className="flex flex-col items-center justify-center py-6 text-center">
@@ -108,3 +100,58 @@ export function TimeEntryApprovalPanel({
         </Card>
     );
 }
+
+interface TimeEntryApprovalRowProps {
+    entry: PendingTimeEntry;
+    isPending: boolean;
+    activeEntryId: string | null;
+    onDecision: (entryId: string, decision: 'approve' | 'reject') => void;
+}
+
+const TimeEntryApprovalRow = memo(function TimeEntryApprovalRow({
+    entry,
+    isPending,
+    activeEntryId,
+    onDecision,
+}: TimeEntryApprovalRowProps) {
+    return (
+        <div className="flex items-start justify-between gap-3 rounded-lg border p-3">
+            <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                    <p className="font-medium text-sm truncate">{entry.employeeName}</p>
+                    {entry.project ? (
+                        <Badge variant="outline" className="text-xs">
+                            {entry.project}
+                        </Badge>
+                    ) : null}
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                    <span suppressHydrationWarning>
+                        {DATE_FORMATTER.format(entry.date)}
+                    </span>
+                    {entry.totalHours ? ` | ${entry.totalHours.toFixed(2)}h` : ''}
+                </p>
+            </div>
+            <div className="flex items-center gap-2">
+                <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-8 w-8"
+                    disabled={isPending && activeEntryId === entry.id}
+                    onClick={() => onDecision(entry.id, 'reject')}
+                >
+                    <XCircle className="h-4 w-4 text-red-500" />
+                </Button>
+                <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-8 w-8"
+                    disabled={isPending && activeEntryId === entry.id}
+                    onClick={() => onDecision(entry.id, 'approve')}
+                >
+                    <CheckCircle className="h-4 w-4 text-emerald-500" />
+                </Button>
+            </div>
+        </div>
+    );
+});

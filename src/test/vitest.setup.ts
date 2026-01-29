@@ -1,3 +1,5 @@
+﻿import '@testing-library/jest-dom/vitest';
+import '@testing-library/jest-dom/vitest';
 /*
  * Test-only runtime setup.
  *
@@ -32,3 +34,9 @@ vi.mock('@/server/logging/audit-logger', () => ({
     recordAuditEvent: vi.fn(() => undefined),
     setAuditLogRepository: vi.fn(),
 }));
+
+
+
+
+
+

@@ -58,8 +58,12 @@ export function LmsIntegrationSection({ pending, state, enabledReference }: Inte
                         name="lmsEnabled"
                         value={state.values.lmsEnabled ? 'on' : 'off'}
                     />
+                    <p id="lmsEnabled-help" className="sr-only">
+                        Toggle LMS integration for HR.
+                    </p>
                     <Switch
                         id="lmsEnabled"
+                        aria-describedby="lmsEnabled-help"
                         key={state.values.lmsEnabled ? 'lms-on' : 'lms-off'}
                         defaultChecked={state.values.lmsEnabled}
                         onCheckedChange={(checked) => {

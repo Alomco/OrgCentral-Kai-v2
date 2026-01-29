@@ -1,7 +1,8 @@
-'use client';
+﻿'use client';
 
 import { useCallback, useMemo, useState, type ChangeEvent } from 'react';
 import { Paperclip, Trash2 } from 'lucide-react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,6 +11,7 @@ import { Separator } from '@/components/ui/separator';
 import type { AbsenceAttachment, UnplannedAbsence } from '@/server/types/hr-ops-types';
 import { formatHumanDate } from '../../_components/format-date';
 import { useAbsenceAttachmentUpload } from './use-absence-attachment-upload';
+import { absenceAttachmentKeys, attachAbsenceEvidence, removeAbsenceAttachment } from '../absence-attachments.api';
 
 export interface AbsenceAttachmentsPanelProps {
     absenceId: string;
@@ -43,6 +45,31 @@ export function AbsenceAttachmentsPanel({
     const [actionError, setActionError] = useState<string | null>(null);
     const [fileInputKey, setFileInputKey] = useState(0);
     const { uploading, uploadError, uploadAttachment, resetUploadError } = useAbsenceAttachmentUpload(absenceId);
+    const queryClient = useQueryClient();
+
+    const attachMutation = useMutation({
+        mutationFn: async (attachment: { fileName: string; contentType: string; fileSize: number; storageKey: string }) => attachAbsenceEvidence(absenceId, [attachment]),
+        onSuccess: async (absence) => {
+            onAbsenceUpdated(absence);
+            setSelectedFile(null);
+            setFileInputKey((value) => value + 1);
+            await queryClient.invalidateQueries({ queryKey: absenceAttachmentKeys.list(absenceId) });
+        },
+        onError: (error) => {
+            setActionError(error instanceof Error ? error.message : 'Unable to attach evidence.');
+        },
+    });
+
+    const removeMutation = useMutation({
+        mutationFn: async (attachmentId: string) => removeAbsenceAttachment(absenceId, attachmentId),
+        onSuccess: async (absence) => {
+            onAbsenceUpdated(absence);
+            await queryClient.invalidateQueries({ queryKey: absenceAttachmentKeys.list(absenceId) });
+        },
+        onError: (error) => {
+            setActionError(error instanceof Error ? error.message : 'Unable to remove attachment.');
+        },
+    });
 
     const errorMessage = uploadError ?? actionError;
 
@@ -71,55 +98,22 @@ export function AbsenceAttachmentsPanel({
             if (!uploaded) {
                 return;
             }
-
-            const response = await fetch(`/api/hr/absences/${absenceId}/attachments`, {
-                method: 'POST',
-                headers: { 'content-type': 'application/json' },
-                body: JSON.stringify({
-                    attachments: [uploaded],
-                }),
-            });
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(errorText || 'Unable to attach evidence.');
-            }
-
-            const result = (await response.json()) as { absence: UnplannedAbsence };
-            onAbsenceUpdated(result.absence);
-            setSelectedFile(null);
-            setFileInputKey((value) => value + 1);
-        } catch (error) {
-            setActionError(error instanceof Error ? error.message : 'Unable to attach evidence.');
+            await attachMutation.mutateAsync(uploaded);
         } finally {
             setIsSubmitting(false);
         }
-    }, [absenceId, onAbsenceUpdated, selectedFile, uploadAttachment]);
+    }, [absenceId, attachMutation, onAbsenceUpdated, selectedFile, uploadAttachment]);
 
     const handleRemove = useCallback(async (attachmentId: string) => {
         setIsSubmitting(true);
         setActionError(null);
 
         try {
-            const response = await fetch(`/api/hr/absences/${absenceId}/attachments`, {
-                method: 'DELETE',
-                headers: { 'content-type': 'application/json' },
-                body: JSON.stringify({ attachmentId }),
-            });
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(errorText || 'Unable to remove attachment.');
-            }
-
-            const result = (await response.json()) as { absence: UnplannedAbsence };
-            onAbsenceUpdated(result.absence);
-        } catch (error) {
-            setActionError(error instanceof Error ? error.message : 'Unable to remove attachment.');
+            await removeMutation.mutateAsync(attachmentId);
         } finally {
             setIsSubmitting(false);
         }
-    }, [absenceId, onAbsenceUpdated]);
+    }, [absenceId, onAbsenceUpdated, removeMutation]);
 
     return (
         <div className="space-y-3">
@@ -151,10 +145,10 @@ export function AbsenceAttachmentsPanel({
                 type="button"
                 variant="outline"
                 onClick={handleSubmit}
-                disabled={disabled || isSubmitting || uploading}
+                disabled={disabled || isSubmitting || uploading || attachMutation.isPending}
                 className="w-full"
             >
-                {isSubmitting || uploading ? 'Uploading...' : 'Upload attachment'}
+                {isSubmitting || uploading || attachMutation.isPending ? 'Uploading...' : 'Upload attachment'}
             </Button>
 
             <Separator />
@@ -180,7 +174,7 @@ export function AbsenceAttachmentsPanel({
                                     </a>
                                 </div>
                                 <div className="text-xs text-muted-foreground">
-                                    {formatSize(attachment.fileSize)} � Uploaded {formatHumanDate(new Date(attachment.uploadedAt))}
+                                    {formatSize(attachment.fileSize)} ï¿½ Uploaded {formatHumanDate(new Date(attachment.uploadedAt))}
                                 </div>
                             </div>
                             <Button
@@ -188,7 +182,7 @@ export function AbsenceAttachmentsPanel({
                                 variant="ghost"
                                 size="icon"
                                 onClick={() => handleRemove(attachment.id)}
-                                disabled={disabled || isSubmitting}
+                                disabled={disabled || isSubmitting || removeMutation.isPending}
                                 aria-label={`Remove ${attachment.fileName}`}
                             >
                                 <Trash2 className="h-4 w-4 text-muted-foreground" />
@@ -200,3 +194,4 @@ export function AbsenceAttachmentsPanel({
         </div>
     );
 }
+

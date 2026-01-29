@@ -8,6 +8,8 @@ import { getSessionContext } from '@/server/use-cases/auth/sessions/get-session'
 import { PrismaAbsenceTypeConfigRepository } from '@/server/repositories/prisma/hr/absences';
 import { createAbsenceTypeConfig } from '@/server/use-cases/hr/absences/create-absence-type-config';
 import { updateAbsenceTypeConfig } from '@/server/use-cases/hr/absences/update-absence-type-config';
+import { listAbsenceTypeConfigsForUi } from '@/server/use-cases/hr/absences/list-absence-type-configs.cached';
+import type { AbsenceTypeConfig } from '@/server/types/hr-ops-types';
 
 import { toFieldErrors } from '../_components/form-errors';
 import type {
@@ -193,5 +195,28 @@ export async function updateAbsenceTypeAction(
             status: 'error',
             message: error instanceof Error ? error.message : 'Unable to update absence type.',
         };
+    }
+}
+
+export async function listAbsenceTypesAction(): Promise<{ types: AbsenceTypeConfig[] }> {
+    try {
+        const headerStore = await headers();
+        const session = await getSessionContext(
+            {},
+            {
+                headers: headerStore,
+                requiredPermissions: { organization: ['update'] },
+                auditSource: 'ui:hr:absence-types:list',
+            },
+        );
+
+        const { types } = await listAbsenceTypeConfigsForUi({
+            authorization: session.authorization,
+            includeInactive: true,
+        });
+
+        return { types };
+    } catch {
+        return { types: [] };
     }
 }

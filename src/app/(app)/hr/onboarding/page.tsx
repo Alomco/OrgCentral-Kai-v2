@@ -1,4 +1,4 @@
-import { Suspense } from 'react';
+﻿import { Suspense } from 'react';
 import { headers as nextHeaders } from 'next/headers';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
@@ -20,7 +20,7 @@ import { hasPermission } from '@/lib/security/permission-check';
 import { HrPageHeader } from '../_components/hr-page-header';
 import { ChecklistTemplatesPanel } from './_components/checklist-templates-panel';
 import { InviteEmployeePanel } from './_components/invite-employee-panel';
-import { OnboardingInvitationsPanel } from './_components/onboarding-invitations-panel';
+import { OnboardingInvitationsPanel } from './_components/onboarding-invitations-panel';\nimport dynamic from 'next/dynamic';\nconst OnboardingFiltersClient = dynamic(() => import('./_components/onboarding-filters.client').then(m => m.OnboardingFiltersClient), { ssr: false });
 
 function PanelSkeleton() {
     return (
@@ -106,3 +106,4 @@ export default async function HrOnboardingPage() {
         </div>
     );
 }
+

@@ -1,7 +1,8 @@
-'use client';
+﻿'use client';
 
 import { useActionState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
+import { policyKeys } from './policies.api';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -51,7 +52,7 @@ export function PolicyAdminUpdateForm(props: {
     policyCategories: readonly string[];
     statusOptions: readonly string[];
 }) {
-    const router = useRouter();
+    const queryClient = useQueryClient();
     const [state, action, pending] = useActionState(updatePolicyAdminAction, initialInlineState);
     const requiresAckReference = useRef<HTMLInputElement | null>(null);
 
@@ -60,9 +61,9 @@ export function PolicyAdminUpdateForm(props: {
 
     useEffect(() => {
         if (state.status === 'success') {
-            router.refresh();
+            void queryClient.invalidateQueries({ queryKey: policyKeys.list() });
         }
-    }, [router, state.status]);
+    }, [queryClient, state.status]);
 
     const message = state.status === 'idle' ? null : state.message;
 

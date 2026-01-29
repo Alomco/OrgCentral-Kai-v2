@@ -1,4 +1,4 @@
-import { Suspense } from 'react';
+﻿import { Suspense } from 'react';
 import Link from 'next/link';
 import { headers as nextHeaders } from 'next/headers';
 import { FileText } from 'lucide-react';
@@ -13,6 +13,9 @@ import {
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { PoliciesTableClient } from './_components/policies-table.client';
+import { PoliciesHeaderClient } from './_components/policies-header.client';
+import { PoliciesFiltersClient } from './_components/policies-filters.client';
 import { Skeleton } from '@/components/ui/skeleton';
 import { listHrPoliciesForUi } from '@/server/use-cases/hr/policies/list-hr-policies.cached';
 import { getSessionContext } from '@/server/use-cases/auth/sessions/get-session';
@@ -35,7 +38,7 @@ export default function HrPoliciesPage() {
     );
 }
 
-async function PoliciesPageContent() {
+async function PoliciesPageContent({ searchParams }: { searchParams: Record<string, string | string[] | undefined> }) {
     const headerStore = await nextHeaders();
     const { authorization } = await getSessionContextOrRedirect({}, {
         headers: headerStore,
@@ -86,7 +89,11 @@ async function PoliciesPageContent() {
                     description="Review and acknowledge organization policies."
                     icon={<FileText className="h-5 w-5" />}
                 />
-                <Badge variant="secondary">{sortedPolicies.length} total</Badge>
+                <PoliciesHeaderClient />
+            </div>
+
+            <div className="flex justify-end">
+                <PoliciesFiltersClient />
             </div>
 
             <Card>
@@ -95,51 +102,7 @@ async function PoliciesPageContent() {
                     <CardDescription>Latest effective policies appear first.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    {sortedPolicies.length === 0 ? (
-                        <div className="text-sm text-muted-foreground">No policies are available yet.</div>
-                    ) : (
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-sm">
-                                <thead className="border-b text-left">
-                                    <tr>
-                                        <th className="px-2 py-2 font-medium">Title</th>
-                                        <th className="px-2 py-2 font-medium">Category</th>
-                                        <th className="px-2 py-2 font-medium">Version</th>
-                                        <th className="px-2 py-2 font-medium">Effective</th>
-                                        <th className="px-2 py-2 font-medium">Status</th>
-                                        <th className="px-2 py-2 font-medium">Ack</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {sortedPolicies.map((policy) => (
-                                        <tr key={policy.id} className="border-b last:border-b-0 hover:bg-muted/50">
-                                            <td className="px-2 py-2">
-                                                <Link
-                                                    href={`/hr/policies/${policy.id}`}
-                                                    className="font-medium underline underline-offset-4"
-                                                >
-                                                    {policy.title}
-                                                </Link>
-                                            </td>
-                                            <td className="px-2 py-2 text-muted-foreground">{policy.category}</td>
-                                            <td className="px-2 py-2 text-muted-foreground">{policy.version}</td>
-                                            <td className="px-2 py-2 text-muted-foreground">
-                                                {formatHumanDate(policy.effectiveDate)}
-                                            </td>
-                                            <td className="px-2 py-2">
-                                                <Badge variant="outline">{policy.status}</Badge>
-                                            </td>
-                                            <td className="px-2 py-2">
-                                                <Badge variant={policy.requiresAcknowledgment ? 'secondary' : 'outline'}>
-                                                    {policy.requiresAcknowledgment ? 'Required' : 'Optional'}
-                                                </Badge>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    )}
+                    <PoliciesTableClient initial={sortedPolicies} />
                 </CardContent>
             </Card>
 
@@ -177,3 +140,4 @@ function PoliciesPageSkeleton() {
         </div>
     );
 }
+

@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 import { Check, Paperclip, Save } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -16,6 +16,7 @@ import {
     parseSubmissionMetadata,
     toDateInputValue,
 } from './compliance-item-submission.helpers';
+import { buildComplianceItemQueryKey, COMPLIANCE_ITEMS_QUERY_KEY } from '../compliance-items-query';
 
 interface ComplianceItemSubmissionFormProps {
     item: ComplianceLogItem;
@@ -28,7 +29,7 @@ export function ComplianceItemSubmissionForm({
     templateItem,
     canEdit,
 }: ComplianceItemSubmissionFormProps) {
-    const router = useRouter();
+    const queryClient = useQueryClient();
     const initialMetadata = useMemo(
         () => parseSubmissionMetadata(item.metadata),
         [item.metadata],
@@ -104,7 +105,8 @@ export function ComplianceItemSubmissionForm({
 
             setStatus('success');
             setMessage('Submission sent for review.');
-            router.refresh();
+            void queryClient.invalidateQueries({ queryKey: buildComplianceItemQueryKey(item.id, item.userId) }).catch(() => null);
+            void queryClient.invalidateQueries({ queryKey: COMPLIANCE_ITEMS_QUERY_KEY }).catch(() => null);
         } catch (error) {
             setStatus('error');
             setMessage(error instanceof Error ? error.message : 'Unable to update compliance item.');

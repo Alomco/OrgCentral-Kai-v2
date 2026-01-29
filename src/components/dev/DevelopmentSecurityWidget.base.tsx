@@ -3,10 +3,10 @@
 import { useCallback, useMemo, useState } from "react";
 import Link from "next/link";
 import { RefreshCcw, Shield, X } from "lucide-react";
+import { useQuery } from '@tanstack/react-query';
 
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import type { DebugSecurityResponse } from "./DevelopmentSecurityWidget.types";
 import { copyToClipboard, DEBUG_TITLE, TOAST_LONG_MS, TOAST_SHORT_MS, truncateId } from "./DevelopmentSecurityWidget.helpers";
 import {
   renderAbacSection,
@@ -17,14 +17,24 @@ import {
   renderTools,
 } from "./DevelopmentSecurityWidget.sections";
 import { useRegisterDevelopmentAction } from "./toolbar";
+import { devSecurityKeys, fetchDevSecurity as fetchDevelopmentSecurity } from "./dev-security.api";
 
 export function DevelopmentSecurityWidget() {
   const [open, setOpen] = useState(false);
-  const [payload, setPayload] = useState<DebugSecurityResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
 
   const isDevelopment = process.env.NODE_ENV === "development";
+
+  const { data, refetch } = useQuery({
+    queryKey: devSecurityKeys.detail(),
+    queryFn: fetchDevelopmentSecurity,
+    enabled: false,
+    gcTime: 0,
+    staleTime: 0,
+  });
+
+  const payload = data ?? null;
 
   const fetchSecurity = useCallback(async () => {
     if (!isDevelopment) {
@@ -32,17 +42,13 @@ export function DevelopmentSecurityWidget() {
     }
     setIsLoading(true);
     try {
-      const response = await fetch("/api/debug/security", { cache: "no-store" });
-      const body: unknown = await response.json().catch(() => null);
-      if (body && typeof body === "object") {
-        setPayload(body as DebugSecurityResponse);
-      } else {
-        setPayload(null);
-      }
+      await refetch();
+    } catch {
+      setToast("Failed to load security context");
     } finally {
       setIsLoading(false);
     }
-  }, [isDevelopment]);
+  }, [isDevelopment, refetch]);
 
   // Register with DevToolbar
   const handleToggle = useCallback(() => {

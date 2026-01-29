@@ -7,7 +7,9 @@ import { invalidateOrgCache } from '@/server/lib/cache-tags';
 import { requireSessionUser } from '@/server/api-adapters/http/session-helpers';
 import { CACHE_SCOPE_ONBOARDING_INVITATIONS } from '@/server/repositories/cache-scopes';
 import { PrismaOnboardingInvitationRepository } from '@/server/repositories/prisma/hr/onboarding';
+import type { OnboardingInvitation } from '@/server/repositories/contracts/hr/onboarding/invitation-repository-contract';
 import { getSessionContext } from '@/server/use-cases/auth/sessions/get-session';
+import { getOnboardingInvitationsForUi } from '@/server/use-cases/hr/onboarding/invitations/get-onboarding-invitations.cached';
 import { revokeOnboardingInvitation } from '@/server/use-cases/hr/onboarding/invitations/revoke-onboarding-invitation';
 import { getInvitationEmailDependencies } from '@/server/use-cases/notifications/invitation-email.provider';
 import { resendInvitationEmail } from '@/server/use-cases/notifications/resend-invitation-email';
@@ -15,6 +17,7 @@ import {
     getInvitationDeliveryFailureMessage,
     isInvitationDeliverySuccessful,
 } from '@/server/use-cases/notifications/invitation-email.helpers';
+import { hasPermission } from '@/lib/security/permission-check';
 
 import type { OnboardingRevokeInviteFormState } from '../form-state';
 import type { ResendOnboardingInvitationActionState } from './onboarding-invitations.types';
@@ -34,6 +37,8 @@ const resendInviteSchema = z.object({
 });
 
 const onboardingInvitationRepository = new PrismaOnboardingInvitationRepository();
+const ONBOARDING_INVITATIONS_AUDIT_PREFIX = 'ui:hr:onboarding:invitations';
+const ONBOARDING_RESOURCE_TYPE = 'hr.onboarding';
 
 export async function revokeOnboardingInvitationAction(
     previous: OnboardingRevokeInviteFormState,
@@ -48,8 +53,8 @@ export async function revokeOnboardingInvitationAction(
             {
                 headers: headerStore,
                 requiredPermissions: { member: ['invite'] },
-                auditSource: 'ui:hr:onboarding:invitations:revoke',
-                resourceType: 'hr.onboarding',
+                auditSource: `${ONBOARDING_INVITATIONS_AUDIT_PREFIX}:revoke`,
+                resourceType: ONBOARDING_RESOURCE_TYPE,
             },
         );
     } catch {
@@ -129,8 +134,8 @@ export async function resendOnboardingInvitationAction(
             {
                 headers: headerStore,
                 requiredPermissions: { member: ['invite'] },
-                auditSource: 'ui:hr:onboarding:invitations:resend',
-                resourceType: 'hr.onboarding',
+                auditSource: `${ONBOARDING_INVITATIONS_AUDIT_PREFIX}:resend`,
+                resourceType: ONBOARDING_RESOURCE_TYPE,
                 action: 'resend',
                 resourceAttributes: { token: parsed.data.token },
             },
@@ -164,5 +169,39 @@ export async function resendOnboardingInvitationAction(
     } catch (error) {
         const message = error instanceof Error ? error.message : 'Unable to resend invitation.';
         return { status: 'error', message };
+    }
+}
+
+export async function listOnboardingInvitationsAction(
+    limit: number,
+): Promise<{ invitations: OnboardingInvitation[] }> {
+    try {
+        const headerStore = await headers();
+        const session = await getSessionContext(
+            {},
+            {
+                headers: headerStore,
+                requiredPermissions: { organization: ['read'] },
+                auditSource: `${ONBOARDING_INVITATIONS_AUDIT_PREFIX}:list`,
+                resourceType: ONBOARDING_RESOURCE_TYPE,
+                action: 'list',
+            },
+        );
+
+        const canInviteMembers =
+            hasPermission(session.authorization.permissions, 'member', 'invite') ||
+            hasPermission(session.authorization.permissions, 'organization', 'update');
+        if (!canInviteMembers) {
+            return { invitations: [] };
+        }
+
+        const result = await getOnboardingInvitationsForUi({
+            authorization: session.authorization,
+            limit,
+        });
+
+        return { invitations: result.invitations };
+    } catch {
+        return { invitations: [] };
     }
 }

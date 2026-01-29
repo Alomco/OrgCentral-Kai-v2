@@ -30,6 +30,10 @@
 4) Bulk assign dialog is rendered with empty templates/employees and no onAssign handler, so it cannot assign packs.
 5) Expiry management panel exists but is not connected to data or shown on the compliance page.
 6) Category management UI is missing; templates use free-text categoryKey with no picker or upsert flow.
+7) Compliance reporting and analytics are missing - no comprehensive reporting on compliance status across the organization.
+8) Automated compliance reminders and notifications are limited - may lack sophisticated reminder workflows.
+9) Compliance audit trail is incomplete - may lack comprehensive logging of all compliance-related actions.
+10) Integration with regulatory requirements is missing - no mapping to specific regulations or standards.
 
 ## Gap details (parity notes)
 
@@ -63,6 +67,16 @@ Old Project: Assignment dialog and employee logs provided visibility into who wa
 New Project: BulkAssignDialog is not wired (empty templates/employees) and there is no admin employee compliance log view.
 Gap: No operational visibility or bulk assignment workflow for compliance at organization scale.
 
+### Reporting and Analytics
+Old Project: Had comprehensive reporting capabilities across HR modules.
+New Project: Compliance reporting may be limited to basic status displays.
+Gap: Missing comprehensive reporting on compliance status, trends, and organizational compliance metrics.
+
+### Regulatory Integration
+Old Project: May have had basic compliance tracking.
+New Project: No clear evidence of mapping to specific regulations or standards.
+Gap: Missing integration with regulatory requirements like SOX, HIPAA, GDPR, etc.
+
 ## TODOs
 - [x] Analyze and implement user submission UI that calls /api/hr/compliance/update with attachments, completion dates, acknowledgements, and notes.
 - [x] Analyze and wire compliance item detail page to real data and align status labels with ComplianceItemStatus.
@@ -70,6 +84,10 @@ Gap: No operational visibility or bulk assignment workflow for compliance at org
 - [x] Analyze and wire bulk assignment to templates/employees with an onAssign action backed by assign-compliance-items.
 - [x] Analyze and surface expiring items in the compliance page using dueDate/expiryDurationDays and the reminders pipeline.
 - [x] Analyze and add a category manager (list/upsert categories) to avoid free-text category keys.
+- [ ] Implement comprehensive compliance reporting and analytics dashboard.
+- [ ] Enhance automated compliance reminders with configurable workflows.
+- [ ] Implement complete compliance audit trail with comprehensive logging.
+- [ ] Add integration with regulatory requirements and standards mapping.
 
 ## Actionable TODOs with targets
 - [x] Build interactive item submission UI in `orgcentral/src/app/(app)/hr/compliance/_components/compliance-items-panel.tsx` or a new client detail view, calling `orgcentral/src/app/api/hr/compliance/update/route.ts` with attachments, completedAt, and notes.
@@ -79,8 +97,16 @@ Gap: No operational visibility or bulk assignment workflow for compliance at org
 - [x] Wire `orgcentral/src/app/(app)/hr/compliance/_components/bulk-assign-dialog.tsx` with templates and employees and add an onAssign action that calls `orgcentral/src/app/api/hr/compliance/assign/route.ts`.
 - [x] Surface expiry data in `orgcentral/src/app/(app)/hr/compliance/_components/compliance-expiry-panel.tsx` and mount it on `orgcentral/src/app/(app)/hr/compliance/page.tsx` with a real expiring-items query.
 - [x] Add category manager UI with list/upsert API in `orgcentral/src/app/(app)/hr/compliance/_components/compliance-category-manager.tsx`.
+- [ ] Add compliance reporting dashboard with organizational compliance metrics and trends.
+- [ ] Enhance reminder system with configurable workflows and escalation rules.
+- [ ] Implement comprehensive audit logging for all compliance-related actions.
+- [ ] Add regulatory standards mapping and compliance tracking features.
 
-## Implementation Status (as of 2026-01-24)
+## Related gaps
+- orgcentral/docs/gaps/hr/reporting-analytics-gap.md
+- orgcentral/docs/gaps/comprehensive-feature-gap-analysis.md
+
+## Implementation Status (as of 2026-01-27)
 
 | # | Gap | Status | Implementation |
 |---|-----|--------|----------------|
@@ -90,7 +116,21 @@ Gap: No operational visibility or bulk assignment workflow for compliance at org
 | 4 | Bulk assign dialog wiring | ✅ CLOSED | Templates/employees passed from page; API route called |
 | 5 | Expiry panel not connected | ✅ CLOSED | `compliance-expiry-panel-loader.tsx` with real 30-day expiry query |
 | 6 | Category management UI | ✅ CLOSED | `compliance-category-manager.tsx` with list/upsert API |
+| 7 | Compliance reporting and analytics | ❌ OPEN | Missing comprehensive reporting dashboard |
+| 8 | Automated compliance reminders | ⚠️ PARTIAL | Basic reminders exist, advanced workflows missing |
+| 9 | Compliance audit trail | ❌ OPEN | Incomplete logging of compliance actions |
+| 10 | Regulatory requirements integration | ❌ OPEN | No mapping to specific regulations/standards |
 
-### All gaps from this document have been implemented. ✅
-- [ ] Add compliance category manager UI that calls `orgcentral/src/app/api/hr/compliance/categories/route.ts` for list/upsert.
-- [ ] Enhance review flow in `orgcentral/src/app/(app)/hr/compliance/_components/compliance-review-queue-panel.tsx` to show evidence context and update completedAt/attachments in `orgcentral/src/app/(app)/hr/compliance/actions/review-item.ts`.
+### Implemented gaps from this document ✅
+- User-facing submission UI
+- Detail page with real data
+- Template metadata joining
+- Bulk assignment workflow
+- Expiry panel integration
+- Category management UI
+
+### Remaining Work
+1. **High Priority:** Implement comprehensive compliance reporting and analytics
+2. **Medium Priority:** Enhance automated compliance reminders with configurable workflows
+3. **High Priority:** Implement complete compliance audit trail
+4. **High Priority:** Add integration with regulatory requirements and standards mapping

@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, type ReactNode } from 'react';
+import { useCallback, useMemo, type ReactNode } from 'react';
 import Link, { type LinkProps } from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -9,12 +9,36 @@ interface IntentPrefetchLinkProps extends LinkProps {
     children: ReactNode;
 }
 
+function toHrefString(href: LinkProps['href']): string {
+    if (typeof href === 'string') {
+        return href;
+    }
+    const pathname = href.pathname ?? '';
+    const hash = href.hash ? (href.hash.startsWith('#') ? href.hash : `#${href.hash}`) : '';
+    const searchParams = new URLSearchParams();
+    if (href.query && typeof href.query === 'object') {
+        Object.entries(href.query).forEach(([key, value]) => {
+            if (value === undefined) {
+                return;
+            }
+            if (Array.isArray(value)) {
+                value.forEach((entry) => searchParams.append(key, String(entry)));
+            } else {
+                searchParams.append(key, String(value));
+            }
+        });
+    }
+    const search = searchParams.toString();
+    return `${pathname}${search ? `?${search}` : ''}${hash}`;
+}
+
 export function IntentPrefetchLink({ href, className, children, ...props }: IntentPrefetchLinkProps) {
     const router = useRouter();
+    const hrefString = useMemo(() => toHrefString(href), [href]);
 
     const handleIntentPrefetch = useCallback(() => {
-        router.prefetch(String(href));
-    }, [href, router]);
+        router.prefetch(hrefString);
+    }, [hrefString, router]);
 
     return (
         <Link

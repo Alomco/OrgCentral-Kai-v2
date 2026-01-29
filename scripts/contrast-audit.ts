@@ -146,7 +146,7 @@ function mergeOverrides(tokens: ThemeTokenMap, overrides: TokenOverrides): Token
     };
 }
 
-function pickOverrides(raw: Record<string, string>): TokenOverrides {
+function pickOverrides(raw: Record<string, unknown>): TokenOverrides {
     const overrides: TokenOverrides = {};
     for (const key of themeTokenKeys) {
         const value = raw[key];
@@ -162,16 +162,16 @@ function loadOverrides(path: string | null): TokenOverrides {
         return {};
     }
     const content = readFileSync(path, 'utf8');
-    let parsed: Record<string, string>;
+    let parsed: unknown;
     try {
-        parsed = JSON.parse(content) as Record<string, string>;
+        parsed = JSON.parse(content);
     } catch {
         throw new Error(`Failed to parse overrides JSON at ${path}`);
     }
     if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
         throw new Error(`Overrides JSON must be an object of token values at ${path}`);
     }
-    return pickOverrides(parsed);
+    return pickOverrides(parsed as Record<string, unknown>);
 }
 
 function findArgumentValue(args: string[], key: string): string | null {
@@ -203,7 +203,7 @@ function main() {
     const globalsPath = join(process.cwd(), 'src', 'app', 'globals.css');
     const css = readFileSync(globalsPath, 'utf8');
     const rootBlock = extractBlock(css, ':root');
-    const darkBlock = extractBlockWithToken(css, '.dark', 'background');
+    const darkBlock = extractBlockWithToken(css, '.dark', 'background') ?? '';
 
     if (!rootBlock) {
         throw new Error('Failed to find :root block in globals.css');
@@ -212,7 +212,7 @@ function main() {
     const rootTokens = parseTokens(rootBlock);
     auditBlock('Light theme', rootTokens);
 
-    if (darkBlock) {
+    if (darkBlock.length > 0) {
         const darkTokens = parseTokens(darkBlock);
         auditBlock('Dark theme', darkTokens);
     } else {

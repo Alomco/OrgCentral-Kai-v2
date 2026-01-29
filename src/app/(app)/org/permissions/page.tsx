@@ -53,7 +53,7 @@ export default async function OrgPermissionsPage() {
                 </Suspense>
 
                 <Suspense fallback={<PanelSkeleton />}>
-                    <PermissionResourcePanel resourcesPromise={resourcesPromise} />
+                    <PermissionResourcePanel orgId={authorization.orgId} resourcesPromise={resourcesPromise} />
                 </Suspense>
 
                 <LegacyMappingPanel />
@@ -183,3 +183,4 @@ async function AbacSummaryPanel({ policiesPromise }: { policiesPromise: Promise<
 function PanelSkeleton() {
     return <div className="h-44 w-full animate-pulse rounded-2xl bg-[oklch(var(--muted))]" />;
 }
+

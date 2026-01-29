@@ -5,6 +5,7 @@ import * as React from "react"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
 import { TooltipProvider } from "@/components/ui/tooltip"
+import { subscribeGlobalEventListener } from "@/lib/dom/global-event-listeners"
 
 import { SIDEBAR_COOKIE_MAX_AGE, SIDEBAR_COOKIE_NAME, SIDEBAR_KEYBOARD_SHORTCUT } from "./constants"
 import { SidebarContext, type SidebarContextProps } from "./context"
@@ -56,8 +57,13 @@ export function SidebarProvider({
             }
         }
 
-        window.addEventListener("keydown", handleKeyDown)
-        return () => window.removeEventListener("keydown", handleKeyDown)
+        const unsubscribe = subscribeGlobalEventListener({
+            key: "window:keydown:sidebar",
+            target: window,
+            type: "keydown",
+            handler: (event) => handleKeyDown(event as KeyboardEvent),
+        })
+        return () => unsubscribe()
     }, [toggleSidebar])
 
     const state = open ? "expanded" : "collapsed"

@@ -65,6 +65,11 @@ Evidence:
 - orgcentral/src/app/(app)/hr/absence/_components/absence-calendar.tsx
 Gap: Day buttons only announce the day number and do not describe month, year, or absence counts, limiting screen reader usability.
 
+### Missing comprehensive accessibility compliance
+Evidence:
+- Across multiple UI components throughout the application
+Gap: The application may lack comprehensive WCAG 2.1/2.2 compliance across all modules and components. Limited evidence of systematic accessibility testing and remediation.
+
 ## TODOs
 - [x] Define theme token SSOT across globals, theme presets, and UI style presets.
 	- docs/theme-token-ssot.md
@@ -76,7 +81,11 @@ Gap: Day buttons only announce the day number and do not describe month, year, o
 - [x] Analyze priority and status indicators to add non-color cues and accessible text.
 - [x] Analyze calendar navigation and day cells to add aria-labels and full date context.
 - [x] Analyze hover-only controls in notification items to ensure keyboard discoverability.
+- [ ] Conduct comprehensive accessibility audit across all UI components and modules.
+- [ ] Implement systematic accessibility testing in CI/CD pipeline.
+- [ ] Add accessibility documentation and guidelines for developers.
 
 ## Related gaps
 - orgcentral/docs/gaps/ui-ux/theme-ui-switching-gap.md
 - orgcentral/docs/gaps/ui-ux/theme-remediation-checklist.md
+- orgcentral/docs/gaps/comprehensive-feature-gap-analysis.md

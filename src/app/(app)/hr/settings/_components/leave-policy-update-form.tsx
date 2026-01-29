@@ -1,7 +1,7 @@
 'use client';
 
-import { useActionState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useActionState, useRef } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,6 +14,7 @@ import type { LeavePolicy } from '@/server/types/leave-types';
 import { updateLeavePolicyAction } from '../leave-policy-actions';
 import type { LeavePolicyInlineState } from '../leave-policy-form-utils';
 import { formatPolicyType, toDateInputValue } from './leave-policy-form-utils';
+import { LEAVE_POLICIES_QUERY_KEY } from '../leave-policy-query';
 
 const initialInlineState: LeavePolicyInlineState = { status: 'idle' };
 
@@ -21,18 +22,22 @@ export function LeavePolicyUpdateForm(props: {
     policy: LeavePolicy;
     policyTypes: readonly string[];
 }) {
-    const router = useRouter();
-    const [state, action, pending] = useActionState(updateLeavePolicyAction, initialInlineState);
+    const queryClient = useQueryClient();
+    const handleUpdate = async (
+        previous: LeavePolicyInlineState,
+        formData: FormData,
+    ): Promise<LeavePolicyInlineState> => {
+        const next = await updateLeavePolicyAction(previous, formData);
+        if (next.status === 'success') {
+            void queryClient.invalidateQueries({ queryKey: LEAVE_POLICIES_QUERY_KEY }).catch(() => null);
+        }
+        return next;
+    };
+    const [state, action, pending] = useActionState(handleUpdate, initialInlineState);
     const requiresApprovalReference = useRef<HTMLInputElement | null>(null);
     const isDefaultReference = useRef<HTMLInputElement | null>(null);
     const statutoryReference = useRef<HTMLInputElement | null>(null);
     const allowNegativeReference = useRef<HTMLInputElement | null>(null);
-
-    useEffect(() => {
-        if (state.status === 'success') {
-            router.refresh();
-        }
-    }, [router, state.status]);
 
     const updateMessage = state.status === 'idle' ? null : state.message;
 

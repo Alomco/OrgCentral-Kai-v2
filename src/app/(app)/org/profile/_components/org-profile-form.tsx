@@ -1,14 +1,15 @@
 "use client";
 
-import { useActionState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { cva } from 'class-variance-authority';
+import { useActionState, useEffect } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { Button } from '@/components/ui/button';
 import type { OrganizationData } from '@/server/types/leave-types';
-
+import { orgProfileKeys } from '../org-profile.api';
+import { initialOrgProfileActionState } from '../actions.state';
 import { updateOrgProfileAction } from '../actions';
-import { initialOrgProfileActionState, type OrgProfileActionState } from '../actions.state';
+
 import {
     ContactCard,
     TextAreaField,
@@ -22,25 +23,26 @@ const panelVariants = cva(
 );
 
 export function OrgProfileForm({ organization }: { organization: OrganizationData }) {
-    const router = useRouter();
-    const [state, formAction, pending] = useActionState<OrgProfileActionState, FormData>(
+    const incorporationDate = toDateInputValue(organization.incorporationDate);
+    const queryClient = useQueryClient();
+    const [state, formAction, pending] = useActionState(
         updateOrgProfileAction,
         initialOrgProfileActionState,
     );
 
     useEffect(() => {
         if (state.status === 'success') {
-            router.refresh();
+            queryClient.invalidateQueries({ queryKey: orgProfileKeys.detail(organization.id) }).catch(() => null);
         }
-    }, [router, state.status]);
+    }, [organization.id, queryClient, state.status]);
 
-    const incorporationDate = toDateInputValue(organization.incorporationDate);
+    const formMessage = state.status === 'error'
+        ? state.message
+        : state.status === 'success'
+            ? state.message ?? 'Saved'
+            : undefined;
 
-    const formMessage = state.message;
-    const formError = state.status === 'error' ? formMessage : undefined;
-    const formSuccess = state.status === 'success' ? formMessage ?? 'Saved' : undefined;
-    const fieldErrors: Partial<Record<string, string[]>> = state.fieldErrors ?? {};
-
+    const fieldErrors = state.fieldErrors ?? {};
     const errorFor = (name: string): string | undefined => fieldErrors[name]?.[0];
 
     const profileFields: TextFieldConfig[] = [
@@ -88,7 +90,7 @@ export function OrgProfileForm({ organization }: { organization: OrganizationDat
     ];
 
     return (
-        <form action={formAction} className={panelVariants()}>
+        <form action={formAction} className={panelVariants()} aria-busy={pending}>
             <fieldset disabled={pending} className="grid gap-6">
                 <div>
                     <p className="text-sm font-semibold text-foreground">Profile settings</p>
@@ -97,17 +99,11 @@ export function OrgProfileForm({ organization }: { organization: OrganizationDat
                     </p>
                 </div>
 
-                <div className="sr-only" aria-live="polite">
-                    {formError ?? formSuccess ?? ''}
-                </div>
+                <div className="sr-only" aria-live="polite">{formMessage ?? ''}</div>
 
                 <div className="grid gap-4 sm:grid-cols-2">
                     {profileFields.map((field) => (
-                        <TextField
-                            key={field.name}
-                            {...field}
-                            error={errorFor(field.name)}
-                        />
+                        <TextField key={field.name} {...field} error={errorFor(field.name)} />
                     ))}
                 </div>
 
@@ -127,55 +123,25 @@ export function OrgProfileForm({ organization }: { organization: OrganizationDat
                 <div className="grid gap-4">
                     <div>
                         <p className="text-sm font-semibold text-foreground">Contacts</p>
-                        <p className="text-xs text-muted-foreground">
-                            Leave blank to clear contact records.
-                        </p>
+                        <p className="text-xs text-muted-foreground">Leave blank to clear contact records.</p>
                     </div>
 
                     <div className="grid gap-4 sm:grid-cols-2">
                         <ContactCard
                             title="Primary business"
                             fields={[
-                                {
-                                    name: 'primaryContactName',
-                                    label: 'Name',
-                                    defaultValue: organization.primaryBusinessContact?.name ?? '',
-                                },
-                                {
-                                    name: 'primaryContactEmail',
-                                    label: 'Email',
-                                    type: 'email',
-                                    defaultValue: organization.primaryBusinessContact?.email ?? '',
-                                },
-                                {
-                                    name: 'primaryContactPhone',
-                                    label: 'Phone',
-                                    type: 'tel',
-                                    defaultValue: organization.primaryBusinessContact?.phone ?? '',
-                                },
+                                { name: 'primaryContactName', label: 'Name', defaultValue: organization.primaryBusinessContact?.name ?? '' },
+                                { name: 'primaryContactEmail', label: 'Email', type: 'email', defaultValue: organization.primaryBusinessContact?.email ?? '' },
+                                { name: 'primaryContactPhone', label: 'Phone', type: 'tel', defaultValue: organization.primaryBusinessContact?.phone ?? '' },
                             ]}
                             errorFor={errorFor}
                         />
                         <ContactCard
                             title="Accounts & finance"
                             fields={[
-                                {
-                                    name: 'financeContactName',
-                                    label: 'Name',
-                                    defaultValue: organization.accountsFinanceContact?.name ?? '',
-                                },
-                                {
-                                    name: 'financeContactEmail',
-                                    label: 'Email',
-                                    type: 'email',
-                                    defaultValue: organization.accountsFinanceContact?.email ?? '',
-                                },
-                                {
-                                    name: 'financeContactPhone',
-                                    label: 'Phone',
-                                    type: 'tel',
-                                    defaultValue: organization.accountsFinanceContact?.phone ?? '',
-                                },
+                                { name: 'financeContactName', label: 'Name', defaultValue: organization.accountsFinanceContact?.name ?? '' },
+                                { name: 'financeContactEmail', label: 'Email', type: 'email', defaultValue: organization.accountsFinanceContact?.email ?? '' },
+                                { name: 'financeContactPhone', label: 'Phone', type: 'tel', defaultValue: organization.accountsFinanceContact?.phone ?? '' },
                             ]}
                             errorFor={errorFor}
                         />
@@ -186,13 +152,13 @@ export function OrgProfileForm({ organization }: { organization: OrganizationDat
                     <Button type="submit" size="sm" className="px-4" disabled={pending}>
                         {pending ? 'Saving...' : 'Save changes'}
                     </Button>
-                    {formSuccess ? <p className="text-xs text-muted-foreground">{formSuccess}</p> : null}
+                    {state.status === 'success' ? (
+                        <p className="text-xs text-muted-foreground">{state.message ?? 'Saved'}</p>
+                    ) : null}
                 </div>
 
-                {formError ? (
-                    <p className="text-xs text-destructive" role="alert">
-                        {formError}
-                    </p>
+                {state.status === 'error' ? (
+                    <p className="text-xs text-destructive" role="alert">{state.message ?? 'Unable to save'}</p>
                 ) : null}
             </fieldset>
         </form>

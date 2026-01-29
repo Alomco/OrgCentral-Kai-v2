@@ -1,7 +1,6 @@
 {
   "typescript.tsserver.maxNodeModuleJsDepth": 0,
   "postman.settings.dotenv-detection-notification-visibility": false,
-
   "css.customData": [
     ".vscode/tailwindcss.custom-data.json"
   ]

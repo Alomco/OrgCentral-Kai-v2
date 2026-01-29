@@ -1,7 +1,7 @@
 'use client';
 
 import { useActionState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,19 +12,20 @@ import type { ComplianceTemplate } from '@/server/types/compliance-types';
 
 import { updateComplianceTemplateAction } from '../actions/compliance-templates';
 import type { ComplianceTemplateInlineState } from '../compliance-template-form-utils';
+import { COMPLIANCE_TEMPLATES_QUERY_KEY } from '../compliance-templates-query';
 
 const initialInlineState: ComplianceTemplateInlineState = { status: 'idle' };
 
 export function ComplianceTemplateUpdateForm(props: { template: ComplianceTemplate }) {
-    const router = useRouter();
+    const queryClient = useQueryClient();
     const [state, action, pending] = useActionState(updateComplianceTemplateAction, initialInlineState);
     const itemsJson = JSON.stringify(props.template.items, null, 2);
 
     useEffect(() => {
         if (state.status === 'success') {
-            router.refresh();
+            void queryClient.invalidateQueries({ queryKey: COMPLIANCE_TEMPLATES_QUERY_KEY }).catch(() => null);
         }
-    }, [router, state.status]);
+    }, [queryClient, state.status]);
 
     const message = state.status === 'idle' ? null : state.message;
 

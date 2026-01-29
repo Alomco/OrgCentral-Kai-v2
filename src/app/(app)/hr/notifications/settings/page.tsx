@@ -8,11 +8,22 @@ import { NotificationSettingsForm } from './notification-settings-form';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ensureDefaultNotificationPreferences } from '@/server/use-cases/notifications/ensure-default-preferences';
 import { PrismaNotificationPreferenceRepository } from '@/server/repositories/prisma/org/notifications';
+import { registerNotificationPreferenceCacheTag } from '@/server/use-cases/notifications/cache-helpers';
+import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
 
 export const metadata: Metadata = {
   title: 'Notification Settings | HR',
   description: 'Manage your notification preferences',
 };
+
+async function getPreferencesWithCache(
+  authorization: RepositoryAuthorizationContext,
+  userId: string,
+) {
+  'use cache';
+  registerNotificationPreferenceCacheTag(authorization);
+  return getNotificationPreferencesAction({ authorization, userId });
+}
 
 export default async function NotificationSettingsPage() {
   const headerStore = await nextHeaders();
@@ -25,14 +36,11 @@ export default async function NotificationSettingsPage() {
   // Ensure defaults exist
   const repo = new PrismaNotificationPreferenceRepository();
   await ensureDefaultNotificationPreferences(
-    { preferenceRepository: repo }, 
+    { preferenceRepository: repo },
     { authorization, userId: session.user.id }
   );
 
-  const { preferences } = await getNotificationPreferencesAction({
-    authorization,
-    userId: session.user.id,
-  });
+  const { preferences } = await getPreferencesWithCache(authorization, session.user.id);
 
   return (
     <div className="flex flex-col h-full space-y-6 max-w-4xl mx-auto">

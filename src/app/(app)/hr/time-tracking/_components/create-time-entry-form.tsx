@@ -10,21 +10,17 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
-import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
-
 import { createTimeEntryAction } from '../actions';
 import type { TimeEntryFormState } from '../form-state';
 import { FieldError } from '../../_components/field-error';
 
 export interface CreateTimeEntryFormProps {
-    authorization: RepositoryAuthorizationContext;
     initialState: TimeEntryFormState;
 }
 
-export function CreateTimeEntryForm({ authorization, initialState }: CreateTimeEntryFormProps) {
+export function CreateTimeEntryForm({ initialState }: CreateTimeEntryFormProps) {
     const formId = useId();
-    const boundAction = createTimeEntryAction.bind(null, authorization);
-    const [state, formAction, isPending] = useActionState(boundAction, initialState);
+    const [state, formAction, isPending] = useActionState(createTimeEntryAction, initialState);
     const billableReference = useRef<HTMLInputElement | null>(null);
 
     const isSuccess = state.status === 'success';
@@ -130,7 +126,7 @@ export function CreateTimeEntryForm({ authorization, initialState }: CreateTimeE
                         <div className="flex items-center justify-between gap-3 rounded-lg border px-3 py-2">
                             <div className="space-y-1">
                                 <Label htmlFor={`${formId}-billable`}>Billable time</Label>
-                                <p className="text-xs text-muted-foreground">Marks work that is client billable.</p>
+                                <p id={`${formId}-billable-help`} className="text-xs text-muted-foreground">Marks work that is client billable.</p>
                             </div>
                             <input
                                 ref={billableReference}
@@ -139,7 +135,7 @@ export function CreateTimeEntryForm({ authorization, initialState }: CreateTimeE
                                 value={state.values.billable}
                             />
                             <Switch
-                                id={`${formId}-billable`}
+                                id={`${formId}-billable`} aria-describedby={`${formId}-billable-help`}
                                 defaultChecked={state.values.billable === 'on'}
                                 onCheckedChange={(checked) => {
                                     if (billableReference.current) {
@@ -198,3 +194,4 @@ export function CreateTimeEntryForm({ authorization, initialState }: CreateTimeE
         </Card>
     );
 }
+

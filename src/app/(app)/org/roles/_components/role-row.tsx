@@ -8,7 +8,7 @@ export interface OrgRoleRow {
     permissions: Role['permissions'];
 }
 
-export function RoleRow({ role }: { role: OrgRoleRow }) {
+export function RoleRow({ orgId, role }: { orgId: string; role: OrgRoleRow }) {
     const permissionsText = serializePermissionsToText(role.permissions);
 
     return (
@@ -19,6 +19,7 @@ export function RoleRow({ role }: { role: OrgRoleRow }) {
             </div>
 
             <RoleEditor
+                orgId={orgId}
                 roleId={role.id}
                 initialName={role.name}
                 initialDescription={role.description ?? ''}
@@ -58,3 +59,4 @@ function serializePermissionsToText(permissions: Role['permissions']): string {
 
     return lines.join('\n');
 }
+

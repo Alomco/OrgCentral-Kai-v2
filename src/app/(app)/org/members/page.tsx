@@ -7,13 +7,10 @@ import { getRoleService } from '@/server/services/org';
 import { getUserService, type UserServiceContract } from '@/server/services/org/users/user-service.provider';
 import { resolveAllowedInviteRoles } from '@/server/services/org/membership/membership-service.policy';
 import { assertOnboardingInviteSender } from '@/server/security/authorization/hr-guards/onboarding';
-import { MemberActions } from './_components/member-actions';
+import { MembersListClient } from './_components/members-list.client';
 import { OnboardingWizardPanel } from '../../hr/onboarding/_components/onboarding-wizard-panel';
 import { OrgInvitationsPanel } from './_components/org-invitations-panel';
-import {
-    parseOrgMembersQuery,
-    type OrgMembersSearchParams,
-} from './_components/org-members-helpers';
+import { parseOrgMembersQuery, buildOrgMembersSearchParams, type OrgMembersSearchParams } from './_components/org-members-helpers';
 import { OrgMembersPagination } from './_components/org-members-pagination';
 import { OrgMembersFilters } from './_components/org-members-filters';
 import { OrgMembersBulkActions } from './_components/org-members-bulk-actions';
@@ -37,8 +34,6 @@ const orgUserSchema = z
         memberships: z.array(membershipSchema),
     })
     .loose();
-
-type OrgUser = z.infer<typeof orgUserSchema>;
 
 export default async function OrgMembersPage({
     searchParams,
@@ -122,47 +117,17 @@ export default async function OrgMembersPage({
 
             <div className="rounded-2xl bg-[oklch(var(--card)/0.6)] p-6 backdrop-blur">
                 <OrgMembersFilters query={query} roleNames={filterRoleNames} />
-                <OrgMembersBulkActions roleNames={filterRoleNames} />
-                <div className="mt-4 grid gap-3">
-                    {users.length === 0 ? (
-                        <p className="text-sm text-[oklch(var(--muted-foreground))]">No users found.</p>
-                    ) : (
-                        users.map((user) => {
-                            const displayLabel = user.displayName.trim().length > 0 ? user.displayName : user.email;
-                            const membership = resolveMembershipForOrg(user, authorization.orgId);
-                            const status = membership?.status ?? 'INVITED';
-                            const initialRoles = resolveUserRolesForOrg(user, authorization.orgId).join(', ');
-
-                            return (
-                                <div
-                                    key={user.id}
-                                    className="flex flex-col gap-2 rounded-xl bg-[oklch(var(--muted)/0.35)] p-3"
-                                >
-                                    <div className="flex items-start gap-3">
-                                        <input
-                                            type="checkbox"
-                                            name="userIds"
-                                            value={user.id}
-                                            form="bulk-members-form"
-                                            aria-label={`Select ${displayLabel}`}
-                                            data-bulk-member="select"
-                                            className="mt-1 h-4 w-4 rounded border-[oklch(var(--border))] text-[oklch(var(--primary))]"
-                                        />
-                                        <div className="flex-1">
-                                            <p className="text-sm font-semibold text-[oklch(var(--foreground))]">
-                                                {displayLabel}
-                                            </p>
-                                            <p className="text-xs text-[oklch(var(--muted-foreground))]">{user.email}</p>
-                                        </div>
-                                    </div>
-
-                                    <MemberActions userId={user.id} initialRoles={initialRoles} status={status} />
-                                </div>
-                            );
-                        })
-                    )}
+                <div className="mt-2">
+                    <a
+                        href={"/api/org/" + authorization.orgId + "/members/export?" + buildOrgMembersSearchParams(query).toString()}
+                        className="inline-flex h-8 items-center rounded-md border px-3 text-xs"
+                        aria-label="Export filtered members as CSV"
+                    >
+                        Export CSV
+                    </a>
                 </div>
-                <div className="mt-4">
+                <OrgMembersBulkActions orgId={authorization.orgId} currentQueryKey={buildOrgMembersSearchParams(query).toString()} roleNames={filterRoleNames} />
+                <MembersListClient orgId={authorization.orgId} currentQueryKey={buildOrgMembersSearchParams(query).toString()} initial={{ users, totalCount, page, pageSize }} /><div className="mt-4">
                     <OrgMembersPagination
                         query={{ ...query, page, pageSize }}
                         totalCount={totalCount}
@@ -176,22 +141,7 @@ export default async function OrgMembersPage({
     );
 }
 
-function resolveUserRolesForOrg(
-    user: Pick<OrgUser, 'memberships' | 'roles'>,
-    orgId: string,
-): string[] {
-    const membership = user.memberships.find((candidate) => candidate.organizationId === orgId);
-    if (membership) {
-        return membership.roles;
-    }
 
-    return user.roles;
-}
 
-function resolveMembershipForOrg(
-    user: Pick<OrgUser, 'memberships'>,
-    orgId: string,
-): z.infer<typeof membershipSchema> | undefined {
-    return user.memberships.find((candidate) => candidate.organizationId === orgId);
-}
+
 

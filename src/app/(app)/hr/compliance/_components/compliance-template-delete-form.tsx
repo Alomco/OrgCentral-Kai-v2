@@ -1,7 +1,7 @@
 'use client';
 
 import { useActionState, useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 
 import {
     AlertDialog,
@@ -19,20 +19,21 @@ import { Spinner } from '@/components/ui/spinner';
 
 import { deleteComplianceTemplateAction } from '../actions/compliance-templates';
 import type { ComplianceTemplateInlineState } from '../compliance-template-form-utils';
+import { COMPLIANCE_TEMPLATES_QUERY_KEY } from '../compliance-templates-query';
 
 const initialInlineState: ComplianceTemplateInlineState = { status: 'idle' };
 
 export function ComplianceTemplateDeleteForm(props: { templateId: string }) {
-    const router = useRouter();
+    const queryClient = useQueryClient();
     const [state, action, pending] = useActionState(deleteComplianceTemplateAction, initialInlineState);
     const [confirmOpen, setConfirmOpen] = useState(false);
     const formReference = useRef<HTMLFormElement | null>(null);
 
     useEffect(() => {
         if (state.status === 'success') {
-            router.refresh();
+            void queryClient.invalidateQueries({ queryKey: COMPLIANCE_TEMPLATES_QUERY_KEY }).catch(() => null);
         }
-    }, [router, state.status]);
+    }, [queryClient, state.status]);
 
     return (
         <form

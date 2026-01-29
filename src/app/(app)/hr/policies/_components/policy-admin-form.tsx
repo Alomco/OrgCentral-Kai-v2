@@ -1,7 +1,8 @@
-'use client';
+﻿'use client';
 
 import { useActionState, useEffect, useMemo, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
+import { policyKeys } from './policies.api';
 
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
@@ -16,7 +17,7 @@ interface PolicyAdminFormProps {
 }
 
 export function PolicyAdminForm({ policyCategories }: PolicyAdminFormProps) {
-    const router = useRouter();
+    const queryClient = useQueryClient();
     const initialState = useMemo<PolicyAdminCreateState>(
         () => buildInitialPolicyAdminState(policyCategories),
         [policyCategories],
@@ -27,10 +28,10 @@ export function PolicyAdminForm({ policyCategories }: PolicyAdminFormProps) {
 
     useEffect(() => {
         if (!pending && state.status === 'success') {
-            router.refresh();
+            void queryClient.invalidateQueries({ queryKey: policyKeys.list() });
             formReference.current?.reset();
         }
-    }, [pending, router, state.status]);
+    }, [pending, queryClient, state.status]);
 
     const message =
         state.status === 'error'

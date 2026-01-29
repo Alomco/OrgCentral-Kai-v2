@@ -7,7 +7,14 @@ import { getSessionContext } from '@/server/use-cases/auth/sessions/get-session'
 import { listPendingReviewComplianceItemsForUi } from '@/server/use-cases/hr/compliance/list-pending-review-items.cached';
 import { getLeaveRequestsForUi } from '@/server/use-cases/hr/leave/get-leave-requests.cached';
 import { getPeopleService } from '@/server/services/hr/people/people-service.provider';
+import { createLruCache } from '@/server/lib/lru-cache';
 import type { AdminDashboardStats, PendingApprovalItem } from './actions.types';
+
+const adminStatsCache = createLruCache<string, AdminDashboardStats>({ maxEntries: 50, ttlMs: 30_000 });
+
+function canCacheAdminStats(dataClassification: string): boolean {
+    return dataClassification === 'OFFICIAL';
+}
 
 /**
  * Fetch admin dashboard statistics
@@ -22,6 +29,15 @@ export const getAdminDashboardStats = cache(async (): Promise<AdminDashboardStat
             auditSource: 'action:hr:admin:stats',
         },
     );
+
+    const cacheKey = `org:${authorization.tenantScope.orgId}`;
+    const shouldCache = canCacheAdminStats(authorization.tenantScope.dataClassification);
+    if (shouldCache) {
+        const cached = adminStatsCache.get(cacheKey);
+        if (cached) {
+            return cached;
+        }
+    }
 
     const stats: AdminDashboardStats = {
         totalEmployees: 0,
@@ -66,6 +82,10 @@ export const getAdminDashboardStats = cache(async (): Promise<AdminDashboardStat
     stats.complianceAlerts = complianceResult.items.length;
 
     // Upcoming expirations can be added once org-level summary is available
+
+    if (shouldCache) {
+        adminStatsCache.set(cacheKey, stats);
+    }
 
     return stats;
 });

@@ -1,7 +1,7 @@
 'use client';
 
 import { useActionState, useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 import {
@@ -24,6 +24,7 @@ import {
     type OnboardingRevokeInviteFormState,
     type OnboardingRevokeInviteFormStatus,
 } from '../form-state';
+import { ONBOARDING_INVITATIONS_QUERY_KEY } from '../onboarding-invitations-query';
 
 export interface RevokeOnboardingInvitationFormProps {
     token: string;
@@ -38,7 +39,7 @@ export function RevokeOnboardingInvitationForm({
     onPendingChange,
     onStatusChange,
 }: RevokeOnboardingInvitationFormProps) {
-    const router = useRouter();
+    const queryClient = useQueryClient();
     const revokeAction = async (
         previousState: OnboardingRevokeInviteFormState,
         formData: FormData,
@@ -78,13 +79,13 @@ export function RevokeOnboardingInvitationForm({
         }
         if (!pending && state.status === 'success' && priorStatus !== 'success') {
             toast.success('Invitation revoked.');
-            router.refresh();
+            void queryClient.invalidateQueries({ queryKey: ONBOARDING_INVITATIONS_QUERY_KEY }).catch(() => null);
         }
         if (priorStatus !== state.status) {
             onStatusChange?.(state.status);
         }
         previousStatus.current = state.status;
-    }, [pending, state.status, onStatusChange, router]);
+    }, [pending, state.status, onStatusChange, queryClient]);
 
     return (
         <form ref={formReference} action={action} className="inline-flex flex-col items-end gap-1" aria-busy={pending}>

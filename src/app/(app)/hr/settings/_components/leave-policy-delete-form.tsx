@@ -1,7 +1,7 @@
 'use client';
 
 import { useActionState, useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 
 import {
     AlertDialog,
@@ -19,20 +19,21 @@ import { Spinner } from '@/components/ui/spinner';
 
 import { deleteLeavePolicyAction } from '../leave-policy-actions';
 import type { LeavePolicyInlineState } from '../leave-policy-form-utils';
+import { LEAVE_POLICIES_QUERY_KEY } from '../leave-policy-query';
 
 const initialInlineState: LeavePolicyInlineState = { status: 'idle' };
 
 export function LeavePolicyDeleteForm(props: { policyId: string }) {
-    const router = useRouter();
+    const queryClient = useQueryClient();
     const [state, action, pending] = useActionState(deleteLeavePolicyAction, initialInlineState);
     const [confirmOpen, setConfirmOpen] = useState(false);
     const formReference = useRef<HTMLFormElement | null>(null);
 
     useEffect(() => {
         if (state.status === 'success') {
-            router.refresh();
+            void queryClient.invalidateQueries({ queryKey: LEAVE_POLICIES_QUERY_KEY }).catch(() => null);
         }
-    }, [router, state.status]);
+    }, [queryClient, state.status]);
 
     return (
         <form

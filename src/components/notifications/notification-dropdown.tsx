@@ -1,40 +1,79 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { CheckCheck } from 'lucide-react';
 import { useTransition } from 'react';
 import { toast } from 'sonner';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { NotificationItem } from './notification-item';
-import type { HRNotificationDTO } from '@/server/types/hr/notifications';
+import { NotificationItem, type NotificationSummary } from './notification-item';
 import { markAllHrNotificationsRead } from '@/app/(app)/hr/notifications/actions';
+import {
+  buildHrNotificationsQueryKey,
+  HR_NOTIFICATION_DROPDOWN_FILTERS,
+  HR_NOTIFICATIONS_QUERY_KEY,
+} from '@/app/(app)/hr/notifications/notification-query';
 
 interface NotificationDropdownProps {
-  notifications: HRNotificationDTO[];
+  notifications: NotificationSummary[];
   onClose?: () => void;
 }
 
 export function NotificationDropdown({ notifications, onClose }: NotificationDropdownProps) {
-  const router = useRouter();
+  const queryClient = useQueryClient();
   const [isPending, startTransition] = useTransition();
+  const queryKey = buildHrNotificationsQueryKey(HR_NOTIFICATION_DROPDOWN_FILTERS);
 
-  const handleMarkAllRead = () => {
-    startTransition(async () => {
-      const result = await markAllHrNotificationsRead();
+  const markAllMutation = useMutation({
+    mutationFn: () => markAllHrNotificationsRead(),
+    onSuccess: (result) => {
       if (result.success) {
+        queryClient.setQueryData<{ notifications: NotificationSummary[]; unreadCount: number }>(
+          queryKey,
+          (current) => {
+            if (!current) {
+              return current;
+            }
+            const nextNotifications = current.notifications.map((notification) => ({
+              ...notification,
+              isRead: true,
+            }));
+            return { notifications: nextNotifications, unreadCount: 0 };
+          },
+        );
         toast.success('All notifications marked as read');
-        router.refresh();
+        void queryClient.invalidateQueries({ queryKey: HR_NOTIFICATIONS_QUERY_KEY }).catch(() => null);
       } else {
         toast.error('Failed to mark all as read');
       }
+    },
+    onError: () => {
+      toast.error('Failed to mark all as read');
+    },
+  });
+
+  const handleMarkAllRead = () => {
+    startTransition(() => {
+      markAllMutation.mutate();
     });
   };
 
-  const handleItemRead = () => {
-    router.refresh();
+  const handleItemRead = (id: string) => {
+    queryClient.setQueryData<{ notifications: NotificationSummary[]; unreadCount: number }>(
+      queryKey,
+      (current) => {
+        if (!current) {
+          return current;
+        }
+        const nextNotifications = current.notifications.map((notification) => (
+          notification.id === id ? { ...notification, isRead: true } : notification
+        ));
+        const unreadCount = nextNotifications.filter((item) => !item.isRead).length;
+        return { notifications: nextNotifications, unreadCount };
+      },
+    );
   };
 
   return (
@@ -47,7 +86,7 @@ export function NotificationDropdown({ notifications, onClose }: NotificationDro
             size="sm"
             className="h-auto p-0 text-xs text-muted-foreground hover:text-foreground"
             onClick={handleMarkAllRead}
-            disabled={isPending}
+            disabled={isPending || markAllMutation.isPending}
           >
             <CheckCheck className="mr-1 h-3 w-3" />
             Mark all read

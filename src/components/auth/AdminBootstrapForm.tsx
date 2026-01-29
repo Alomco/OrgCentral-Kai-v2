@@ -7,7 +7,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ADMIN_BOOTSTRAP_SECRET_STORAGE_KEY } from './admin-bootstrap.storage';
+import { useAdminBootstrapStore } from './admin-bootstrap-store';
 
 type OAuthProvider = 'google' | 'microsoft';
 
@@ -15,6 +15,7 @@ export function AdminBootstrapForm() {
     const [secret, setSecret] = useState('');
     const [error, setError] = useState<string | null>(null);
     const [oauthLoading, setOauthLoading] = useState<OAuthProvider | null>(null);
+    const setToken = useAdminBootstrapStore((state) => state.setToken);
 
     const handleOAuthSignIn = async (provider: OAuthProvider) => {
         const token = secret.trim();
@@ -24,7 +25,7 @@ export function AdminBootstrapForm() {
         }
 
         setError(null);
-        sessionStorage.setItem(ADMIN_BOOTSTRAP_SECRET_STORAGE_KEY, token);
+        setToken(token);
 
         setOauthLoading(provider);
         try {

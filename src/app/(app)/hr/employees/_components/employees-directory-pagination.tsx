@@ -24,7 +24,9 @@ function buildPageWindow(current: number, total: number): PageWindowEntry[] {
     }
 
     const pages = new Set<number>([1, total, current - 1, current, current + 1]);
-    const sorted = Array.from(pages).filter((page) => page >= 1 && page <= total).sort((a, b) => a - b);
+    const sorted = Array.from(pages)
+        .filter((page) => page >= 1 && page <= total)
+        .toSorted((a, b) => a - b);
 
     const window: PageWindowEntry[] = [];
     let previous = 0;

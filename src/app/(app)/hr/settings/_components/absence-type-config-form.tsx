@@ -1,7 +1,7 @@
 'use client';
 
 import { useActionState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,6 +15,7 @@ import { FieldError } from '../../_components/field-error';
 import { createAbsenceTypeAction } from '../absence-type-actions';
 import type { AbsenceTypeCreateState } from '../absence-type-actions.types';
 import { AbsenceTypeRow } from './absence-type-row';
+import { ABSENCE_TYPES_QUERY_KEY, fetchAbsenceTypes } from '../absence-type-query';
 
 const initialCreateState: AbsenceTypeCreateState = {
     status: 'idle',
@@ -27,18 +28,23 @@ const initialCreateState: AbsenceTypeCreateState = {
 };
 
 export function AbsenceTypeConfigForm(props: { types: AbsenceTypeConfig[] }) {
-    const router = useRouter();
+    const queryClient = useQueryClient();
     const [createState, createAction, createPending] = useActionState(createAbsenceTypeAction, initialCreateState);
+    const { data: types = props.types } = useQuery({
+        queryKey: ABSENCE_TYPES_QUERY_KEY,
+        queryFn: fetchAbsenceTypes,
+        initialData: props.types,
+    });
     const formReference = useRef<HTMLFormElement | null>(null);
     const tracksBalanceReference = useRef<HTMLInputElement | null>(null);
     const isActiveReference = useRef<HTMLInputElement | null>(null);
 
     useEffect(() => {
         if (!createPending && createState.status === 'success') {
-            router.refresh();
+            void queryClient.invalidateQueries({ queryKey: ABSENCE_TYPES_QUERY_KEY }).catch(() => null);
             formReference.current?.reset();
         }
-    }, [createPending, createState.status, router]);
+    }, [createPending, createState.status, queryClient]);
 
     const createMessage =
         createState.status === 'error'
@@ -174,13 +180,13 @@ export function AbsenceTypeConfigForm(props: { types: AbsenceTypeConfig[] }) {
                     <CardDescription>Update labels or toggle active status.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                    {props.types.length === 0 ? (
+                    {types.length === 0 ? (
                         <p className="text-sm text-muted-foreground">
                             No absence types configured yet.
                         </p>
                     ) : (
                         <div className="space-y-3">
-                            {props.types.map((type) => (
+                            {types.map((type) => (
                                 <AbsenceTypeRow key={type.id} type={type} />
                             ))}
                         </div>

@@ -6,6 +6,7 @@ import { Paintbrush } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { useDevelopmentThemeStore } from './development-theme-store';
 import { useRegisterDevelopmentAction } from './toolbar';
 
 export interface DevelopmentThemeWidgetProps {
@@ -13,9 +14,6 @@ export interface DevelopmentThemeWidgetProps {
     enabled: boolean;
 }
 
-type ThemePresetKey = 'server' | 'demo';
-
-const STORAGE_KEY = 'orgcentral:dev-theme-preset';
 const STYLE_ELEMENT_ID = 'orgcentral-dev-theme-overrides';
 
 const DEMO_OVERRIDES: Record<string, string> = {
@@ -24,10 +22,6 @@ const DEMO_OVERRIDES: Record<string, string> = {
     'sidebar-background': '258 54% 18%',
     'sidebar-foreground': '260 40% 96%',
 };
-
-function resolveStoredPreset(value: string | null): ThemePresetKey {
-    return value === 'demo' ? 'demo' : 'server';
-}
 
 function buildCss(overrides: Record<string, string> | null): string {
     if (!overrides) {
@@ -43,7 +37,6 @@ function buildCss(overrides: Record<string, string> | null): string {
 
 function applyOverrides(overrides: Record<string, string> | null): void {
     const css = buildCss(overrides);
-
     const existing = document.getElementById(STYLE_ELEMENT_ID);
 
     if (!css) {
@@ -66,16 +59,8 @@ export function DevelopmentThemeWidget({ orgId, enabled }: DevelopmentThemeWidge
     const [open, setOpen] = useState(false);
     const isDevelopment = process.env.NODE_ENV === 'development';
     const visible = enabled && isDevelopment;
-
-    const [preset, setPreset] = useState<ThemePresetKey>(() => {
-        if (!visible) {
-            return 'server';
-        }
-        if (typeof window === 'undefined') {
-            return 'server';
-        }
-        return resolveStoredPreset(window.localStorage.getItem(STORAGE_KEY));
-    });
+    const preset = useDevelopmentThemeStore((state) => state.preset);
+    const setPreset = useDevelopmentThemeStore((state) => state.setPreset);
 
     useEffect(() => {
         if (!visible) {
@@ -88,8 +73,6 @@ export function DevelopmentThemeWidget({ orgId, enabled }: DevelopmentThemeWidge
         } else {
             applyOverrides(null);
         }
-
-        window.localStorage.setItem(STORAGE_KEY, preset);
     }, [preset, visible]);
 
     const badge = useMemo(() => {
@@ -97,14 +80,14 @@ export function DevelopmentThemeWidget({ orgId, enabled }: DevelopmentThemeWidge
     }, [preset]);
 
     const shortOrgId = useMemo(() => {
-        return orgId.length > 12 ? `${orgId.slice(0, 8)}…${orgId.slice(-4)}` : orgId;
+        return orgId.length > 12 ? `${orgId.slice(0, 8)}...${orgId.slice(-4)}` : orgId;
     }, [orgId]);
 
     const handleReset = useCallback(() => {
         setPreset('server');
-    }, []);
+    }, [setPreset]);
 
-    const component = useMemo(() => (
+    const component = (
         <div className="fixed bottom-4 right-20 z-(--z-dev-widget) animate-in fade-in slide-in-from-bottom-4 duration-300">
             <div className="w-[320px] max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border bg-card text-foreground shadow-xl backdrop-blur">
                 <div className="flex items-start justify-between gap-3 px-4 py-3">
@@ -115,8 +98,14 @@ export function DevelopmentThemeWidget({ orgId, enabled }: DevelopmentThemeWidge
                         </div>
                         <div className="mt-1 truncate text-xs text-muted-foreground">org {shortOrgId}</div>
                     </div>
-                    <Button type="button" variant="ghost" size="icon-sm" onClick={() => setOpen(false)} aria-label="Close dev theme widget">
-                        ×
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon-sm"
+                        onClick={() => setOpen(false)}
+                        aria-label="Close dev theme widget"
+                    >
+                        x
                     </Button>
                 </div>
                 <Separator />
@@ -145,20 +134,17 @@ export function DevelopmentThemeWidget({ orgId, enabled }: DevelopmentThemeWidge
                 </div>
             </div>
         </div>
-    ), [badge, shortOrgId, preset, handleReset]); // Memoized content
+    );
 
-    const action = useMemo(() => {
-        if (!visible) { return null; }
-        return {
-            id: "dev-theme",
-            label: "Dev Theme",
-            icon: <Paintbrush className="h-4 w-4" />,
-            onClick: () => setOpen(p => !p),
-            isActive: open,
-            order: 20,
-            component: component
-        };
-    }, [visible, open, component]);
+    const action = visible ? {
+        id: 'dev-theme',
+        label: 'Dev Theme',
+        icon: <Paintbrush className="h-4 w-4" />,
+        onClick: () => setOpen((current) => !current),
+        isActive: open,
+        order: 20,
+        component,
+    } : null;
 
     useRegisterDevelopmentAction(action);
 

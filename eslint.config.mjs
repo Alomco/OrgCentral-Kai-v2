@@ -140,6 +140,7 @@ const eslintConfig = defineConfig([
             "**/*.test.{ts,tsx,js,jsx}",
             "**/*.spec.{ts,tsx,js,jsx}",
             "**/src/test/**/*.{ts,tsx,js,jsx}",
+            "test/**",
             "scripts/**",
           ],
           packageDir: [projectRoot],

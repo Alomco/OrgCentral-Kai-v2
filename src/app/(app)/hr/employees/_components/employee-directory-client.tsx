@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useCallback, useTransition } from 'react';
+import { useState, useCallback } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { UserPlus, Download } from 'lucide-react';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,32 +24,50 @@ export function EmployeeDirectoryClient({
     initialResult,
     filterOptions,
 }: EmployeeDirectoryClientProps) {
-    const [result, setResult] = useState(() => initialResult);
     const [params, setParams] = useState<Partial<EmployeeSearchParams>>(() => ({
-        page: 1,
-        pageSize: 20,
+        page: initialResult.page,
+        pageSize: initialResult.pageSize,
     }));
-    const [isPending, startTransition] = useTransition();
+    const isInitialParams = params.page === initialResult.page
+        && params.pageSize === initialResult.pageSize
+        && !params.query
+        && !params.department
+        && !params.status
+        && !params.sortBy
+        && !params.sortOrder;
+
+    const { data } = useQuery({
+        queryKey: ['hr', 'employees', params],
+        queryFn: async () => getEmployeeList(params),
+        initialData: isInitialParams ? initialResult : undefined,
+        placeholderData: (previous) => previous,
+    });
+
+    const result = data ?? (isInitialParams ? initialResult : undefined);
 
     const handleParamsChange = useCallback((newParams: Partial<EmployeeSearchParams>) => {
         setParams(newParams);
-        startTransition(() => {
-            getEmployeeList(newParams).then(setResult);
-        });
-    }, [startTransition]);
+    }, []);
 
     const handlePageChange = useCallback(
         (page: number) => {
             setParams((current) => {
                 const nextParams = { ...current, page };
-                startTransition(() => {
-                    getEmployeeList(nextParams).then(setResult);
-                });
                 return nextParams;
             });
         },
-        [startTransition],
+        [],
     );
+
+    const pagination = result && result.totalPages > 1 ? (
+        <EmployeePagination
+            page={result.page}
+            totalPages={result.totalPages}
+            total={result.total}
+            pageSize={result.pageSize}
+            onPageChange={handlePageChange}
+        />
+    ) : null;
 
     return (
         <Card>
@@ -81,7 +100,7 @@ export function EmployeeDirectoryClient({
                     onParamsChange={handleParamsChange}
                 />
 
-                {isPending ? (
+                {!result ? (
                     <div className="space-y-2">
                         <Skeleton className="h-12 w-full" />
                         <Skeleton className="h-12 w-full" />
@@ -91,15 +110,7 @@ export function EmployeeDirectoryClient({
                     <EmployeeDirectoryTable result={result} />
                 )}
 
-                {result.totalPages > 1 ? (
-                    <EmployeePagination
-                        page={result.page}
-                        totalPages={result.totalPages}
-                        total={result.total}
-                        pageSize={result.pageSize}
-                        onPageChange={handlePageChange}
-                    />
-                ) : null}
+                {pagination}
             </CardContent>
         </Card>
     );

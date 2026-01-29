@@ -48,6 +48,7 @@ export const navItems: NavItem[] = [
             { href: "/org/profile", label: "Profile", icon: Building },
             { href: "/org/members", label: "Members", icon: Users },
             { href: "/org/roles", label: "Roles", icon: Shield },
+            { href: "/org/audit", label: "Audit Log", icon: FileText },
             { href: "/org/branding", label: "Branding", icon: FileText },
             { href: "/org/settings", label: "Settings", icon: Settings },
         ],

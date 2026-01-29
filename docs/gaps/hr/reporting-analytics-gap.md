@@ -28,18 +28,25 @@
    - Old admin center exposed a reports entry and live pending counts from hubs.
 4) HR admin reporting visibility is not linked to reports from the admin dashboard quick actions.
    - New admin quick actions omit reports; old admin center exposed a reports entry.
+5) Cross-module reporting is missing - no comprehensive reporting connecting data from different modules (e.g., how training affects performance).
+6) Advanced analytics capabilities are missing - no predictive analytics, trend analysis, or workforce planning tools.
+7) Export functionality for reports is limited or missing - no comprehensive export options for employee data or analytics.
 
 ## TODOs
 - [ ] Analyze and restore document-expiry/compliance KPIs in HR dashboards and reports (compare old HR dashboard to new KPI surfaces).
 - [ ] Analyze and add compliance/document-expiry metrics to HR reports aggregation (tie into compliance data sources).
 - [ ] Analyze and wire HR admin reporting visibility plus real pending/stats data (reports link + non-placeholder stats).
 - [ ] Analyze and link HR admin quick actions to HR reports with role-appropriate routing.
+- [ ] Implement cross-module reporting capabilities that connect data from different modules.
+- [ ] Add advanced analytics features including trend analysis and predictive capabilities.
+- [ ] Implement comprehensive export functionality for reports and employee data.
 
 ## Related gaps
 - orgcentral/docs/gaps/documents/document-management-gap.md
 - orgcentral/docs/gaps/hr/compliance-gap.md
+- orgcentral/docs/gaps/comprehensive-feature-gap-analysis.md
 
-## Implementation Status (as of 2026-01-24)
+## Implementation Status (as of 2026-01-27)
 
 | # | Gap | Status | Notes |
 |---|-----|--------|-------|
@@ -48,8 +55,13 @@
 | 3 | HR Admin stats - real data | ⚠️ PARTIAL | Employee counts real; `pendingLeaveRequests`, `complianceAlerts`, `upcomingExpirations` hardcoded to 0 |
 | 4 | HR Admin pending approvals | ❌ OPEN | `getPendingApprovals` returns empty array placeholder |
 | 5 | HR Admin quick actions → Reports link | ❌ OPEN | No `/hr/reports` entry in quick actions |
+| 6 | Cross-module reporting | ❌ OPEN | No connection between different HR modules for reporting |
+| 7 | Advanced analytics | ❌ OPEN | No predictive or trend analysis capabilities |
+| 8 | Report export functionality | ❌ OPEN | Limited or missing export options |
 
 ### Priority Recommendations
 1. **Low effort:** Add `/hr/reports` link to `hr-admin-quick-actions.tsx`
 2. **Medium effort:** Wire `pendingLeaveRequests` in admin stats (leave service exists)
 3. **High effort:** Create document-expiry use-case and add KPI tiles
+4. **High effort:** Implement cross-module reporting capabilities
+5. **High effort:** Add advanced analytics and predictive capabilities

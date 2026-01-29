@@ -1,6 +1,9 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useQuery } from '@tanstack/react-query';
+import { listPermissionResourcesQuery } from './permissions.api';
 import { X } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
@@ -16,14 +19,29 @@ import { PermissionResourceRow } from './permission-resource-row';
 
 type SortOption = 'resource' | 'updated' | 'actions';
 
-export function PermissionResourceManager(props: { resources: PermissionResource[] }) {
-    const [query, setQuery] = useState('');
-    const [actionFilter, setActionFilter] = useState<string[]>([]);
-    const [sortBy, setSortBy] = useState<SortOption>('resource');
+export function PermissionResourceManager(props: { orgId: string; resources: PermissionResource[] }) {
+    const searchParams = useSearchParams();
+    const router = useRouter();
+    const pathname = usePathname();
+    const [query, setQuery] = useState(() => searchParams.get('q') ?? '');
+    const [actionFilter, setActionFilter] = useState<string[]>(() => {
+        const actions = searchParams.get('actions');
+        return actions ? actions.split(',').filter(Boolean) : [];
+    });
+    const [sortBy, setSortBy] = useState<SortOption>(() => {
+        const value = searchParams.get('sort');
+        if (value === 'resource' || value === 'updated' || value === 'actions') {
+            return value;
+        }
+        return 'resource';
+    });
+
+    const { data } = useQuery({ ...listPermissionResourcesQuery(props.orgId), initialData: props.resources });
+    const liveResources = data ?? [];
 
     const actionOptions = useMemo(() => {
         const set = new Set<string>();
-        for (const resource of props.resources) {
+        for (const resource of liveResources) {
             if (!Array.isArray(resource.actions)) {
                 continue;
             }
@@ -35,13 +53,13 @@ export function PermissionResourceManager(props: { resources: PermissionResource
             }
         }
         return Array.from(set).sort((left, right) => left.localeCompare(right));
-    }, [props.resources]);
+    }, [liveResources]);
 
     const filteredResources = useMemo(() => {
         const search = query.trim().toLowerCase();
         const selectedActions = new Set(actionFilter);
 
-        return props.resources.filter((resource) => {
+        return liveResources.filter((resource) => {
             const actions = Array.isArray(resource.actions) ? resource.actions : [];
             const matchesActions =
                 selectedActions.size === 0 ||
@@ -67,7 +85,7 @@ export function PermissionResourceManager(props: { resources: PermissionResource
 
             return haystack.includes(search);
         });
-    }, [actionFilter, props.resources, query]);
+    }, [actionFilter, liveResources, query]);
 
     const sortedResources = useMemo(() => {
         const resources = [...filteredResources];
@@ -100,7 +118,7 @@ export function PermissionResourceManager(props: { resources: PermissionResource
         return resources;
     }, [filteredResources, sortBy]);
 
-    const totalCount = props.resources.length;
+    const totalCount = liveResources.length;
     const filteredCount = sortedResources.length;
     const missingDescriptions = props.resources.filter((resource) => {
         return !resource.description || resource.description.trim().length === 0;
@@ -112,9 +130,28 @@ export function PermissionResourceManager(props: { resources: PermissionResource
         setActionFilter([]);
     };
 
+    useEffect(() => {
+        const params = new URLSearchParams();
+        if (query) {
+            params.set('q', query);
+        }
+        if (actionFilter.length > 0) {
+            params.set('actions', actionFilter.join(','));
+        }
+        if (sortBy !== 'resource') {
+            params.set('sort', sortBy);
+        }
+        const nextQuery = params.toString();
+        const currentQuery = searchParams.toString();
+        if (nextQuery !== currentQuery) {
+            const href = nextQuery.length > 0 ? `${pathname}?${nextQuery}` : pathname;
+            router.replace(href, { scroll: false });
+        }
+    }, [actionFilter, pathname, query, router, searchParams, sortBy]);
+
     return (
         <div className="space-y-6">
-            <PermissionResourceCreateForm />
+            <PermissionResourceCreateForm orgId={props.orgId} />
 
             <div className="space-y-4">
                 <div className="flex flex-wrap items-center justify-between gap-3">
@@ -207,7 +244,7 @@ export function PermissionResourceManager(props: { resources: PermissionResource
                 ) : (
                     <div className="space-y-3">
                         {sortedResources.map((resource) => (
-                            <PermissionResourceRow key={resource.id} resource={resource} />
+                            <PermissionResourceRow key={resource.id} orgId={props.orgId} resource={resource} />
                         ))}
                     </div>
                 )}

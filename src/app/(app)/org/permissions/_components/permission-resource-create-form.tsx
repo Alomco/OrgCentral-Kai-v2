@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
 import { useActionState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,53 +9,49 @@ import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
 
-import { createPermissionResourceAction } from '../permission-resource-actions';
 import { defaultCreateValues, type PermissionResourceCreateState } from '../permission-resource-form-utils';
 import { FieldError } from './field-error';
+import { permissionKeys } from './permissions.api';
+import { createPermissionResourceAction } from '../permission-resource-actions';
 
-const initialCreateState: PermissionResourceCreateState = {
-    status: 'idle',
-    values: defaultCreateValues,
-};
-
-export function PermissionResourceCreateForm() {
-    const router = useRouter();
-    const [state, action, pending] = useActionState(createPermissionResourceAction, initialCreateState);
+export function PermissionResourceCreateForm({ orgId }: { orgId: string }) {
     const formReference = useRef<HTMLFormElement | null>(null);
+    const queryClient = useQueryClient();
+    const [state, formAction, pending] = useActionState<PermissionResourceCreateState, FormData>(
+        createPermissionResourceAction,
+        {
+            status: 'idle',
+            values: defaultCreateValues,
+        },
+    );
 
     useEffect(() => {
-        if (!pending && state.status === 'success') {
-            router.refresh();
+        if (state.status === 'success') {
             formReference.current?.reset();
+            queryClient.invalidateQueries({ queryKey: permissionKeys.list(orgId) }).catch(() => null);
         }
-    }, [pending, router, state.status]);
+    }, [orgId, queryClient, state.status]);
 
-    useEffect(() => {
-        formReference.current?.setAttribute('aria-busy', pending ? 'true' : 'false');
-    }, [pending]);
+    const message = state.status === 'error'
+        ? state.message ?? 'Unable to create permission resource.'
+        : state.status === 'success'
+            ? state.message ?? 'Permission resource created.'
+            : null;
 
     const resourceError = state.fieldErrors?.resource;
     const actionsError = state.fieldErrors?.actions;
     const descriptionError = state.fieldErrors?.description;
 
-    const message =
-        state.status === 'error'
-            ? state.message
-            : state.status === 'success'
-                ? state.message
-                : null;
-
     return (
         <form
             ref={formReference}
-            action={action}
+            action={formAction}
             className="space-y-4 rounded-xl border bg-[oklch(var(--muted)/0.2)] p-4"
+            aria-busy={pending}
         >
             <div>
                 <p className="text-sm font-semibold text-[oklch(var(--foreground))]">Add resource</p>
-                <p className="text-xs text-[oklch(var(--muted-foreground))]">
-                    Use dot-notation keys that align with your ABAC policies.
-                </p>
+                <p className="text-xs text-[oklch(var(--muted-foreground))]">Use dot-notation keys that align with your ABAC policies.</p>
             </div>
 
             <fieldset disabled={pending} className="space-y-4">
@@ -91,9 +87,7 @@ export function PermissionResourceCreateForm() {
                         aria-describedby={actionsError ? 'permission-resource-actions-error' : undefined}
                     />
                     <FieldError id="permission-resource-actions-error" message={actionsError} />
-                    <p className="text-xs text-muted-foreground">
-                        Separate actions with commas or new lines.
-                    </p>
+                    <p className="text-xs text-muted-foreground">Separate actions with commas or new lines.</p>
                 </div>
 
                 <div className="space-y-2">
@@ -106,14 +100,9 @@ export function PermissionResourceCreateForm() {
                         key={`permission-resource-description-${state.values.description}`}
                         defaultValue={state.values.description}
                         aria-invalid={Boolean(descriptionError)}
-                        aria-describedby={
-                            descriptionError ? 'permission-resource-description-error' : undefined
-                        }
+                        aria-describedby={descriptionError ? 'permission-resource-description-error' : undefined}
                     />
-                    <FieldError
-                        id="permission-resource-description-error"
-                        message={descriptionError}
-                    />
+                    <FieldError id="permission-resource-description-error" message={descriptionError} />
                 </div>
             </fieldset>
 
@@ -123,17 +112,7 @@ export function PermissionResourceCreateForm() {
                     {pending ? 'Creating...' : 'Create resource'}
                 </Button>
                 {message ? (
-                    <p
-                        className={
-                            state.status === 'error'
-                                ? 'text-xs text-destructive'
-                                : 'text-xs text-muted-foreground'
-                        }
-                        role="status"
-                        aria-live="polite"
-                    >
-                        {message}
-                    </p>
+                    <p className={state.status === 'error' ? 'text-xs text-destructive' : 'text-xs text-muted-foreground'} role="status" aria-live="polite">{message}</p>
                 ) : null}
             </div>
         </form>

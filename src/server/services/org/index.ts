@@ -10,3 +10,4 @@ export { BrandingService, type BrandingServiceDependencies } from './branding/br
 export { getBrandingService, type BrandingServiceContract } from './branding/branding-service.provider';
 
 export { getPermissionResourceService } from './permissions/permission-resource-service.provider';
+export { getAuditLogService, type AuditLogServiceContract } from './audit/audit-log-service.provider';

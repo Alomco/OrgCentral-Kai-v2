@@ -108,7 +108,9 @@ export async function LeaveRequestsPanel({
                                     <TableHead>Evidence</TableHead>
                                     <TableHead>Submitted</TableHead>
                                     <TableHead>Approver/SLA</TableHead>
-                                    {(approver || manager) && <TableHead className="text-right">Actions</TableHead>}
+                                    {approver || manager ? (
+                                        <TableHead className="text-right">Actions</TableHead>
+                                    ) : null}
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -152,7 +154,7 @@ export async function LeaveRequestsPanel({
                                                 </Tooltip>
                                             </TooltipProvider>
                                         </TableCell>
-                                        {(approver || manager) && (
+                                        {approver || manager ? (
                                             <TableCell className="text-right">
                                                 <LeaveRequestActions
                                                     requestId={request.id}
@@ -162,7 +164,7 @@ export async function LeaveRequestsPanel({
                                                     canManage={manager}
                                                 />
                                             </TableCell>
-                                        )}
+                                        ) : null}
                                     </TableRow>
                                 ))}
                             </TableBody>

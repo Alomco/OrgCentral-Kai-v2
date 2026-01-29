@@ -1,7 +1,8 @@
 'use client';
 
 import { useActionState, useEffect, useMemo, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
@@ -18,6 +19,8 @@ import { createComplianceTemplateAction } from '../actions/compliance-templates'
 import type { ComplianceTemplateCreateState } from '../compliance-template-form-utils';
 import { ComplianceTemplateRow } from './compliance-template-row';
 import { ComplianceTemplateGuideCard } from './compliance-template-guide-card';
+import { COMPLIANCE_TEMPLATES_QUERY_KEY, fetchComplianceTemplates } from '../compliance-templates-query';
+import { ComplianceTemplatesFilters } from './compliance-templates-filters.client';
 
 const initialCreateState: ComplianceTemplateCreateState = {
     status: 'idle',
@@ -30,19 +33,24 @@ const initialCreateState: ComplianceTemplateCreateState = {
 };
 
 export function ComplianceTemplatesManager(props: { templates: ComplianceTemplate[] }) {
-    const router = useRouter();
+    const queryClient = useQueryClient();
     const [state, action, pending] = useActionState(
         createComplianceTemplateAction,
         initialCreateState,
     );
+    const { data: templates = props.templates } = useQuery({
+        queryKey: COMPLIANCE_TEMPLATES_QUERY_KEY,
+        queryFn: fetchComplianceTemplates,
+        initialData: props.templates,
+    });
     const formReference = useRef<HTMLFormElement | null>(null);
 
     useEffect(() => {
         if (!pending && state.status === 'success') {
-            router.refresh();
+            void queryClient.invalidateQueries({ queryKey: COMPLIANCE_TEMPLATES_QUERY_KEY }).catch(() => null);
             formReference.current?.reset();
         }
-    }, [pending, router, state.status]);
+    }, [pending, queryClient, state.status]);
 
     useEffect(() => {
         formReference.current?.setAttribute('aria-busy', pending ? 'true' : 'false');
@@ -62,18 +70,29 @@ export function ComplianceTemplatesManager(props: { templates: ComplianceTemplat
 
     const summary = useMemo(() => {
         const categories = new Set<string>();
-        for (const template of props.templates) {
+        for (const template of templates) {
             if (template.categoryKey) {
                 categories.add(template.categoryKey);
             }
         }
 
         return {
-            count: props.templates.length,
+            count: templates.length,
             categories: Array.from(categories).slice(0, 6),
             hasOverflow: categories.size > 6,
         };
-    }, [props.templates]);
+    }, [templates]);
+
+    const searchParams = useSearchParams();
+    const q = (searchParams.get('q') ?? '').trim().toLowerCase();
+    const filteredTemplates = useMemo(() => {
+        if (!q) {return templates;}
+        return templates.filter((t) => {
+            const hay = `${t.name} ${t.categoryKey} ${t.version}`.toLowerCase();
+            return hay.includes(q);
+        });
+    }, [q, templates]);
+
 
     return (
         <div className="space-y-6">
@@ -209,11 +228,11 @@ export function ComplianceTemplatesManager(props: { templates: ComplianceTemplat
                     </div>
                 </CardHeader>
                 <CardContent>
-                    {props.templates.length === 0 ? (
+                    {filteredTemplates.length === 0 ? (
                         <p className="text-sm text-muted-foreground">No templates configured yet. Seed defaults or add one manually to get started.</p>
                     ) : (
                         <div className="space-y-3">
-                            {props.templates.map((template) => (
+                            {filteredTemplates.map((template) => (
                                 <ComplianceTemplateRow key={template.id} template={template} />
                             ))}
                         </div>
