@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import Link from 'next/link';
 import { headers as nextHeaders } from 'next/headers';
-import { ShieldCheck } from 'lucide-react';
+import { Bell, CheckCircle2, FileText, ShieldCheck } from 'lucide-react';
 
 import {
     Breadcrumb,
@@ -10,6 +10,7 @@ import {
     BreadcrumbList,
     BreadcrumbLink,
     BreadcrumbPage,
+    BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 
 import { getSessionContextOrRedirect } from '@/server/ui/auth/session-redirect';
@@ -18,6 +19,7 @@ import { getComplianceStatusService } from '@/server/services/hr/compliance/comp
 import { PrismaComplianceTemplateRepository } from '@/server/repositories/prisma/hr/compliance/prisma-compliance-template-repository';
 import { listComplianceTemplates } from '@/server/use-cases/hr/compliance/list-compliance-templates';
 import { listEmployeeProfilesForUi } from '@/server/use-cases/hr/people/list-employee-profiles.cached';
+import { FeatureCard, InfoCard } from '@/components/theme/elements';
 
 import { HrPageHeader } from '../_components/hr-page-header';
 import { ComplianceItemsPanel } from './_components/compliance-items-panel';
@@ -91,11 +93,62 @@ export default async function HrCompliancePage() {
                             <Link href="/hr">HR</Link>
                         </BreadcrumbLink>
                     </BreadcrumbItem>
+                    <BreadcrumbSeparator />
                     <BreadcrumbItem>
                         <BreadcrumbPage>Compliance</BreadcrumbPage>
                     </BreadcrumbItem>
                 </BreadcrumbList>
             </Breadcrumb>
+
+            <div className="rounded-xl border border-border/60 bg-card/60 p-6 shadow-sm">
+                <div className="flex flex-col gap-2">
+                    <p className="text-sm font-medium text-muted-foreground">Compliance made simple</p>
+                    <h2 className="text-xl font-semibold">Stay on top of required tasks with clear next steps</h2>
+                    <p className="text-sm text-muted-foreground max-w-2xl">
+                        This page shows what you need to do, when it’s due, and what’s already completed.
+                        If anything is unclear, open the item for guidance.
+                    </p>
+                </div>
+                <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                    <InfoCard
+                        label="Your compliance status"
+                        value={status ? status.status : 'No items yet'}
+                        icon={<ShieldCheck className="h-4 w-4" />}
+                    />
+                    <InfoCard
+                        label="Items assigned"
+                        value={status ? String(status.itemCount) : '0'}
+                        icon={<CheckCircle2 className="h-4 w-4" />}
+                    />
+                    <InfoCard
+                        label="Next reminder"
+                        value="We’ll notify you before due dates"
+                        icon={<Bell className="h-4 w-4" />}
+                    />
+                    <InfoCard
+                        label="Need help?"
+                        value="Open any item for instructions"
+                        icon={<FileText className="h-4 w-4" />}
+                    />
+                </div>
+                <div className="mt-4 grid gap-3 md:grid-cols-3">
+                    <FeatureCard
+                        title="1. Check what’s due"
+                        description="Review your list and focus on anything marked “Needs action.”"
+                        variant="outline"
+                    />
+                    <FeatureCard
+                        title="2. Complete the requirement"
+                        description="Upload a document, confirm a date, or acknowledge a policy." 
+                        variant="outline"
+                    />
+                    <FeatureCard
+                        title="3. We keep you updated"
+                        description="You’ll see progress here and get reminders before deadlines."
+                        variant="outline"
+                    />
+                </div>
+            </div>
 
             <HrPageHeader
                 title="Compliance"

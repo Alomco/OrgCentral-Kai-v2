@@ -38,7 +38,7 @@ export function DocumentVaultTable({ documents }: DocumentVaultTableProps) {
 
     return (
         <div className="overflow-auto rounded-md border">
-            <Table>
+            <Table className="min-w-[900px]">
                 <TableHeader>
                     <TableRow>
                         <TableHead>File</TableHead>
@@ -55,13 +55,19 @@ export function DocumentVaultTable({ documents }: DocumentVaultTableProps) {
                 <TableBody>
                     {documents.map((document_) => (
                         <TableRow key={document_.id}>
-                            <TableCell className="font-medium">{document_.fileName}</TableCell>
+                            <TableCell className="font-medium max-w-[240px]">
+                                <span className="truncate" title={document_.fileName}>{document_.fileName}</span>
+                            </TableCell>
                             <TableCell>{document_.type}</TableCell>
                             <TableCell>{document_.classification}</TableCell>
                             <TableCell>{document_.retentionPolicy}</TableCell>
                             <TableCell>v{String(document_.version)}</TableCell>
                             <TableCell>{formatBytes(document_.sizeBytes)}</TableCell>
-                            <TableCell>{document_.ownerUserId ?? '-'}</TableCell>
+                            <TableCell className="max-w-[180px]">
+                                <span className="truncate" title={document_.ownerUserId ?? undefined}>
+                                    {document_.ownerUserId ?? '-'}
+                                </span>
+                            </TableCell>
                             <TableCell>{formatDate(document_.createdAt)}</TableCell>
                             <TableCell>
                                 <Link

@@ -21,7 +21,9 @@ export function EmployeeDataOperationsCard() {
         <Card>
             <CardHeader>
                 <CardTitle>Data retention & SAR</CardTitle>
-                <CardDescription>Export SAR data and manage retention sweeps.</CardDescription>
+                <CardDescription>
+                    Export subject access requests (SAR) and manage retention sweeps.
+                </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
                 <section className="space-y-3">
@@ -53,6 +55,9 @@ export function EmployeeDataOperationsCard() {
                             <Button type="submit" size="sm">
                                 Download SAR export
                             </Button>
+                            <p className="mt-2 text-xs text-muted-foreground">
+                                Use this for data access requests from employees.
+                            </p>
                         </div>
                     </form>
                 </section>
@@ -85,6 +90,9 @@ export function EmployeeDataOperationsCard() {
                             </p>
                         </form>
                     </div>
+                    <p className="text-xs text-muted-foreground">
+                        Sweeps remove or archive records based on your retention policy.
+                    </p>
                 </section>
             </CardContent>
         </Card>

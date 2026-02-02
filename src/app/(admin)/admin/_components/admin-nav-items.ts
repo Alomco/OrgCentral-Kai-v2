@@ -10,6 +10,7 @@ import {
     Users,
     Wrench,
     Building2,
+    FileText,
 } from 'lucide-react';
 
 import type { OrgPermissionMap } from '@/server/security/access-control';
@@ -74,6 +75,14 @@ const ADMIN_NAV_ITEMS: AdminNavItem[] = [
         audience: 'admin',
         description: 'Triage and resolve escalations',
         ariaLabel: 'Support Tickets Console',
+    },
+    {
+        href: '/admin/global/document-vault',
+        label: 'Document Vault',
+        icon: FileText,
+        audience: 'admin',
+        description: 'Tenant-scoped document access',
+        ariaLabel: 'Document Vault',
     },
     {
         href: '/admin/global/user-impersonation',

@@ -1,0 +1,186 @@
+@layer utilities {
+  .gradient-text {
+    background: var(--app-gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .btn-gradient {
+    background: var(--app-gradient-primary);
+    box-shadow: var(--app-shadow-primary);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .btn-gradient:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--app-shadow-primary-strong);
+  }
+
+  .feature-icon {
+    background: var(--app-gradient-cool);
+  }
+
+  .bg-grid-slate-200\/50 {
+    background-image: linear-gradient(to right, oklch(var(--border) / 0.5) 1px, transparent 1px),
+      linear-gradient(to bottom, oklch(var(--border) / 0.5) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  .dark .bg-grid-slate-800\/50 {
+    background-image: linear-gradient(to right, oklch(var(--border) / 0.4) 1px, transparent 1px),
+      linear-gradient(to bottom, oklch(var(--border) / 0.4) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  .bg-grid-slate-200\/30 {
+    background-image: linear-gradient(to right, oklch(var(--border) / 0.3) 1px, transparent 1px),
+      linear-gradient(to bottom, oklch(var(--border) / 0.3) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  .dark .bg-grid-slate-800\/30 {
+    background-image: linear-gradient(to right, oklch(var(--border) / 0.25) 1px, transparent 1px),
+      linear-gradient(to bottom, oklch(var(--border) / 0.25) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  .nav-underline {
+    position: relative;
+  }
+
+  .nav-underline::after {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -5px;
+    left: 0;
+    background: var(--app-gradient-cool);
+    transition: width 0.3s ease;
+  }
+
+  .nav-underline:hover::after {
+    width: 100%;
+  }
+
+  .step-number {
+    background: var(--app-gradient-warm);
+  }
+
+  /* Modern Gradient Utilities - Purple/Pink HR Theme */
+  .gradient-purple-pink {
+    background: var(--app-gradient-primary);
+  }
+
+  .gradient-purple-blue {
+    background: var(--app-gradient-cool);
+  }
+
+  .gradient-mesh {
+    background: 
+      radial-gradient(at 27% 37%, oklch(var(--primary) / 0.12) 0px, transparent 50%),
+      radial-gradient(at 97% 21%, oklch(var(--accent) / 0.12) 0px, transparent 50%),
+      radial-gradient(at 52% 99%, oklch(var(--secondary) / 0.2) 0px, transparent 50%),
+      radial-gradient(at 10% 29%, oklch(var(--primary) / 0.12) 0px, transparent 50%),
+      radial-gradient(at 97% 96%, oklch(var(--accent) / 0.12) 0px, transparent 50%),
+      radial-gradient(at 33% 50%, oklch(var(--muted) / 0.35) 0px, transparent 50%),
+      radial-gradient(at 79% 53%, oklch(var(--accent) / 0.12) 0px, transparent 50%);
+  }
+
+  .dark .gradient-mesh {
+    background: 
+      radial-gradient(at 27% 37%, oklch(var(--primary) / 0.25) 0px, transparent 50%),
+      radial-gradient(at 97% 21%, oklch(var(--accent) / 0.22) 0px, transparent 50%),
+      radial-gradient(at 52% 99%, oklch(var(--secondary) / 0.28) 0px, transparent 50%),
+      radial-gradient(at 10% 29%, oklch(var(--primary) / 0.25) 0px, transparent 50%),
+      radial-gradient(at 97% 96%, oklch(var(--accent) / 0.22) 0px, transparent 50%),
+      radial-gradient(at 33% 50%, oklch(var(--muted) / 0.3) 0px, transparent 50%),
+      radial-gradient(at 79% 53%, oklch(var(--accent) / 0.22) 0px, transparent 50%);
+  }
+
+  .page-mesh {
+    background:
+      linear-gradient(135deg in oklab,
+        oklch(var(--background)) 0%,
+        oklch(var(--muted) / 0.52) 45%,
+        oklch(var(--background)) 100%),
+      radial-gradient(120% 120% at 15% 0% in oklab,
+        oklch(var(--primary) / 0.18) 0%,
+        transparent 60%),
+      radial-gradient(90% 90% at 85% 12% in oklab,
+        oklch(var(--accent) / 0.16) 0%,
+        transparent 58%),
+      radial-gradient(120% 120% at 50% 100% in oklab,
+        oklch(var(--secondary) / 0.14) 0%,
+        transparent 68%);
+    filter: saturate(1.12);
+    opacity: 0.95;
+  }
+
+  .dark .page-mesh {
+    background:
+      linear-gradient(135deg in oklab,
+        oklch(var(--background)) 0%,
+        oklch(var(--muted) / 0.22) 45%,
+        oklch(var(--background)) 100%),
+      radial-gradient(120% 120% at 15% 0% in oklab,
+        oklch(var(--primary) / 0.26) 0%,
+        transparent 60%),
+      radial-gradient(90% 90% at 85% 12% in oklab,
+        oklch(var(--accent) / 0.24) 0%,
+        transparent 58%),
+      radial-gradient(120% 120% at 50% 100% in oklab,
+        oklch(var(--secondary) / 0.18) 0%,
+        transparent 68%);
+    filter: saturate(1.1);
+    opacity: 0.78;
+  }
+
+  .hr-page-shell {
+    background:
+      radial-gradient(120% 120% at 12% 0% in oklab,
+        oklch(var(--primary) / 0.22) 0%,
+        transparent 58%),
+      radial-gradient(120% 120% at 88% 8% in oklab,
+        oklch(var(--accent) / 0.18) 0%,
+        transparent 60%),
+      oklch(var(--background));
+  }
+
+  .dark .hr-page-shell {
+    background:
+      radial-gradient(120% 120% at 12% 0% in oklab,
+        oklch(var(--primary) / 0.28) 0%,
+        transparent 58%),
+      radial-gradient(120% 120% at 88% 8% in oklab,
+        oklch(var(--accent) / 0.24) 0%,
+        transparent 60%),
+      oklch(var(--background));
+  }
+
+  /* Text Gradients */
+  .text-gradient-purple {
+    background: var(--app-gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* 🌈 Theme-aware Gradient Text - Uses CSS variables for tenant theming */
+  .text-gradient-theme {
+    background: linear-gradient(135deg, oklch(var(--primary)) 0%, oklch(var(--accent)) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* 🌊 Gradient Background - Theme-aware */
+  .bg-gradient-theme {
+    background: linear-gradient(135deg, oklch(var(--primary) / 0.1) 0%, oklch(var(--accent) / 0.1) 100%);
+  }
+
+  .bg-gradient-theme-solid {
+    background: linear-gradient(135deg, oklch(var(--primary)) 0%, oklch(var(--accent)) 100%);
+  }
+}

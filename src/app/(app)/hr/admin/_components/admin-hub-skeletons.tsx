@@ -19,7 +19,7 @@ export function LeaveHubSkeleton() {
             <CardContent>
                 <div className="space-y-3">
                     {Array.from({ length: 5 }).map((_, index) => (
-                        <div key={index} className="flex items-center justify-between gap-4">
+                        <div key={index} className="flex flex-wrap items-center gap-4">
                             <Skeleton className="h-4 w-32" />
                             <Skeleton className="h-4 w-20" />
                             <Skeleton className="h-4 w-28" />
@@ -47,12 +47,12 @@ export function AbsenceHubSkeleton() {
             <CardContent>
                 <div className="space-y-3">
                     {Array.from({ length: 4 }).map((_, index) => (
-                        <div key={index} className="flex items-center justify-between gap-4">
+                        <div key={index} className="flex flex-wrap items-center gap-4">
                             <Skeleton className="h-4 w-28" />
                             <Skeleton className="h-4 w-24" />
                             <Skeleton className="h-4 w-20" />
                             <Skeleton className="h-4 w-20" />
-                            <Skeleton className="h-4 w-18" />
+                            <Skeleton className="h-4 w-20" />
                             <Skeleton className="h-8 w-28" />
                         </div>
                     ))}
@@ -89,7 +89,7 @@ export function EmployeeHubSkeleton() {
                 <CardContent>
                     <div className="space-y-3">
                         {Array.from({ length: 5 }).map((_, index) => (
-                            <div key={index} className="flex items-center gap-4">
+                            <div key={index} className="flex flex-wrap items-center gap-4">
                                 <Skeleton className="h-4 w-32" />
                                 <Skeleton className="h-4 w-28" />
                                 <Skeleton className="h-4 w-24" />
@@ -114,7 +114,7 @@ export function ComplianceHubSkeleton() {
             <CardContent>
                 <div className="space-y-3">
                     {Array.from({ length: 4 }).map((_, index) => (
-                        <div key={index} className="flex items-center justify-between gap-4">
+                        <div key={index} className="flex flex-wrap items-center gap-4">
                             <Skeleton className="h-4 w-28" />
                             <Skeleton className="h-4 w-32" />
                             <Skeleton className="h-4 w-20" />

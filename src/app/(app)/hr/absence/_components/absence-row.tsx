@@ -113,13 +113,13 @@ export function AbsenceRow({ absence, authorization, typeLabels, showNotes = fal
     return (
         <>
             <TableRow className="group transition-colors hover:bg-muted/40 motion-reduce:transition-none">
-                <TableCell className="font-medium">
-                    <span className="flex items-center gap-2">
+                <TableCell className="font-medium max-w-[220px] min-w-0">
+                    <span className="flex min-w-0 items-center gap-2">
                         <span className="text-base">{typeEmoji}</span>
-                        {typeInfo.label}
+                        <span className="truncate">{typeInfo.label}</span>
                     </span>
                 </TableCell>
-                <TableCell className="text-muted-foreground">
+                <TableCell className="text-muted-foreground whitespace-nowrap">
                     {formatDate(currentAbsence.startDate)} – {formatDate(currentAbsence.endDate)}
                 </TableCell>
                 <TableCell className="text-right tabular-nums">
@@ -138,7 +138,9 @@ export function AbsenceRow({ absence, authorization, typeLabels, showNotes = fal
                 </TableCell>
                 {showNotes ? (
                     <TableCell className="text-xs text-muted-foreground max-w-[240px]">
-                        {currentAbsence.lifecycleNotes ?? '—'}
+                        <span className="line-clamp-2 break-words">
+                            {currentAbsence.lifecycleNotes ?? '—'}
+                        </span>
                     </TableCell>
                 ) : null}
                 <TableCell className="text-right">
@@ -147,7 +149,7 @@ export function AbsenceRow({ absence, authorization, typeLabels, showNotes = fal
                             <Button
                                 variant="ghost"
                                 size="icon"
-                                className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity motion-reduce:transition-none"
+                                className="h-8 w-8 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity motion-reduce:transition-none"
                             >
                                 <MoreHorizontal className="h-4 w-4" />
                                 <span className="sr-only">Actions</span>

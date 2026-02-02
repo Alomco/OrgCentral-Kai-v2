@@ -195,7 +195,7 @@ export function NotificationSettingsForm({ preferences: initialPreferences }: No
       />
 
       {isPending && (
-        <div className="fixed bottom-4 right-4 bg-primary text-primary-foreground px-4 py-2 rounded-lg shadow-lg flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2">
+        <div className="flex items-center gap-2 rounded-lg border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
           <Spinner className="h-4 w-4" />
           Saving changes...
         </div>

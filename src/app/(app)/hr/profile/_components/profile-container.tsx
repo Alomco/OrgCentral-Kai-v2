@@ -106,10 +106,10 @@ export function ProfileContainer({ profile, authorization, userImage }: ProfileC
             <Modal open={isEditOpen} onOpenChange={setIsEditOpen} modal>
                 <ModalContent
                     side="center"
-                    className="w-full max-w-3xl overflow-hidden rounded-2xl border border-[oklch(var(--border)/0.7)] bg-[oklch(var(--popover)/0.97)] shadow-[0_24px_64px_-28px_rgba(0,0,0,0.55)]"
+                    className="w-full max-w-3xl overflow-hidden rounded-2xl border border-[oklch(var(--border)/0.7)] bg-[oklch(var(--popover)/1)] shadow-[0_24px_64px_-28px_rgba(0,0,0,0.55)]"
                     bodyClassName="gap-0 overflow-hidden"
                 >
-                    <ModalHeader className="sticky top-0 z-20 flex items-start justify-between gap-4 border-b border-[oklch(var(--border)/0.65)] bg-[oklch(var(--popover)/0.96)] px-6 py-5 backdrop-blur-md">
+                    <ModalHeader className="sticky top-0 z-20 flex items-start justify-between gap-4 border-b border-[oklch(var(--border)/0.65)] bg-[oklch(var(--popover)/1)] px-6 py-5 backdrop-blur-md">
                         <div className="space-y-1">
                             <ModalTitle className="text-xl leading-tight">Edit Profile</ModalTitle>
                             <ModalDescription>

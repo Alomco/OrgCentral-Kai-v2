@@ -17,11 +17,11 @@ export interface AbsencesPanelProps {
 }
 
 const COLUMNS: readonly HrDataTableColumn[] = [
-    { key: 'type', label: '📋 Type' },
-    { key: 'dates', label: '📅 Dates' },
-    { key: 'hours', label: '⏱️ Hours', className: 'text-right' },
-    { key: 'status', label: '🏷️ Status' },
-    { key: 'reported', label: '📝 Reported' },
+    { key: 'type', label: 'Type' },
+    { key: 'dates', label: 'Dates' },
+    { key: 'hours', label: 'Hours', className: 'text-right' },
+    { key: 'status', label: 'Status' },
+    { key: 'reported', label: 'Reported' },
     { key: 'actions', label: '', className: 'w-12' },
 ] as const;
 
@@ -40,9 +40,9 @@ export async function AbsenceListPanel({
     authorization,
     userId,
     includeClosed = false,
-    title = '📊 Recent Absences',
+    title = 'Recent absences',
     description = 'Unplanned absences and leave reports',
-    emptyMessage = '✨ No absences recorded yet — looking good!',
+    emptyMessage = 'No absences recorded yet — looking good!',
 }: AbsencesPanelProps) {
     const result = await getAbsencesForUi({
         authorization,

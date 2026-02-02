@@ -43,15 +43,15 @@ export function ComplianceItemDetailHeader({
         <Card>
             <CardHeader>
                 <div className="flex items-start justify-between">
-                    <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                            <CardTitle>{itemTitle}</CardTitle>
-                            <Badge variant={statusDetails.variant}>
+                    <div className="min-w-0 space-y-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                            <CardTitle className="min-w-0 line-clamp-2">{itemTitle}</CardTitle>
+                            <Badge variant={statusDetails.variant} className="shrink-0">
                                 <StatusIcon className="h-3 w-3 mr-1" />
                                 {statusDetails.label}
                             </Badge>
                             {isInternalOnly ? (
-                                <Badge variant="outline">Internal only</Badge>
+                                <Badge variant="outline" className="shrink-0">Internal only</Badge>
                             ) : null}
                         </div>
                         <CardDescription>{itemGuidance ?? 'Compliance item details and evidence.'}</CardDescription>

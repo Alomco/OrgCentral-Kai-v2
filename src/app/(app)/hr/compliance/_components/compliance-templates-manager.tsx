@@ -10,11 +10,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
-import { Textarea } from '@/components/ui/textarea';
 import type { ComplianceTemplate } from '@/server/types/compliance-types';
 import { FieldError } from '../../_components/field-error';
 import { createComplianceTemplateAction } from '../actions/compliance-templates';
 import type { ComplianceTemplateCreateState } from '../compliance-template-form-utils';
+import { ComplianceTemplateItemsBuilder } from './compliance-template-items-builder';
 import { ComplianceTemplateRow } from './compliance-template-row';
 import { ComplianceTemplateGuideCard } from './compliance-template-guide-card';
 import { ComplianceTemplateListHeader } from './compliance-template-list-header';
@@ -74,10 +74,15 @@ export function ComplianceTemplatesManager(props: { templates: ComplianceTemplat
             }
         }
 
+        const categoryKeys = Array.from(categories);
+        const preview = categoryKeys.slice(0, 6);
+        const overflowCount = Math.max(0, categoryKeys.length - preview.length);
+
         return {
             count: templates.length,
-            categories: Array.from(categories).slice(0, 6),
-            hasOverflow: categories.size > 6,
+            categories: preview,
+            categoryCount: categoryKeys.length,
+            overflowCount,
         };
     }, [templates]);
 
@@ -93,16 +98,28 @@ export function ComplianceTemplatesManager(props: { templates: ComplianceTemplat
         router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
     };
 
+    const handleSearchClear = () => {
+        const next = new URLSearchParams(searchParams.toString());
+        next.delete('q');
+        const query = next.toString();
+        router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
+    };
+
     return (
         <div className="space-y-6">
-            <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
-                <Card className="border-primary/15 shadow-sm">
+            <div className="grid gap-6 lg:grid-cols-[1.6fr_1fr]">
+                <Card id="create-template" className="border-primary/10 bg-card/70 shadow-sm">
                     <CardHeader className="flex flex-row items-start justify-between gap-3">
                         <div>
-                            <CardTitle className="text-lg">Create compliance template</CardTitle>
-                            <CardDescription>Standardize checklists for each region or business unit.</CardDescription>
+                            <CardTitle className="text-lg">Create a template</CardTitle>
+                            <CardDescription>
+                                Templates are reusable checklists. Add a name, an optional category, and a simple list of items.
+                            </CardDescription>
                         </div>
-                        <Badge variant="secondary" className="text-xs">Self-serve</Badge>
+                        <div className="text-right">
+                            <Badge variant="secondary" className="text-xs">Admin tool</Badge>
+                            <p className="mt-1 text-[11px] text-muted-foreground">Admins only • scoped to org</p>
+                        </div>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         {message ? (
@@ -111,6 +128,11 @@ export function ComplianceTemplatesManager(props: { templates: ComplianceTemplat
                                 <AlertDescription>{message}</AlertDescription>
                             </Alert>
                         ) : null}
+
+                        <div className="rounded-lg border border-border/60 bg-muted/20 p-3 text-sm text-muted-foreground">
+                            <p className="font-medium text-foreground">Quick steps</p>
+                            <p className="mt-1">Name the template, add optional metadata, then list each required item.</p>
+                        </div>
 
                         <form
                             ref={formReference}
@@ -132,15 +154,18 @@ export function ComplianceTemplatesManager(props: { templates: ComplianceTemplat
                                             aria-describedby={nameError ? 'compliance-template-name-error' : undefined}
                                         />
                                         <FieldError id="compliance-template-name-error" message={nameError} />
+                                        <p className="text-xs text-muted-foreground">
+                                            Example: “Onboarding checks – UK”.
+                                        </p>
                                     </div>
 
                                     <div className="grid gap-4 sm:grid-cols-2">
                                         <div className="space-y-2">
-                                            <Label htmlFor="compliance-template-category">Category key</Label>
+                                            <Label htmlFor="compliance-template-category">Category (optional)</Label>
                                             <Input
                                                 id="compliance-template-category"
                                                 name="categoryKey"
-                                                placeholder="uk_employment"
+                                                placeholder="employment_uk"
                                                 key={`compliance-template-category-${state.values.categoryKey}`}
                                                 defaultValue={state.values.categoryKey}
                                                 aria-invalid={Boolean(categoryError)}
@@ -150,14 +175,15 @@ export function ComplianceTemplatesManager(props: { templates: ComplianceTemplat
                                                 id="compliance-template-category-error"
                                                 message={categoryError}
                                             />
+                                            <p className="text-xs text-muted-foreground">Used to group templates in lists.</p>
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label htmlFor="compliance-template-version">Version</Label>
+                                            <Label htmlFor="compliance-template-version">Version (optional)</Label>
                                             <Input
                                                 id="compliance-template-version"
                                                 name="version"
-                                                placeholder="1"
+                                                placeholder="1.0"
                                                 key={`compliance-template-version-${state.values.version}`}
                                                 defaultValue={state.values.version}
                                                 aria-invalid={Boolean(versionError)}
@@ -167,36 +193,21 @@ export function ComplianceTemplatesManager(props: { templates: ComplianceTemplat
                                                 id="compliance-template-version-error"
                                                 message={versionError}
                                             />
+                                            <p className="text-xs text-muted-foreground">Increase when requirements change.</p>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="compliance-template-items">Template items (JSON)</Label>
-                                    <Textarea
-                                        id="compliance-template-items"
+                                    <Label htmlFor="compliance-template-items">Items list</Label>
+                                    <ComplianceTemplateItemsBuilder
                                         name="itemsJson"
-                                        required
-                                        rows={10}
-                                        placeholder={`[
-    {
-        "id": "uk_employment.right_to_work",
-        "name": "Right to work check",
-        "type": "DOCUMENT",
-        "isMandatory": true,
-        "regulatoryRefs": ["UK_GDPR"]
-    }
-]`}
-                                        key={`compliance-template-items-${state.values.itemsJson}`}
-                                        defaultValue={state.values.itemsJson}
-                                        className="font-mono text-xs"
-                                        aria-invalid={Boolean(itemsError)}
-                                        aria-describedby={itemsError ? 'compliance-template-items-error' : undefined}
+                                        inputId="compliance-template-items"
+                                        initialItemsJson={state.values.itemsJson}
+                                        errorId="compliance-template-items-error"
+                                        errorMessage={itemsError}
+                                        disabled={pending}
                                     />
-                                    <FieldError id="compliance-template-items-error" message={itemsError} />
-                                    <p className="text-xs text-muted-foreground">
-                                        Include stable ids, a human name, the item type, regulatoryRefs, and whether each item is mandatory.
-                                    </p>
                                 </div>
                             </fieldset>
 
@@ -205,7 +216,7 @@ export function ComplianceTemplatesManager(props: { templates: ComplianceTemplat
                                     {pending ? <Spinner className="mr-2" /> : null}
                                     {pending ? 'Creating...' : 'Create template'}
                                 </Button>
-                                <p className="text-xs text-muted-foreground">Templates are scoped to the current organization and residency policy.</p>
+                                <p className="text-xs text-muted-foreground">Templates are saved to the current organization.</p>
                             </div>
                         </form>
                     </CardContent>
@@ -216,17 +227,26 @@ export function ComplianceTemplatesManager(props: { templates: ComplianceTemplat
                 </div>
             </div>
 
-            <Card className="border-primary/10">
+            <Card className="border-primary/10 bg-card/70">
                 <ComplianceTemplateListHeader
                     qValue={qValue}
                     summary={summary}
                     onSearchChange={handleSearchChange}
+                    onSearchClear={handleSearchClear}
                 />
                 <CardContent>
                     {templates.length === 0 ? (
-                        <p className="text-sm text-muted-foreground">No templates configured yet. Seed defaults or add one manually to get started.</p>
+                        <div className="rounded-lg border border-dashed border-border/60 bg-muted/30 p-6 text-sm text-muted-foreground">
+                            <p className="font-medium text-foreground">No templates yet</p>
+                            <p className="mt-1">Create your first template or seed a starter pack to get going.</p>
+                            <div className="mt-4 flex flex-wrap items-center gap-2">
+                                <Button asChild size="sm">
+                                    <a href="#create-template">Create template</a>
+                                </Button>
+                            </div>
+                        </div>
                     ) : (
-                        <div className="space-y-3">
+                        <div className="space-y-4">
                             {templates.map((template) => (
                                 <ComplianceTemplateRow key={template.id} template={template} />
                             ))}

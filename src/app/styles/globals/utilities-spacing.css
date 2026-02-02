@@ -1,0 +1,50 @@
+@layer utilities {
+  /* Golden Ratio Spacing Utilities */
+  .space-phi {
+    gap: var(--phi-base);
+  }
+
+  .space-phi-sm {
+    gap: var(--phi-sm);
+  }
+
+  .space-phi-md {
+    gap: var(--phi-md);
+  }
+
+  .space-phi-lg {
+    gap: var(--phi-lg);
+  }
+
+  .p-phi {
+    padding: var(--phi-base);
+  }
+
+  .p-phi-sm {
+    padding: var(--phi-sm);
+  }
+
+  .p-phi-md {
+    padding: var(--phi-md);
+  }
+
+  .p-phi-lg {
+    padding: var(--phi-lg);
+  }
+
+  .m-phi {
+    margin: var(--phi-base);
+  }
+
+  .m-phi-sm {
+    margin: var(--phi-sm);
+  }
+
+  .m-phi-md {
+    margin: var(--phi-md);
+  }
+
+  .m-phi-lg {
+    margin: var(--phi-lg);
+  }
+}

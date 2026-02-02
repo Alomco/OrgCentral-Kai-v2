@@ -31,7 +31,7 @@ export async function LeaveTrendsCard({
 
     return (
         <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
+            <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <CardTitle className="text-base flex items-center gap-2">
                         <BarChart3 className="h-4 w-4" />
@@ -39,7 +39,7 @@ export async function LeaveTrendsCard({
                     </CardTitle>
                     <CardDescription>Monthly leave activity for {year}.</CardDescription>
                 </div>
-                <Badge variant="secondary">{requests.length} total</Badge>
+                <Badge variant="secondary" className="shrink-0">{requests.length} total</Badge>
             </CardHeader>
             <CardContent className="space-y-4">
                 <div className="grid gap-2">

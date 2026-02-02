@@ -23,7 +23,7 @@ export function NotificationChannelCard(props: NotificationChannelCardProps) {
     return (
         <Card>
             <CardHeader>
-                <div className="flex items-center justify-between">
+                <div className="flex items-start justify-between gap-3">
                     <div className="space-y-0.5">
                         <CardTitle>{props.title}</CardTitle>
                         <CardDescription>{props.description}</CardDescription>
@@ -35,11 +35,11 @@ export function NotificationChannelCard(props: NotificationChannelCardProps) {
                     />
                 </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-3">
                 <NotificationSettingsTypeHelp id={props.helpId} text={props.helpText} />
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {props.types.map((type) => (
-                        <div key={`${props.channel}-${type}`} className="flex items-center space-x-2">
+                        <div key={`${props.channel}-${type}`} className="flex items-start space-x-2">
                             <span id={`${props.channel.toLowerCase()}-${type}-help`} className="sr-only">
                                 {`Toggle ${type.replace(/-/g, ' ')} ${props.title.toLowerCase()} alerts.`}
                             </span>

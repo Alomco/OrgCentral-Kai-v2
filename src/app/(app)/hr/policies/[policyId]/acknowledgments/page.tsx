@@ -100,7 +100,7 @@ async function AcknowledgmentsCard({ policyId }: { policyId: string }) {
         <Card>
             <CardHeader>
                 <CardTitle>Acknowledgments</CardTitle>
-                <CardDescription>Requires `orgAdmin` role.</CardDescription>
+                <CardDescription>Requires `orgAdmin` role. User IDs are shortened for readability.</CardDescription>
             </CardHeader>
             <CardContent>
                 {response.kind === 'error' ? (
@@ -109,7 +109,7 @@ async function AcknowledgmentsCard({ policyId }: { policyId: string }) {
                     <div className="text-sm text-muted-foreground">No acknowledgments recorded yet.</div>
                 ) : (
                     <div className="overflow-x-auto">
-                        <table className="w-full text-sm">
+                        <table className="min-w-[520px] w-full text-sm">
                             <thead className="border-b text-left">
                                 <tr>
                                     <th className="px-2 py-2 font-medium">User</th>
@@ -129,7 +129,7 @@ async function AcknowledgmentsCard({ policyId }: { policyId: string }) {
                                             </Badge>
                                         </td>
                                         <td className="px-2 py-2 text-muted-foreground">{acknowledgment.version}</td>
-                                        <td className="px-2 py-2 text-muted-foreground">
+                                        <td className="px-2 py-2 text-muted-foreground whitespace-nowrap">
                                             {formatHumanDateTime(acknowledgment.acknowledgedAt)}
                                         </td>
                                     </tr>

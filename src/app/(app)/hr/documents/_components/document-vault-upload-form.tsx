@@ -84,6 +84,9 @@ export function DocumentVaultUploadForm({ onUploaded }: DocumentVaultUploadFormP
                             <Input id="document-file" type="file" ref={fileInputReference} />
                         </div>
 
+                        <div className="pt-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                            Classification & retention
+                        </div>
                         <div className="grid gap-4 md:grid-cols-2">
                             <div className="space-y-2">
                                 <Label htmlFor="document-type">Type</Label>
@@ -130,6 +133,9 @@ export function DocumentVaultUploadForm({ onUploaded }: DocumentVaultUploadFormP
                             </div>
                         </div>
 
+                        <div className="pt-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                            Ownership & lineage
+                        </div>
                         <div className="grid gap-4 md:grid-cols-2">
                             <div className="space-y-2">
                                 <Label htmlFor="document-owner">Owner user ID (optional)</Label>
@@ -141,6 +147,9 @@ export function DocumentVaultUploadForm({ onUploaded }: DocumentVaultUploadFormP
                             </div>
                         </div>
 
+                        <div className="pt-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                            Legal basis
+                        </div>
                         <div className="grid gap-4 md:grid-cols-2">
                             <div className="space-y-2">
                                 <Label htmlFor="document-category">Data category (optional)</Label>

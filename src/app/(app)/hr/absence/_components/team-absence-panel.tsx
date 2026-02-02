@@ -38,7 +38,7 @@ function formatDateRange(start: Date, end: Date): string {
         month: 'short',
         day: 'numeric',
     });
-    if (startString === endString) {return startString;}
+    if (startString === endString) { return startString; }
     return `${startString} - ${endString}`;
 }
 
@@ -81,15 +81,17 @@ export function TeamAbsencePanel({ teamAbsences, teamSize }: TeamAbsencePanelPro
                                 <Link
                                     key={absence.id}
                                     href={`/hr/employees/${absence.employeeId}`}
-                                    className="flex items-center gap-2 rounded-full bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 px-3 py-1.5 text-sm transition-colors hover:bg-amber-100 dark:hover:bg-amber-900/30"
+                                    className="flex min-w-0 items-center gap-2 rounded-full bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 px-3 py-1.5 text-sm transition-colors hover:bg-amber-100 dark:hover:bg-amber-900/30"
                                 >
                                     <Avatar className="h-5 w-5">
                                         <AvatarFallback className="text-[10px]">
                                             {getInitials(absence.employeeName)}
                                         </AvatarFallback>
                                     </Avatar>
-                                    <span className="font-medium">{absence.employeeName}</span>
-                                    <Badge variant="outline" className="text-xs">
+                                    <span className="font-medium max-w-[8rem] truncate">
+                                        {absence.employeeName}
+                                    </span>
+                                    <Badge variant="outline" className="max-w-[7rem] truncate text-xs">
                                         {absence.type}
                                     </Badge>
                                 </Link>
@@ -110,22 +112,22 @@ export function TeamAbsencePanel({ teamAbsences, teamSize }: TeamAbsencePanelPro
                                     key={absence.id}
                                     className="flex items-center justify-between rounded-lg border p-2"
                                 >
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex min-w-0 items-center gap-2">
                                         <Avatar className="h-7 w-7">
                                             <AvatarFallback className="text-xs">
                                                 {getInitials(absence.employeeName)}
                                             </AvatarFallback>
                                         </Avatar>
-                                        <div>
-                                            <p className="text-sm font-medium">
+                                        <div className="min-w-0">
+                                            <p className="text-sm font-medium truncate">
                                                 {absence.employeeName}
                                             </p>
-                                            <p className="text-xs text-muted-foreground">
+                                            <p className="text-xs text-muted-foreground truncate">
                                                 {absence.type}
                                             </p>
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                    <div className="flex shrink-0 items-center gap-1 text-xs text-muted-foreground">
                                         <Calendar className="h-3 w-3" />
                                         {formatDateRange(absence.startDate, absence.endDate)}
                                     </div>

@@ -95,13 +95,13 @@ async function PolicyPageContent({ policyId }: { policyId: string }) {
             </Breadcrumb>
 
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                <div className="space-y-2">
+                <div className="space-y-2 min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
                         <Badge variant="secondary">{policy.category}</Badge>
                         <Badge variant="outline">v{policy.version}</Badge>
                         <Badge variant="outline">{policy.status}</Badge>
                     </div>
-                    <h1 className="text-2xl font-semibold">{policy.title}</h1>
+                    <h1 className="text-2xl font-semibold break-words">{policy.title}</h1>
                     <div className="text-sm text-muted-foreground">
                         Effective {formatHumanDate(policy.effectiveDate)}
                         {policy.expiryDate ? ` · Expires ${formatHumanDate(policy.expiryDate)}` : ''}
@@ -127,7 +127,9 @@ async function PolicyPageContent({ policyId }: { policyId: string }) {
                 <Card>
                     <CardHeader>
                         <CardTitle>Acknowledgment</CardTitle>
-                        <CardDescription>{acknowledgmentDisplay.description}</CardDescription>
+                        <CardDescription>
+                            {acknowledgmentDisplay.description} If this is required, confirm below to keep your records up to date.
+                        </CardDescription>
                     </CardHeader>
                     <CardContent>
                         {acknowledgmentDisplay.isAcknowledged ? (
@@ -141,7 +143,7 @@ async function PolicyPageContent({ policyId }: { policyId: string }) {
                 <Card>
                     <CardHeader>
                         <CardTitle>Acknowledgment</CardTitle>
-                        <CardDescription>This policy does not require acknowledgment.</CardDescription>
+                        <CardDescription>This policy does not require acknowledgment. No action needed.</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <Badge variant="outline">Optional</Badge>
@@ -152,7 +154,7 @@ async function PolicyPageContent({ policyId }: { policyId: string }) {
             <Card>
                 <CardHeader>
                     <CardTitle>Policy text</CardTitle>
-                    <CardDescription>Stored as plain text (rendered safely).</CardDescription>
+                    <CardDescription>Read the policy below. Use the acknowledgment section above if required.</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <div className="whitespace-pre-wrap text-sm leading-6">{policy.content}</div>

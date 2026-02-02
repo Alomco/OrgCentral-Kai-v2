@@ -119,7 +119,7 @@ export function ColorPanel<TThemeId extends string = string>({
                             key={theme.id}
                             type="button"
                             role="radio"
-                                aria-checked="false"
+                            aria-checked="false"
                             onClick={() => {
                                 onSelect(themeId);
                                 setOpen(false);

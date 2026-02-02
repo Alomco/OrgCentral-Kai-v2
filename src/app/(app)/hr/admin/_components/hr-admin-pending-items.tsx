@@ -65,8 +65,8 @@ export function HrAdminPendingItems({ items }: HrAdminPendingItemsProps) {
 
     return (
         <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-                <div>
+            <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div className="min-w-0">
                     <CardTitle className="text-base flex items-center gap-2">
                         <Clock className="h-4 w-4" />
                         Pending Approvals
@@ -84,9 +84,9 @@ export function HrAdminPendingItems({ items }: HrAdminPendingItemsProps) {
                             <Link
                                 key={item.id}
                                 href={getItemHref(item)}
-                                className="flex items-center justify-between rounded-lg border p-3 transition-colors hover:bg-muted"
+                                className="flex flex-col gap-2 rounded-lg border p-3 transition-colors hover:bg-muted sm:flex-row sm:items-center sm:justify-between"
                             >
-                                <div className="flex items-center gap-3 min-w-0 flex-1">
+                                <div className="flex min-w-0 items-center gap-3 flex-1">
                                     {getItemIcon(item.type)}
                                     <div className="min-w-0 flex-1">
                                         <p className="font-medium text-sm truncate">
@@ -97,7 +97,7 @@ export function HrAdminPendingItems({ items }: HrAdminPendingItemsProps) {
                                         </p>
                                     </div>
                                 </div>
-                                <span className="text-xs text-muted-foreground shrink-0 ml-2">
+                                <span className="text-xs text-muted-foreground shrink-0 sm:ml-2">
                                     {formatTimeAgo(item.submittedAt)}
                                 </span>
                             </Link>

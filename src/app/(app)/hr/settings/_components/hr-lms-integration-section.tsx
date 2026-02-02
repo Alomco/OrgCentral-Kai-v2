@@ -88,6 +88,9 @@ export function LmsIntegrationSection({ pending, state, enabledReference }: Inte
                             aria-describedby={lmsProviderNameError ? 'lmsProviderName-error' : undefined}
                         />
                         <FieldError id="lmsProviderName-error" message={lmsProviderNameError} />
+                        <p className="text-xs text-muted-foreground">
+                            Example: Cornerstone, Docebo, Moodle.
+                        </p>
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="lmsBaseUrl">Base URL</Label>
@@ -101,6 +104,9 @@ export function LmsIntegrationSection({ pending, state, enabledReference }: Inte
                             aria-describedby={lmsBaseUrlError ? 'lmsBaseUrl-error' : undefined}
                         />
                         <FieldError id="lmsBaseUrl-error" message={lmsBaseUrlError} />
+                        <p className="text-xs text-muted-foreground">
+                            Use the URL you log into for training.
+                        </p>
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="lmsApiTokenLabel">API token label</Label>
@@ -114,6 +120,9 @@ export function LmsIntegrationSection({ pending, state, enabledReference }: Inte
                             aria-describedby={lmsApiTokenLabelError ? 'lmsApiTokenLabel-error' : undefined}
                         />
                         <FieldError id="lmsApiTokenLabel-error" message={lmsApiTokenLabelError} />
+                        <p className="text-xs text-muted-foreground">
+                            Store a label only—tokens are handled securely elsewhere.
+                        </p>
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="lmsSyncWindowDays">Sync window (days)</Label>
@@ -131,6 +140,9 @@ export function LmsIntegrationSection({ pending, state, enabledReference }: Inte
                             aria-describedby={lmsSyncWindowDaysError ? 'lmsSyncWindowDays-error' : undefined}
                         />
                         <FieldError id="lmsSyncWindowDays-error" message={lmsSyncWindowDaysError} />
+                        <p className="text-xs text-muted-foreground">
+                            How many days ahead to sync completions.
+                        </p>
                     </div>
                 </div>
             </fieldset>

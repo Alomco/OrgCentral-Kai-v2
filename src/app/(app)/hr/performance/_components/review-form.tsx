@@ -99,7 +99,7 @@ export function ReviewForm({
                 <CardHeader className="pb-2">
                     <CardTitle>{reviewTitle}</CardTitle>
                     <CardDescription>
-                        {answeredCount} of {questions.length} questions answered
+                        {answeredCount} of {questions.length} questions answered. Save a draft anytime.
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -124,9 +124,12 @@ export function ReviewForm({
                                     <Label className="text-sm font-medium">
                                         {index + 1}. {question.question}
                                     </Label>
+                                    <p className="text-xs text-muted-foreground">
+                                        Select a rating, then add optional comments.
+                                    </p>
 
                                     {/* Star Rating */}
-                                    <div className="flex items-center gap-1">
+                                    <div className="flex flex-wrap items-center gap-1">
                                         {[1, 2, 3, 4, 5].map((rating) => (
                                             <button
                                                 key={rating}
@@ -154,7 +157,7 @@ export function ReviewForm({
 
                                     {/* Comments */}
                                     <Textarea
-                                        placeholder="Add your comments (optional)..."
+                                        placeholder="Add helpful context (optional)..."
                                         value={response.comments}
                                         onChange={(event) =>
                                             updateResponse(question.id, 'comments', event.target.value)
@@ -170,11 +173,12 @@ export function ReviewForm({
             ))}
 
             {/* Action Buttons */}
-            <div className="flex justify-end gap-3">
+            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
                 <Button
                     variant="outline"
                     onClick={handleSaveDraft}
                     disabled={isSaving || isSubmitting}
+                    className="w-full sm:w-auto"
                 >
                     {isSaving ? (
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -186,6 +190,7 @@ export function ReviewForm({
                 <Button
                     onClick={handleSubmit}
                     disabled={!isComplete || isSaving || isSubmitting}
+                    className="w-full sm:w-auto"
                 >
                     {isSubmitting ? (
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />

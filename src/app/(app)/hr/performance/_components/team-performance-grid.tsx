@@ -64,13 +64,13 @@ export function TeamPerformanceGrid({ teamMembers }: TeamPerformanceGridProps) {
 
     return (
         <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-                <div>
+            <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div className="min-w-0">
                     <CardTitle className="text-base flex items-center gap-2">
                         <Users className="h-4 w-4" />
                         Team Performance
                     </CardTitle>
-                    <CardDescription>
+                    <CardDescription className="mt-1">
                         {completedReviews} of {teamMembers.length} reviews completed | {avgGoalProgress}%
                         avg goal progress
                     </CardDescription>

@@ -36,9 +36,9 @@ export interface EmployeeManagementHubProps {
 
 export async function EmployeeManagementHub({ authorization }: EmployeeManagementHubProps) {
     const deps = { employeeProfileRepository: new PrismaEmployeeProfileRepository() };
-    
+
     const { profiles } = await listEmployeeProfiles(deps, { authorization });
-    
+
     const stats = computeEmployeeStats(profiles);
     const recentEmployees = [...profiles]
         .sort((a, b) => {
@@ -52,27 +52,27 @@ export async function EmployeeManagementHub({ authorization }: EmployeeManagemen
         <div className="space-y-6">
             {/* Stats Row */}
             <div className="grid gap-4 md:grid-cols-4">
-                <HrStatCard 
-                    label="Total Employees" 
-                    value={stats.total} 
+                <HrStatCard
+                    label="Total Employees"
+                    value={stats.total}
                     icon={<UsersIcon className="h-5 w-5" />}
                     accentColor="primary"
                 />
-                <HrStatCard 
-                    label="Active" 
-                    value={stats.active} 
+                <HrStatCard
+                    label="Active"
+                    value={stats.active}
                     icon={<UserCheckIcon className="h-5 w-5" />}
                     accentColor="success"
                 />
-                <HrStatCard 
-                    label="Pending Onboarding" 
-                    value={stats.pendingOnboarding} 
+                <HrStatCard
+                    label="Offboarding"
+                    value={stats.pendingOnboarding}
                     icon={<UserPlusIcon className="h-5 w-5" />}
                     accentColor="warning"
                 />
-                <HrStatCard 
-                    label="Inactive" 
-                    value={stats.inactive} 
+                <HrStatCard
+                    label="Inactive"
+                    value={stats.inactive}
                     icon={<UserXIcon className="h-5 w-5" />}
                     accentColor="accent"
                 />
@@ -83,7 +83,7 @@ export async function EmployeeManagementHub({ authorization }: EmployeeManagemen
             {/* Recent Employees Table */}
             <Card>
                 <CardHeader>
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                         <div>
                             <CardTitle>Recent Employees</CardTitle>
                             <CardDescription>Latest additions to your organization</CardDescription>
@@ -101,7 +101,7 @@ export async function EmployeeManagementHub({ authorization }: EmployeeManagemen
                         <EmptyState />
                     ) : (
                         <div className="overflow-auto">
-                            <Table>
+                            <Table className="min-w-[720px]">
                                 <TableHeader>
                                     <TableRow>
                                         <TableHead>Name</TableHead>
@@ -114,11 +114,13 @@ export async function EmployeeManagementHub({ authorization }: EmployeeManagemen
                                 <TableBody>
                                     {recentEmployees.map((employee) => (
                                         <TableRow key={employee.id}>
-                                            <TableCell className="font-medium">
+                                            <TableCell className="font-medium min-w-0 max-w-[200px] truncate">
                                                 {employee.firstName} {employee.lastName}
                                             </TableCell>
-                                            <TableCell>{employee.jobTitle ?? '—'}</TableCell>
-                                            <TableCell className="capitalize">
+                                            <TableCell className="min-w-0 max-w-[220px] truncate">
+                                                {employee.jobTitle ?? '—'}
+                                            </TableCell>
+                                            <TableCell className="capitalize whitespace-nowrap">
                                                 {employee.employmentType.toLowerCase().replace('_', ' ')}
                                             </TableCell>
                                             <TableCell>
@@ -126,8 +128,8 @@ export async function EmployeeManagementHub({ authorization }: EmployeeManagemen
                                                     {formatStatus(employee.employmentStatus)}
                                                 </Badge>
                                             </TableCell>
-                                            <TableCell className="text-muted-foreground">
-                                                {employee.startDate 
+                                            <TableCell className="text-muted-foreground whitespace-nowrap">
+                                                {employee.startDate
                                                     ? formatHumanDate(new Date(String(employee.startDate)))
                                                     : '—'}
                                             </TableCell>

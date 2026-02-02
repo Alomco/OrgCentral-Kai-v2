@@ -52,14 +52,14 @@ export function OnboardingInvitationsClient({ initialInvitations }: OnboardingIn
                     <div className="text-sm text-muted-foreground">No invitations found.</div>
                 ) : (
                     <div className="overflow-auto rounded-md border">
-                        <Table className="min-w-[720px]">
+                        <Table className="min-w-[680px]">
                             <TableHeader>
                                 <TableRow>
                                     <TableHead className="w-[260px]">Email</TableHead>
                                     <TableHead className="w-[140px]">Status</TableHead>
                                     <TableHead className="w-[180px]">Created</TableHead>
                                     <TableHead className="w-[180px]">Expires</TableHead>
-                                    <TableHead className="text-right w-[320px]">Actions</TableHead>
+                                    <TableHead className="text-right w-[240px]">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>

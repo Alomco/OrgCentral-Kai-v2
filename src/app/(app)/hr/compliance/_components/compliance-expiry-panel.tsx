@@ -49,7 +49,7 @@ export function ComplianceExpiryPanel({ expiringItems }: ComplianceExpiryPanelPr
 
     return (
         <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
+            <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <CardTitle className="text-base flex items-center gap-2">
                         <Calendar className="h-4 w-4" />
@@ -67,7 +67,7 @@ export function ComplianceExpiryPanel({ expiringItems }: ComplianceExpiryPanelPr
             </CardHeader>
             <CardContent className="space-y-4">
                 {/* Summary Stats */}
-                <div className="grid grid-cols-3 gap-4 text-center">
+                <div className="grid grid-cols-1 gap-4 text-center sm:grid-cols-3">
                     <div className="rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/30 p-3">
                         <p className="text-2xl font-bold text-red-600 dark:text-red-400">
                             {expired.length}
@@ -121,6 +121,7 @@ export function ComplianceExpiryPanel({ expiringItems }: ComplianceExpiryPanelPr
                                         variant={
                                             status.variant === 'warning' ? 'secondary' : status.variant
                                         }
+                                        className="shrink-0"
                                     >
                                         {status.label}
                                     </Badge>

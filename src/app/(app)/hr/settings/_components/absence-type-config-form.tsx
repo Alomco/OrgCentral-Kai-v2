@@ -76,6 +76,9 @@ export function AbsenceTypeConfigForm(props: { types: AbsenceTypeConfig[] }) {
                                         aria-describedby={createState.fieldErrors?.label ? 'absence-type-label-error' : undefined}
                                     />
                                     <FieldError id="absence-type-label-error" message={createState.fieldErrors?.label} />
+                                    <p className="text-xs text-muted-foreground">
+                                        This is what employees will see.
+                                    </p>
                                 </div>
 
                                 <div className="space-y-2">
@@ -128,7 +131,7 @@ export function AbsenceTypeConfigForm(props: { types: AbsenceTypeConfig[] }) {
                                     <div className="space-y-1">
                                         <Label htmlFor="absence-type-active">Active</Label>
                                         <p className="text-xs text-muted-foreground">
-                                            Hide inactive types from employee reporting.
+                                            Turn off to hide it from employee requests.
                                         </p>
                                     </div>
                                     <input

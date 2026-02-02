@@ -54,7 +54,7 @@ export function EmployeeProfileEditCard({ initialState }: EmployeeProfileEditCar
                         />
                     </fieldset>
                 </CardContent>
-                <CardFooter className="border-t justify-between gap-4">
+                <CardFooter className="border-t flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <p
                         className="text-xs text-muted-foreground"
                         role="status"

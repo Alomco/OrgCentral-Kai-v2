@@ -81,7 +81,7 @@ async function PoliciesPageContent() {
                 </BreadcrumbList>
             </Breadcrumb>
 
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                 <HrPageHeader
                     title="Policies"
                     description="Review and acknowledge organization policies."
@@ -90,7 +90,7 @@ async function PoliciesPageContent() {
                 <PoliciesHeaderClient />
             </div>
 
-            <div className="flex justify-end">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <PoliciesFiltersClient />
             </div>
 

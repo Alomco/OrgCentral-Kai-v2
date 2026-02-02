@@ -7,6 +7,28 @@
     border-width: var(--ui-border-width) !important;
 }
 
+[data-slot="popover-content"],
+[data-slot="dropdown-menu-content"],
+[data-slot="dropdown-menu-sub-content"],
+[data-slot="select-content"],
+[data-slot="context-menu-content"],
+[data-slot="context-menu-sub-content"],
+[data-slot="menubar-content"],
+[data-slot="menubar-sub-content"],
+[data-slot="navigation-menu-content"],
+[data-slot="hover-card-content"],
+[data-slot="tooltip-content"],
+[data-slot="command"] {
+    background-color: oklch(var(--popover) / 1) !important;
+}
+
+[data-slot="dialog-content"],
+[data-slot="alert-dialog-content"],
+[data-slot="sheet-content"],
+[data-slot="drawer-content"] {
+    background-color: oklch(var(--popover) / 1) !important;
+}
+
 [data-ui-style="clean-corporate"] [data-slot="popover-content"],
 [data-ui-style="clean-corporate"] [data-slot="dropdown-menu-content"],
 [data-ui-style="clean-corporate"] [data-slot="dropdown-menu-sub-content"],
@@ -19,7 +41,6 @@
 [data-ui-style="clean-corporate"] [data-slot="hover-card-content"],
 [data-ui-style="clean-corporate"] [data-slot="tooltip-content"],
 [data-ui-style="clean-corporate"] [data-slot="command"] {
-    background-color: oklch(var(--popover) / 0.98) !important;
     border-color: oklch(var(--border) / 0.6) !important;
     box-shadow: var(--ui-surface-item-shadow) !important;
 }
@@ -28,7 +49,6 @@
 [data-ui-style="clean-corporate"] [data-slot="alert-dialog-content"],
 [data-ui-style="clean-corporate"] [data-slot="sheet-content"],
 [data-ui-style="clean-corporate"] [data-slot="drawer-content"] {
-    background-color: oklch(var(--popover) / 0.98) !important;
     border-color: oklch(var(--border) / 0.6) !important;
     box-shadow: var(--ui-surface-item-shadow) !important;
 }
@@ -44,6 +64,15 @@
 
 [data-ui-style="clean-corporate"] [data-slot="button"]:hover,
 [data-ui-style="clean-corporate"] [data-slot="button"]:active {
+    transform: none !important;
+}
+
+[data-ui-style="clean-corporate"] [class*="hover:scale"]:hover,
+[data-ui-style="clean-corporate"] [class*="hover:translate"]:hover,
+[data-ui-style="clean-corporate"] [class*="active:scale"]:active,
+[data-ui-style="clean-corporate"] [class*="active:translate"]:active,
+[data-ui-style="clean-corporate"] [class*="group-hover"][class*="scale"],
+[data-ui-style="clean-corporate"] [class*="group-hover"][class*="translate"] {
     transform: none !important;
 }
 

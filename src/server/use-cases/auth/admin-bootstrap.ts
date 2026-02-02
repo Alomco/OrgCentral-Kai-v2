@@ -110,28 +110,6 @@ export async function runAdminBootstrap(
 
         assertUuid(organization.id, 'Organization id');
 
-        const existingPolicies = await deps.abacPolicyRepository.getPoliciesForOrg(organization.id);
-        if (existingPolicies.length === 0) {
-            const authorization = buildAuthorizationContext({
-                orgId: organization.id,
-                userId,
-                roleKey: config.roleName,
-                dataResidency: organization.dataResidency,
-                dataClassification: organization.dataClassification,
-                auditSource: BOOTSTRAP_SEED_SOURCE,
-                tenantScope: {
-                    orgId: organization.id,
-                    dataResidency: organization.dataResidency,
-                    dataClassification: organization.dataClassification,
-                    auditSource: BOOTSTRAP_SEED_SOURCE,
-                },
-            });
-            await setAbacPolicies(
-                { policyRepository: deps.abacPolicyRepository },
-                { authorization, policies: DEFAULT_BOOTSTRAP_POLICIES },
-            );
-        }
-
         const permissions = resolveRoleTemplate(config.roleName).permissions as Record<string, string[]>;
 
         const role = await deps.provisioningRepository.upsertPlatformRole({
@@ -160,6 +138,28 @@ export async function runAdminBootstrap(
             },
             auditUserId: userId,
         });
+
+        const existingPolicies = await deps.abacPolicyRepository.getPoliciesForOrg(organization.id);
+        if (existingPolicies.length === 0) {
+            const authorization = buildAuthorizationContext({
+                orgId: organization.id,
+                userId,
+                roleKey: config.roleName,
+                dataResidency: organization.dataResidency,
+                dataClassification: organization.dataClassification,
+                auditSource: BOOTSTRAP_SEED_SOURCE,
+                tenantScope: {
+                    orgId: organization.id,
+                    dataResidency: organization.dataResidency,
+                    dataClassification: organization.dataClassification,
+                    auditSource: BOOTSTRAP_SEED_SOURCE,
+                },
+            });
+            await setAbacPolicies(
+                { policyRepository: deps.abacPolicyRepository },
+                { authorization, policies: DEFAULT_BOOTSTRAP_POLICIES },
+            );
+        }
 
         await deps.provisioningRepository.ensurePlatformAuthOrganization(
             provisioningConfig,
@@ -240,4 +240,3 @@ export async function runAdminBootstrap(
         throw error;
     }
 }
-

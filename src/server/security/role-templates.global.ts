@@ -11,6 +11,7 @@ export const globalAdminTemplate = {
     platformTenants: ROLE_PERMISSION_STATEMENTS.platformTenants,
     platformBillingPlans: ROLE_PERMISSION_STATEMENTS.platformBillingPlans,
     platformTools: ROLE_PERMISSION_STATEMENTS.platformTools,
+    platformDocuments: ROLE_PERMISSION_STATEMENTS.platformDocuments,
     platformSupport: ROLE_PERMISSION_STATEMENTS.platformSupport,
     platformImpersonation: ROLE_PERMISSION_STATEMENTS.platformImpersonation,
     platformBreakGlass: ROLE_PERMISSION_STATEMENTS.platformBreakGlass,

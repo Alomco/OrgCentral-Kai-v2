@@ -8,12 +8,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
-import { Textarea } from '@/components/ui/textarea';
 import type { ComplianceTemplate } from '@/server/types/compliance-types';
 
 import { updateComplianceTemplateAction } from '../actions/compliance-templates';
 import type { ComplianceTemplateInlineState } from '../compliance-template-form-utils';
 import { templatesKey } from '../compliance-templates.api';
+import { ComplianceTemplateItemsBuilder } from './compliance-template-items-builder';
 
 const initialInlineState: ComplianceTemplateInlineState = { status: 'idle' };
 
@@ -22,7 +22,6 @@ export function ComplianceTemplateUpdateForm(props: { template: ComplianceTempla
     const searchParams = useSearchParams();
     const qNormalized = (searchParams.get('q') ?? '').trim().toLowerCase();
     const [state, action, pending] = useActionState(updateComplianceTemplateAction, initialInlineState);
-    const itemsJson = JSON.stringify(props.template.items, null, 2);
 
     useEffect(() => {
         if (state.status === 'success') {
@@ -37,8 +36,8 @@ export function ComplianceTemplateUpdateForm(props: { template: ComplianceTempla
             <input type="hidden" name="templateId" value={props.template.id} />
 
             <fieldset disabled={pending} className="space-y-3">
-                <div className="grid gap-3 sm:grid-cols-2">
-                    <div className="space-y-1">
+                <div className="grid gap-3 sm:grid-cols-3">
+                    <div className="space-y-1 sm:col-span-2">
                         <Label htmlFor={`compliance-template-name-${props.template.id}`}>Name</Label>
                         <Input
                             id={`compliance-template-name-${props.template.id}`}
@@ -47,37 +46,34 @@ export function ComplianceTemplateUpdateForm(props: { template: ComplianceTempla
                         />
                     </div>
 
-                    <div className="grid gap-3 sm:grid-cols-2">
-                        <div className="space-y-1">
-                            <Label htmlFor={`compliance-template-category-${props.template.id}`}>
-                                Category key
-                            </Label>
-                            <Input
-                                id={`compliance-template-category-${props.template.id}`}
-                                name="categoryKey"
-                                defaultValue={props.template.categoryKey ?? ''}
-                            />
-                        </div>
+                    <div className="space-y-1">
+                        <Label htmlFor={`compliance-template-version-${props.template.id}`}>Version</Label>
+                        <Input
+                            id={`compliance-template-version-${props.template.id}`}
+                            name="version"
+                            defaultValue={props.template.version ?? ''}
+                        />
+                    </div>
 
-                        <div className="space-y-1">
-                            <Label htmlFor={`compliance-template-version-${props.template.id}`}>Version</Label>
-                            <Input
-                                id={`compliance-template-version-${props.template.id}`}
-                                name="version"
-                                defaultValue={props.template.version ?? ''}
-                            />
-                        </div>
+                    <div className="space-y-1 sm:col-span-3">
+                        <Label htmlFor={`compliance-template-category-${props.template.id}`}>
+                            Category key
+                        </Label>
+                        <Input
+                            id={`compliance-template-category-${props.template.id}`}
+                            name="categoryKey"
+                            defaultValue={props.template.categoryKey ?? ''}
+                        />
                     </div>
                 </div>
 
                 <div className="space-y-1">
-                    <Label htmlFor={`compliance-template-items-${props.template.id}`}>Template items (JSON)</Label>
-                    <Textarea
-                        id={`compliance-template-items-${props.template.id}`}
+                    <Label htmlFor={`compliance-template-items-${props.template.id}`}>Items list</Label>
+                    <ComplianceTemplateItemsBuilder
                         name="itemsJson"
-                        rows={8}
-                        defaultValue={itemsJson}
-                        className="font-mono text-xs"
+                        inputId={`compliance-template-items-${props.template.id}`}
+                        initialItems={props.template.items}
+                        disabled={pending}
                     />
                 </div>
             </fieldset>

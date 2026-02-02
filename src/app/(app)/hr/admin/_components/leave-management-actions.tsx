@@ -25,18 +25,24 @@ export function LeaveManagementActions({ requests, delegateFor }: Props) {
 
     return (
         <div className="col-span-full flex flex-wrap items-center gap-2">
-            <Button type="submit" size="sm" variant="outline">Apply</Button>
-            <Button type="button" size="sm" variant="ghost" disabled={!hasRows} onClick={() => downloadCsv(requests)}>
+            <Button type="submit" size="sm" variant="outline">Apply filters</Button>
+            <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                disabled={!hasRows}
+                onClick={() => downloadCsv(requests)}
+            >
                 Export CSV
             </Button>
-            <Separator orientation="vertical" className="h-6" />
+            <Separator orientation="vertical" className="hidden h-6 sm:block" />
             <LeaveDelegationControl delegateFor={delegateFor} />
         </div>
     );
 }
 
 function downloadCsv(requests: ExportableRequest[]) {
-    if (!requests.length) {return;}
+    if (!requests.length) { return; }
 
     const header = ['Employee', 'Type', 'Start', 'End', 'Days', 'Status', 'Submitted'];
     const rows = requests.map((r) => [

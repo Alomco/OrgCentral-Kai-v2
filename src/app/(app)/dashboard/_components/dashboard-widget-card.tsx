@@ -42,9 +42,11 @@ export function DashboardWidgetCard(props: DashboardWidgetCardProps) {
         <article className="group h-full">
             <Card className="flex h-full flex-col rounded-lg border border-border/60 bg-card text-card-foreground shadow-sm transition-all duration-300 hover:shadow-md">
                 <CardHeader className="flex flex-row items-start justify-between gap-4 space-y-0 p-6 relative z-10">
-                    <div className="space-y-2 flex-1">
+                    <div className="min-w-0 flex-1 space-y-2">
                         <CardTitle className="text-lg font-semibold leading-tight">{props.title}</CardTitle>
-                        <CardDescription className="text-sm leading-relaxed text-muted-foreground">{props.description}</CardDescription>
+                        <CardDescription className="line-clamp-2 text-sm leading-relaxed text-muted-foreground">
+                            {props.description}
+                        </CardDescription>
                     </div>
                     <div className="flex items-center justify-center rounded-lg bg-muted/60 p-2.5 text-foreground shadow-inner shrink-0">
                         <Icon className="h-5 w-5" />
@@ -52,10 +54,10 @@ export function DashboardWidgetCard(props: DashboardWidgetCardProps) {
                 </CardHeader>
                 <CardContent className="flex flex-1 flex-col gap-4 p-6 pt-0 relative z-10">
                     {state === 'error' ? (
-                        <div className="flex-1 flex flex-col items-center justify-center gap-3 py-6">
+                        <div className="flex-1 flex flex-col items-center justify-center gap-3 py-4">
                             <div className="text-base font-semibold">{statusBadge?.label ?? 'Error'}</div>
                             {props.footerHint ? (
-                                <div className="text-sm text-center text-muted-foreground leading-relaxed">
+                                <div className="text-sm text-center text-muted-foreground leading-relaxed line-clamp-2 break-words">
                                     {props.footerHint}
                                 </div>
                             ) : null}
@@ -73,7 +75,7 @@ export function DashboardWidgetCard(props: DashboardWidgetCardProps) {
                                 ) : null}
                             </div>
                             {props.footerHint ? (
-                                <div className="text-sm text-muted-foreground leading-relaxed">
+                                <div className="text-sm text-muted-foreground leading-relaxed line-clamp-2 break-words">
                                     {props.footerHint}
                                 </div>
                             ) : null}

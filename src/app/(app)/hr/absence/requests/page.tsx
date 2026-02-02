@@ -137,7 +137,7 @@ export default async function HrAbsenceRequestsPage() {
                     authorization={authorization}
                     userId={authorization.userId}
                     includeClosed
-                    title="🗂️ Absence History"
+                    title="Absence history"
                     description="Your submitted absence requests and their current status."
                     emptyMessage="No absence requests yet — you’re all set!"
                 />

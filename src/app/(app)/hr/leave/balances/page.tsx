@@ -105,7 +105,7 @@ export default async function HrLeaveBalancesPage({ searchParams }: PageProps) {
                 icon={<Briefcase className="h-5 w-5" />}
             />
 
-            <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <LeaveSubnav />
                 <form action={refreshLeaveBalancesAction}>
                     <Button type="submit" variant="outline" size="sm" className="gap-2">

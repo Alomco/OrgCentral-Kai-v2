@@ -85,6 +85,9 @@ export function MicrosoftCalendarSection({ pending, state, enabledReference }: I
                             aria-describedby={m365TenantIdError ? 'm365TenantId-error' : undefined}
                         />
                         <FieldError id="m365TenantId-error" message={m365TenantIdError} />
+                        <p className="text-xs text-muted-foreground">
+                            Provided by your Microsoft 365 admin.
+                        </p>
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="m365CalendarId">Calendar ID</Label>
@@ -98,6 +101,9 @@ export function MicrosoftCalendarSection({ pending, state, enabledReference }: I
                             aria-describedby={m365CalendarIdError ? 'm365CalendarId-error' : undefined}
                         />
                         <FieldError id="m365CalendarId-error" message={m365CalendarIdError} />
+                        <p className="text-xs text-muted-foreground">
+                            Use the shared mailbox calendar.
+                        </p>
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="m365SyncWindowDays">Sync window (days)</Label>
@@ -115,6 +121,9 @@ export function MicrosoftCalendarSection({ pending, state, enabledReference }: I
                             aria-describedby={m365SyncWindowDaysError ? 'm365SyncWindowDays-error' : undefined}
                         />
                         <FieldError id="m365SyncWindowDays-error" message={m365SyncWindowDaysError} />
+                        <p className="text-xs text-muted-foreground">
+                            How many days ahead to sync leave events.
+                        </p>
                     </div>
                 </div>
             </fieldset>

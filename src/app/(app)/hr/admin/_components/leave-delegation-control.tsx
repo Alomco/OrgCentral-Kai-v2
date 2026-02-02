@@ -42,13 +42,15 @@ export function LeaveDelegationControl({ delegateFor }: Props) {
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <Button type="button" size="sm" variant="secondary">
-                    {derivedDelegate ? `Acting: ${derivedDelegate}` : 'Delegate / Act on behalf'}
+                    {derivedDelegate ? `Acting for: ${derivedDelegate}` : 'Act on behalf'}
                 </Button>
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Delegate / Act on behalf</DialogTitle>
-                    <DialogDescription>Specify an employee ID to act on behalf of for approvals.</DialogDescription>
+                    <DialogTitle>Act on behalf</DialogTitle>
+                    <DialogDescription>
+                        Enter the employee ID you are covering for. Leave blank to clear delegation.
+                    </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-2">
                     <Label htmlFor="delegateFor">Employee ID</Label>
@@ -56,8 +58,9 @@ export function LeaveDelegationControl({ delegateFor }: Props) {
                         id="delegateFor"
                         value={value}
                         onChange={(event) => setValue(event.target.value)}
-                        placeholder="employee-id"
+                        placeholder="e.g. emp-1024"
                     />
+                    <p className="text-xs text-muted-foreground">Use the ID shown in the employee profile.</p>
                 </div>
                 <DialogFooter>
                     <Button type="button" variant="outline" onClick={() => setOpen(false)}>Cancel</Button>

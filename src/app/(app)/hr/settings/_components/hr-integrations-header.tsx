@@ -108,6 +108,7 @@ function IntegrationSyncButton(props: { provider: IntegrationProvider; disabled:
                 variant="outline"
                 disabled={props.disabled || isPending}
                 onClick={handleSync}
+                aria-label="Run a manual sync"
             >
                 {isPending ? <Spinner className="mr-2" /> : null}
                 Sync now

@@ -41,12 +41,12 @@ export function NotificationBell({ unreadCount, notifications }: NotificationBel
           variant="ghost"
           size="icon"
           className="relative h-8.5 w-8.5 rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
-          aria-label="Notifications"
+          aria-label="Open notifications"
         >
           <Bell className="h-4.5 w-4.5" />
           {currentUnreadCount > 0 && (
-            <Badge 
-              variant="destructive" 
+            <Badge
+              variant="destructive"
               className="absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center text-[10px] rounded-full min-w-[16px]"
             >
               {currentUnreadCount > 9 ? '9+' : currentUnreadCount}
@@ -55,9 +55,9 @@ export function NotificationBell({ unreadCount, notifications }: NotificationBel
         </Button>
       </PopoverTrigger>
       <PopoverContent className="p-0" align="end" sideOffset={8}>
-        <NotificationDropdown 
-          notifications={currentNotifications} 
-          onClose={() => setIsOpen(false)} 
+        <NotificationDropdown
+          notifications={currentNotifications}
+          onClose={() => setIsOpen(false)}
         />
       </PopoverContent>
     </Popover>

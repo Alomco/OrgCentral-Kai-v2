@@ -32,7 +32,7 @@ export function ChecklistTemplatesManager({ templates }: ChecklistTemplatesManag
             ) : (
                 <div className="space-y-3">
                     <div className="overflow-auto">
-                        <Table>
+                        <Table className="min-w-[560px]">
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>Name</TableHead>
@@ -44,7 +44,9 @@ export function ChecklistTemplatesManager({ templates }: ChecklistTemplatesManag
                             <TableBody>
                                 {templates.map((template) => (
                                     <TableRow key={template.id}>
-                                        <TableCell className="font-medium">{template.name}</TableCell>
+                                        <TableCell className="font-medium min-w-0 max-w-[280px] truncate">
+                                            {template.name}
+                                        </TableCell>
                                         <TableCell>
                                             <Badge variant={typeBadgeVariant(template.type)}>{template.type}</Badge>
                                         </TableCell>
@@ -53,7 +55,7 @@ export function ChecklistTemplatesManager({ templates }: ChecklistTemplatesManag
                                             <div className="inline-flex items-center gap-2">
                                                 <details>
                                                     <summary className="cursor-pointer text-xs text-muted-foreground">Edit</summary>
-                                                    <div className="mt-2 w-[320px] space-y-3 rounded-lg border p-3 text-left">
+                                                    <div className="mt-2 w-[320px] max-w-[80vw] space-y-3 rounded-lg border p-3 text-left">
                                                         <ChecklistTemplateEditForm template={template} />
                                                     </div>
                                                 </details>

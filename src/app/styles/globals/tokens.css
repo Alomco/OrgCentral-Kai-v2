@@ -1,0 +1,192 @@
+:root {
+  /* Golden Ratio: φ ≈ 1.618 - use for harmonious spacing */
+  --phi: 1.618;
+  --phi-sm: 0.618rem;
+  /* 1/φ */
+  --phi-base: 1rem;
+  --phi-md: 1.618rem;
+  /* φ */
+  --phi-lg: 2.618rem;
+  /* φ² */
+  --phi-xl: 4.236rem;
+  /* φ³ */
+
+  /* ===== Z-Index Stacking System ===== */
+  /* Hierarchical layers for floating elements - single source of truth */
+  --z-base: 0;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-overlay: 300;
+  --z-modal: 400;
+  --z-toast: 500;
+  --z-tooltip: 600;
+  --z-dev-widget: 700;
+  --z-max: 9999;
+
+  /* Modern Border Radius with Golden Ratio */
+  --radius: 0.618rem; /* φ⁻¹ */
+  --radius-2xl: calc(var(--radius) + 8px);
+  /* WCAG 2.2 AA Compliant Color System - Enhanced Contrast */
+  --background: 1 0 0;
+  --foreground: 0.2 0.02 255;
+
+  /* Cards with subtle gradient capability */
+  --card: 1 0 0;
+  --card-foreground: 0.2 0.02 255;
+
+  --popover: 1 0 0;
+  --popover-foreground: 0.2 0.02 255;
+
+  /* Primary: WCAG 2.2 AA Compliant Corporate Blue - Enhanced contrast ratio */
+  --primary: 0.55 0.17 250;
+  --primary-foreground: 0.98 0 0;
+
+  /* Secondary: WCAG 2.2 AA Compliant neutral - Better contrast */
+  --secondary: 0.95 0.01 250;
+  --secondary-foreground: 0.28 0.02 250;
+
+  /* Muted: WCAG 2.2 AA Compliant slate-gray - Better contrast */
+  --muted: 0.96 0.01 255;
+  --muted-foreground: 0.5 0.02 255;
+
+  /* Accent: WCAG 2.2 AA Compliant Blue-Teal - Enhanced contrast ratio */
+  --accent: 0.53 0.14 200;
+  --accent-foreground: 0.98 0 0;
+
+  /* Destructive: WCAG 2.2 AA Compliant Red - Enhanced contrast */
+  --destructive: 0.55 0.2 30;
+  --destructive-foreground: 0.98 0 0;
+
+  /* Border: WCAG 2.2 AA Compliant - Better contrast */
+  --border: 0.6 0.01 255;
+  --input: 0.6 0.01 255;
+  --ring: 0.55 0.17 250;
+
+  /* Charts: WCAG 2.2 AA Compliant Palette - Enhanced contrast ratios */
+  --chart-1: 0.55 0.17 250;
+  /* Blue - Enhanced contrast */
+  --chart-2: 0.58 0.14 200;
+  /* Teal - Enhanced contrast */
+  --chart-3: 0.58 0.12 150;
+  /* Green - Enhanced contrast */
+  --chart-4: 0.75 0.14 90;
+  /* Yellow - Enhanced contrast */
+  --chart-5: 0.68 0.16 40;
+  /* Orange - Enhanced contrast */
+
+  /* Sidebar: WCAG 2.2 AA Compliant - Better contrast ratios */
+  --sidebar: 0.97 0.01 255;
+  --sidebar-background: var(--sidebar);
+  --sidebar-foreground: 0.28 0.02 255;
+  --sidebar-primary: 0.55 0.17 250;
+  --sidebar-primary-foreground: 0.98 0 0;
+  --sidebar-accent: 0.94 0.01 250;
+  --sidebar-accent-foreground: 0.28 0.02 255;
+  --sidebar-border: 0.88 0.01 255;
+  --sidebar-ring: 0.55 0.17 250;
+
+  --app-background-gradient: linear-gradient(135deg,
+    oklch(var(--background)) 0%,
+    oklch(var(--secondary) / 0.7) 30%,
+    oklch(var(--muted) / 0.8) 60%,
+    oklch(var(--accent) / 0.12) 100%
+  );
+  --app-gradient-primary: linear-gradient(135deg, oklch(var(--primary)) 0%, oklch(var(--accent)) 100%);
+  --app-gradient-cool: linear-gradient(135deg, oklch(var(--chart-3)) 0%, oklch(var(--chart-2)) 100%);
+  --app-gradient-warm: linear-gradient(135deg, oklch(var(--accent)) 0%, oklch(var(--primary)) 100%);
+  --app-shadow-primary: 0 8px 25px oklch(var(--primary) / 0.4);
+  --app-shadow-primary-strong: 0 15px 35px oklch(var(--primary) / 0.6);
+}
+
+select {
+  color-scheme: light;
+}
+
+.dark select {
+  color-scheme: dark;
+  background-color: oklch(var(--background));
+  color: oklch(var(--foreground));
+}
+
+[data-slot="sidebar-wrapper"] {
+  --sidebar-width: 16rem;
+  --sidebar-width-icon: 5rem;
+}
+
+[data-slot="sidebar"][data-mobile="true"] {
+  --sidebar-width: 18rem;
+}
+
+.dark {
+  /* Dark Mode: WCAG 2.2 AA Compliant Slate-Blue with enhanced contrast */
+  --background: 0.14 0.01 255;
+  /* Deep slate - Enhanced contrast */
+  --foreground: 0.96 0.01 255;
+  /* Enhanced contrast light text */
+
+  --card: 0.18 0.01 255;
+  --card-foreground: 0.96 0.01 255;
+  /* Enhanced contrast card text */
+
+  --popover: 0.18 0.01 255;
+  --popover-foreground: 0.96 0.01 255;
+  /* Enhanced contrast popover text */
+
+  /* Primary: WCAG 2.2 AA Compliant blue in dark mode - Enhanced contrast */
+  --primary: 0.54 0.14 250;
+  --primary-foreground: 0.98 0 0;
+
+  /* Secondary: WCAG 2.2 AA Compliant dark slate - Enhanced contrast */
+  --secondary: 0.24 0.02 255;
+  --secondary-foreground: 0.96 0.01 255;
+  /* Enhanced contrast secondary text */
+
+  /* Muted: WCAG 2.2 AA Compliant darker slate - Enhanced contrast */
+  --muted: 0.24 0.02 255;
+  --muted-foreground: 0.7 0.02 255;
+  /* Enhanced contrast muted text */
+  /* Accent: WCAG 2.2 AA Compliant teal in dark mode - Enhanced contrast */
+  --accent: 0.52 0.12 200;
+  --accent-foreground: 0.98 0 0;
+
+  /* Destructive: WCAG 2.2 AA Compliant red - Enhanced contrast */
+  --destructive: 0.55 0.2 30;
+  --destructive-foreground: 0.98 0 0;
+
+  /* Border: WCAG 2.2 AA Compliant subtle slate - Enhanced contrast */
+  --border: 0.52 0.01 255;
+  --input: 0.52 0.01 255;
+  --ring: 0.7 0.14 250;
+
+  /* Charts: WCAG 2.2 AA Compliant dark mode palette - Enhanced contrast */
+  --chart-1: 0.66 0.14 200;
+  /* Teal - Enhanced contrast */
+  --chart-2: 0.7 0.14 250;
+  /* Blue - Enhanced contrast */
+  --chart-3: 0.68 0.12 150;
+  /* Green - Enhanced contrast */
+  --chart-4: 0.8 0.14 90;
+  /* Yellow - Enhanced contrast */
+  --chart-5: 0.72 0.16 40;
+  /* Orange - Enhanced contrast */
+
+  /* Sidebar: WCAG 2.2 AA Compliant deep slate with enhanced contrast */
+  --sidebar: 0.18 0.01 255;
+  --sidebar-background: var(--sidebar);
+  --sidebar-foreground: 0.96 0.01 255;
+  /* Enhanced contrast sidebar text */
+  --sidebar-primary: 0.54 0.14 250;
+  --sidebar-primary-foreground: 0.98 0 0;
+  --sidebar-accent: 0.24 0.02 255;
+  --sidebar-accent-foreground: 0.96 0.01 255;
+  --sidebar-border: 0.52 0.01 255;
+  --sidebar-ring: 0.54 0.14 250;
+
+  --app-background-gradient: linear-gradient(135deg,
+    oklch(var(--background)) 0%,
+    oklch(var(--secondary) / 0.35) 45%,
+    oklch(var(--accent) / 0.2) 100%
+  );
+  --app-shadow-primary: 0 8px 25px oklch(var(--primary) / 0.35);
+  --app-shadow-primary-strong: 0 15px 35px oklch(var(--primary) / 0.5);
+}

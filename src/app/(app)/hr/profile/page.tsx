@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import { Suspense } from 'react';
 import { headers as nextHeaders } from 'next/headers';
+import Link from 'next/link';
 
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -11,6 +12,14 @@ import type { EmployeeProfile } from '@/server/types/hr-types';
 import { getSessionContextOrRedirect } from '@/server/ui/auth/session-redirect';
 
 import { ProfileContainer } from './_components/profile-container';
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbList,
+    BreadcrumbLink,
+    BreadcrumbPage,
+    BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
 
 export default async function HrProfilePage() {
     const headerStore = await nextHeaders();
@@ -24,6 +33,20 @@ export default async function HrProfilePage() {
 
     return (
         <div className="space-y-6">
+            <Breadcrumb>
+                <BreadcrumbList>
+                    <BreadcrumbItem>
+                        <BreadcrumbLink asChild>
+                            <Link href="/hr">HR</Link>
+                        </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                        <BreadcrumbPage>Profile</BreadcrumbPage>
+                    </BreadcrumbItem>
+                </BreadcrumbList>
+            </Breadcrumb>
+
             <Suspense fallback={<ProfileContentSkeleton />}>
                 <ProfileContent
                     profilePromise={profilePromise}

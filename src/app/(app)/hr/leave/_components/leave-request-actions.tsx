@@ -70,7 +70,7 @@ export function LeaveRequestActions({ requestId, status, isActor, canApprove, ca
         <div className="space-y-2 text-right">
             {showApproveReject ? (
                 <div className="flex flex-col gap-2">
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                         <Button size="sm" variant="default" onClick={handleApprove} disabled={pending}>
                             {pending ? '...' : 'Approve'}
                         </Button>
@@ -78,7 +78,7 @@ export function LeaveRequestActions({ requestId, status, isActor, canApprove, ca
                             value={rejectReason}
                             onChange={(event) => setRejectReason(event.target.value)}
                             placeholder="Reject reason"
-                            className="h-9 max-w-[180px]"
+                            className="h-9 w-full sm:max-w-[180px]"
                         />
                         <Button size="sm" variant="destructive" onClick={handleReject} disabled={pending || rejectReason.trim().length < 5}>
                             {pending ? '...' : 'Reject'}
@@ -88,12 +88,12 @@ export function LeaveRequestActions({ requestId, status, isActor, canApprove, ca
             ) : null}
 
             {showCancel ? (
-                <div className="flex items-center gap-2">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                     <Input
                         value={cancelReason}
                         onChange={(event) => setCancelReason(event.target.value)}
                         placeholder="Cancel reason (optional)"
-                        className="h-9 max-w-[180px]"
+                        className="h-9 w-full sm:max-w-[180px]"
                     />
                     <Button size="sm" variant="outline" onClick={handleCancel} disabled={pending}>
                         {pending ? '...' : 'Cancel'}

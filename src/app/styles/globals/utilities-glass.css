@@ -1,0 +1,104 @@
+@layer utilities {
+  .glass-card-wrapper {
+    position: relative;
+    --border-angle-1: 0deg;
+    --border-angle-2: 180deg;
+    animation: none;
+  }
+
+  .glass-card-wrapper::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 3px;
+    background:
+      conic-gradient(from var(--border-angle-1),
+        transparent 0deg,
+        transparent 60deg,
+        oklch(var(--primary)) 70deg,
+        oklch(var(--primary) / 0.85) 90deg,
+        oklch(var(--primary)) 110deg,
+        transparent 120deg,
+        transparent 360deg),
+      conic-gradient(from var(--border-angle-2),
+        transparent 0deg,
+        transparent 60deg,
+        oklch(var(--accent)) 70deg,
+        oklch(var(--accent) / 0.85) 90deg,
+        oklch(var(--accent)) 110deg,
+        transparent 120deg,
+        transparent 360deg);
+    -webkit-mask:
+      linear-gradient(oklch(1 0 0) 0 0) content-box,
+      linear-gradient(oklch(1 0 0) 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(oklch(1 0 0) 0 0) content-box,
+      linear-gradient(oklch(1 0 0) 0 0);
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    filter: blur(3px) brightness(1.4);
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  .glass-card-wrapper:hover {
+    animation: rotateBorderAngles 3s linear infinite;
+  }
+
+  .glass-card-wrapper:hover::before {
+    opacity: 1;
+  }
+
+  .glass-card {
+    @apply border overflow-hidden;
+    /* Layered approach: Base Theme Opacity + Premium Shine Gradient */
+    background: linear-gradient(135deg,
+      var(--ui-surface-fill, oklch(var(--card) / 0.85)) 0%,
+      var(--ui-surface-fill, oklch(var(--card) / 0.85)) 100%
+    );
+    border-color: oklch(var(--border) / var(--ui-border-opacity, 0.4));
+    box-shadow: var(--ui-card-shadow);
+    backdrop-filter: blur(var(--ui-backdrop-blur, 12px));
+    border-radius: var(--ui-border-radius);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .dark .glass-card {
+    /* Respect theme engine */
+    box-shadow: var(--ui-surface-shadow);
+  }
+
+  .glass-cta {
+    @apply relative overflow-hidden transition-all duration-300;
+    background-color: var(--ui-surface-fill, oklch(var(--card) / 0.8));
+    border: 1px solid oklch(var(--border) / 0.5);
+    backdrop-filter: blur(8px);
+  }
+
+  .dark .glass-cta {
+    /* Respect theme engine */
+  }
+
+  .glass {
+    background: oklch(1 0 0 / 0.1);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    box-shadow: inset 0 0 0 1px oklch(1 0 0 / 0.18);
+  }
+
+  .dark .glass {
+    background: oklch(0 0 0 / 0.2);
+    box-shadow: inset 0 0 0 1px oklch(1 0 0 / 0.1);
+  }
+
+  .hr-dashboard-surface {
+    --ui-border-opacity: 0.18;
+  }
+
+  .dark .hr-dashboard-surface {
+    --ui-border-opacity: 0.26;
+  }
+}

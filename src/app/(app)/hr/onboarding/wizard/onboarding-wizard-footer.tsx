@@ -21,19 +21,20 @@ export function OnboardingWizardFooter({
     onSubmit,
 }: OnboardingWizardFooterProps) {
     return (
-        <CardFooter className="flex justify-between">
+        <CardFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-between">
             <Button
                 type="button"
                 variant="outline"
                 onClick={onPrevious}
                 disabled={isFirstStep || isSubmitting}
+                className="w-full sm:w-auto"
             >
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Back
             </Button>
 
             {isLastStep ? (
-                <Button type="button" onClick={onSubmit} disabled={isSubmitting}>
+                <Button type="button" onClick={onSubmit} disabled={isSubmitting} className="w-full sm:w-auto">
                     {isSubmitting ? (
                         <>
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -47,7 +48,7 @@ export function OnboardingWizardFooter({
                     )}
                 </Button>
             ) : (
-                <Button type="button" onClick={onNext} disabled={isSubmitting}>
+                <Button type="button" onClick={onNext} disabled={isSubmitting} className="w-full sm:w-auto">
                     Next
                     <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>

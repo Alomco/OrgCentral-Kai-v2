@@ -85,7 +85,7 @@ export function EmployeeSearchBar({
         currentParams.status;
 
     return (
-        <div className="flex flex-col gap-2 sm:flex-row">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
             <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
@@ -96,11 +96,11 @@ export function EmployeeSearchBar({
                     disabled={isPending}
                 />
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
                 {/* Department Filter */}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="sm" disabled={isPending}>
+                        <Button variant="outline" size="sm" disabled={isPending} className="w-full sm:w-auto">
                             <Filter className="h-4 w-4 mr-2" />
                             Department
                             {currentParams.department ? (
@@ -131,7 +131,7 @@ export function EmployeeSearchBar({
                 {/* Status Filter */}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="sm" disabled={isPending}>
+                        <Button variant="outline" size="sm" disabled={isPending} className="w-full sm:w-auto">
                             <Filter className="h-4 w-4 mr-2" />
                             Status
                             {currentParams.status ? (
@@ -162,7 +162,7 @@ export function EmployeeSearchBar({
                 {/* Sort */}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="sm" disabled={isPending}>
+                        <Button variant="outline" size="sm" disabled={isPending} className="w-full sm:w-auto">
                             <ArrowUpDown className="h-4 w-4 mr-2" />
                             Sort
                         </Button>
@@ -195,6 +195,7 @@ export function EmployeeSearchBar({
                         size="sm"
                         onClick={clearFilters}
                         disabled={isPending}
+                        className="w-full sm:w-auto"
                     >
                         <X className="h-4 w-4 mr-1" />
                         Clear

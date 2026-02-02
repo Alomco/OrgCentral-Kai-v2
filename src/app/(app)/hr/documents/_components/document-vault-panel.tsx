@@ -28,7 +28,7 @@ export function DocumentVaultPanel({ initialDocuments }: DocumentVaultPanelProps
             <DocumentVaultUploadForm onUploaded={handleUploaded} />
 
             <div className="space-y-2">
-                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <div className="flex flex-col gap-1 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
                     <span>{data.length} documents stored</span>
                     {isError ? (
                         <span>{error instanceof Error ? error.message : 'Unable to refresh documents.'}</span>

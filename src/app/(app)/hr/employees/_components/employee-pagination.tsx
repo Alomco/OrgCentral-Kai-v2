@@ -22,13 +22,13 @@ export function EmployeePagination({
     const end = Math.min(page * pageSize, total);
 
     return (
-        <div className="flex items-center justify-between px-2">
+        <div className="flex flex-col gap-2 px-2 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm text-muted-foreground">
                 Showing <span className="font-medium">{start}</span> to{' '}
                 <span className="font-medium">{end}</span> of{' '}
                 <span className="font-medium">{total}</span> employees
             </p>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
                 <Button
                     variant="outline"
                     size="sm"

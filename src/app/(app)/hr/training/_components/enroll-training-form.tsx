@@ -34,7 +34,9 @@ export function EnrollTrainingForm({ authorization, initialState }: EnrollTraini
                     <GraduationCap className="h-5 w-5" />
                     Enroll in Training
                 </CardTitle>
-                <CardDescription>Register for a new training course or certification.</CardDescription>
+                <CardDescription>
+                    Register a course or certification. Use the provider name shown on your training portal.
+                </CardDescription>
             </CardHeader>
             <CardContent>
                 <form action={formAction} className="space-y-4">

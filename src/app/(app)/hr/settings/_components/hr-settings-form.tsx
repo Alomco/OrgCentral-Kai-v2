@@ -89,6 +89,9 @@ export function HrSettingsForm(props: {
                                     aria-describedby={hoursPerDayErrorId}
                                 />
                                 <FieldError id={hoursPerDayErrorId} message={standardHoursPerDayError} />
+                                <p className="text-xs text-muted-foreground">
+                                    Typical full-time is 8 hours.
+                                </p>
                             </div>
 
                             <div className="space-y-2">
@@ -108,6 +111,9 @@ export function HrSettingsForm(props: {
                                     aria-describedby={daysPerWeekErrorId}
                                 />
                                 <FieldError id={daysPerWeekErrorId} message={standardDaysPerWeekError} />
+                                <p className="text-xs text-muted-foreground">
+                                    Typical full-time is 5 days.
+                                </p>
                             </div>
                         </div>
 
@@ -175,7 +181,7 @@ export function HrSettingsForm(props: {
                             />
                             <FieldError id={workflowsErrorId} message={approvalWorkflowsJsonError} />
                             <p className="text-xs text-muted-foreground">
-                                JSON object stored in HR settings. Empty value resets to an empty object.
+                                Only edit if your HR ops team provides the JSON. Empty value resets to an empty object.
                             </p>
                         </div>
                     </fieldset>

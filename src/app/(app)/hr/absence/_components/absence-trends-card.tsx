@@ -68,9 +68,9 @@ export async function AbsenceTrendsCard({
                                 Top absence types
                             </p>
                             {topTypes.map(([label, count]) => (
-                                <div key={label} className="flex items-center justify-between text-sm">
-                                    <span>{label}</span>
-                                    <span className="text-xs text-muted-foreground">{count}</span>
+                                <div key={label} className="flex items-center justify-between gap-3 text-sm">
+                                    <span className="min-w-0 truncate">{label}</span>
+                                    <span className="shrink-0 text-xs text-muted-foreground">{count}</span>
                                 </div>
                             ))}
                         </div>

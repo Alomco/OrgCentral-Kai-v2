@@ -22,17 +22,29 @@ export function AdminBootstrapComplete() {
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [hasHydrated, setHasHydrated] = useState(() => useAdminBootstrapStore.persist.hasHydrated());
     const lastBootstrapToken = useRef<string | null>(null);
+    const fallbackRedirectTimeout = useRef<number | null>(null);
     const clearToken = useAdminBootstrapStore((store) => store.clearToken);
     const token = useAdminBootstrapStore((store) => store.token);
 
-    const mutation = useMutation({
+    const { mutate, isSuccess } = useMutation({
         mutationFn: bootstrapAdmin,
         onMutate: () => {
             setErrorMessage(null);
         },
         onSuccess: (result) => {
             clearToken();
-            router.replace(result.redirectTo ?? '/admin/dashboard');
+            const target = result.redirectTo ?? '/admin/dashboard';
+            router.replace(target);
+            if (typeof window !== 'undefined') {
+                if (fallbackRedirectTimeout.current !== null) {
+                    window.clearTimeout(fallbackRedirectTimeout.current);
+                }
+                fallbackRedirectTimeout.current = window.setTimeout(() => {
+                    if (window.location.pathname.startsWith('/admin-signup/complete')) {
+                        window.location.assign(target);
+                    }
+                }, 1500);
+            }
         },
         onError: (error) => {
             if (error instanceof DOMException && error.name === 'AbortError') {
@@ -55,6 +67,10 @@ export function AdminBootstrapComplete() {
         }
 
         return () => {
+            if (fallbackRedirectTimeout.current !== null) {
+                window.clearTimeout(fallbackRedirectTimeout.current);
+                fallbackRedirectTimeout.current = null;
+            }
             unsubscribe();
         };
     }, []);
@@ -69,16 +85,12 @@ export function AdminBootstrapComplete() {
         }
 
         lastBootstrapToken.current = token;
-        const controller = new AbortController();
-
-        mutation.mutate({ token, signal: controller.signal });
-
-        return () => controller.abort();
-    }, [hasHydrated, token, mutation]);
+        mutate({ token });
+    }, [hasHydrated, token, mutate]);
 
     const missingToken = hasHydrated && !token;
     const state: BootstrapState = {
-        status: missingToken || errorMessage ? 'error' : mutation.isSuccess ? 'success' : 'loading',
+        status: missingToken || errorMessage ? 'error' : isSuccess ? 'success' : 'loading',
         message: missingToken
             ? 'Missing bootstrap secret. Start again and enter the secret before continuing.'
             : errorMessage ?? undefined,

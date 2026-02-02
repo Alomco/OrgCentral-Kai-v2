@@ -48,7 +48,7 @@ export function HrIntegrationsForm(props: { defaults: HrIntegrationsDefaults }) 
                 <CardHeader>
                     <CardTitle>Integration connectors</CardTitle>
                     <CardDescription>
-                        Configure calendar and learning system connectors. These stubs store settings and queue sync jobs.
+                        Connect calendars and training systems. Fill in what you know now and save—sync can be run later.
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-8">

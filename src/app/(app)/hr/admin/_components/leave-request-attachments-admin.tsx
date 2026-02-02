@@ -47,11 +47,13 @@ export function LeaveRequestAttachmentsAdmin({ requestId }: Props) {
 	}, [requestId]);
 
 	if (loading) { return <span className="text-xs text-muted-foreground">Loading…</span>; }
-	if (error) { return <span className="text-xs text-destructive">{error}</span>; }
+	if (error) {
+		return <span className="text-xs text-destructive line-clamp-2 break-words">{error}</span>;
+	}
 	if (attachments.length === 0) { return <span className="text-xs text-muted-foreground">None</span>; }
 
 	return (
-		<div className="flex flex-wrap gap-2">
+		<div className="flex flex-wrap gap-2 max-w-[260px]">
 			{attachments.map((attachment) => (
 				<Badge key={attachment.id} variant="outline" className="flex items-center gap-2">
 					<span className="truncate max-w-[140px]" title={attachment.fileName}>{attachment.fileName}</span>

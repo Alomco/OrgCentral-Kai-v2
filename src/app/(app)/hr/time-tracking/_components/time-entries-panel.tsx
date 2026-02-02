@@ -23,23 +23,23 @@ const COLUMNS: readonly HrDataTableColumn[] = [
 ] as const;
 
 function formatDate(value: Date | null | undefined): string {
-    if (!value) {return 'N/A';}
+    if (!value) { return 'N/A'; }
     const date = new Date(value);
-    if (Number.isNaN(date.getTime())) {return 'N/A';}
+    if (Number.isNaN(date.getTime())) { return 'N/A'; }
     return formatHumanDate(date);
 }
 
 function formatTime(value: Date | null | undefined): string {
-    if (!value) {return 'N/A';}
+    if (!value) { return 'N/A'; }
     const date = new Date(value);
-    if (Number.isNaN(date.getTime())) {return 'N/A';}
+    if (Number.isNaN(date.getTime())) { return 'N/A'; }
     return date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
 }
 
 function formatHours(value: number | { toNumber?: () => number } | null | undefined): string {
-    if (value === null || value === undefined) {return 'N/A';}
+    if (value === null || value === undefined) { return 'N/A'; }
     const number_ = typeof value === 'object' && value.toNumber ? value.toNumber() : Number(value);
-    if (Number.isNaN(number_)) {return 'N/A';}
+    if (Number.isNaN(number_)) { return 'N/A'; }
     return number_.toFixed(1);
 }
 
@@ -86,17 +86,17 @@ export async function TimeEntriesPanel({ authorization, userId }: TimeEntriesPan
 
                 return (
                     <TableRow key={entry.id}>
-                        <TableCell className="font-medium">{formatDate(entry.date)}</TableCell>
-                        <TableCell>
+                        <TableCell className="font-medium whitespace-nowrap">{formatDate(entry.date)}</TableCell>
+                        <TableCell className="min-w-0 max-w-[240px]">
                             <div className="text-sm">
-                                <div className="font-medium">{entry.project ?? 'N/A'}</div>
-                                <div className="text-xs text-muted-foreground">
+                                <div className="font-medium truncate">{entry.project ?? 'N/A'}</div>
+                                <div className="text-xs text-muted-foreground truncate">
                                     {projectCode}
                                 </div>
                             </div>
                         </TableCell>
-                        <TableCell>{formatTime(entry.clockIn)}</TableCell>
-                        <TableCell>{formatTime(entry.clockOut)}</TableCell>
+                        <TableCell className="whitespace-nowrap">{formatTime(entry.clockIn)}</TableCell>
+                        <TableCell className="whitespace-nowrap">{formatTime(entry.clockOut)}</TableCell>
                         <TableCell className="text-right">
                             <div className="flex flex-col items-end gap-1">
                                 <span>{formatHours(entry.totalHours)}</span>

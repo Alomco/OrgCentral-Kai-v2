@@ -129,16 +129,18 @@ export async function EmployeeTimelineTab({
                                 <div className="mt-1 flex h-8 w-8 items-center justify-center rounded-full border bg-muted/40">
                                     <event.icon className="h-4 w-4 text-muted-foreground" />
                                 </div>
-                                <div className="flex-1">
+                                <div className="min-w-0 flex-1">
                                     <div className="flex flex-wrap items-center gap-2">
-                                        <p className="text-sm font-medium">{event.title}</p>
+                                        <p className="text-sm font-medium truncate">{event.title}</p>
                                         <Badge variant="outline" className="text-xs">
                                             {event.badge}
                                         </Badge>
                                     </div>
-                                    <p className="text-xs text-muted-foreground">{event.description}</p>
+                                    <p className="text-xs text-muted-foreground line-clamp-2 break-words">
+                                        {event.description}
+                                    </p>
                                 </div>
-                                <div className="text-xs text-muted-foreground">
+                                <div className="shrink-0 text-xs text-muted-foreground">
                                     {formatHumanDate(event.date)}
                                 </div>
                             </div>

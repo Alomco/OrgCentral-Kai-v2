@@ -31,7 +31,7 @@ export function AbsenceTypeRow(props: { type: AbsenceTypeConfig }) {
 
     return (
         <form action={action} className="space-y-2 rounded-lg border p-3">
-            <div className="grid gap-3 sm:grid-cols-[minmax(0,2fr)_minmax(0,1.3fr)_auto_auto_auto] sm:items-center">
+            <div className="grid gap-3 lg:grid-cols-[minmax(0,2fr)_minmax(0,1.3fr)_auto_auto_auto] lg:items-center">
                 <input type="hidden" name="typeId" value={props.type.id} />
 
                 <div className="space-y-1">
@@ -44,14 +44,18 @@ export function AbsenceTypeRow(props: { type: AbsenceTypeConfig }) {
                     />
                 </div>
 
-                <div className="space-y-1">
+                <div className="space-y-1 min-w-0">
                     <Label>Key</Label>
-                    <div className="rounded-md border bg-muted/40 px-3 py-2 text-xs font-mono text-muted-foreground">
+                    <div
+                        className="rounded-md border bg-muted/40 px-3 py-2 text-xs font-mono text-muted-foreground truncate"
+                        title={props.type.key}
+                    >
                         {props.type.key}
                     </div>
+                    <p className="text-xs text-muted-foreground">Auto-generated ID used in reports.</p>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                     <input
                         ref={tracksBalanceReference}
                         type="hidden"
@@ -77,7 +81,7 @@ export function AbsenceTypeRow(props: { type: AbsenceTypeConfig }) {
                     <span id={`absence-type-tracks-help-${props.type.id}`} className="sr-only">Toggle whether this absence type affects balances.</span>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                     <input
                         ref={isActiveReference}
                         type="hidden"
@@ -103,7 +107,7 @@ export function AbsenceTypeRow(props: { type: AbsenceTypeConfig }) {
                     <span id={`absence-type-active-help-${props.type.id}`} className="sr-only">Toggle whether this absence type can be used by employees.</span>
                 </div>
 
-                <div className="flex items-center justify-start sm:justify-end">
+                <div className="flex items-center justify-start lg:justify-end">
                     <Button type="submit" size="sm" disabled={pending}>
                         {pending ? 'Saving...' : 'Save'}
                     </Button>

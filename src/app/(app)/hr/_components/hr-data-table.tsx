@@ -32,12 +32,12 @@ export function HrDataTable<TKey extends string = string>({
     return (
         <Card>
             <CardHeader>
-                <div className="flex items-center justify-between gap-4">
-                    <div>
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="min-w-0">
                         <CardTitle>{title}</CardTitle>
                         {description ? <CardDescription>{description}</CardDescription> : null}
                     </div>
-                    {actions ? <div className="flex items-center gap-2">{actions}</div> : null}
+                    {actions ? <div className="flex flex-wrap items-center gap-2">{actions}</div> : null}
                 </div>
             </CardHeader>
             <CardContent>
@@ -45,7 +45,7 @@ export function HrDataTable<TKey extends string = string>({
                     <p className="text-sm text-muted-foreground">{emptyMessage}</p>
                 ) : (
                     <div className="overflow-auto">
-                        <Table>
+                        <Table className="min-w-[640px]">
                             <TableHeader>
                                 <TableRow>
                                     {columns.map((col) => (

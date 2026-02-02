@@ -82,7 +82,7 @@ export async function OffboardingQueuePanel({ authorization, searchParams }: Off
             <Card>
                 <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                        <CardTitle>Offboarding queue</CardTitle>
+                        <CardTitle>Queue details</CardTitle>
                         <CardDescription>Track checklist progress and take action.</CardDescription>
                     </div>
                     <form method="get" className="flex flex-wrap items-center gap-2">
@@ -107,7 +107,7 @@ export async function OffboardingQueuePanel({ authorization, searchParams }: Off
                         </Button>
                     </form>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="overflow-auto">
                     <OffboardingQueueTable rows={rows} />
                 </CardContent>
             </Card>

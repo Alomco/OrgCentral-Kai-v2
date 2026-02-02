@@ -66,7 +66,7 @@ export function TimeEntryApprovalPanel({
 
     return (
         <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
+            <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <CardTitle className="text-base flex items-center gap-2">
                         <Clock className="h-4 w-4" />
@@ -117,10 +117,10 @@ const TimeEntryApprovalRow = memo(function TimeEntryApprovalRow({
     return (
         <div className="flex items-start justify-between gap-3 rounded-lg border p-3">
             <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 min-w-0">
                     <p className="font-medium text-sm truncate">{entry.employeeName}</p>
                     {entry.project ? (
-                        <Badge variant="outline" className="text-xs">
+                        <Badge variant="outline" className="text-xs max-w-[160px] truncate">
                             {entry.project}
                         </Badge>
                     ) : null}
@@ -139,6 +139,8 @@ const TimeEntryApprovalRow = memo(function TimeEntryApprovalRow({
                     className="h-8 w-8"
                     disabled={isPending && activeEntryId === entry.id}
                     onClick={() => onDecision(entry.id, 'reject')}
+                    aria-label="Reject time entry"
+                    title="Reject time entry"
                 >
                     <XCircle className="h-4 w-4 text-red-500" />
                 </Button>
@@ -148,6 +150,8 @@ const TimeEntryApprovalRow = memo(function TimeEntryApprovalRow({
                     className="h-8 w-8"
                     disabled={isPending && activeEntryId === entry.id}
                     onClick={() => onDecision(entry.id, 'approve')}
+                    aria-label="Approve time entry"
+                    title="Approve time entry"
                 >
                     <CheckCircle className="h-4 w-4 text-emerald-500" />
                 </Button>

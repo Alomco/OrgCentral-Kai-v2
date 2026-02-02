@@ -3,7 +3,7 @@ import type { DataClassificationLevel, DataResidencyZone } from '@/server/types/
 export const BREAK_GLASS_STATUSES = ['PENDING', 'APPROVED', 'REJECTED', 'EXPIRED', 'CONSUMED'] as const;
 export type BreakGlassStatus = (typeof BREAK_GLASS_STATUSES)[number];
 
-export const BREAK_GLASS_SCOPES = ['tenant-status', 'platform-tools', 'impersonation'] as const;
+export const BREAK_GLASS_SCOPES = ['tenant-status', 'platform-tools', 'impersonation', 'document-vault'] as const;
 export type BreakGlassScope = (typeof BREAK_GLASS_SCOPES)[number];
 
 export interface BreakGlassApproval {

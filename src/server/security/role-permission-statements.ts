@@ -8,6 +8,7 @@ export const ROLE_PERMISSION_STATEMENTS: Record<string, readonly string[]> = {
     platformTenants: ['read', 'update'],
     platformBillingPlans: ['read', 'create', 'update', 'assign'],
     platformTools: ['read', 'execute'],
+    platformDocuments: ['read', 'download'],
     platformSupport: ['read', 'create', 'update', 'assign'],
     platformImpersonation: ['read', 'request', 'approve', 'start', 'stop'],
     platformBreakGlass: ['request', 'approve', 'read'],

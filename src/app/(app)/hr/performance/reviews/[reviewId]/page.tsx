@@ -122,18 +122,20 @@ export default async function ReviewDetailPage({ params }: ReviewDetailPageProps
             {/* Review Header */}
             <Card>
                 <CardHeader>
-                    <div className="flex items-start justify-between">
-                        <div className="space-y-1">
-                            <div className="flex items-center gap-2">
-                                <CardTitle>{review.title}</CardTitle>
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                        <div className="space-y-1 min-w-0">
+                            <div className="flex flex-wrap items-center gap-2">
+                                <CardTitle className="min-w-0 break-words">{review.title}</CardTitle>
                                 <Badge variant={statusDetails.variant}>
                                     {statusDetails.label}
                                 </Badge>
                             </div>
-                            <CardDescription>{review.type}</CardDescription>
+                            <CardDescription>
+                                {review.type}. Complete the questions below. You can return later if needed.
+                            </CardDescription>
                         </div>
                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                            <div className="flex items-center gap-1">
+                            <div className="flex items-center gap-1 whitespace-nowrap">
                                 <Calendar className="h-4 w-4" />
                                 Due: {formatDate(review.dueDate)}
                             </div>
@@ -141,18 +143,19 @@ export default async function ReviewDetailPage({ params }: ReviewDetailPageProps
                     </div>
                 </CardHeader>
                 <CardContent>
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-4 min-w-0">
                         <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center">
                             <User className="h-6 w-6 text-muted-foreground" />
                         </div>
-                        <div>
+                        <div className="min-w-0">
                             <Link
                                 href={`/hr/employees/${review.employee.id}`}
-                                className="font-medium hover:underline"
+                                className="font-medium hover:underline truncate"
+                                title={review.employee.name}
                             >
                                 {review.employee.name}
                             </Link>
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-sm text-muted-foreground truncate" title={review.employee.jobTitle}>
                                 {review.employee.jobTitle}
                             </p>
                         </div>

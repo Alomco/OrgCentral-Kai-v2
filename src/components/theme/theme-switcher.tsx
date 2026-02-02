@@ -68,7 +68,7 @@ export function ThemeSwitcher() {
                 </Button>
             </PopoverTrigger>
             <PopoverContent
-                className="w-80 overflow-hidden rounded-xl border border-[oklch(var(--border)/0.6)] bg-[oklch(var(--popover)/0.98)] p-0 text-popover-foreground shadow-[var(--ui-surface-item-shadow)]"
+                className="w-80 overflow-hidden rounded-xl border border-[oklch(var(--border)/0.6)] bg-[oklch(var(--popover)/1)] p-0 text-popover-foreground shadow-[var(--ui-surface-item-shadow)]"
                 align="start"
                 sideOffset={10}
             >

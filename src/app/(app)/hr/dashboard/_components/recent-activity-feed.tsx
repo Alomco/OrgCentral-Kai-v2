@@ -32,7 +32,7 @@ export async function RecentActivityFeed({ authorization }: RecentActivityFeedPr
                 <CardDescription>Latest updates and notifications</CardDescription>
             </CardHeader>
             <CardContent>
-                <ScrollArea className="h-[400px] pr-4">
+                <ScrollArea className="max-h-[360px] pr-4 sm:max-h-[420px]">
                     {recentNotifications.length > 0 ? (
                         <div className="space-y-6">
                             {recentNotifications.map((notification, index) => (
@@ -87,14 +87,14 @@ function ActivityItem({ notification, isLast }: { notification: HRNotificationDT
             <div className={`relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border/50 ${iconBg} ${iconColor}`}>
                 <Icon className="h-5 w-5" />
             </div>
-            <div className="flex-1 space-y-1 pt-1">
-                <div className="flex items-center justify-between">
-                    <p className="font-medium text-sm text-foreground">{notification.title}</p>
-                    <time className="text-xs text-muted-foreground">
+            <div className="min-w-0 flex-1 space-y-1 pt-1">
+                <div className="flex items-center justify-between gap-3">
+                    <p className="min-w-0 truncate font-medium text-sm text-foreground">{notification.title}</p>
+                    <time className="shrink-0 text-xs text-muted-foreground">
                         {formatHumanDate(new Date(notification.createdAt))}
                     </time>
                 </div>
-                <p className="text-sm text-muted-foreground leading-relaxed">
+                <p className="text-sm text-muted-foreground leading-relaxed break-words line-clamp-2">
                     {notification.message}
                 </p>
                 {notification.actionUrl && (

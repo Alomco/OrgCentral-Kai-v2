@@ -131,7 +131,7 @@ function AbsenceTable(props: {
                     <p className="text-sm text-muted-foreground">{props.emptyMessage}</p>
                 ) : (
                     <div className="overflow-auto">
-                        <Table>
+                        <Table className="min-w-[860px]">
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>Employee</TableHead>
@@ -147,10 +147,10 @@ function AbsenceTable(props: {
                             <TableBody>
                                 {rows.map((absence) => (
                                     <TableRow key={absence.id}>
-                                        <TableCell className="font-medium">
+                                        <TableCell className="font-medium min-w-0 max-w-[200px] truncate">
                                             {absence.employeeName}
                                         </TableCell>
-                                        <TableCell className="text-muted-foreground text-sm">
+                                        <TableCell className="text-muted-foreground text-sm max-w-[160px] truncate">
                                             {absence.typeLabel}
                                         </TableCell>
                                         <TableCell className="whitespace-nowrap">
@@ -164,15 +164,17 @@ function AbsenceTable(props: {
                                                 {absence.status}
                                             </Badge>
                                         </TableCell>
-                                        <TableCell className="text-muted-foreground">
+                                        <TableCell className="text-muted-foreground whitespace-nowrap">
                                             {formatHumanDate(new Date(absence.createdAt))}
                                         </TableCell>
                                         {showNotes ? (
-                                            <TableCell className="text-xs text-muted-foreground max-w-[240px]">
-                                                {absence.lifecycleNotes ?? '—'}
+                                            <TableCell className="text-xs text-muted-foreground max-w-[260px]">
+                                                <span className="block line-clamp-2" title={absence.lifecycleNotes ?? '—'}>
+                                                    {absence.lifecycleNotes ?? '—'}
+                                                </span>
                                             </TableCell>
                                         ) : null}
-                                        <TableCell className="text-right">
+                                        <TableCell className="text-right align-top">
                                             {props.renderActions(absence)}
                                         </TableCell>
                                     </TableRow>

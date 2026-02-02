@@ -31,30 +31,30 @@ export function ComplianceItemDetailsCard({
                 </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4 text-sm">
+                <div className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
                     <div>
                         <p className="text-muted-foreground">Category</p>
-                        <p className="font-medium">{categoryLabel}</p>
+                        <p className="font-medium break-words">{categoryLabel}</p>
                     </div>
                     <div>
                         <p className="text-muted-foreground">Status</p>
-                        <p className="font-medium">{statusLabel}</p>
+                        <p className="font-medium break-words">{statusLabel}</p>
                     </div>
                     <div>
                         <p className="text-muted-foreground">Type</p>
-                        <p className="font-medium">{itemType}</p>
+                        <p className="font-medium break-words">{itemType}</p>
                     </div>
                     <div>
                         <p className="text-muted-foreground">Due Date</p>
-                        <p className="font-medium">{formatDate(dueDate)}</p>
+                        <p className="font-medium break-words">{formatDate(dueDate)}</p>
                     </div>
                     <div>
                         <p className="text-muted-foreground">Created</p>
-                        <p className="font-medium">{formatDate(createdAt)}</p>
+                        <p className="font-medium break-words">{formatDate(createdAt)}</p>
                     </div>
                     <div>
                         <p className="text-muted-foreground">Completed</p>
-                        <p className="font-medium">{formatDate(completedAt)}</p>
+                        <p className="font-medium break-words">{formatDate(completedAt)}</p>
                     </div>
                 </div>
             </CardContent>
@@ -84,10 +84,10 @@ export function ComplianceItemAssignmentCard({
                     <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center">
                         <User className="h-6 w-6 text-muted-foreground" />
                     </div>
-                    <div>
+                    <div className="min-w-0">
                         <Link
                             href={`/hr/employees/${userId}`}
-                            className="font-medium hover:underline"
+                            className="font-medium hover:underline truncate"
                         >
                             {assignedName}
                         </Link>

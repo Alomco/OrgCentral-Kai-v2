@@ -64,7 +64,7 @@ export default async function HrEmployeesPage() {
                 description="Manage your organization's employee records and workforce data"
                 icon={<Users className="h-5 w-5" />}
                 actions={(
-                    <Button asChild variant="outline" size="sm">
+                    <Button asChild variant="outline" size="sm" className="w-full sm:w-auto">
                         <Link href="/hr/employees/export">
                             <Download className="mr-2 h-4 w-4" />
                             Export CSV

@@ -99,6 +99,9 @@ export function LeavePolicyConfigForm(props: {
                                         aria-describedby={nameError ? 'leave-policy-name-error' : undefined}
                                     />
                                     <FieldError id="leave-policy-name-error" message={nameError} />
+                                    <p className="text-xs text-muted-foreground">
+                                        Clear names help employees understand which policy applies.
+                                    </p>
                                 </div>
 
                                 <div className="space-y-2">
@@ -125,6 +128,9 @@ export function LeavePolicyConfigForm(props: {
                                         </SelectContent>
                                     </Select>
                                     <FieldError id="leave-policy-type-error" message={typeError} />
+                                    <p className="text-xs text-muted-foreground">
+                                        Choose the closest match for reporting.
+                                    </p>
                                 </div>
                             </div>
 

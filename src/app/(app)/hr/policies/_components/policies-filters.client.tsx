@@ -19,12 +19,16 @@ export function PoliciesFiltersClient() {
     <div className="w-full sm:w-80">
       <Input
         aria-label="Search policies"
+        aria-describedby="policies-search-help"
         placeholder="Search policies..."
         defaultValue={searchParams.get('q') ?? ''}
         onChange={(event) => onChange(event.target.value)}
         disabled={isPending}
         className="h-9"
       />
+      <p id="policies-search-help" className="mt-1 text-xs text-muted-foreground">
+        Search by title or keyword.
+      </p>
     </div>
   );
 }

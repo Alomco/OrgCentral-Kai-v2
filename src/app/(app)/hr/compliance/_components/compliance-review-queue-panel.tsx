@@ -66,14 +66,14 @@ function renderAttachments(value: ComplianceAttachment[] | null | undefined): Re
     return (
         <div className="space-y-1 text-xs">
             {shown.map((item) => (
-                <div key={item.documentId} className="flex items-center gap-2">
+                <div key={item.documentId} className="flex min-w-0 items-center gap-2">
                     <a
                         href={`/api/hr/documents/${item.documentId}/download`}
-                        className="underline underline-offset-4"
+                        className="underline underline-offset-4 truncate"
                     >
                         {item.fileName}
                     </a>
-                    <span className="text-muted-foreground">
+                    <span className="text-muted-foreground truncate">
                         {item.classification} / {item.retentionPolicy} / v{String(item.version)}
                     </span>
                 </div>
@@ -165,10 +165,10 @@ export async function ComplianceReviewQueuePanel({ authorization }: ComplianceRe
                                             <TableCell>{formatDate(item.dueDate)}</TableCell>
                                             <TableCell>{formatDate(item.completedAt)}</TableCell>
                                             <TableCell className="text-muted-foreground">{formatDate(item.updatedAt)}</TableCell>
-                                            <TableCell className="max-w-88 truncate" title={item.notes ?? undefined}>
-                                                {item.notes ?? '-'}
+                                            <TableCell className="max-w-88" title={item.notes ?? undefined}>
+                                                <div className="truncate">{item.notes ?? '-'}</div>
                                             </TableCell>
-                                            <TableCell className="max-w-88 truncate">
+                                            <TableCell className="max-w-88">
                                                 {renderAttachments(item.attachments)}
                                             </TableCell>
                                             <TableCell className="text-right">
@@ -193,7 +193,7 @@ export async function ComplianceReviewQueuePanel({ authorization }: ComplianceRe
                                                         id={`reject-notes-${item.id}`}
                                                         name="notes"
                                                         placeholder="Rejection notes (optional)"
-                                                        className="w-[18rem]"
+                                                        className="min-w-[12rem] w-full"
                                                         defaultValue=""
                                                     />
 

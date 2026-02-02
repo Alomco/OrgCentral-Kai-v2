@@ -1,0 +1,84 @@
+@layer utilities {
+  /* Neon glow effect */
+  .neon-glow {
+    box-shadow:
+      0 0 5px oklch(0.62 0.2 255),
+      0 0 10px oklch(0.62 0.2 255),
+      0 0 20px oklch(0.62 0.2 255),
+      0 0 40px oklch(0.55 0.22 255);
+  }
+
+  /* Modern Card Shadows with Color */
+  .card-shadow {
+    box-shadow:
+      0 0 0 1px oklch(0 0 0 / 0.03),
+      0 2px 4px oklch(0 0 0 / 0.05),
+      0 12px 24px oklch(0 0 0 / 0.05);
+  }
+
+  .card-shadow-colored {
+    box-shadow:
+      0 0 0 1px oklch(0.93 0.05 290),
+      0 4px 6px -1px oklch(0.85 0.06 290),
+      0 10px 15px -3px oklch(0.9 0.04 290);
+  }
+
+  .dark .card-shadow-colored {
+    box-shadow:
+      0 0 0 1px oklch(0.3 0.04 290),
+      0 4px 6px -1px oklch(0.26 0.04 290),
+      0 10px 15px -3px oklch(0.22 0.03 290);
+  }
+
+  /* Glow Effects */
+  .glow-purple {
+    box-shadow: 0 0 20px oklch(0.6 0.18 289 / 0.5);
+  }
+
+  .glow-pink {
+    box-shadow: 0 0 20px oklch(0.64 0.2 330 / 0.5);
+  }
+
+  /* Hover Scale */
+  .hover-scale {
+    transition: transform 0.2s ease-in-out;
+  }
+
+  .hover-scale:hover {
+    transform: scale(1.05);
+  }
+
+  /* Interactive Card */
+  .interactive-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .interactive-card:hover {
+    transform: translateY(-4px);
+    box-shadow:
+      0 0 0 1px oklch(0.9 0.04 290),
+      0 12px 24px -4px oklch(0.83 0.05 290),
+      0 20px 40px -8px oklch(0.88 0.04 290);
+  }
+
+  .dark .interactive-card:hover {
+    box-shadow:
+      0 0 0 1px oklch(0.34 0.04 290),
+      0 12px 24px -4px oklch(0.26 0.05 290),
+      0 20px 40px -8px oklch(0.22 0.03 290);
+  }
+
+  /* 🌟 Futuristic Border Glow */
+  .border-glow {
+    position: relative;
+    border: 1px solid transparent;
+    background: linear-gradient(oklch(var(--card)), oklch(var(--card))) padding-box,
+      linear-gradient(135deg, oklch(var(--primary) / 0.5), oklch(var(--accent) / 0.5)) border-box;
+  }
+
+  /* 🎯 Theme-aware Focus Ring */
+  .focus-ring-theme:focus-visible {
+    outline: none;
+    box-shadow: var(--ui-focus-shadow, 0 0 0 2px oklch(var(--primary) / 0.45));
+  }
+}

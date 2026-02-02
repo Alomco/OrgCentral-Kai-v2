@@ -24,7 +24,7 @@ interface OffboardingQueueTableProps {
 
 export function OffboardingQueueTable({ rows }: OffboardingQueueTableProps) {
     return (
-        <Table>
+        <Table className="min-w-[720px]">
             <TableHeader>
                 <TableRow>
                     <TableHead>Employee</TableHead>
@@ -45,9 +45,9 @@ export function OffboardingQueueTable({ rows }: OffboardingQueueTableProps) {
                 ) : (
                     rows.map((row) => (
                         <TableRow key={row.id}>
-                            <TableCell>
-                                <div className="flex flex-col">
-                                    <span className="text-sm font-medium">{row.employeeName}</span>
+                            <TableCell className="min-w-0">
+                                <div className="flex min-w-0 flex-col">
+                                    <span className="text-sm font-medium truncate">{row.employeeName}</span>
                                     <span className="text-xs text-muted-foreground">
                                         {formatOptionalText(row.employeeNumber)}
                                     </span>

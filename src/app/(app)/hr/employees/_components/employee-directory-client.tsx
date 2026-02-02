@@ -91,7 +91,7 @@ export function EmployeeDirectoryClient({
     return (
         <Card>
             <CardHeader>
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div className="space-y-1">
                         <CardTitle className="flex items-center gap-2">
                             Employee Directory
@@ -100,7 +100,7 @@ export function EmployeeDirectoryClient({
                             Search and manage employee records
                         </CardDescription>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                         <span id="employees-kbd-gg-hint" className="sr-only">Keyboard: press g twice to jump to the top.</span>
                         <Button
                             type="button"

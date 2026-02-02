@@ -85,6 +85,9 @@ export function GoogleCalendarSection({ pending, state, enabledReference }: Inte
                             aria-describedby={googleCalendarIdError ? 'googleCalendarId-error' : undefined}
                         />
                         <FieldError id="googleCalendarId-error" message={googleCalendarIdError} />
+                        <p className="text-xs text-muted-foreground">
+                            Use the shared team calendar address.
+                        </p>
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="googleServiceAccountEmail">Service account email</Label>
@@ -98,6 +101,9 @@ export function GoogleCalendarSection({ pending, state, enabledReference }: Inte
                             aria-describedby={googleServiceAccountEmailError ? 'googleServiceAccountEmail-error' : undefined}
                         />
                         <FieldError id="googleServiceAccountEmail-error" message={googleServiceAccountEmailError} />
+                        <p className="text-xs text-muted-foreground">
+                            Ask your IT admin for the service account email.
+                        </p>
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="googleSyncWindowDays">Sync window (days)</Label>
@@ -115,6 +121,9 @@ export function GoogleCalendarSection({ pending, state, enabledReference }: Inte
                             aria-describedby={googleSyncWindowDaysError ? 'googleSyncWindowDays-error' : undefined}
                         />
                         <FieldError id="googleSyncWindowDays-error" message={googleSyncWindowDaysError} />
+                        <p className="text-xs text-muted-foreground">
+                            How many days ahead to sync leave events.
+                        </p>
                     </div>
                 </div>
             </fieldset>

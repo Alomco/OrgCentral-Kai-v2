@@ -96,8 +96,11 @@ export function NotificationItem({ notification, compact = false, onRead }: Noti
 
       <div className="flex-1 min-w-0 space-y-1">
         <div className="flex items-start justify-between gap-2">
-          <div className="flex flex-wrap items-center gap-2">
-            <p className={cn("font-medium leading-none", !notification.isRead && "font-semibold")}>
+          <div className="flex min-w-0 flex-wrap items-center gap-2">
+            <p
+              className={cn("font-medium leading-none line-clamp-1", !notification.isRead && "font-semibold")}
+              title={notification.title}
+            >
               {notification.title}
             </p>
             <span className="rounded border border-border/60 px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
@@ -121,7 +124,7 @@ export function NotificationItem({ notification, compact = false, onRead }: Noti
           </p>
         )}
 
-        <div className="flex items-center gap-2 pt-1 opacity-100 transition-opacity">
+        <div className="flex flex-wrap items-center gap-2 pt-1 opacity-100 transition-opacity">
           {!notification.isRead && (
             <Button
               variant="ghost"
@@ -129,8 +132,9 @@ export function NotificationItem({ notification, compact = false, onRead }: Noti
               className="h-6 px-2 text-xs"
               onClick={handleMarkRead}
               disabled={isPending}
+              aria-label="Mark notification as read"
             >
-              Mark read
+              Mark as read
             </Button>
           )}
           {notification.actionUrl && (
@@ -140,8 +144,12 @@ export function NotificationItem({ notification, compact = false, onRead }: Noti
               className="h-6 px-2 text-xs"
               asChild
             >
-              <a href={notification.actionUrl} onClick={(event) => event.stopPropagation()}>
-                {notification.actionLabel ?? 'View'}
+              <a
+                href={notification.actionUrl}
+                onClick={(event) => event.stopPropagation()}
+                aria-label={notification.actionLabel ?? 'Open details'}
+              >
+                {notification.actionLabel ?? 'Open details'}
               </a>
             </Button>
           )}

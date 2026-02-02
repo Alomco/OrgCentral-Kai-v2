@@ -67,7 +67,7 @@ export function LeaveRequestForm({ initialState, policySummary, balances }: Leav
         <Card className="border-muted/70 shadow-sm">
             <CardHeader className="space-y-3">
                 <div className="space-y-1">
-                    <CardTitle>Leave management</CardTitle>
+                    <CardTitle>Request leave</CardTitle>
                     <CardDescription>Request personal leave, preview balance, and confirm before submitting.</CardDescription>
                 </div>
                 <LeavePolicyDisclosure policySummary={policySummary} />
@@ -200,7 +200,7 @@ export function LeaveRequestForm({ initialState, policySummary, balances }: Leav
                             />
                         </div>
 
-                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                             <LeaveRequestPreviewDialog
                                 open={showPreview}
                                 onOpenChange={setShowPreview}
@@ -218,7 +218,7 @@ export function LeaveRequestForm({ initialState, policySummary, balances }: Leav
                                 balanceText={balanceText}
                                 policySummary={policySummary}
                             />
-                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <div className="flex items-start gap-2 text-xs text-muted-foreground sm:max-w-[28rem]">
                                 <AlertCircle className="h-3.5 w-3.5" />
                                 <span>Approvers see your note; manager signs first, HR follows. No sensitive data is cached.</span>
                             </div>

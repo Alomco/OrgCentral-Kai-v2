@@ -1,0 +1,120 @@
+@layer utilities {
+  @keyframes rotateBorderAngles {
+    to {
+      --border-angle-1: 360deg;
+      --border-angle-2: 540deg;
+    }
+  }
+
+  /* Animated blob for background */
+  @keyframes blob {
+    0% {
+      transform: translate(0px, 0px) scale(1);
+    }
+
+    33% {
+      transform: translate(30px, -50px) scale(1.1);
+    }
+
+    66% {
+      transform: translate(-20px, 20px) scale(0.9);
+    }
+
+    100% {
+      transform: translate(0px, 0px) scale(1);
+    }
+  }
+
+  .animate-blob {
+    animation: blob 7s infinite;
+  }
+
+  .animation-delay-2000 {
+    animation-delay: 2s;
+  }
+
+  .animation-delay-4000 {
+    animation-delay: 4s;
+  }
+
+  /* Shimmer effect */
+  @keyframes shimmer {
+    0% {
+      background-position: -1000px 0;
+    }
+
+    100% {
+      background-position: 1000px 0;
+    }
+  }
+
+  .shimmer {
+    animation: shimmer 2s infinite linear;
+    background: linear-gradient(to right, transparent 0%, oklch(var(--foreground) / 0.2) 50%, transparent 100%);
+    background-size: 1000px 100%;
+  }
+
+  /* ✨ Animated Gradient Shift - For dynamic headers */
+  @keyframes gradient-shift {
+    0% {
+      background-position: 0% 50%;
+    }
+
+    50% {
+      background-position: 100% 50%;
+    }
+
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  /* 💫 Pulse Animation for Interactive Elements */
+  @keyframes pulse-theme {
+
+    0%,
+    100% {
+      box-shadow: 0 0 0 0 oklch(var(--primary) / 0.4);
+    }
+
+    50% {
+      box-shadow: 0 0 0 8px oklch(var(--primary) / 0);
+    }
+  }
+
+  .animate-pulse-theme {
+    animation: pulse-theme 2s ease-in-out infinite;
+  }
+
+  /* Smooth Animations */
+  .transition-smooth {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* 🌊 Theme-aware Glow Effects */
+  .glow-theme {
+    box-shadow: 0 0 20px oklch(var(--primary) / 0.4);
+  }
+
+  .glow-theme-accent {
+    box-shadow: 0 0 20px oklch(var(--accent) / 0.4);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .glass-card-wrapper {
+      animation: none;
+    }
+
+    .glass-card-wrapper::before {
+      filter: none;
+      opacity: 0;
+    }
+
+    .glass-card,
+    .glass-cta,
+    .glass {
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+    }
+  }
+}

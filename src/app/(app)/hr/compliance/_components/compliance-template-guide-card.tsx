@@ -11,43 +11,39 @@ export function ComplianceTemplateGuideCard() {
             <CardHeader className="space-y-1">
                 <CardTitle className="flex items-center gap-2 text-base">
                     <Library className="h-4 w-4" />
-                    Working guide
+                    Getting started
                 </CardTitle>
-                <CardDescription>Keep templates consistent and auditable.</CardDescription>
+                <CardDescription>Simple tips for clean, consistent templates.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-3 text-sm text-muted-foreground">
+            <CardContent className="space-y-4 text-sm text-muted-foreground">
                 <div className="flex items-start gap-2">
                     <FileJson className="mt-0.5 h-4 w-4 text-primary" />
                     <div>
-                        <div className="font-medium text-foreground">Structure</div>
-                        Use predictable ids (region.domain.requirement) and bump the version when requirements change.
+                        <div className="font-medium text-foreground">Use clear IDs</div>
+                        Stick to a consistent format like region.domain.requirement and update the version when rules change.
                     </div>
                 </div>
                 <div className="flex items-start gap-2">
                     <Sparkles className="mt-0.5 h-4 w-4 text-primary" />
                     <div>
-                        <div className="font-medium text-foreground">Seed defaults fast</div>
+                        <div className="font-medium text-foreground">Start with a template pack</div>
                         <form action={seedComplianceTemplatesAction} className="mt-1 flex items-center gap-2">
                             <Button type="submit" size="sm" variant="secondary">
                                 <Sparkles className="mr-2 h-4 w-4" /> Seed starter templates
                             </Button>
-                            <span className="text-xs text-muted-foreground">Great for onboarding new regions.</span>
+                            <span className="text-xs text-muted-foreground">Great for onboarding quickly.</span>
                         </form>
                     </div>
                 </div>
                 <div className="rounded-lg border border-dashed border-primary/20 bg-primary/5 p-3 text-xs text-foreground">
-                    <div className="mb-2 font-semibold uppercase tracking-wide text-[10px] text-muted-foreground">Sample payload</div>
-                    <pre className="overflow-auto text-xs leading-relaxed">
-{`[
-  {
-    "id": "uk_employment.right_to_work",
-    "name": "Right to work check",
-    "type": "DOCUMENT",
-    "isMandatory": true,
-    "regulatoryRefs": ["UK_GDPR"]
-  }
-]`}
-                    </pre>
+                    <div className="mb-2 font-semibold uppercase tracking-wide text-[10px] text-muted-foreground">
+                        Example items
+                    </div>
+                    <ul className="list-disc space-y-1 pl-4 text-xs">
+                        <li>Right to work check (Document upload, required)</li>
+                        <li>Signed policy acknowledgement (Acknowledgement, required)</li>
+                        <li>Health & safety training date (Completion date, optional)</li>
+                    </ul>
                 </div>
             </CardContent>
         </Card>

@@ -32,7 +32,7 @@ export async function PeopleStats({ authorization }: PeopleStatsProps) {
     return (
         <Card className="h-full">
             <CardHeader>
-                <CardTitle>Workforce Overview</CardTitle>
+                <CardTitle className="text-base font-semibold">Workforce Overview</CardTitle>
                 <CardDescription>Current employee distribution</CardDescription>
             </CardHeader>
             <CardContent>

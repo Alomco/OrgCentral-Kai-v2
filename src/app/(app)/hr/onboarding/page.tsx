@@ -72,7 +72,7 @@ export default async function HrOnboardingPage() {
             />
 
             {canInviteMembers ? (
-                <div className="flex items-center gap-3">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                     <Button asChild>
                         <Link href="/hr/onboarding/new">
                             <Wand2 className="mr-2 h-4 w-4" />
@@ -101,7 +101,9 @@ export default async function HrOnboardingPage() {
 
             {canInviteMembers ? (
                 <div className="space-y-3">
-                    <OnboardingFiltersClient />
+                    <div className="rounded-lg border bg-card p-3">
+                        <OnboardingFiltersClient />
+                    </div>
                     <Suspense fallback={<PanelSkeleton />}>
                         <OnboardingInvitationsPanel authorization={authorization} />
                     </Suspense>

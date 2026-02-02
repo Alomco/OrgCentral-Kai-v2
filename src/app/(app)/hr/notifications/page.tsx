@@ -2,6 +2,8 @@ import { Suspense } from 'react';
 import dynamic from 'next/dynamic';
 import { type Metadata } from 'next';
 import { headers as nextHeaders } from 'next/headers';
+import Link from 'next/link';
+import { Bell } from 'lucide-react';
 
 import { getSessionContextOrRedirect } from '@/server/ui/auth/session-redirect';
 import { NotificationList } from './_components/notification-list';
@@ -12,6 +14,16 @@ const NotificationFilters = dynamic(
 import { notificationFilterSchema, type NotificationFilters } from './_schemas/filter-schema';
 import { listHrNotifications } from './actions';
 import { Skeleton } from '@/components/ui/skeleton';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbList,
+  BreadcrumbLink,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
+import { HrPageHeader } from '../_components/hr-page-header';
+import { Button } from '@/components/ui/button';
 
 export const metadata: Metadata = {
   title: 'Notifications | HR',
@@ -39,12 +51,30 @@ export default async function NotificationsPage({ searchParams }: PageProps) {
 
   return (
     <div className="flex flex-col h-full space-y-6">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-2xl font-bold tracking-tight">Notifications</h1>
-        <p className="text-muted-foreground">
-          Stay updated with your HR tasks and announcements.
-        </p>
-      </div>
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link href="/hr">HR</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Notifications</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+
+      <HrPageHeader
+        title="Notifications"
+        description="Stay updated with HR tasks and announcements."
+        icon={<Bell className="h-5 w-5" />}
+        actions={(
+          <Button asChild variant="outline" size="sm" className="w-full sm:w-auto">
+            <Link href="/hr/notifications/settings">Notification settings</Link>
+          </Button>
+        )}
+      />
 
       <NotificationFilters />
 

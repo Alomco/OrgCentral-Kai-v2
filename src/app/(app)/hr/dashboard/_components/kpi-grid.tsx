@@ -93,7 +93,7 @@ export async function KpiGrid({ authorization, employeeId }: KpiGridProps) {
     ).length;
 
     return (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5 xl:grid-cols-6">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
             <KpiCard
                 title="Leave Balance"
                 value={`${leaveBalance.toLocaleString()} days`}
@@ -161,7 +161,7 @@ function KpiCard({ title, value, icon: Icon, href }: {
 
 export function KpiGridSkeleton() {
     return (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5 xl:grid-cols-6">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
             {Array.from({ length: 6 }).map((_, index) => (
                 <Card key={index} className="overflow-hidden">
                     <CardContent className="p-6">

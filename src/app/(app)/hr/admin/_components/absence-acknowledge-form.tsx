@@ -36,7 +36,7 @@ export function AbsenceAcknowledgeForm({ absenceId }: AbsenceAcknowledgeFormProp
     const isPending = ackPending || approvePending;
 
     return (
-        <div className="flex items-center justify-end gap-2">
+        <div className="flex flex-wrap items-center justify-end gap-2">
             {/* Quick Acknowledge */}
             <form action={ackAction}>
                 <input type="hidden" name="absenceId" value={absenceId} />
@@ -46,6 +46,7 @@ export function AbsenceAcknowledgeForm({ absenceId }: AbsenceAcknowledgeFormProp
                     variant="outline"
                     disabled={isPending}
                     className="gap-1"
+                    aria-label="Acknowledge absence"
                 >
                     <EyeIcon className="h-3.5 w-3.5" />
                     <span className="sr-only sm:not-sr-only sm:inline">Acknowledge</span>
@@ -60,6 +61,7 @@ export function AbsenceAcknowledgeForm({ absenceId }: AbsenceAcknowledgeFormProp
                         variant="default"
                         disabled={isPending}
                         className="gap-1"
+                        aria-label="Approve absence"
                     >
                         <CheckCircleIcon className="h-3.5 w-3.5" />
                         <span className="sr-only sm:not-sr-only sm:inline">Approve</span>
@@ -69,14 +71,14 @@ export function AbsenceAcknowledgeForm({ absenceId }: AbsenceAcknowledgeFormProp
                     <form action={approveAction}>
                         <input type="hidden" name="absenceId" value={absenceId} />
                         <DialogHeader>
-                            <DialogTitle>Approve Absence</DialogTitle>
+                            <DialogTitle>Approve absence</DialogTitle>
                             <DialogDescription>
-                                Confirm absence approval with optional return date.
+                                Confirm approval and optionally add a return date.
                             </DialogDescription>
                         </DialogHeader>
                         <div className="space-y-4 py-4">
                             <div>
-                                <Label htmlFor="returnDate">Confirmed Return Date (optional)</Label>
+                                <Label htmlFor="returnDate">Confirmed return date (optional)</Label>
                                 <Input
                                     id="returnDate"
                                     name="returnDate"
@@ -89,7 +91,7 @@ export function AbsenceAcknowledgeForm({ absenceId }: AbsenceAcknowledgeFormProp
                                 <Input
                                     id="notes"
                                     name="notes"
-                                    placeholder="Additional notes..."
+                                    placeholder="Example: return to work expected Monday"
                                     maxLength={500}
                                     className="mt-1.5"
                                 />
@@ -100,7 +102,7 @@ export function AbsenceAcknowledgeForm({ absenceId }: AbsenceAcknowledgeFormProp
                         </div>
                         <DialogFooter>
                             <Button type="submit" disabled={approvePending}>
-                                {approvePending ? 'Approving...' : 'Confirm Approval'}
+                                {approvePending ? 'Approving...' : 'Confirm approval'}
                             </Button>
                         </DialogFooter>
                     </form>

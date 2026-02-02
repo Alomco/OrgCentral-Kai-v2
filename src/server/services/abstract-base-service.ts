@@ -3,6 +3,22 @@ import type { RepositoryAuthorizationContext } from '@/server/repositories/secur
 import { appLogger } from '@/server/logging/structured-logger';
 import { getSecurityEventService } from './security/security-event-service.provider';
 import type { EnhancedSecurityContext } from '@/server/types/enhanced-security-types';
+import { recordAuditEvent } from '@/server/logging/audit-logger';
+
+export interface AuditAccessInput {
+    action: string;
+    resourceType: string;
+    resourceId?: string;
+    payload?: Record<string, unknown>;
+    eventType?: 'ACCESS' | 'DATA_CHANGE' | 'POLICY_CHANGE' | 'AUTH' | 'SYSTEM';
+    sensitiveOnly?: boolean;
+}
+
+export interface GuardedOperationOptions<TResult> {
+    guard?: () => Promise<void> | void;
+    handler: () => Promise<TResult>;
+    audit?: (result: TResult) => Promise<void> | void;
+}
 
 export interface ServiceExecutionContext {
     authorization: RepositoryAuthorizationContext;
@@ -54,6 +70,64 @@ export abstract class AbstractBaseService {
                 throw error;
             }
         });
+    }
+
+    protected async runGuardedOperation<TResult>(
+        context: ServiceExecutionContext,
+        operationName: string,
+        options: GuardedOperationOptions<TResult>,
+    ): Promise<TResult> {
+        return this.executeInServiceContext(context, operationName, async () => {
+            if (options.guard) {
+                await options.guard();
+            }
+
+            const result = await options.handler();
+
+            if (options.audit) {
+                await options.audit(result);
+            }
+
+            return result;
+        });
+    }
+
+    protected async auditAccess(
+        context: ServiceExecutionContext,
+        input: AuditAccessInput,
+    ): Promise<void> {
+        if (input.sensitiveOnly && !this.isSensitiveAccess(context.authorization)) {
+            return;
+        }
+
+        await recordAuditEvent({
+            orgId: context.authorization.orgId,
+            userId: context.authorization.userId,
+            eventType: input.eventType ?? 'ACCESS',
+            action: input.action,
+            resource: input.resourceType,
+            resourceId: input.resourceId,
+            payload: {
+                ...input.payload,
+                ipAddress: context.authorization.ipAddress ?? null,
+                userAgent: context.authorization.userAgent ?? null,
+                correlationId: context.authorization.correlationId ?? null,
+            },
+            residencyZone: context.authorization.dataResidency,
+            classification: context.authorization.dataClassification,
+            auditSource: context.authorization.auditSource,
+            auditBatchId: context.authorization.auditBatchId,
+            correlationId: context.authorization.correlationId,
+        });
+    }
+
+    private isSensitiveAccess(context: RepositoryAuthorizationContext): boolean {
+        return (
+            context.piiAccessRequired === true ||
+            context.dataBreachRisk === true ||
+            context.dataClassification === 'SECRET' ||
+            context.dataClassification === 'TOP_SECRET'
+        );
     }
 
     private async logServiceOperation(context: ServiceExecutionContext, operationName: string): Promise<void> {

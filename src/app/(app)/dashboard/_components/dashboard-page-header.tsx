@@ -10,7 +10,7 @@ export function DashboardPageHeader(props: {
 
     return (
         <header className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-            <div className="space-y-3">
+            <div className="min-w-0 space-y-3">
                 <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl leading-tight">
                     Dashboard
                 </h1>
@@ -19,11 +19,11 @@ export function DashboardPageHeader(props: {
                 </p>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2 sm:justify-end min-w-0">
                 <Badge variant="secondary" className="font-mono text-xs border border-border/60 bg-muted/50 text-foreground hover:bg-muted/70 transition-colors">
                     {shortOrgId}
                 </Badge>
-                <Badge variant="outline" className="capitalize border-border/60 bg-muted/40 text-foreground hover:bg-muted/60 transition-colors">
+                <Badge variant="outline" className="max-w-[12rem] truncate capitalize border-border/60 bg-muted/40 text-foreground hover:bg-muted/60 transition-colors">
                     {props.roleKey}
                 </Badge>
             </div>

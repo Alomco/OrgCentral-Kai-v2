@@ -103,43 +103,43 @@ export function AbsenceApprovalPanel({
                             return (
                                 <div
                                     key={request.id}
-                                    className="flex items-start justify-between gap-4 rounded-lg border p-3"
+                                    className="flex flex-col gap-3 rounded-lg border p-3 sm:flex-row sm:items-start sm:justify-between"
                                 >
                                     <div className="min-w-0 flex-1">
-                                    <div className="flex items-center gap-2">
-                                        <p className="font-medium text-sm truncate">
-                                            {request.employeeName}
-                                        </p>
-                                        <Badge variant="outline" className="text-xs">
-                                            {request.type}
-                                        </Badge>
-                                    </div>
-                                    <p className="text-xs text-muted-foreground mt-1">
-                                        {formatDateRange(request.startDate, request.endDate)} · {durationDisplay.label}
-                                    </p>
-                                    {durationDisplay.timeRange ? (
+                                        <div className="flex min-w-0 items-center gap-2">
+                                            <p className="font-medium text-sm truncate">
+                                                {request.employeeName}
+                                            </p>
+                                            <Badge variant="outline" className="max-w-[10rem] truncate text-xs">
+                                                {request.type}
+                                            </Badge>
+                                        </div>
                                         <p className="text-xs text-muted-foreground mt-1">
-                                            {durationDisplay.timeRange}
+                                            {formatDateRange(request.startDate, request.endDate)} · {durationDisplay.label}
                                         </p>
-                                    ) : null}
-                                    {request.reason ? (
-                                        <p className="text-xs text-muted-foreground mt-1 truncate">
-                                            {request.reason}
-                                        </p>
-                                    ) : null}
-                                </div>
-                                <div className="flex flex-col items-end gap-2">
-                                    <span className="text-xs text-muted-foreground">
-                                        {formatTimeAgo(request.submittedAt)}
-                                    </span>
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => handleReview(request)}
-                                    >
-                                        Review
-                                    </Button>
-                                </div>
+                                        {durationDisplay.timeRange ? (
+                                            <p className="text-xs text-muted-foreground mt-1">
+                                                {durationDisplay.timeRange}
+                                            </p>
+                                        ) : null}
+                                        {request.reason ? (
+                                            <p className="text-xs text-muted-foreground mt-1 line-clamp-2 break-words">
+                                                {request.reason}
+                                            </p>
+                                        ) : null}
+                                    </div>
+                                    <div className="flex shrink-0 flex-row items-center gap-2 sm:flex-col sm:items-end">
+                                        <span className="text-xs text-muted-foreground">
+                                            {formatTimeAgo(request.submittedAt)}
+                                        </span>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => handleReview(request)}
+                                        >
+                                            Review
+                                        </Button>
+                                    </div>
                                 </div>
                             );
                         })}

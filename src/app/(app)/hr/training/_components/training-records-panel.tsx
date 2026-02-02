@@ -23,16 +23,16 @@ const COLUMNS: readonly HrDataTableColumn[] = [
 ] as const;
 
 function formatDate(value: Date | null | undefined): string {
-    if (!value) {return '—';}
+    if (!value) { return '—'; }
     const date = new Date(value);
-    if (Number.isNaN(date.getTime())) {return '—';}
+    if (Number.isNaN(date.getTime())) { return '—'; }
     return formatHumanDate(date);
 }
 
 function isExpiringSoon(expiryDate: Date | null | undefined): boolean {
-    if (!expiryDate) {return false;}
+    if (!expiryDate) { return false; }
     const date = new Date(expiryDate);
-    if (Number.isNaN(date.getTime())) {return false;}
+    if (Number.isNaN(date.getTime())) { return false; }
     const thirtyDays = 30 * 24 * 60 * 60 * 1000;
     return date.getTime() - Date.now() < thirtyDays && date.getTime() > Date.now();
 }
@@ -62,16 +62,18 @@ export async function TrainingRecordsPanel({
         >
             {records.map((record) => (
                 <TableRow key={record.id}>
-                    <TableCell className="font-medium">{record.courseName}</TableCell>
-                    <TableCell>{record.provider}</TableCell>
-                    <TableCell>
+                    <TableCell className="font-medium min-w-0 max-w-[220px] truncate">
+                        {record.courseName}
+                    </TableCell>
+                    <TableCell className="min-w-0 max-w-[180px] truncate">{record.provider}</TableCell>
+                    <TableCell className="whitespace-nowrap">
                         {formatDate(record.startDate)}
                         {record.endDate ? ` – ${formatDate(record.endDate)}` : ''}
                     </TableCell>
                     <TableCell>
                         <HrStatusBadge status={record.status} />
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="whitespace-nowrap">
                         {record.expiryDate ? (
                             <span className={isExpiringSoon(record.expiryDate) ? 'text-orange-600' : ''}>
                                 {formatDate(record.expiryDate)}

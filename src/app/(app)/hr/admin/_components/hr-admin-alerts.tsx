@@ -19,7 +19,7 @@ interface AlertItemProps {
 }
 
 function AlertItem({ icon, title, count, href, variant }: AlertItemProps) {
-    if (count === 0) {return null;}
+    if (count === 0) { return null; }
 
     const variantStyles = {
         warning: 'border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/50',
@@ -32,11 +32,11 @@ function AlertItem({ icon, title, count, href, variant }: AlertItemProps) {
             href={href}
             className={`flex items-center justify-between rounded-lg border p-3 transition-colors hover:bg-muted ${variantStyles[variant]}`}
         >
-            <div className="flex items-center gap-3">
+            <div className="flex min-w-0 items-center gap-3">
                 {icon}
-                <span className="font-medium text-sm">{title}</span>
+                <span className="min-w-0 truncate font-medium text-sm">{title}</span>
             </div>
-            <Badge variant={variant === 'destructive' ? 'destructive' : 'secondary'}>
+            <Badge variant={variant === 'destructive' ? 'destructive' : 'secondary'} className="shrink-0">
                 {count}
             </Badge>
         </Link>
@@ -51,8 +51,8 @@ export function HrAdminAlerts({ stats }: HrAdminAlertsProps) {
 
     return (
         <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-                <div>
+            <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div className="min-w-0">
                     <CardTitle className="text-base flex items-center gap-2">
                         <AlertTriangle className="h-4 w-4" />
                         Alerts & Actions

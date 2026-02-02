@@ -28,7 +28,7 @@ export function PoliciesTableClient({ initial }: { initial: HRPolicy[] }) {
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full text-sm">
+      <table className="min-w-[720px] w-full text-sm">
         <thead className="border-b text-left">
           <tr>
             <th className={`px-2 ${rowPad} font-medium`}>Title</th>
@@ -42,14 +42,22 @@ export function PoliciesTableClient({ initial }: { initial: HRPolicy[] }) {
         <tbody>
           {policies.map((policy) => (
             <tr key={policy.id} className="border-b last:border-b-0 hover:bg-muted/50">
-              <td className={`px-2 ${rowPad}`}>
-                <Link href={`/hr/policies/${policy.id}`} className="font-medium underline underline-offset-4">
+              <td className={`px-2 ${rowPad} min-w-0 max-w-[280px]`}>
+                <Link
+                  href={`/hr/policies/${policy.id}`}
+                  className="block truncate font-medium underline underline-offset-4"
+                  title={policy.title}
+                >
                   {policy.title}
                 </Link>
               </td>
-              <td className={`px-2 ${rowPad} text-muted-foreground`}>{policy.category}</td>
+              <td className={`px-2 ${rowPad} max-w-[180px] truncate text-muted-foreground`}>
+                {policy.category}
+              </td>
               <td className={`px-2 ${rowPad} text-muted-foreground`}>{policy.version}</td>
-              <td className={`px-2 ${rowPad} text-muted-foreground`}>{formatHumanDate(policy.effectiveDate)}</td>
+              <td className={`px-2 ${rowPad} whitespace-nowrap text-muted-foreground`}>
+                {formatHumanDate(policy.effectiveDate)}
+              </td>
               <td className={`px-2 ${rowPad}`}>
                 <Badge variant="outline">{policy.status}</Badge>
               </td>

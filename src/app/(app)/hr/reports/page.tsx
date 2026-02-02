@@ -108,17 +108,17 @@ export default async function HrReportsPage() {
                 icon={<BarChart3 className="h-5 w-5" />}
                 actions={(
                     <>
-                        <Button asChild variant="outline">
+                        <Button asChild variant="outline" size="sm" className="w-full sm:w-auto">
                             <Link href="/api/hr/reports/export?format=csv" download>
                                 Export CSV
                             </Link>
                         </Button>
-                        <Button asChild variant="outline">
+                        <Button asChild variant="outline" size="sm" className="w-full sm:w-auto">
                             <Link href="/api/hr/reports/export?format=pdf" download>
                                 Export PDF
                             </Link>
                         </Button>
-                        <Button asChild variant="outline">
+                        <Button asChild variant="outline" size="sm" className="w-full sm:w-auto">
                             <Link href="/api/hr/reports/export?format=json" download>
                                 Export JSON
                             </Link>

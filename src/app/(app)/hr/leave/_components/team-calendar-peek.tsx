@@ -39,20 +39,22 @@ export function TeamCalendarPeek({ absences }: { absences: TeamCalendarAbsence[]
                 <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
                     <Badge variant="secondary">{overlapSummaries.totalOverlaps} overlaps</Badge>
                     <Badge variant="outline">{overlapSummaries.daysWithOverlaps.length} affected days</Badge>
-                    <span>Peak day: {overlapSummaries.peakDay.label} ({overlapSummaries.peakDay.count} people away)</span>
+                    <span className="min-w-0 break-words">Peak day: {overlapSummaries.peakDay.label} ({overlapSummaries.peakDay.count} people away)</span>
                 </div>
                 {absences.map((absence) => (
-                    <div key={absence.id} className="flex items-start justify-between rounded-lg border p-3">
-                        <div>
-                            <div className="font-medium">Employee {absence.userId}</div>
+                    <div key={absence.id} className="flex items-start justify-between gap-3 rounded-lg border p-3">
+                        <div className="min-w-0">
+                            <div className="font-medium truncate">Employee {absence.userId}</div>
                             <div className="text-sm text-muted-foreground">
                                 {formatRange(absence.startDate, absence.endDate)}
                             </div>
                             {absence.reason ? (
-                                <div className="text-xs text-muted-foreground">{absence.reason}</div>
+                                <div className="text-xs text-muted-foreground line-clamp-2 break-words">
+                                    {absence.reason}
+                                </div>
                             ) : null}
                         </div>
-                        <Badge variant="outline">Away</Badge>
+                        <Badge variant="outline" className="shrink-0">Away</Badge>
                     </div>
                 ))}
                 <div className="rounded-md bg-muted/40 p-3 text-sm">

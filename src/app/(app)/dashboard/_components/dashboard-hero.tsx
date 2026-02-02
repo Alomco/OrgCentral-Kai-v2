@@ -104,8 +104,8 @@ export async function DashboardHero(props: DashboardViewerContext) {
         <div className="grid gap-4 lg:grid-cols-3">
             <Card className="relative overflow-hidden border border-border/60 bg-card text-card-foreground shadow-sm">
                 <CardHeader className="space-y-2">
-                    <CardTitle className="text-lg font-semibold">Workforce pulse</CardTitle>
-                    <CardDescription className="text-muted-foreground">
+                    <CardTitle className="text-base font-semibold">Workforce pulse</CardTitle>
+                    <CardDescription className="text-sm text-muted-foreground">
                         Live headcount and quick links for people ops.
                     </CardDescription>
                 </CardHeader>
@@ -177,13 +177,13 @@ export async function DashboardHero(props: DashboardViewerContext) {
                     </div>
                 </CardHeader>
                 <CardContent className="grid gap-2">
-                    <Button asChild variant="secondary" className="justify-start">
+                    <Button asChild size="sm" variant="secondary" className="justify-start">
                         <Link href="/hr/leave">Leave requests</Link>
                     </Button>
-                    <Button asChild variant="secondary" className="justify-start">
+                    <Button asChild size="sm" variant="secondary" className="justify-start">
                         <Link href="/org/profile">Org profile</Link>
                     </Button>
-                    <Button asChild variant="secondary" className="justify-start">
+                    <Button asChild size="sm" variant="secondary" className="justify-start">
                         <Link href="/hr/training">Training & policies</Link>
                     </Button>
                 </CardContent>

@@ -44,7 +44,11 @@ export function EmployeeDetailTabs({ profileId, activeTab }: EmployeeDetailTabsP
                     size="sm"
                     variant={tab.id === activeTab ? 'default' : 'outline'}
                 >
-                    <Link href={buildEmployeeDetailTabHref(profileId, tab.id)}>
+                    <Link
+                        href={buildEmployeeDetailTabHref(profileId, tab.id)}
+                        aria-current={tab.id === activeTab ? 'page' : undefined}
+                        title={tab.label}
+                    >
                         {tab.label}
                     </Link>
                 </Button>

@@ -32,6 +32,7 @@ export function AbsenceManagementRowActions({
                 variant="outline"
                 className="gap-1 text-destructive hover:text-destructive"
                 onClick={() => setOpen(true)}
+                aria-label="Cancel absence"
             >
                 <X className="h-3.5 w-3.5" />
                 Cancel

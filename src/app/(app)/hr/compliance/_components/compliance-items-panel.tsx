@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { EmptyState } from '@/components/theme/elements';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
 import { PrismaComplianceCategoryRepository } from '@/server/repositories/prisma/hr/compliance/prisma-compliance-category-repository';
 import { PrismaComplianceItemRepository } from '@/server/repositories/prisma/hr/compliance/prisma-compliance-item-repository';
@@ -29,6 +30,43 @@ function formatDate(value: Date | null | undefined): string {
         return '—';
     }
     return formatHumanDate(value);
+}
+
+function formatItemType(type?: string): string {
+    if (!type) {
+        return 'Requirement';
+    }
+    switch (type) {
+        case 'DOCUMENT':
+            return 'Document upload';
+        case 'COMPLETION_DATE':
+            return 'Completion date';
+        case 'YES_NO':
+            return 'Yes / No confirmation';
+        case 'ACKNOWLEDGEMENT':
+            return 'Acknowledgement';
+        default:
+            return 'Requirement';
+    }
+}
+
+function formatStatusLabel(status: string): string {
+    switch (status) {
+        case 'PENDING':
+            return 'Needs action';
+        case 'COMPLETE':
+            return 'Completed';
+        case 'MISSING':
+            return 'Missing info';
+        case 'PENDING_REVIEW':
+            return 'Awaiting review';
+        case 'NOT_APPLICABLE':
+            return 'Not required';
+        case 'EXPIRED':
+            return 'Expired';
+        default:
+            return status;
+    }
 }
 
 export async function ComplianceItemsPanel({
@@ -72,11 +110,17 @@ export async function ComplianceItemsPanel({
         <Card>
             <CardHeader>
                 <CardTitle>{title ?? 'Your compliance items'}</CardTitle>
-                <CardDescription>{description ?? 'Assigned items and their current status.'}</CardDescription>
+                <CardDescription>
+                    {description ?? 'See what needs your attention and when it’s due.'}
+                </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
                 {totalItems === 0 ? (
-                    <div className="text-sm text-muted-foreground">No compliance items assigned yet.</div>
+                    <EmptyState
+                        title="You’re all set"
+                        description="There are no compliance items assigned to you right now. If something looks missing, contact your admin."
+                        className="rounded-lg border border-dashed border-border/60 bg-muted/30"
+                    />
                 ) : (
                     filteredGroups.map((group) => (
                         <div key={group.categoryKey} className="space-y-2">
@@ -85,11 +129,11 @@ export async function ComplianceItemsPanel({
                                 <Table>
                                     <TableHeader>
                                         <TableRow>
-                                            <TableHead>Item</TableHead>
-                                            <TableHead>Type</TableHead>
+                                            <TableHead>What to do</TableHead>
+                                            <TableHead>Requirement</TableHead>
                                             <TableHead>Status</TableHead>
-                                            <TableHead>Due</TableHead>
-                                            <TableHead>Completed</TableHead>
+                                            <TableHead>Due date</TableHead>
+                                            <TableHead>Completed on</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
@@ -101,31 +145,31 @@ export async function ComplianceItemsPanel({
 
                                             return (
                                                 <TableRow key={item.id}>
-                                                    <TableCell className="font-medium">
+                                                    <TableCell className="font-medium max-w-[360px] min-w-0">
                                                         <Link
                                                             href={`/hr/compliance/${item.id}`}
-                                                            className="hover:underline"
+                                                            className="block truncate hover:underline"
                                                         >
                                                             {itemName}
                                                         </Link>
                                                         {guidance ? (
-                                                            <div className="text-xs text-muted-foreground">
+                                                            <div className="text-xs text-muted-foreground line-clamp-2">
                                                                 {guidance}
                                                             </div>
                                                         ) : null}
                                                     </TableCell>
                                                     <TableCell className="text-xs text-muted-foreground">
-                                                        {itemType}
+                                                        {formatItemType(itemType)}
                                                     </TableCell>
-                                                <TableCell>
-                                                    <Badge variant={complianceItemStatusBadgeVariant(item.status)}>
-                                                        {item.status}
-                                                    </Badge>
-                                                </TableCell>
-                                                <TableCell>{formatDate(item.dueDate)}</TableCell>
-                                                <TableCell className="text-muted-foreground">
-                                                    {formatDate(item.completedAt)}
-                                                </TableCell>
+                                                    <TableCell>
+                                                        <Badge variant={complianceItemStatusBadgeVariant(item.status)}>
+                                                            {formatStatusLabel(item.status)}
+                                                        </Badge>
+                                                    </TableCell>
+                                                    <TableCell>{formatDate(item.dueDate)}</TableCell>
+                                                    <TableCell className="text-muted-foreground">
+                                                        {formatDate(item.completedAt)}
+                                                    </TableCell>
                                                 </TableRow>
                                             );
                                         })}

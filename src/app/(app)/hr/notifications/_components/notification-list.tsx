@@ -140,16 +140,16 @@ export function NotificationList({
   if (notifications.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center text-muted-foreground border rounded-lg border-dashed">
-        <p className="text-lg font-medium">No notifications found</p>
-        <p className="text-sm">Try adjusting your filters</p>
+        <p className="text-lg font-medium">You&apos;re all caught up</p>
+        <p className="text-sm">No notifications match these filters.</p>
       </div>
     );
   }
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between p-2 bg-muted/30 rounded-lg">
-        <div className="flex items-center gap-3 px-2">
+      <div className="flex flex-col gap-2 rounded-lg bg-muted/30 p-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-wrap items-center gap-3 px-2">
           <Checkbox
             checked={selectedIds.size === notifications.length && notifications.length > 0}
             onCheckedChange={toggleSelectAll}
@@ -158,9 +158,10 @@ export function NotificationList({
           <span className="text-sm text-muted-foreground">
             {selectedIds.size} selected
           </span>
+          <span className="text-xs text-muted-foreground">Select items, then choose an action.</span>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {selectedIds.size > 0 ? (
             <>
               <Button
@@ -221,8 +222,12 @@ const NotificationRow = memo(function NotificationRow({
 }: NotificationRowProps) {
   return (
     <div className="flex items-start gap-3">
-      <div className="pt-4 pl-2">
-        <Checkbox checked={selected} onCheckedChange={onToggle} />
+      <div className="pt-1 pl-2">
+        <Checkbox
+          checked={selected}
+          onCheckedChange={onToggle}
+          aria-label="Select notification"
+        />
       </div>
       <div className="flex-1">
         <NotificationItem

@@ -33,7 +33,9 @@ export function CreateTimeEntryForm({ initialState }: CreateTimeEntryFormProps) 
                     <Clock className="h-5 w-5" />
                     Log Time
                 </CardTitle>
-                <CardDescription>Record your working hours for today.</CardDescription>
+                <CardDescription>
+                    Record your working hours. Leave project fields blank if you are unsure.
+                </CardDescription>
             </CardHeader>
             <CardContent>
                 <form action={formAction} className="space-y-4">

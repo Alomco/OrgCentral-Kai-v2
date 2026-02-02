@@ -31,14 +31,14 @@ export interface LeavePolicySummary {
 }
 
 export function LeavePolicyDisclosure({ policySummary }: { policySummary?: LeavePolicySummary }) {
-    if (!policySummary) {return null;}
+    if (!policySummary) { return null; }
 
     return (
         <div className="rounded-lg border bg-muted/70 p-3">
-            <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+            <div className="flex flex-col gap-2 text-sm font-medium text-foreground sm:flex-row sm:items-center">
                 <ShieldCheck className="h-4 w-4 text-primary" />
                 <span>Classification {policySummary.dataClassification}</span>
-                <Badge variant="secondary" className="ml-auto">{policySummary.jurisdiction} • {policySummary.dataResidency}</Badge>
+                <Badge variant="secondary" className="sm:ml-auto">{policySummary.jurisdiction} • {policySummary.dataResidency}</Badge>
             </div>
             <Accordion type="single" collapsible className="mt-2">
                 <AccordionItem value="policy">
@@ -55,15 +55,15 @@ export function LeavePolicyDisclosure({ policySummary }: { policySummary?: Leave
 }
 
 export function LeaveBalanceGrid({ balances }: { balances?: LeaveBalance[] }) {
-    if (!balances || balances.length === 0) {return null;}
+    if (!balances || balances.length === 0) { return null; }
 
     return (
         <div className="grid gap-3 sm:grid-cols-2">
             {balances.map((balance) => (
                 <div key={balance.id} className="rounded-lg border bg-card/70 p-3 text-sm">
-                    <div className="flex items-center justify-between font-medium">
-                        <span>{balance.leaveType}</span>
-                        <Badge variant="outline">{balance.available} days left</Badge>
+                    <div className="flex items-center justify-between gap-2 font-medium">
+                        <span className="min-w-0 truncate">{balance.leaveType}</span>
+                        <Badge variant="outline" className="shrink-0">{balance.available} days left</Badge>
                     </div>
                     <div className="text-xs text-muted-foreground">Entitlement {balance.totalEntitlement} • Used {balance.used} • Pending {balance.pending}</div>
                 </div>
@@ -157,17 +157,17 @@ export function LeaveRequestPreviewDialog({
                     <DialogDescription>Double-check before submission. Submission happens after confirm.</DialogDescription>
                 </DialogHeader>
                 <div className="space-y-3 text-sm">
-                    <div className="grid grid-cols-2 gap-2 text-muted-foreground">
+                    <div className="grid grid-cols-1 gap-2 text-muted-foreground sm:grid-cols-2">
                         <span className="font-medium text-foreground">Type</span>
-                        <span>{values.leaveType || '—'}</span>
+                        <span className="break-words">{values.leaveType || '—'}</span>
                         <span className="font-medium text-foreground">Dates</span>
-                        <span>{values.startDate || '—'} → {values.endDate || values.startDate || '—'}</span>
+                        <span className="break-words">{values.startDate || '—'} → {values.endDate || values.startDate || '—'}</span>
                         <span className="font-medium text-foreground">Days</span>
-                        <span>{values.calculatedDays}</span>
+                        <span className="break-words">{values.calculatedDays}</span>
                         <span className="font-medium text-foreground">Half day</span>
-                        <span>{values.isHalfDay ? 'Yes (start date)' : 'No'}</span>
-                        <span className="font-medium text-foreground">Reason</span>
-                        <span>{values.reason || '—'}</span>
+                        <span className="break-words">{values.isHalfDay ? 'Yes (start date)' : 'No'}</span>
+                        <span className="font-medium text-foreground sm:col-span-2">Reason</span>
+                        <span className="break-words sm:col-span-2">{values.reason || '—'}</span>
                     </div>
                     {balanceText ? <div className="text-sm">Balance check: {balanceText}</div> : null}
                     {policySummary ? (

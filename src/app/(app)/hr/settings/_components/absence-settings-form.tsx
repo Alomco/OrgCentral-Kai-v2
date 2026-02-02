@@ -73,6 +73,7 @@ export function AbsenceSettingsForm(props: { defaults: AbsenceSettingsFormValues
                                     aria-describedby={hoursErrorId}
                                 />
                                 <FieldError id={hoursErrorId} message={hoursError} />
+                                <p className="text-xs text-muted-foreground">Matches your standard work day.</p>
                             </div>
 
                             <div className="space-y-2">
@@ -90,7 +91,7 @@ export function AbsenceSettingsForm(props: { defaults: AbsenceSettingsFormValues
                                 />
                                 <FieldError id={roundingErrorId} message={roundingError} />
                                 <p className="text-xs text-muted-foreground">
-                                    Optional label for rounding logic used in reporting and approvals.
+                                    Optional label for rounding logic (example: quarter_day).
                                 </p>
                             </div>
                         </div>

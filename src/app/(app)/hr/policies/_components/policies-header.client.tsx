@@ -70,7 +70,7 @@ export function PoliciesHeaderClient() {
   };
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex flex-wrap items-center gap-2">
       <span id="policies-kbd-gg-hint" className="sr-only">Keyboard: press g twice to jump to the top.</span>
       <Badge variant="secondary">{data.length} {q ? 'matching' : 'total'}</Badge>
       {autoCategory ? (

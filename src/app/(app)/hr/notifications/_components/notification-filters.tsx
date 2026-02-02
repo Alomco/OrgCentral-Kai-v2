@@ -52,16 +52,22 @@ export function NotificationFilters() {
   const hasFilters = Boolean(currentType) || Boolean(currentPriority) || unreadOnly;
 
   return (
-    <div className="flex flex-wrap items-center gap-4 mb-6">
-      <div className="w-64">
+    <div className="flex flex-wrap items-end gap-4">
+      <div className="w-full sm:w-64">
+        <Label htmlFor="notification-search" className="text-xs text-muted-foreground">Search</Label>
         <Input
+          id="notification-search"
           aria-label="Search notifications"
-          placeholder="Search"
+          aria-describedby="notification-search-help"
+          placeholder="Search by keyword"
           defaultValue={q}
           onChange={(event) => updateFilters('q', event.target.value.trim().length > 0 ? event.target.value : null)}
           disabled={isPending}
           className="h-9"
         />
+        <p id="notification-search-help" className="mt-1 text-xs text-muted-foreground">
+          Example: time off, approvals, policy.
+        </p>
       </div>
       <div className="flex items-center space-x-2">
         <Switch
@@ -73,41 +79,47 @@ export function NotificationFilters() {
         <Label htmlFor="unread-mode">Unread only</Label>
       </div>
 
-      <Select
-        value={currentType ?? 'all'}
-        onValueChange={(value) => updateFilters('type', value === 'all' ? null : value)}
-        disabled={isPending}
-      >
-        <SelectTrigger className="w-[180px] h-9">
-          <SelectValue placeholder="All types" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">All types</SelectItem>
-          {HR_NOTIFICATION_TYPE_VALUES.map((type) => (
-            <SelectItem key={type} value={type}>
-              {type.replace(TYPE_LABEL_SEPARATOR_REGEX, ' ')}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <div className="space-y-1">
+        <Label className="text-xs text-muted-foreground">Type</Label>
+        <Select
+          value={currentType ?? 'all'}
+          onValueChange={(value) => updateFilters('type', value === 'all' ? null : value)}
+          disabled={isPending}
+        >
+          <SelectTrigger className="w-full h-9 sm:w-[180px]">
+            <SelectValue placeholder="All types" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All types</SelectItem>
+            {HR_NOTIFICATION_TYPE_VALUES.map((type) => (
+              <SelectItem key={type} value={type}>
+                {type.replace(TYPE_LABEL_SEPARATOR_REGEX, ' ')}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
 
-      <Select
-        value={currentPriority ?? 'all'}
-        onValueChange={(value) => updateFilters('priority', value === 'all' ? null : value)}
-        disabled={isPending}
-      >
-        <SelectTrigger className="w-[150px] h-9">
-          <SelectValue placeholder="All priorities" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">All priorities</SelectItem>
-          {HR_NOTIFICATION_PRIORITY_VALUES.map((p) => (
-            <SelectItem key={p} value={p}>
-              {p}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <div className="space-y-1">
+        <Label className="text-xs text-muted-foreground">Priority</Label>
+        <Select
+          value={currentPriority ?? 'all'}
+          onValueChange={(value) => updateFilters('priority', value === 'all' ? null : value)}
+          disabled={isPending}
+        >
+          <SelectTrigger className="w-full h-9 sm:w-[150px]">
+            <SelectValue placeholder="All priorities" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All priorities</SelectItem>
+            {HR_NOTIFICATION_PRIORITY_VALUES.map((p) => (
+              <SelectItem key={p} value={p}>
+                {p}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
 
       {hasFilters && (
         <Button

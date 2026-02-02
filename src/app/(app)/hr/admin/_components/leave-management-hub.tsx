@@ -86,8 +86,10 @@ export async function LeaveManagementHub({ authorization, statusFilter = 'submit
                     <span className="text-lg">Pending Leave Approvals</span>
                     <Badge variant="secondary">{filteredRequests.length}</Badge>
                 </CardTitle>
-                <CardDescription className="flex flex-col gap-2">
-                    <span>Review and approve/reject submitted leave requests</span>
+                <CardDescription>Review and approve or reject submitted leave requests.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <div className="space-y-3">
                     <form className="grid w-full grid-cols-1 gap-2 md:grid-cols-5" method="get">
                         <input type="hidden" name="delegateFor" value={resolvedDelegate ?? ''} />
                         <div className="space-y-1">
@@ -108,15 +110,18 @@ export async function LeaveManagementHub({ authorization, statusFilter = 'submit
                         </div>
                         <div className="space-y-1">
                             <Label className="text-xs" htmlFor={typeFieldId}>Type</Label>
-                            <Input id={typeFieldId} name="type" defaultValue={resolvedType} className="w-full" placeholder="ANNUAL" />
+                            <Input id={typeFieldId} name="type" defaultValue={resolvedType} className="w-full" placeholder="Annual" />
+                            <p className="text-[11px] text-muted-foreground">Leave type name.</p>
                         </div>
                         <div className="space-y-1">
                             <Label className="text-xs" htmlFor={employeeFieldId}>Employee</Label>
                             <Input id={employeeFieldId} name="employee" defaultValue={resolvedEmployee} className="w-full" placeholder="Search name" />
+                            <p className="text-[11px] text-muted-foreground">Search by employee name.</p>
                         </div>
                         <div className="space-y-1">
                             <Label className="text-xs" htmlFor={departmentFieldId}>Department</Label>
                             <Input id={departmentFieldId} name="department" defaultValue={resolvedDepartment} className="w-full" placeholder="Finance" />
+                            <p className="text-[11px] text-muted-foreground">Optional filter.</p>
                         </div>
                         <div className="space-y-1">
                             <Label className="text-xs" htmlFor={fromFieldId}>Date range</Label>
@@ -124,20 +129,19 @@ export async function LeaveManagementHub({ authorization, statusFilter = 'submit
                                 <Input id={fromFieldId} name="from" type="date" defaultValue={resolvedFrom} className="w-full" />
                                 <Input id={toFieldId} name="to" type="date" defaultValue={resolvedTo} className="w-full" />
                             </div>
+                            <p className="text-[11px] text-muted-foreground">Filter by start date.</p>
                         </div>
                         <LeaveManagementActions requests={exportableRequests} delegateFor={resolvedDelegate} />
                     </form>
                     {resolvedDelegate ? (
-                        <div className="text-xs text-muted-foreground">Acting on behalf of {resolvedDelegate}. Filters persist in the URL for sharing.</div>
+                        <div className="text-xs text-muted-foreground">Acting on behalf of {resolvedDelegate}. Filters are saved in the URL for sharing.</div>
                     ) : null}
-                </CardDescription>
-            </CardHeader>
-            <CardContent>
+                </div>
                 {filteredRequests.length === 0 ? (
                     <EmptyState />
                 ) : (
                     <div className="overflow-auto">
-                        <Table>
+                        <Table className="min-w-[920px]">
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>Employee</TableHead>
@@ -153,16 +157,18 @@ export async function LeaveManagementHub({ authorization, statusFilter = 'submit
                             <TableBody>
                                 {filteredRequests.map((request) => (
                                     <TableRow key={request.id}>
-                                        <TableCell className="font-medium">
+                                        <TableCell className="font-medium min-w-0 max-w-[200px] truncate">
                                             {request.employeeName}
                                         </TableCell>
-                                        <TableCell>{request.leaveType}</TableCell>
+                                        <TableCell className="text-muted-foreground max-w-[160px] truncate">
+                                            {request.leaveType}
+                                        </TableCell>
                                         <TableCell className="whitespace-nowrap">
                                             {formatHumanDate(new Date(request.startDate))}
                                             {' – '}
                                             {formatHumanDate(new Date(request.endDate))}
                                         </TableCell>
-                                        <TableCell>{request.totalDays} day(s)</TableCell>
+                                        <TableCell className="whitespace-nowrap">{request.totalDays} day(s)</TableCell>
                                         <TableCell>
                                             <Badge variant={leaveRequestStatusBadgeVariant(request.status)}>
                                                 {request.status}
@@ -171,12 +177,12 @@ export async function LeaveManagementHub({ authorization, statusFilter = 'submit
                                         <TableCell>
                                             <LeaveRequestAttachmentsAdmin requestId={request.id} />
                                         </TableCell>
-                                        <TableCell className="text-muted-foreground">
+                                        <TableCell className="text-muted-foreground whitespace-nowrap">
                                             {request.submittedAt
                                                 ? formatHumanDate(new Date(request.submittedAt))
                                                 : '—'}
                                         </TableCell>
-                                        <TableCell className="text-right">
+                                        <TableCell className="text-right align-top">
                                             <LeaveApprovalForm requestId={request.id} />
                                         </TableCell>
                                     </TableRow>

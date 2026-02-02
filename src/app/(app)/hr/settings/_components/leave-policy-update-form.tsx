@@ -50,6 +50,7 @@ export function LeavePolicyUpdateForm(props: {
                     <div className="space-y-1 lg:col-span-2">
                         <Label htmlFor={`leave-policy-name-${props.policy.id}`}>Name</Label>
                         <Input id={`leave-policy-name-${props.policy.id}`} name="name" defaultValue={props.policy.name} />
+                        <p className="text-xs text-muted-foreground">Visible to employees in leave requests.</p>
                     </div>
                     <div className="space-y-1">
                         <Label htmlFor={`leave-policy-type-${props.policy.id}`}>Type</Label>
@@ -69,6 +70,7 @@ export function LeavePolicyUpdateForm(props: {
                     <div className="space-y-1">
                         <Label htmlFor={`leave-policy-accrual-${props.policy.id}`}>Annual accrual</Label>
                         <Input id={`leave-policy-accrual-${props.policy.id}`} name="accrualAmount" type="number" inputMode="numeric" min={0} max={366} step={0.5} defaultValue={props.policy.accrualAmount ?? ''} />
+                        <p className="text-xs text-muted-foreground">Days earned per year.</p>
                     </div>
                 </div>
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -116,7 +118,7 @@ export function LeavePolicyUpdateForm(props: {
                     </div>
                 </div>
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                    <div className="flex items-center gap-2 rounded-md border px-3 py-2">
+                    <div className="flex flex-wrap items-center gap-2 rounded-md border px-3 py-2">
                         <input
                             ref={requiresApprovalReference}
                             type="hidden"
@@ -142,7 +144,7 @@ export function LeavePolicyUpdateForm(props: {
                             Requires approval
                         </Label>
                     </div>
-                    <div className="flex items-center gap-2 rounded-md border px-3 py-2">
+                    <div className="flex flex-wrap items-center gap-2 rounded-md border px-3 py-2">
                         <input
                             ref={isDefaultReference}
                             type="hidden"
@@ -168,7 +170,7 @@ export function LeavePolicyUpdateForm(props: {
                             Default policy
                         </Label>
                     </div>
-                    <div className="flex items-center gap-2 rounded-md border px-3 py-2">
+                    <div className="flex flex-wrap items-center gap-2 rounded-md border px-3 py-2">
                         <input
                             ref={statutoryReference}
                             type="hidden"
@@ -194,7 +196,7 @@ export function LeavePolicyUpdateForm(props: {
                             Statutory compliance
                         </Label>
                     </div>
-                    <div className="flex items-center gap-2 rounded-md border px-3 py-2">
+                    <div className="flex flex-wrap items-center gap-2 rounded-md border px-3 py-2">
                         <input
                             ref={allowNegativeReference}
                             type="hidden"
