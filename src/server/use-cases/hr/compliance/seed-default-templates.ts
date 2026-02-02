@@ -49,6 +49,7 @@ export async function seedDefaultComplianceTemplates(
                 key: existing.categoryKey,
                 label: 'UK Employment',
                 sortOrder: 100,
+                metadata: { regulatoryRefs: ['UK_GDPR'] },
             });
         }
         return { success: true, created: false, template: existing };
@@ -75,6 +76,7 @@ export async function seedDefaultComplianceTemplates(
                 allowedFileTypes: ['pdf', 'jpg', 'png'],
                 reminderDaysBeforeExpiry: 30,
                 expiryDurationDays: 365,
+                regulatoryRefs: ['UK_GDPR'],
             },
             {
                 id: 'uk_employment.contract_signed',
@@ -83,6 +85,7 @@ export async function seedDefaultComplianceTemplates(
                 isMandatory: true,
                 guidanceText: 'Upload the signed employment contract.',
                 allowedFileTypes: ['pdf', 'docx'],
+                regulatoryRefs: ['UK_GDPR'],
             },
             {
                 id: 'uk_employment.privacy_ack',
@@ -90,6 +93,7 @@ export async function seedDefaultComplianceTemplates(
                 type: 'ACKNOWLEDGEMENT',
                 isMandatory: true,
                 acknowledgementText: 'I acknowledge that I have read the privacy notice.',
+                regulatoryRefs: ['UK_GDPR'],
             },
         ],
     });
@@ -100,6 +104,7 @@ export async function seedDefaultComplianceTemplates(
             key: template.categoryKey,
             label: 'UK Employment',
             sortOrder: 100,
+            metadata: { regulatoryRefs: ['UK_GDPR'] },
         });
     }
 

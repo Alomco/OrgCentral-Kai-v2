@@ -62,7 +62,7 @@ export function ComplianceReminderSettingsForm({ defaults }: ComplianceReminderS
                                 <Input
                                     id="compliance-escalations"
                                     name="escalationDays"
-                                    placeholder="7, 3, 1"
+                                    placeholder="30, 14, 7, 1"
                                     defaultValue={defaults.escalationDays.join(', ')}
                                 />
                                 <p className="text-xs text-muted-foreground">
@@ -115,7 +115,7 @@ export function ComplianceReminderSettingsForm({ defaults }: ComplianceReminderS
                     </p>
                     <Button type="submit" size="sm" disabled={pending}>
                         {pending ? <Spinner className="mr-2" /> : null}
-                        {pending ? 'Saving…' : 'Save'}
+                        {pending ? 'Saving...' : 'Save'}
                     </Button>
                 </CardFooter>
             </Card>

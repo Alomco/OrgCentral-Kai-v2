@@ -37,7 +37,7 @@ export function ModalOverlay({
     <Dialog.Overlay
       data-slot="dialog-overlay"
       className={cn(
-        "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-(--z-overlay) bg-[oklch(var(--background)/0.85)] backdrop-blur-[var(--ui-backdrop-blur)] backdrop-saturate-75",
+        "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-(--z-overlay) bg-black/40 backdrop-blur-[var(--ui-backdrop-blur)] backdrop-saturate-90",
         className
       )}
       {...props}
@@ -70,7 +70,7 @@ export function ModalContent({
       <Dialog.Content
         data-slot="dialog-content"
         className={cn(
-          "data-[state=open]:animate-in data-[state=closed]:animate-out fixed z-(--z-modal) flex min-h-0 max-h-[calc(90vh-2rem)] flex-col overflow-hidden bg-[oklch(var(--popover))] border border-[oklch(var(--border)/var(--ui-border-opacity))] p-0 shadow-(--ui-card-shadow) transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[oklch(var(--primary)/0.4)] focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+          "data-[state=open]:animate-in data-[state=closed]:animate-out fixed z-(--z-modal) flex min-h-0 max-h-[calc(90vh-2rem)] flex-col overflow-hidden bg-[oklch(var(--popover))] border border-[oklch(var(--border)/var(--ui-border-opacity))] p-0 shadow-[var(--ui-surface-item-shadow)] transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[oklch(var(--primary)/0.4)] focus-visible:ring-offset-2 focus-visible:ring-offset-background",
           side === "center" &&
           cn(
             "left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-xl data-[state=open]:zoom-in-95 data-[state=closed]:zoom-out-95",

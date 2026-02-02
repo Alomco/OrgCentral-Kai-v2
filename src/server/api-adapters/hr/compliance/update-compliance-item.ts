@@ -3,6 +3,7 @@ import {
     updateComplianceItem,
     type UpdateComplianceItemDependencies,
 } from '@/server/use-cases/hr/compliance/update-compliance-item';
+import type { UpdateComplianceItemInput } from '@/server/use-cases/hr/compliance/update-compliance-item';
 import { updateComplianceItemSchema } from '@/server/types/hr-compliance-schemas';
 import type { ComplianceControllerDependencies } from './common';
 import { resolveComplianceControllerDependencies, readJson } from './common';
@@ -60,11 +61,23 @@ export async function updateComplianceItemController(
     }
 
     const useCaseDeps: UpdateComplianceItemDependencies = { complianceItemRepository, complianceTemplateRepository };
+    const normalizedAttachments = payload.updates.attachments ?? undefined;
+    const useCaseUpdates: UpdateComplianceItemInput['updates'] = {
+        status: updates.status,
+        notes: updates.notes ?? undefined,
+        attachments: normalizedAttachments,
+        completedAt: updates.completedAt ?? undefined,
+        dueDate: updates.dueDate ?? undefined,
+        reviewedBy: updates.reviewedBy ?? undefined,
+        reviewedAt: updates.reviewedAt ?? undefined,
+        metadata: updates.metadata,
+    };
+
     await updateComplianceItem(useCaseDeps, {
         authorization,
         userId: payload.userId,
         itemId: payload.itemId,
-        updates,
+        updates: useCaseUpdates,
     });
 
     return {

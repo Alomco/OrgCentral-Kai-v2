@@ -3,6 +3,7 @@ import type { LeaveRequest } from '@/server/types/leave-types';
 import type { TrainingRecord } from '@/server/types/hr-types';
 import type { EmployeeDirectoryStats } from '@/server/use-cases/hr/people/get-employee-directory-stats';
 import type { ComplianceLogItem } from '@/server/types/compliance-types';
+import type { DocumentVaultRecord } from '@/server/types/records/document-vault';
 
 const DAY_MS = 1000 * 60 * 60 * 24;
 
@@ -79,6 +80,11 @@ export interface ReportsMetrics {
     complianceExpiringSoon: number;
     compliancePendingReview: number;
     complianceComplete: number;
+    complianceCompletedLast30: number;
+    complianceCompletedPrev30: number;
+    documentTotal: number;
+    documentRetentionExpiringSoon: number;
+    documentAddedLast30: number;
 }
 
 export function buildReportsMetrics(input: {
@@ -89,6 +95,7 @@ export function buildReportsMetrics(input: {
     trainingRecords: TrainingRecord[];
     policies: HRPolicy[];
     complianceItems: ComplianceLogItem[];
+    documents: DocumentVaultRecord[];
     now?: Date;
 }): ReportsMetrics {
     const now = input.now ?? new Date();
@@ -143,6 +150,20 @@ export function buildReportsMetrics(input: {
     const complianceExpiringSoon = input.complianceItems.filter((item) =>
         isWithin(item.dueDate ?? null, now, next30Days),
     ).length;
+    const complianceCompletedLast30 = input.complianceItems.filter((item) =>
+        isWithin(toDate(item.completedAt ?? null), last30Days, now),
+    ).length;
+    const complianceCompletedPrevious30 = input.complianceItems.filter((item) =>
+        isWithin(toDate(item.completedAt ?? null), previous30Days, last30Days),
+    ).length;
+
+    const documentTotal = input.documents.length;
+    const documentRetentionExpiringSoon = input.documents.filter((document_) =>
+        isWithin(toDate(document_.retentionExpires ?? null), now, next30Days),
+    ).length;
+    const documentAddedLast30 = input.documents.filter((document_) =>
+        isWithin(toDate(document_.createdAt), last30Days, now),
+    ).length;
 
     return {
         leaveSubmitted,
@@ -165,5 +186,10 @@ export function buildReportsMetrics(input: {
         complianceExpiringSoon,
         compliancePendingReview,
         complianceComplete,
+        complianceCompletedLast30,
+        complianceCompletedPrev30: complianceCompletedPrevious30,
+        documentTotal,
+        documentRetentionExpiringSoon,
+        documentAddedLast30,
     };
 }

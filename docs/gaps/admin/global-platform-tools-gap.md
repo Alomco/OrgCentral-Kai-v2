@@ -11,14 +11,17 @@
 - Dev tools are not a substitute; this must be guarded and audited.
 
 ## Status (as of 2026-02-01)
-- ❌ Not started — only dev tools exist under `/(dev)`.
+- ✅ Completed — guarded platform tools surface and execution history added.
 
 ## Impact
 - No admin UI for maintenance tools (backfills, claim sync, scheduled tasks).
 
 ## TODO
-- [ ] Define platform tool allowlist with required parameters and runbook links.
-- [ ] Implement secure execution controllers with Zod validation, confirmations, and audit logs.
-- [ ] Build tooling UI with dry-run, status, and execution history.
-- [ ] Add guardrails (rate limits, role allowlists, break-glass approvals).
-- [ ] Add tests and monitoring for tool execution outcomes.
+- [x] Define platform tool allowlist with required parameters and runbook links.
+- [x] Implement secure execution controllers with Zod validation, confirmations, and audit logs.
+- [x] Build tooling UI with dry-run, status, and execution history.
+- [x] Add guardrails (rate limits, role allowlists, break-glass approvals).
+- [x] Add tests and monitoring for tool execution outcomes.
+
+## Notes
+- Tool executions are rate-limited, MFA-gated, and audited.

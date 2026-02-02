@@ -1,5 +1,6 @@
 import type { PrismaJsonValue } from '@/server/types/prisma';
-import type { ComplianceLogItem } from '@/server/types/compliance-types';
+import type { ComplianceAttachmentInput, ComplianceLogItem } from '@/server/types/compliance-types';
+import type { JsonValue } from '@/server/types/json';
 import type {
     ComplianceItemUpdateInput,
     IComplianceItemRepository,
@@ -18,12 +19,12 @@ export interface UpdateComplianceItemInput {
     updates: {
         status?: ComplianceLogItem['status'];
         notes?: string | null;
-        attachments?: string[] | null;
+        attachments?: ComplianceAttachmentInput[] | null;
         completedAt?: Date | null;
         dueDate?: Date | null;
         reviewedBy?: string | null;
         reviewedAt?: Date | null;
-        metadata?: Record<string, unknown>;
+        metadata?: JsonValue;
     };
 }
 

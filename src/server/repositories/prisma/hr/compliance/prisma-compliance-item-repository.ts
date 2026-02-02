@@ -19,7 +19,7 @@ import { toPrismaInputJson } from '@/server/repositories/prisma/helpers/prisma-u
 import { registerOrgCacheTag, invalidateOrgCache } from '@/server/lib/cache-tags';
 import { CACHE_SCOPE_COMPLIANCE_ITEMS } from '@/server/repositories/cache-scopes';
 import { RepositoryAuthorizationError } from '@/server/repositories/security';
-import { attachmentSchema } from '@/server/validators/hr/compliance/compliance-validators';
+import { complianceAttachmentsSchema } from '@/server/validators/hr/compliance/compliance-validators';
 import type { DataClassificationLevel, DataResidencyZone } from '@/server/types/tenant';
 
 type ComplianceLogRecord = PrismaComplianceLogItem;
@@ -60,7 +60,7 @@ export class PrismaComplianceItemRepository
         await Promise.all(
             records.map((data) => {
                 // Validate attachments and metadata (optional but safe)
-                const validatedAttachments = data.attachments ? attachmentSchema.parse(data.attachments) : null;
+                const validatedAttachments = data.attachments ? complianceAttachmentsSchema.parse(data.attachments) : null;
                 // metadata is already typed as Record<string, unknown> | undefined in mapper result usually
 
                 return this.complianceLog.create({
@@ -132,7 +132,7 @@ export class PrismaComplianceItemRepository
         // Validate attachments if present
         let attachmentsJson: Prisma.InputJsonValue | typeof Prisma.JsonNull | undefined = undefined;
         if (mapped.attachments !== undefined) {
-            const validatedAttachments = mapped.attachments ? attachmentSchema.parse(mapped.attachments) : null;
+            const validatedAttachments = mapped.attachments ? complianceAttachmentsSchema.parse(mapped.attachments) : null;
             attachmentsJson = toJsonNullInput(
                 validatedAttachments as unknown as Prisma.InputJsonValue,
             );

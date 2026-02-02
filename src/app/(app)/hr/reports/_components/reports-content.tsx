@@ -8,7 +8,6 @@ import {
     Timer,
     Users,
 } from 'lucide-react';
-
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -19,7 +18,6 @@ import { formatCount, type ReportsMetrics } from '../reports-utils';
 import type { EmployeeDirectoryStats } from '@/server/use-cases/hr/people/get-employee-directory-stats';
 import type { LeaveRequest } from '@/server/types/leave-types';
 import type { UnplannedAbsence, TimeEntry } from '@/server/types/hr-ops-types';
-
 export interface ReportsContentProps {
     employeeStats: EmployeeDirectoryStats;
     leaveRequests: LeaveRequest[];
@@ -42,6 +40,12 @@ export function ReportsContent({
     const complianceCoverageRate = metrics.complianceTotal > 0
         ? Math.round((metrics.complianceComplete / metrics.complianceTotal) * 100)
         : 0;
+    const complianceCompletedDelta = metrics.complianceCompletedPrev30 > 0
+        ? Math.round(((metrics.complianceCompletedLast30 - metrics.complianceCompletedPrev30) / metrics.complianceCompletedPrev30) * 100)
+        : null;
+    const complianceDeltaLabel = complianceCompletedDelta === null
+        ? 'N/A'
+        : `${complianceCompletedDelta >= 0 ? '+' : ''}${String(complianceCompletedDelta)}%`;
     const absenceRate = employeeStats.active > 0
         ? Math.round((metrics.absencesOpen / employeeStats.active) * 100)
         : 0;
@@ -97,10 +101,16 @@ export function ReportsContent({
                         accentColor="warning"
                     />
                     <HrStatCard
-                        label="Documents expiring"
-                        value={formatCount(metrics.complianceExpiringSoon)}
+                        label="Docs retention due"
+                        value={formatCount(metrics.documentRetentionExpiringSoon)}
                         icon={<ScrollText className="h-5 w-5" />}
                         accentColor="accent"
+                    />
+                    <HrStatCard
+                        label="Vault documents"
+                        value={formatCount(metrics.documentTotal)}
+                        icon={<ScrollText className="h-5 w-5" />}
+                        accentColor="primary"
                     />
                 </div>
             </HrSection>
@@ -216,10 +226,22 @@ export function ReportsContent({
                         accentColor="accent"
                     />
                     <HrStatCard
+                        label="Compliance completion trend"
+                        value={complianceDeltaLabel}
+                        icon={<BarChart3 className="h-5 w-5" />}
+                        accentColor={complianceCompletedDelta !== null && complianceCompletedDelta < 0 ? 'warning' : 'success'}
+                    />
+                    <HrStatCard
                         label="Open absence rate"
                         value={`${String(absenceRate)}%`}
                         icon={<CalendarClock className="h-5 w-5" />}
                         accentColor="warning"
+                    />
+                    <HrStatCard
+                        label="Documents added (30d)"
+                        value={formatCount(metrics.documentAddedLast30)}
+                        icon={<ScrollText className="h-5 w-5" />}
+                        accentColor="accent"
                     />
                 </div>
             </HrSection>

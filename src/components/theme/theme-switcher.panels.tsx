@@ -54,7 +54,7 @@ export function ModePanel({ modeOptions, currentMode, onSelect, setOpen }: ModeP
                         onKeyDown={(event) => handleRadioKeyDown(event, modeOptions, currentMode, onSelect)}
                         className={cn(
                             'flex w-full items-center gap-3 rounded-lg border px-3 py-2 text-left transition-all',
-                            'border-transparent hover:bg-muted/50',
+                            'border-border/50 hover:border-primary/40 hover:bg-muted/50',
                             FOCUS_RING_CLASSES,
                         )}
                     >
@@ -128,7 +128,7 @@ export function ColorPanel<TThemeId extends string = string>({
                             className={cn(
                                 'group relative w-full rounded-lg border p-3 text-left transition-all duration-200',
                                 'hover:scale-[1.02]',
-                                'border-border hover:border-primary/50',
+                                'border-border/50 hover:border-primary/50',
                                 FOCUS_RING_CLASSES,
                             )}
                         >
@@ -194,7 +194,7 @@ export function StylePanel({ styles, currentStyle, onSelect, setOpen }: StylePan
                         onKeyDown={(event) => handleRadioKeyDown(event, styles, currentStyle, onSelect)}
                         className={cn(
                             'flex w-full items-center gap-3 rounded-lg border p-3 text-left transition-all',
-                            'border-transparent hover:bg-muted/50',
+                            'border-border/50 hover:border-primary/40 hover:bg-muted/50',
                             FOCUS_RING_CLASSES,
                         )}
                     >

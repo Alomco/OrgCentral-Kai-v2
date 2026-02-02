@@ -1,7 +1,7 @@
 /* UI style token defaults for clean corporate. */
 :root {
     --ui-backdrop-blur: 0px;
-    --ui-glow-intensity: 0;
+    --ui-glow-intensity: 0.22;
     --ui-transition-duration: 150ms;
     --ui-transition-easing: ease-out;
     --ui-transition: var(--ui-transition-duration) var(--ui-transition-easing);
@@ -15,7 +15,7 @@
     --ui-hover-lift: 0px;
     --ui-active-scale: 0.99;
     --ui-focus-ring-width: 2px;
-    --ui-focus-ring-offset: 1px;
+    --ui-focus-ring-offset: 2px;
     --ui-border-width: 1px;
     --ui-animation-intensity: subtle;
 
@@ -26,7 +26,7 @@
     --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
     --shadow-glow: 0 8px 24px -4px oklch(var(--primary) / 0.25);
 
-    --ui-card-shadow: var(--shadow-sm);
+    --ui-card-shadow: var(--shadow-md);
     --ui-border-radius: var(--radius-sm);
     --ui-input-shadow: inset 0 0 0 1px oklch(var(--border) / 0.5);
     --ui-control-shadow: inset 0 0 0 1px oklch(var(--border) / 0.5);

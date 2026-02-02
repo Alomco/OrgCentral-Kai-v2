@@ -60,16 +60,14 @@ export function Topbar({
                 </Link>
 
                 {/* Left Content */}
-                {leftContent}
-
-                {/* Spacer */}
-                <div className="flex-1" />
+                {leftContent && (
+                    <div className={styles.leftContent}>{leftContent}</div>
+                )}
 
                 {/* Center Content */}
-                {centerContent}
-
-                {/* Spacer */}
-                <div className="flex-1" />
+                {centerContent && (
+                    <div className={styles.centerContent}>{centerContent}</div>
+                )}
             </div>
 
             {/* Actions */}

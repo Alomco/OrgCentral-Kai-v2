@@ -1,23 +1,29 @@
-import { Database, FileText, KeyRound, Settings, UserPlus } from 'lucide-react';
+import { Building2, Database, LifeBuoy, Settings, ShieldUser, UserPlus } from 'lucide-react';
 
 export const QUICK_ACTIONS = [
+    {
+        title: 'Review tenants',
+        description: 'Approve or suspend tenants',
+        href: '/admin/global/tenant-management',
+        icon: Building2,
+    },
+    {
+        title: 'Support tickets',
+        description: 'Triage platform escalations',
+        href: '/admin/global/support-tickets',
+        icon: LifeBuoy,
+    },
+    {
+        title: 'Impersonation',
+        description: 'Request time-boxed access',
+        href: '/admin/global/user-impersonation',
+        icon: ShieldUser,
+    },
     {
         title: 'Invite member',
         description: 'Add a user and assign access',
         href: '/org/members',
         icon: UserPlus,
-    },
-    {
-        title: 'Review roles',
-        description: 'Audit role assignments',
-        href: '/org/roles',
-        icon: KeyRound,
-    },
-    {
-        title: 'View audit log',
-        description: 'Track critical admin activity',
-        href: '/org/permissions',
-        icon: FileText,
     },
     {
         title: 'Manage org settings',

@@ -26,17 +26,13 @@
 - Document vault metadata and expiry signals are tracked in `orgcentral/docs/gaps/documents/document-management-gap.md`.
 
 ## Gaps (new project only)
-1) Document/compliance KPIs are missing from HR analytics surfaces.
-   - Old dashboard surfaced "Documents Expiring" and "Compliance" tiles; new HR dashboard omits those signals and manager snapshot does not include them.
-2) HR reports do not include compliance or document-expiry metrics, despite compliance workflows being core in the old dashboard.
-3) HR admin reporting visibility is reduced and stats are placeholders.
-   - New admin quick actions do not link to reports, and `getAdminDashboardStats`/`getPendingApprovals` return placeholder values.
-   - Old admin center exposed a reports entry and live pending counts from hubs.
-4) HR admin reporting visibility is not linked to reports from the admin dashboard quick actions.
-   - New admin quick actions omit reports; old admin center exposed a reports entry.
-5) Cross-module reporting is missing - no comprehensive reporting connecting data from different modules (e.g., how training affects performance).
+1) ✅ Document/compliance KPIs now surface in HR analytics (dashboard + reports).
+2) ✅ HR reports include compliance and document-retention metrics.
+3) ✅ HR admin reporting visibility and stats restored (pending approvals + real counts).
+4) ✅ HR admin quick actions link to reports.
+5) ✅ Cross-module reporting surfaced via the reports insights section.
 6) Advanced analytics capabilities are missing - no predictive analytics, trend analysis, or workforce planning tools.
-7) Export functionality for reports is limited or missing - no comprehensive export options for employee data or analytics.
+7) ✅ Export functionality now includes CSV/JSON/PDF for reports.
 
 ## TODOs
 - [x] Analyze and restore document-expiry/compliance KPIs in HR dashboards and reports (compare old HR dashboard to new KPI surfaces).
@@ -45,7 +41,7 @@
 - [x] Analyze and link HR admin quick actions to HR reports with role-appropriate routing.
 - [x] Implement cross-module reporting capabilities that connect data from different modules.
 - [ ] Add advanced analytics features including trend analysis and predictive capabilities.
-- [x] Implement comprehensive export functionality for reports and employee data.
+- [x] Implement comprehensive export functionality for reports and employee data (CSV/JSON/PDF).
 
 ## Related gaps
 - orgcentral/docs/gaps/documents/document-management-gap.md
@@ -56,15 +52,15 @@
 
 | # | Gap | Status | Notes |
 |---|-----|--------|-------|
-| 1 | Document/Compliance KPIs in HR dashboard | ⚠️ PARTIAL | Compliance + expiring KPIs added; document vault expiry still pending |
-| 2 | Document/Compliance metrics in HR reports | ⚠️ PARTIAL | Compliance KPIs added; document vault expiry still pending |
+| 1 | Document/Compliance KPIs in HR dashboard | ✅ CLOSED | Compliance due + document retention KPIs added |
+| 2 | Document/Compliance metrics in HR reports | ✅ CLOSED | Compliance + document retention KPIs + trend cards |
 | 3 | HR Admin stats - real data | ✅ CLOSED | Pending approvals + compliance/upcoming expirations wired |
 | 4 | HR Admin pending approvals | ✅ CLOSED | Pending approvals populated across HR modules |
 | 5 | HR Admin quick actions → Reports link | ✅ CLOSED | Reports entry present in quick actions |
 | 6 | Cross-module reporting | ✅ CLOSED | Cross-module insights section added to reports |
 | 7 | Advanced analytics | ❌ OPEN | No predictive or trend analysis capabilities |
-| 8 | Report export functionality | ✅ CLOSED | CSV/JSON export endpoint wired |
+| 8 | Report export functionality | ✅ CLOSED | CSV/JSON/PDF export endpoint wired |
 
 ### Priority Recommendations
-1. **High effort:** Create document-expiry use-case and add KPI tiles from document vault metadata
+1. **High effort:** Create document-expiry use-case tied to compliance item status views
 2. **High effort:** Add advanced analytics and predictive capabilities

@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
 import type { IComplianceItemRepository } from '@/server/repositories/contracts/hr/compliance/compliance-item-repository-contract';
 import type { IComplianceTemplateRepository } from '@/server/repositories/contracts/hr/compliance/compliance-template-repository-contract';
+import type { IComplianceReminderSettingsRepository } from '@/server/repositories/contracts/hr/compliance/compliance-reminder-settings-repository-contract';
 import type { HrNotificationServiceContract } from '@/server/services/hr/notifications/hr-notification-service.provider';
 import type { NotificationDispatchContract } from '@/server/repositories/contracts/notifications/notification-dispatch-contract';
 import { ComplianceReminderProcessor } from '../reminder.processor';
@@ -32,6 +33,7 @@ function createAuthorization(): RepositoryAuthorizationContext {
 describe('ComplianceReminderProcessor', () => {
     let complianceRepository: Pick<IComplianceItemRepository, 'findExpiringItemsForOrg'>;
     let templateRepository: Pick<IComplianceTemplateRepository, 'listTemplates'>;
+    let reminderSettingsRepository: Pick<IComplianceReminderSettingsRepository, 'getSettings'>;
     let notificationService: HrNotificationServiceContract;
     let notificationDispatcher: NotificationDispatchContract;
     let processor: ComplianceReminderProcessor;
@@ -42,6 +44,9 @@ describe('ComplianceReminderProcessor', () => {
         };
         templateRepository = {
             listTemplates: vi.fn().mockResolvedValue([]),
+        };
+        reminderSettingsRepository = {
+            getSettings: vi.fn().mockResolvedValue(null),
         };
         notificationService = {
             createNotification: vi.fn().mockResolvedValue({ notification: { id: 'notif-1' } }) as never,
@@ -56,6 +61,7 @@ describe('ComplianceReminderProcessor', () => {
         processor = new ComplianceReminderProcessor({
             complianceItemRepository: complianceRepository as IComplianceItemRepository,
             complianceTemplateRepository: templateRepository as IComplianceTemplateRepository,
+            complianceReminderSettingsRepository: reminderSettingsRepository as IComplianceReminderSettingsRepository,
             notificationService,
             notificationDispatcher,
         });

@@ -8,6 +8,12 @@ export const globalAdminTemplate = {
   description: 'Global administrator with full platform access.',
   scope: RoleScope.GLOBAL,
   permissions: {
+    platformTenants: ROLE_PERMISSION_STATEMENTS.platformTenants,
+    platformBillingPlans: ROLE_PERMISSION_STATEMENTS.platformBillingPlans,
+    platformTools: ROLE_PERMISSION_STATEMENTS.platformTools,
+    platformSupport: ROLE_PERMISSION_STATEMENTS.platformSupport,
+    platformImpersonation: ROLE_PERMISSION_STATEMENTS.platformImpersonation,
+    platformBreakGlass: ROLE_PERMISSION_STATEMENTS.platformBreakGlass,
     platformSettings: ROLE_PERMISSION_STATEMENTS.platformSettings,
     'org.settings': ROLE_PERMISSION_STATEMENTS['org.settings'],
     member: ROLE_PERMISSION_STATEMENTS.member,

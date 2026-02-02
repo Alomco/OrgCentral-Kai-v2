@@ -1,14 +1,15 @@
-'use client';
+﻿'use client';
 
-import { useMemo, useState } from 'react';
+import { useActionState, useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { Check, Paperclip, Save } from 'lucide-react';
+import { Check, Save } from 'lucide-react';
+
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import type { ComplianceLogItem, ComplianceTemplateItem } from '@/server/types/compliance-types';
+import type { ComplianceAttachmentInput, ComplianceLogItem, ComplianceTemplateItem } from '@/server/types/compliance-types';
 import type { YesNoValue } from './compliance-item-submission.helpers';
 import {
     buildMetadataPayload,
@@ -17,11 +18,31 @@ import {
     toDateInputValue,
 } from './compliance-item-submission.helpers';
 import { buildComplianceItemQueryKey, COMPLIANCE_ITEMS_QUERY_KEY } from '../compliance-items-query';
+import { ComplianceAttachmentsField } from './compliance-attachments-field';
+import { submitComplianceItemAction, type ComplianceSubmissionActionState } from '../actions/submit-compliance-item';
 
 interface ComplianceItemSubmissionFormProps {
     item: ComplianceLogItem;
     templateItem: ComplianceTemplateItem | null;
     canEdit: boolean;
+}
+
+const INITIAL_STATE: ComplianceSubmissionActionState = { status: 'idle' };
+
+function toAttachmentInput(value: ComplianceAttachmentInput): ComplianceAttachmentInput {
+    return value;
+}
+
+function mapExistingAttachments(item: ComplianceLogItem): ComplianceAttachmentInput[] {
+    if (!item.attachments || item.attachments.length === 0) {
+        return [];
+    }
+    return item.attachments.map((attachment) => ({
+        ...attachment,
+        uploadedAt: attachment.uploadedAt instanceof Date
+            ? attachment.uploadedAt.toISOString()
+            : new Date(attachment.uploadedAt).toISOString(),
+    })) as ComplianceAttachmentInput[];
 }
 
 export function ComplianceItemSubmissionForm({
@@ -30,13 +51,11 @@ export function ComplianceItemSubmissionForm({
     canEdit,
 }: ComplianceItemSubmissionFormProps) {
     const queryClient = useQueryClient();
-    const initialMetadata = useMemo(
-        () => parseSubmissionMetadata(item.metadata),
-        [item.metadata],
-    );
+    const formReference = useRef<HTMLFormElement | null>(null);
+    const initialMetadata = useMemo(() => parseSubmissionMetadata(item.metadata), [item.metadata]);
+
     const [notes, setNotes] = useState(item.notes ?? '');
-    const [attachments, setAttachments] = useState<string[]>(item.attachments ?? []);
-    const [attachmentInput, setAttachmentInput] = useState('');
+    const [attachments, setAttachments] = useState<ComplianceAttachmentInput[]>(() => mapExistingAttachments(item));
     const [completedAt, setCompletedAt] = useState(toDateInputValue(item.completedAt));
     const [acknowledgementAccepted, setAcknowledgementAccepted] = useState(
         initialMetadata.acknowledgement?.accepted ?? false,
@@ -44,32 +63,25 @@ export function ComplianceItemSubmissionForm({
     const [yesNoValue, setYesNoValue] = useState<YesNoValue | null>(
         initialMetadata.yesNo?.value ?? null,
     );
-    const [status, setStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
-    const [message, setMessage] = useState('');
+    const [uploading, setUploading] = useState(false);
+
+    const [state, formAction, pending] = useActionState(submitComplianceItemAction, INITIAL_STATE);
 
     const itemType = templateItem?.type ?? null;
-    const canSubmit = canEdit && status !== 'saving';
+    const canSubmit = canEdit && !pending && !uploading;
 
-    const handleAddAttachment = () => {
-        const trimmed = attachmentInput.trim();
-        if (!trimmed || attachments.includes(trimmed) || attachments.length >= 10) {
+    useEffect(() => {
+        if (state.status === 'success') {
+            void queryClient.invalidateQueries({ queryKey: buildComplianceItemQueryKey(item.id, item.userId) }).catch(() => null);
+            void queryClient.invalidateQueries({ queryKey: COMPLIANCE_ITEMS_QUERY_KEY }).catch(() => null);
+        }
+    }, [item.id, item.userId, queryClient, state.status]);
+
+    const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        if (!canSubmit) {
             return;
         }
-        setAttachments((previous) => [...previous, trimmed]);
-        setAttachmentInput('');
-    };
-
-    const handleRemoveAttachment = (value: string) => {
-        setAttachments((previous) => previous.filter((itemEntry) => itemEntry !== value));
-    };
-
-    const handleSubmit = async () => {
-        if (!canEdit) {
-            return;
-        }
-
-        setStatus('saving');
-        setMessage('');
 
         const metadataPayload = buildMetadataPayload(
             normalizeMetadata(item.metadata),
@@ -79,38 +91,11 @@ export function ComplianceItemSubmissionForm({
             templateItem?.yesNoPrompt,
         );
 
-        const updates = {
-            status: 'PENDING_REVIEW',
-            notes: notes.trim().length > 0 ? notes.trim() : null,
-            attachments: attachments.length > 0 ? attachments : null,
-            completedAt: completedAt ? new Date(completedAt).toISOString() : null,
-            metadata: metadataPayload,
-        };
+        const formData = new FormData(event.currentTarget);
+        formData.set('attachments', JSON.stringify(attachments.map(toAttachmentInput)));
+        formData.set('metadata', metadataPayload ? JSON.stringify(metadataPayload) : '');
 
-        try {
-            const response = await fetch('/api/hr/compliance/update', {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    userId: item.userId,
-                    itemId: item.id,
-                    updates,
-                }),
-            });
-
-            if (!response.ok) {
-                const payload = (await response.json()) as { error?: string } | null;
-                throw new Error(payload?.error ?? 'Unable to update compliance item.');
-            }
-
-            setStatus('success');
-            setMessage('Submission sent for review.');
-            void queryClient.invalidateQueries({ queryKey: buildComplianceItemQueryKey(item.id, item.userId) }).catch(() => null);
-            void queryClient.invalidateQueries({ queryKey: COMPLIANCE_ITEMS_QUERY_KEY }).catch(() => null);
-        } catch (error) {
-            setStatus('error');
-            setMessage(error instanceof Error ? error.message : 'Unable to update compliance item.');
-        }
+        formAction(formData);
     };
 
     if (!canEdit) {
@@ -125,11 +110,14 @@ export function ComplianceItemSubmissionForm({
     }
 
     return (
-        <div className="space-y-4">
-            {status === 'error' || status === 'success' ? (
-                <Alert variant={status === 'error' ? 'destructive' : 'default'} role="status">
-                    <AlertTitle>{status === 'error' ? 'Unable to submit' : 'Submission saved'}</AlertTitle>
-                    <AlertDescription>{message}</AlertDescription>
+        <form ref={formReference} onSubmit={handleSubmit} className="space-y-4">
+            <input type="hidden" name="userId" value={item.userId} />
+            <input type="hidden" name="itemId" value={item.id} />
+
+            {(state.status === 'error' || state.status === 'success') ? (
+                <Alert variant={state.status === 'error' ? 'destructive' : 'default'} role="status">
+                    <AlertTitle>{state.status === 'error' ? 'Unable to submit' : 'Submission saved'}</AlertTitle>
+                    <AlertDescription>{state.message ?? 'Submission sent for review.'}</AlertDescription>
                 </Alert>
             ) : null}
 
@@ -139,6 +127,7 @@ export function ComplianceItemSubmissionForm({
                         <Label htmlFor="compliance-completed-at">Completion date</Label>
                         <Input
                             id="compliance-completed-at"
+                            name="completedAt"
                             type="date"
                             value={completedAt}
                             onChange={(event) => setCompletedAt(event.target.value)}
@@ -153,7 +142,7 @@ export function ComplianceItemSubmissionForm({
                             <label className="flex items-center gap-2 text-sm">
                                 <input
                                     type="radio"
-                                    name="compliance-yes-no"
+                                    name="yesNoValue"
                                     value="YES"
                                     checked={yesNoValue === 'YES'}
                                     onChange={() => setYesNoValue('YES')}
@@ -163,7 +152,7 @@ export function ComplianceItemSubmissionForm({
                             <label className="flex items-center gap-2 text-sm">
                                 <input
                                     type="radio"
-                                    name="compliance-yes-no"
+                                    name="yesNoValue"
                                     value="NO"
                                     checked={yesNoValue === 'NO'}
                                     onChange={() => setYesNoValue('NO')}
@@ -180,6 +169,7 @@ export function ComplianceItemSubmissionForm({
                         <label className="flex items-center gap-2 text-sm">
                             <input
                                 type="checkbox"
+                                name="acknowledgementAccepted"
                                 checked={acknowledgementAccepted}
                                 onChange={(event) => setAcknowledgementAccepted(event.target.checked)}
                             />
@@ -189,48 +179,21 @@ export function ComplianceItemSubmissionForm({
                 ) : null}
             </div>
 
-            {itemType === 'DOCUMENT' ? (
-                <div className="space-y-2">
-                    <Label>Attachments</Label>
-                    <div className="flex flex-wrap gap-2">
-                        <Input
-                            placeholder="Paste a document link"
-                            value={attachmentInput}
-                            onChange={(event) => setAttachmentInput(event.target.value)}
-                        />
-                        <Button type="button" variant="outline" onClick={handleAddAttachment}>
-                            <Paperclip className="mr-2 h-4 w-4" />
-                            Add
-                        </Button>
-                    </div>
-                    <div className="space-y-2">
-                        {attachments.length === 0 ? (
-                            <p className="text-xs text-muted-foreground">No attachments added.</p>
-                        ) : (
-                            attachments.map((value) => (
-                                <div
-                                    key={value}
-                                    className="flex items-center justify-between rounded-md border px-3 py-2 text-sm"
-                                >
-                                    <span className="truncate">{value}</span>
-                                    <button
-                                        type="button"
-                                        className="text-xs text-muted-foreground underline"
-                                        onClick={() => handleRemoveAttachment(value)}
-                                    >
-                                        Remove
-                                    </button>
-                                </div>
-                            ))
-                        )}
-                    </div>
-                </div>
-            ) : null}
+            <ComplianceAttachmentsField
+                itemType={itemType}
+                value={attachments}
+                onChange={setAttachments}
+                ownerUserId={item.userId}
+                allowedFileTypes={templateItem?.allowedFileTypes}
+                disabled={pending}
+                onBusyChange={setUploading}
+            />
 
             <div className="space-y-2">
                 <Label htmlFor="compliance-notes">Notes</Label>
                 <Textarea
                     id="compliance-notes"
+                    name="notes"
                     value={notes}
                     onChange={(event) => setNotes(event.target.value)}
                     placeholder="Add any supporting context for reviewers"
@@ -238,12 +201,10 @@ export function ComplianceItemSubmissionForm({
                 />
             </div>
 
-            <Button type="button" onClick={handleSubmit} disabled={!canSubmit}>
-                {status === 'saving'
-                    ? <Save className="mr-2 h-4 w-4 animate-spin" />
-                    : <Check className="mr-2 h-4 w-4" />}
-                {status === 'saving' ? 'Submitting...' : 'Submit for review'}
+            <Button type="submit" disabled={!canSubmit}>
+                {pending ? <Save className="mr-2 h-4 w-4 animate-spin" /> : <Check className="mr-2 h-4 w-4" />}
+                {pending ? 'Submitting...' : 'Submit for review'}
             </Button>
-        </div>
+        </form>
     );
 }

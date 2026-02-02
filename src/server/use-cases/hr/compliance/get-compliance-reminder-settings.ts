@@ -15,13 +15,14 @@ export interface GetComplianceReminderSettingsResult {
 }
 
 const DEFAULT_WINDOW_DAYS = 30;
+const DEFAULT_ESCALATION_DAYS = [30, 14, 7, 1] as const;
 
 function buildDefaultSettings(orgId: string, authorization: RepositoryAuthorizationContext): ComplianceReminderSettings {
     const now = new Date();
     return {
         orgId,
         windowDays: DEFAULT_WINDOW_DAYS,
-        escalationDays: [7, 3, 1],
+        escalationDays: [...DEFAULT_ESCALATION_DAYS],
         notifyOnComplete: false,
         dataClassification: authorization.dataClassification,
         dataResidency: authorization.dataResidency,

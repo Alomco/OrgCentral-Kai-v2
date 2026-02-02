@@ -21,11 +21,12 @@ function readEscalationDays(formData: FormData): number[] {
     if (!raw) {
         return [];
     }
-    return raw
+    const values = raw
         .split(',')
         .map((value) => Number(value.trim()))
         .filter((value) => Number.isFinite(value) && value > 0)
         .map((value) => Math.round(value));
+    return Array.from(new Set(values)).sort((a, b) => b - a);
 }
 
 export async function updateComplianceReminderSettingsAction(

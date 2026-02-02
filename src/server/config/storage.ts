@@ -9,6 +9,10 @@ export interface AbsenceStorageConfig extends AzureBlobPresignConfig {
     maxBytes: number;
 }
 
+export interface DocumentVaultStorageConfig extends AzureBlobPresignConfig {
+    maxBytes: number;
+}
+
 export function getLeaveStorageConfig(): LeaveStorageConfig {
     const accountName = process.env.AZURE_BLOB_ACCOUNT_NAME;
     const accountKey = process.env.AZURE_BLOB_ACCOUNT_KEY;
@@ -48,6 +52,28 @@ export function getAbsenceStorageConfig(): AbsenceStorageConfig {
         accountKey,
         container,
         basePath: 'absence',
+        maxBytes,
+        defaultTtlSeconds: 15 * 60,
+    };
+}
+
+export function getDocumentVaultStorageConfig(): DocumentVaultStorageConfig {
+    const accountName = process.env.AZURE_BLOB_ACCOUNT_NAME;
+    const accountKey = process.env.AZURE_BLOB_ACCOUNT_KEY;
+    const container = process.env.AZURE_BLOB_CONTAINER_DOCUMENTS ?? process.env.AZURE_BLOB_CONTAINER;
+
+    if (!accountName || !accountKey || !container) {
+        throw new ValidationError('Document vault storage is not configured (missing account name, key, or container).');
+    }
+
+    const maxBytesEnvironment = process.env.DOCUMENT_VAULT_MAX_BYTES;
+    const maxBytes = maxBytesEnvironment ? Number(maxBytesEnvironment) : 25 * 1024 * 1024;
+
+    return {
+        accountName,
+        accountKey,
+        container,
+        basePath: 'documents',
         maxBytes,
         defaultTtlSeconds: 15 * 60,
     };

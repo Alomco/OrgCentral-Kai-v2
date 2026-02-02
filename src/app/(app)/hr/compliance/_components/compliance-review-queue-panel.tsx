@@ -1,4 +1,4 @@
-import { unstable_noStore as noStore } from 'next/cache';
+﻿import { unstable_noStore as noStore } from 'next/cache';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -12,6 +12,7 @@ import {
 } from '@/server/use-cases/hr/compliance/list-pending-review-items';
 import { listComplianceTemplates } from '@/server/use-cases/hr/compliance/list-compliance-templates';
 import type { PrismaJsonValue } from '@/server/types/prisma';
+import type { ComplianceAttachment } from '@/server/types/compliance-types';
 
 import { formatHumanDate } from '../../_components/format-date';
 import { complianceItemStatusBadgeVariant } from '../../_components/hr-badge-variants';
@@ -24,7 +25,7 @@ export interface ComplianceReviewQueuePanelProps {
 
 function formatDate(value: Date | null | undefined): string {
     if (!value) {
-        return '—';
+        return '-';
     }
     return formatHumanDate(value);
 }
@@ -54,51 +55,33 @@ function getEvidenceSummary(metadata: PrismaJsonValue | null | undefined): strin
     return evidence;
 }
 
-function isHttpUrl(value: string): boolean {
-    try {
-        const url = new URL(value);
-        return url.protocol === 'http:' || url.protocol === 'https:';
-    } catch {
-        return false;
-    }
-}
-
-function renderAttachments(value: string[] | null | undefined): React.ReactNode {
+function renderAttachments(value: ComplianceAttachment[] | null | undefined): React.ReactNode {
     if (!value || value.length === 0) {
-        return '—';
+        return 'None';
     }
 
     const shown = value.slice(0, 2);
     const remainder = value.length - shown.length;
 
     return (
-        <>
-            {shown.map((item, index) => {
-                const prefix = index === 0 ? '' : ', ';
-                if (isHttpUrl(item)) {
-                    return (
-                        <span key={item}>
-                            {prefix}
-                            <a
-                                href={item}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="underline underline-offset-4"
-                            >
-                                link
-                            </a>
-                        </span>
-                    );
-                }
-                return (
-                    <span key={item}>
-                        {prefix}
-                        {item}
+        <div className="space-y-1 text-xs">
+            {shown.map((item) => (
+                <div key={item.documentId} className="flex items-center gap-2">
+                    <a
+                        href={`/api/hr/documents/${item.documentId}/download`}
+                        className="underline underline-offset-4"
+                    >
+                        {item.fileName}
+                    </a>
+                    <span className="text-muted-foreground">
+                        {item.classification} / {item.retentionPolicy} / v{String(item.version)}
                     </span>
-                );
-            })}
-            {remainder > 0 ? ` … (+${String(remainder)})` : null}
-        </>
+                </div>
+            ))}
+            {remainder > 0 ? (
+                <div className="text-muted-foreground">+{String(remainder)} more</div>
+            ) : null}
+        </div>
     );
 }
 
@@ -163,7 +146,7 @@ export async function ComplianceReviewQueuePanel({ authorization }: ComplianceRe
                                             <TableCell className="max-w-72">
                                                 <div className="font-medium truncate" title={itemName}>{itemName}</div>
                                                 <div className="text-xs text-muted-foreground">
-                                                    {templateName ? `${templateName} • ` : ''}{itemType ?? 'DOCUMENT'}
+                                                    {templateName ? `${templateName} - ` : ''}{itemType ?? 'DOCUMENT'}
                                                 </div>
                                                 {templateMeta?.item.guidanceText ? (
                                                     <div className="text-xs text-muted-foreground truncate" title={templateMeta.item.guidanceText}>
@@ -172,7 +155,7 @@ export async function ComplianceReviewQueuePanel({ authorization }: ComplianceRe
                                                 ) : null}
                                             </TableCell>
                                             <TableCell className="text-xs text-muted-foreground">
-                                                {evidence.length > 0 ? evidence.join(' • ') : '—'}
+                                                {evidence.length > 0 ? evidence.join(' | ') : '-'}
                                             </TableCell>
                                             <TableCell>
                                                 <Badge variant={complianceItemStatusBadgeVariant(item.status)}>
@@ -183,7 +166,7 @@ export async function ComplianceReviewQueuePanel({ authorization }: ComplianceRe
                                             <TableCell>{formatDate(item.completedAt)}</TableCell>
                                             <TableCell className="text-muted-foreground">{formatDate(item.updatedAt)}</TableCell>
                                             <TableCell className="max-w-88 truncate" title={item.notes ?? undefined}>
-                                                {item.notes ?? '—'}
+                                                {item.notes ?? '-'}
                                             </TableCell>
                                             <TableCell className="max-w-88 truncate">
                                                 {renderAttachments(item.attachments)}

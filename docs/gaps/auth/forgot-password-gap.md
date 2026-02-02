@@ -4,8 +4,8 @@
 - old/src/app/(auth)/forgot-password/page.tsx
 
 ## New project status (orgcentral)
-- No /forgot-password route under orgcentral/src/app/(auth)
-- Login UI now routes help requests to support.
+- /forgot-password route exists but is currently disabled (`notFound()`).
+- Login UI routes help requests to support.
 
 ## Decision (2026-01-31)
 - Invite-only access. Self-serve password reset UI is intentionally disabled.

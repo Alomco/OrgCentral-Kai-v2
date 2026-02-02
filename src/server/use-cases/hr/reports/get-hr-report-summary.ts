@@ -6,6 +6,7 @@ import { getTimeEntriesForUi } from '@/server/use-cases/hr/time-tracking/get-tim
 import { getTrainingRecordsForUi } from '@/server/use-cases/hr/training/get-training-records.cached';
 import { listHrPoliciesForUi } from '@/server/use-cases/hr/policies/list-hr-policies.cached';
 import { listComplianceItemsForOrgForUi } from '@/server/use-cases/hr/compliance/list-compliance-items-for-org.cached';
+import { listDocumentsForUi } from '@/server/use-cases/records/documents/list-documents.cached';
 import { buildReportsMetrics, type ReportsMetrics } from './report-metrics';
 
 export interface HrReportSummaryInput {
@@ -29,6 +30,7 @@ export async function getHrReportSummary(
         trainingResult,
         policyResult,
         complianceResult,
+        documentResult,
     ] = await Promise.all([
         getEmployeeDirectoryStatsForUi({ authorization: input.authorization }).catch(() => ({
             total: 0,
@@ -42,6 +44,7 @@ export async function getHrReportSummary(
         getTrainingRecordsForUi({ authorization: input.authorization }).catch(() => ({ records: [] })),
         listHrPoliciesForUi({ authorization: input.authorization }).catch(() => ({ policies: [] })),
         listComplianceItemsForOrgForUi({ authorization: input.authorization }).catch(() => ({ items: [] })),
+        listDocumentsForUi({ authorization: input.authorization }).catch(() => ({ documents: [] })),
     ]);
 
     const metrics = buildReportsMetrics({
@@ -52,6 +55,7 @@ export async function getHrReportSummary(
         trainingRecords: trainingResult.records,
         policies: policyResult.policies,
         complianceItems: complianceResult.items,
+        documents: documentResult.documents,
         now: input.now,
     });
 

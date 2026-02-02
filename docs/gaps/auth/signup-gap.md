@@ -5,7 +5,7 @@
 - old/src/app/(auth)/signup/SignupClient.tsx
 
 ## New project status (orgcentral)
-- No /signup route under orgcentral/src/app/(auth)
+- /signup route exists but is currently disabled (`notFound()`).
 - Only admin bootstrap exists at orgcentral/src/app/(auth)/admin-signup
 
 ## Decision (2026-01-31)

@@ -1,6 +1,8 @@
 import { z } from 'zod';
 import { COMPLIANCE_ITEM_STATUSES } from '@/server/types/compliance-types';
 import { COMPLIANCE_STANDARD_KEYS } from '@/server/types/hr/compliance-standards';
+import { complianceAttachmentsSchema } from '@/server/validators/hr/compliance/compliance-validators';
+import { jsonValueSchema } from '@/server/types/notification-dispatch';
 
 const complianceStatusValues = [...COMPLIANCE_ITEM_STATUSES] as [
     (typeof COMPLIANCE_ITEM_STATUSES)[number],
@@ -22,10 +24,10 @@ export const updateComplianceItemSchema = z.object({
         .object({
             status: z.enum(complianceStatusValues).optional(),
             notes: z.string().max(4000).nullable().optional(),
-            attachments: z.array(z.string().min(1)).max(10).nullable().optional(),
+            attachments: complianceAttachmentsSchema.max(10).nullable().optional(),
             completedAt: z.coerce.date().nullable().optional(),
             dueDate: z.coerce.date().nullable().optional(),
-            metadata: z.record(z.string(), z.unknown()).optional(),
+            metadata: jsonValueSchema.optional(),
         })
         .refine((value) => Object.keys(value).length > 0, {
             message: 'At least one field must be provided in updates.',

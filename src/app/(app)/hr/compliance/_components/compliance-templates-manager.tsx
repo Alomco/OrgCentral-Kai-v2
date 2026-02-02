@@ -17,6 +17,7 @@ import { createComplianceTemplateAction } from '../actions/compliance-templates'
 import type { ComplianceTemplateCreateState } from '../compliance-template-form-utils';
 import { ComplianceTemplateRow } from './compliance-template-row';
 import { ComplianceTemplateGuideCard } from './compliance-template-guide-card';
+import { ComplianceTemplateListHeader } from './compliance-template-list-header';
 import { listTemplatesQuery, templatesKey } from '../compliance-templates.api';
 
 const initialCreateState: ComplianceTemplateCreateState = {
@@ -177,7 +178,15 @@ export function ComplianceTemplatesManager(props: { templates: ComplianceTemplat
                                         name="itemsJson"
                                         required
                                         rows={10}
-                                        placeholder={`[\n  {\n    "id": "uk_employment.right_to_work",\n    "name": "Right to work check",\n    "type": "DOCUMENT",\n    "isMandatory": true\n  }\n]`}
+                                        placeholder={`[
+    {
+        "id": "uk_employment.right_to_work",
+        "name": "Right to work check",
+        "type": "DOCUMENT",
+        "isMandatory": true,
+        "regulatoryRefs": ["UK_GDPR"]
+    }
+]`}
                                         key={`compliance-template-items-${state.values.itemsJson}`}
                                         defaultValue={state.values.itemsJson}
                                         className="font-mono text-xs"
@@ -186,7 +195,7 @@ export function ComplianceTemplatesManager(props: { templates: ComplianceTemplat
                                     />
                                     <FieldError id="compliance-template-items-error" message={itemsError} />
                                     <p className="text-xs text-muted-foreground">
-                                        Include stable ids, a human name, the item type (DOCUMENT / TRAINING / ATTESTATION), and whether each item is mandatory.
+                                        Include stable ids, a human name, the item type, regulatoryRefs, and whether each item is mandatory.
                                     </p>
                                 </div>
                             </fieldset>
@@ -208,30 +217,11 @@ export function ComplianceTemplatesManager(props: { templates: ComplianceTemplat
             </div>
 
             <Card className="border-primary/10">
-                <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                        <CardTitle className="text-lg">Templates</CardTitle>
-                        <CardDescription>Track coverage by category and version.</CardDescription>
-                    </div>
-                    <div className="flex flex-wrap items-center gap-2 text-xs">
-                        <input
-                            aria-label="Search templates"
-                            value={qValue}
-                            onChange={handleSearchChange}
-                            placeholder="Search..."
-                            className="h-8 rounded-md border bg-background px-2 text-sm"
-                        />
-                        <Badge variant="secondary">{summary.count} total</Badge>
-                        {summary.categories.map((category) => (
-                            <Badge key={category} variant="outline" className="text-[11px]">
-                                {category}
-                            </Badge>
-                        ))}
-                        {summary.hasOverflow ? (
-                            <Badge variant="outline" className="text-[11px]">+{summary.count - summary.categories.length} more</Badge>
-                        ) : null}
-                    </div>
-                </CardHeader>
+                <ComplianceTemplateListHeader
+                    qValue={qValue}
+                    summary={summary}
+                    onSearchChange={handleSearchChange}
+                />
                 <CardContent>
                     {templates.length === 0 ? (
                         <p className="text-sm text-muted-foreground">No templates configured yet. Seed defaults or add one manually to get started.</p>

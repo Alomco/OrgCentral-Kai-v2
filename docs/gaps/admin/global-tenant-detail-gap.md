@@ -11,14 +11,17 @@
 - Detail view for a single tenant; list view is tracked in `global-tenant-management-gap.md`.
 
 ## Status (as of 2026-02-01)
-- ❌ Not started — no tenant detail route in orgcentral.
+- ✅ Completed — tenant detail route, guarded actions, and audit trail added.
 
 ## Impact
 - No tenant detail view for status, billing, or audit review.
 
 ## TODO
-- [ ] Define tenant detail data contract (status, plan, usage, billing, security flags).
-- [ ] Implement tenant detail + actions controllers (suspend, archive, restore) with audit logging.
-- [ ] Build tenant detail UI with audit history and guarded actions.
-- [ ] Add permission guardrails and residency/classification checks.
-- [ ] Add tests for access control and action effects.
+- [x] Define tenant detail data contract (status, plan, usage, billing, security flags).
+- [x] Implement tenant detail + actions controllers (suspend, archive, restore) with audit logging.
+- [x] Build tenant detail UI with audit history and guarded actions.
+- [x] Add permission guardrails and residency/classification checks.
+- [x] Add tests for access control and action effects.
+
+## Notes
+- Detail view shows billing snapshot and platform audit events scoped to the tenant.

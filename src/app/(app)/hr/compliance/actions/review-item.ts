@@ -8,6 +8,8 @@ import { getSessionContext } from '@/server/use-cases/auth/sessions/get-session'
 import { PrismaComplianceItemRepository } from '@/server/repositories/prisma/hr/compliance/prisma-compliance-item-repository';
 import { updateComplianceItem } from '@/server/use-cases/hr/compliance/update-compliance-item';
 import { normalizeString } from '@/server/use-cases/shared/normalizers';
+import { complianceAttachmentsSchema } from '@/server/validators/hr/compliance/compliance-validators';
+import type { ComplianceAttachmentInput } from '@/server/types/compliance-types';
 
 const reviewComplianceItemFormSchema = z.object({
     userId: z.uuid(),
@@ -18,17 +20,17 @@ const reviewComplianceItemFormSchema = z.object({
     completedAt: z.string().optional(),
 });
 
-function parseAttachments(value: string | undefined): string[] | undefined {
+function parseAttachments(value: string | undefined): ComplianceAttachmentInput[] | undefined {
     if (!value) {
         return undefined;
     }
     try {
-        const parsed = JSON.parse(value) as string[] | null;
-        if (!Array.isArray(parsed)) {
+        const parsed: unknown = JSON.parse(value);
+        const validated = complianceAttachmentsSchema.safeParse(parsed);
+        if (!validated.success) {
             return undefined;
         }
-        const cleaned = parsed.filter((item) => typeof item === 'string' && item.trim().length > 0);
-        return cleaned.length > 0 ? cleaned : undefined;
+        return validated.data;
     } catch {
         return undefined;
     }

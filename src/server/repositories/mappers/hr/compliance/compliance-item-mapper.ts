@@ -2,8 +2,9 @@ import type {
     ComplianceAssignmentInput,
     ComplianceItemUpdateInput,
 } from '@/server/repositories/contracts/hr/compliance/compliance-item-repository-contract';
-import type { ComplianceItemStatus, ComplianceLogItem } from '@/server/types/compliance-types';
+import type { ComplianceAttachment, ComplianceItemStatus, ComplianceLogItem } from '@/server/types/compliance-types';
 import type { PrismaJsonValue } from '@/server/types/prisma';
+import { complianceAttachmentsSchema } from '@/server/validators/hr/compliance/compliance-validators';
 
 export interface ComplianceLogItemRecord {
     id: string;
@@ -17,7 +18,7 @@ export interface ComplianceLogItemRecord {
     reviewedBy?: string | null;
     reviewedAt?: Date | string | null;
     notes?: string | null;
-    attachments?: PrismaJsonValue | string[] | null;
+    attachments?: PrismaJsonValue | ComplianceAttachment[] | string[] | null;
     metadata?: PrismaJsonValue | null;
     createdAt: Date | string;
     updatedAt: Date | string;
@@ -51,7 +52,7 @@ export function mapComplianceLogRecordToDomain(record: ComplianceLogItemRecord):
                     ? record.reviewedAt
                     : new Date(record.reviewedAt),
         notes: record.notes ?? null,
-        attachments: isStringArray(record.attachments) ? record.attachments : null,
+        attachments: normalizeComplianceAttachments(record.attachments),
         metadata: record.metadata ?? undefined,
         createdAt: record.createdAt instanceof Date ? record.createdAt : new Date(record.createdAt),
         updatedAt: record.updatedAt instanceof Date ? record.updatedAt : new Date(record.updatedAt),
@@ -92,6 +93,20 @@ export function mapComplianceItemUpdateToRecord(
     return payload;
 }
 
-function isStringArray(value: PrismaJsonValue | string[] | null | undefined): value is string[] {
-    return Array.isArray(value) && value.every((item) => typeof item === 'string');
+function normalizeComplianceAttachments(
+    value: PrismaJsonValue | ComplianceAttachment[] | string[] | null | undefined,
+): ComplianceAttachment[] | null {
+    if (!Array.isArray(value)) {
+        return null;
+    }
+
+    const parsed = complianceAttachmentsSchema.safeParse(value);
+    if (!parsed.success) {
+        return null;
+    }
+
+    return parsed.data.map((item) => ({
+        ...item,
+        uploadedAt: new Date(item.uploadedAt),
+    }));
 }

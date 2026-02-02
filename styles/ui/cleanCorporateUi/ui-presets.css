@@ -38,18 +38,18 @@
 
 [data-ui-style="clean-corporate"] {
     --ui-backdrop-blur: 0px;
-    --ui-card-shadow: var(--shadow-sm);
+    --ui-card-shadow: var(--shadow-md);
     --ui-border-radius: var(--radius-sm);
-    --ui-glow-intensity: 0;
+    --ui-glow-intensity: 0.22;
     --ui-transition-duration: 150ms;
     --ui-transition-easing: ease-out;
-    --ui-border-opacity: 0.3;
+    --ui-border-opacity: 0.4;
     --ui-card-opacity: 1;
     --ui-hover-scale: 1;
     --ui-hover-lift: 0px;
     --ui-active-scale: 0.99;
     --ui-focus-ring-width: 2px;
-    --ui-focus-ring-offset: 1px;
+    --ui-focus-ring-offset: 2px;
     --ui-border-width: 1px;
     --ui-surface-tint: var(--border);
     --ui-surface-fill: oklch(var(--card));

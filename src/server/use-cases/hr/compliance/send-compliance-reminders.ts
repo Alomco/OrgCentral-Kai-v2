@@ -78,6 +78,7 @@ export async function sendComplianceReminders(
     const configuredMaxReminderDays = Math.max(
         0,
         ...Array.from(templateRules.values()).map((rule) => rule.reminderDaysBeforeExpiry ?? 0),
+        ...escalationDays,
     );
     const effectiveWindowDays = Math.max(windowDays, configuredMaxReminderDays);
 

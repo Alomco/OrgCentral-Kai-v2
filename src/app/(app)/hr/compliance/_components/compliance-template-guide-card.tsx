@@ -43,7 +43,8 @@ export function ComplianceTemplateGuideCard() {
     "id": "uk_employment.right_to_work",
     "name": "Right to work check",
     "type": "DOCUMENT",
-    "isMandatory": true
+    "isMandatory": true,
+    "regulatoryRefs": ["UK_GDPR"]
   }
 ]`}
                     </pre>

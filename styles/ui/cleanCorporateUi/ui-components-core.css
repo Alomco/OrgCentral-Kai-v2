@@ -31,6 +31,7 @@
     [data-slot="navigation-menu-content"], [data-slot="navigation-menu-viewport"], [data-slot="tooltip-content"], [data-slot="command"]) {
     --ui-surface-fill: var(--ui-surface-popover-fill);
     --ui-surface-bg: var(--ui-surface-popover-bg);
+    --ui-surface-shadow: var(--ui-surface-item-shadow);
 }
 
 :is([data-slot="card"], [data-slot="alert"], [data-slot="popover-content"], [data-slot="dialog-content"],
@@ -102,7 +103,7 @@
     transition: all var(--ui-transition);
     -webkit-backdrop-filter: blur(var(--ui-backdrop-blur));
     backdrop-filter: blur(var(--ui-backdrop-blur));
-    box-shadow: var(--ui-card-shadow);
+    box-shadow: var(--ui-surface-shadow);
     border-radius: var(--ui-border-radius);
     background: var(--ui-surface-bg);
     border-color: oklch(var(--border) / var(--ui-border-opacity));
@@ -120,7 +121,7 @@
     transition: all var(--ui-transition);
     -webkit-backdrop-filter: blur(var(--ui-backdrop-blur));
     backdrop-filter: blur(var(--ui-backdrop-blur));
-    box-shadow: var(--ui-card-shadow);
+    box-shadow: var(--ui-surface-item-shadow);
     border-radius: var(--ui-border-radius);
     background: var(--ui-surface-popover-bg) !important;
     border-color: oklch(var(--border) / var(--ui-border-opacity));
@@ -131,7 +132,7 @@
     transition: all var(--ui-transition);
     -webkit-backdrop-filter: blur(var(--ui-backdrop-blur));
     backdrop-filter: blur(var(--ui-backdrop-blur));
-    box-shadow: var(--ui-card-shadow);
+    box-shadow: var(--ui-surface-item-shadow);
     border-radius: var(--ui-border-radius);
     background: var(--ui-surface-popover-bg) !important;
     border-color: oklch(var(--border) / var(--ui-border-opacity));
@@ -141,7 +142,7 @@
     transition: all var(--ui-transition);
     -webkit-backdrop-filter: blur(var(--ui-backdrop-blur));
     backdrop-filter: blur(var(--ui-backdrop-blur));
-    box-shadow: var(--ui-card-shadow);
+    box-shadow: var(--ui-surface-item-shadow);
     border-radius: var(--ui-border-radius);
     background-color: var(--ui-surface-popover-fill) !important;
     border-color: oklch(var(--border) / var(--ui-border-opacity));
@@ -152,7 +153,7 @@
     transition: all var(--ui-transition);
     -webkit-backdrop-filter: blur(var(--ui-backdrop-blur));
     backdrop-filter: blur(var(--ui-backdrop-blur));
-    box-shadow: var(--ui-card-shadow);
+    box-shadow: var(--ui-surface-item-shadow);
     border-radius: var(--ui-border-radius);
     background-color: var(--ui-surface-popover-fill) !important;
     border-color: oklch(var(--border) / var(--ui-border-opacity));
@@ -163,7 +164,7 @@
     transition: all var(--ui-transition);
     -webkit-backdrop-filter: blur(var(--ui-backdrop-blur));
     backdrop-filter: blur(var(--ui-backdrop-blur));
-    box-shadow: var(--ui-card-shadow);
+    box-shadow: var(--ui-surface-item-shadow);
     border-radius: var(--ui-border-radius);
     background-color: var(--ui-surface-popover-fill) !important;
     border-color: oklch(var(--border) / var(--ui-border-opacity));
@@ -173,7 +174,7 @@
     transition: all var(--ui-transition);
     -webkit-backdrop-filter: blur(var(--ui-backdrop-blur));
     backdrop-filter: blur(var(--ui-backdrop-blur));
-    box-shadow: var(--ui-card-shadow);
+    box-shadow: var(--ui-surface-item-shadow);
     border-radius: var(--ui-border-radius);
     background-color: var(--ui-surface-popover-fill) !important;
     border-color: oklch(var(--border) / var(--ui-border-opacity));
@@ -184,7 +185,7 @@
     -webkit-backdrop-filter: blur(var(--ui-backdrop-blur));
     backdrop-filter: blur(var(--ui-backdrop-blur));
     box-shadow: var(--shadow-md);
-    border-radius: calc(var(--ui-border-radius) / 2);
+    border-radius: var(--ui-border-radius);
     background-color: var(--ui-surface-popover-fill) !important;
     border-color: oklch(var(--border) / var(--ui-border-opacity));
 }
@@ -193,7 +194,7 @@
     transition: all var(--ui-transition);
     -webkit-backdrop-filter: blur(var(--ui-backdrop-blur));
     backdrop-filter: blur(var(--ui-backdrop-blur));
-    box-shadow: var(--ui-card-shadow);
+    box-shadow: var(--ui-surface-item-shadow);
     border-radius: var(--ui-border-radius);
     background-color: var(--ui-surface-popover-fill) !important;
     border-color: oklch(var(--border) / var(--ui-border-opacity));
@@ -203,7 +204,7 @@
     transition: all var(--ui-transition);
     -webkit-backdrop-filter: blur(var(--ui-backdrop-blur));
     backdrop-filter: blur(var(--ui-backdrop-blur));
-    box-shadow: var(--ui-card-shadow);
+    box-shadow: var(--ui-surface-item-shadow);
     border-radius: var(--ui-border-radius);
     background-color: var(--ui-surface-popover-fill) !important;
     border-color: oklch(var(--border) / var(--ui-border-opacity));
@@ -213,7 +214,7 @@
     transition: all var(--ui-transition);
     -webkit-backdrop-filter: blur(var(--ui-backdrop-blur));
     backdrop-filter: blur(var(--ui-backdrop-blur));
-    box-shadow: var(--ui-card-shadow);
+    box-shadow: var(--ui-surface-item-shadow);
     background-color: oklch(var(--card)) !important;
     border-color: oklch(var(--border) / var(--ui-border-opacity));
 }
@@ -222,7 +223,7 @@
     transition: all var(--ui-transition);
     -webkit-backdrop-filter: blur(var(--ui-backdrop-blur));
     backdrop-filter: blur(var(--ui-backdrop-blur));
-    box-shadow: var(--ui-card-shadow);
+    box-shadow: var(--ui-surface-item-shadow);
     border-radius: var(--ui-border-radius);
     background-color: oklch(var(--card)) !important;
     border-color: oklch(var(--border) / var(--ui-border-opacity));

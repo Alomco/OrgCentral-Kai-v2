@@ -68,7 +68,7 @@ export function ThemeSwitcher() {
                 </Button>
             </PopoverTrigger>
             <PopoverContent
-                className="w-80 overflow-hidden rounded-xl border border-border/60 bg-popover/95 p-0 text-popover-foreground shadow-xl backdrop-blur-md"
+                className="w-80 overflow-hidden rounded-xl border border-[oklch(var(--border)/0.6)] bg-[oklch(var(--popover)/0.98)] p-0 text-popover-foreground shadow-[var(--ui-surface-item-shadow)]"
                 align="start"
                 sideOffset={10}
             >
@@ -125,7 +125,7 @@ export function ThemeSwitcher() {
                     </TabsContent>
                 </Tabs>
 
-                <div className="flex items-center justify-between gap-2 border-t border-border bg-muted/30 p-3">
+                <div className="flex items-center justify-between gap-2 border-t border-border bg-[oklch(var(--muted)/0.4)] p-3">
                     <span className="max-w-[190px] truncate text-xs text-muted-foreground">
                         {selectedModeLabel} / {selectedThemeLabel} / {selectedStyleLabel}
                     </span>

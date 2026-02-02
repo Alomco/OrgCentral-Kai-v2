@@ -9,6 +9,7 @@ import { getLeaveRequests } from '@/server/use-cases/hr/leave/get-leave-requests
 import { getAbsences } from '@/server/use-cases/hr/absences/get-absences';
 import { countEmployeeProfiles } from '@/server/use-cases/hr/people/count-employee-profiles';
 import { listComplianceItems } from '@/server/use-cases/hr/compliance/list-compliance-items';
+import { listDocumentsService } from '@/server/services/records/document-vault-service';
 import { hasPermission } from '@/lib/security/permission-check';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
 
@@ -27,6 +28,7 @@ export async function KpiGrid({ authorization, employeeId }: KpiGridProps) {
         absencesResult,
         employeeCountResult,
         complianceItems,
+        documents,
     ] = await Promise.all([
         // 1. Leave Balance
         employeeId
@@ -74,6 +76,7 @@ export async function KpiGrid({ authorization, employeeId }: KpiGridProps) {
             authorization,
             userId: authorization.userId,
         }).catch(() => []),
+        listDocumentsService(authorization, { ownerUserId: authorization.userId }).catch(() => []),
     ]);
 
     const leaveBalance = balanceResult?.balances.reduce((accumulator, current) => accumulator + current.available, 0) ?? 0;
@@ -85,8 +88,8 @@ export async function KpiGrid({ authorization, employeeId }: KpiGridProps) {
     const complianceDueSoon = complianceItems.filter((item) =>
         item.dueDate && item.dueDate >= now && item.dueDate <= next30 && item.status !== 'COMPLETE',
     ).length;
-    const documentExpiring = complianceItems.filter((item) =>
-        item.dueDate && item.dueDate >= now && item.dueDate <= next30 && item.status === 'COMPLETE',
+    const documentExpiring = documents.filter((document_) =>
+        document_.retentionExpires && document_.retentionExpires >= now && document_.retentionExpires <= next30,
     ).length;
 
     return (
@@ -119,7 +122,7 @@ export async function KpiGrid({ authorization, employeeId }: KpiGridProps) {
                 title="Docs expiring"
                 value={documentExpiring.toString()}
                 icon={ShieldCheck}
-                href="/hr/compliance"
+                href="/hr/documents"
             />
             {isAdmin && (
                 <KpiCard

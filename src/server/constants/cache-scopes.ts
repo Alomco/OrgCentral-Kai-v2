@@ -30,6 +30,7 @@ export const CACHE_SCOPE_HR_SETTINGS = 'hr-settings';
 export const CACHE_SCOPE_NOTIFICATION_PREFERENCES = 'notification-preferences';
 export const CACHE_SCOPE_ONBOARDING_INVITATIONS = 'hr-onboarding-invitations';
 export const CACHE_SCOPE_COMPLIANCE_STATUS = 'compliance-status';
+export const CACHE_SCOPE_DOCUMENT_VAULT = 'document-vault';
 export const CACHE_SCOPE_BILLING_SUBSCRIPTION = 'billing-subscription';
 export const CACHE_SCOPE_BILLING_PAYMENT_METHODS = 'billing-payment-methods';
 export const CACHE_SCOPE_BILLING_INVOICES = 'billing-invoices';

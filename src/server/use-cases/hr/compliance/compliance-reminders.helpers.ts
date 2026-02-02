@@ -23,6 +23,9 @@ export function filterByTemplateRules(
     fallbackWindowDays: number,
     escalationDays: number[] = [],
 ): ComplianceLogItem[] {
+    const normalizedEscalations = escalationDays
+        .filter((day) => Number.isFinite(day) && day > 0)
+        .map((day) => Math.floor(day));
     return items.filter((item) => {
         const dueDate = item.dueDate;
         if (!dueDate) {
@@ -40,12 +43,11 @@ export function filterByTemplateRules(
         if (typeof reminderDays === 'number' && Number.isFinite(reminderDays) && reminderDays > 0) {
             return daysUntilDue === reminderDays;
         }
-
-        if (daysUntilDue <= fallbackWindowDays) {
-            return true;
+        if (normalizedEscalations.length > 0) {
+            return normalizedEscalations.includes(daysUntilDue);
         }
 
-        return escalationDays.includes(daysUntilDue);
+        return daysUntilDue <= fallbackWindowDays;
     });
 }
 

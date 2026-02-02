@@ -1,18 +1,18 @@
 # Gap: Document management workflows
 
 ## Current wiring (orgcentral)
-- Document vault types and repositories exist but have no app routes:
-  - orgcentral/src/server/types/records/document-vault.ts
-  - orgcentral/src/server/repositories/prisma/records/documents/prisma-document-vault-repository.ts
+- Document vault routes and UI are now wired:
+  - orgcentral/src/app/api/hr/documents/route.ts
+  - orgcentral/src/app/api/hr/documents/presign/route.ts
+  - orgcentral/src/app/api/hr/documents/[documentId]/download/route.ts
+  - orgcentral/src/app/(app)/hr/documents/page.tsx
   - orgcentral/src/server/use-cases/records/documents/*
-  - orgcentral/src/server/api-adapters/records/documents/*
-  - No app routes found under orgcentral/src/app/api/** for document vault.
-- Compliance attachments use raw string arrays and do not integrate the vault:
+- Compliance attachments are vault-linked with metadata:
   - orgcentral/src/server/types/hr-compliance-schemas.ts
   - orgcentral/src/server/use-cases/hr/compliance/update-compliance-item.ts
-  - orgcentral/src/app/(app)/hr/compliance/_components/compliance-items-panel.tsx (read-only)
-  - orgcentral/src/app/(app)/hr/compliance/[itemId]/page.tsx (mock data)
-- Document expiry worker exists but is scoped to work permits in employee profiles:
+  - orgcentral/src/app/(app)/hr/compliance/_components/compliance-item-submission-form.tsx
+  - orgcentral/src/app/(app)/hr/compliance/_components/compliance-review-queue-panel.tsx
+- Document expiry worker exists but is scoped to work permits in employee profiles (not vault retention or compliance item status):
   - orgcentral/src/server/use-cases/hr/compliance/process-document-expiry.ts
 
 ## Legacy behavior (old project)
@@ -31,23 +31,23 @@
 - Employee compliance admin views should coordinate with `orgcentral/docs/gaps/hr/compliance-gap.md`.
 
 ## Gaps (document management complexity)
-1) No document vault UI or routes to store/retrieve documents with classification/retention/versioning.
-2) Compliance evidence is stored as raw attachment URLs/strings without document metadata or version history.
-3) No file upload UX for compliance items, despite template-level allowedFileTypes support.
-4) No document classification/retention fields exposed in UI to match DocumentVaultRecord requirements.
-5) Document expiry workflows are not tied to compliance items (expiring soon/expired states not computed or surfaced).
-6) Review queue shows attachments as raw strings without metadata or preview context.
-7) HR dashboards lack document-expiring KPIs and quick actions for document upload/review.
-8) Employee detail view lacks the admin compliance log experience (progress, assignment, review, per-item document controls).
+1) ✅ Document vault UI/routes to store/retrieve documents with classification/retention/versioning.
+2) ✅ Compliance evidence stored as vault-linked metadata (not raw strings).
+3) ✅ File upload UX for compliance items with allowedFileTypes enforcement.
+4) ✅ Document classification/retention fields exposed in upload flows.
+5) ⚠️ Document expiry workflows are not yet tied to document vault retention or compliance item statuses (expiring/expired).
+6) ✅ Review queue shows vault-linked attachments with metadata.
+7) ✅ HR dashboards/reports surface document retention KPIs.
+8) ❌ Employee detail view still lacks admin compliance log experience.
 
 ## TODOs
-- [ ] Analyze and expose document vault routes and UI to list/store documents with classification, retention, and version metadata.
-- [ ] Analyze and link compliance attachments to document vault records (store pointer + metadata, not raw strings).
-- [ ] Analyze and implement compliance evidence upload UI with allowedFileTypes enforcement and audit logging.
-- [ ] Analyze and surface document classification/retention inputs where documents are created or updated.
-- [ ] Analyze and connect compliance expiry states to item statuses and UI warnings.
-- [ ] Analyze and enhance review queue evidence display with document metadata and previews.
-- [ ] Coordinate with HR reporting to surface document-expiring KPIs once vault metadata is available.
+- [x] Expose document vault routes + UI to list/store documents with classification, retention, and version metadata.
+- [x] Link compliance attachments to document vault records (store pointer + metadata).
+- [x] Implement compliance evidence upload UI with allowedFileTypes enforcement and audit logging.
+- [x] Surface document classification/retention inputs where documents are created or updated.
+- [ ] Connect document retention/expiry states to compliance item statuses and UI warnings.
+- [x] Enhance review queue evidence display with document metadata and download links.
+- [x] Coordinate with HR reporting to surface document-retention KPIs once vault metadata is available.
 - [ ] Coordinate with HR compliance to add employee-level compliance log admin view after vault integration.
 
 ## Related gaps

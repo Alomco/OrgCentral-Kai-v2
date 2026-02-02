@@ -4,7 +4,7 @@
 - old/src/app/(app)/profile/page.tsx
 
 ## New project status (orgcentral)
-- No /profile route under orgcentral/src/app
+- /profile route exists but is currently disabled (`notFound()`), so no account profile UI is exposed
 - Existing /hr/profile is employee profile, not account settings
 
 ## Impact

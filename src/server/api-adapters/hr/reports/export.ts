@@ -3,14 +3,15 @@ import { z } from 'zod';
 import { getSessionContext } from '@/server/use-cases/auth/sessions/get-session';
 import { HR_ACTION, HR_RESOURCE } from '@/server/security/authorization/hr-resource-registry';
 import { getHrReportSummary } from '@/server/use-cases/hr/reports/get-hr-report-summary';
+import { renderHrReportPdf } from '@/server/use-cases/hr/reports/hr-report-pdf';
 
 const exportQuerySchema = z.object({
-    format: z.enum(['json', 'csv']).default('json'),
+    format: z.enum(['json', 'csv', 'pdf']).default('json'),
 });
 
 export interface ExportHrReportControllerResult {
     contentType: string;
-    body: string;
+    body: string | Buffer;
     fileName: string;
 }
 
@@ -48,6 +49,11 @@ function toCsv(input: ReturnType<typeof getHrReportSummary> extends Promise<infe
         ['complianceExpiringSoon', metrics.complianceExpiringSoon],
         ['compliancePendingReview', metrics.compliancePendingReview],
         ['complianceComplete', metrics.complianceComplete],
+        ['complianceCompletedLast30', metrics.complianceCompletedLast30],
+        ['complianceCompletedPrev30', metrics.complianceCompletedPrev30],
+        ['documentTotal', metrics.documentTotal],
+        ['documentRetentionExpiringSoon', metrics.documentRetentionExpiringSoon],
+        ['documentAddedLast30', metrics.documentAddedLast30],
     ];
 
     const lines = ['metric,value'];
@@ -79,6 +85,15 @@ export async function exportHrReportController(request: Request): Promise<Export
         return {
             contentType: 'text/csv; charset=utf-8',
             body: toCsv(summary),
+            fileName,
+        };
+    }
+
+    if (query.format === 'pdf') {
+        const buffer = await renderHrReportPdf(summary);
+        return {
+            contentType: 'application/pdf',
+            body: buffer,
             fileName,
         };
     }

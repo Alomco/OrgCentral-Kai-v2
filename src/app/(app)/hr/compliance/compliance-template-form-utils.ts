@@ -1,5 +1,7 @@
 import { z } from 'zod';
 import type { ComplianceTemplateItem } from '@/server/types/compliance-types';
+import { COMPLIANCE_STANDARD_KEYS } from '@/server/types/hr/compliance-standards';
+import { jsonValueSchema } from '@/server/types/notification-dispatch';
 
 const complianceItemTypeValues = ['DOCUMENT', 'COMPLETION_DATE', 'YES_NO', 'ACKNOWLEDGEMENT'] as const;
 const complianceFileTypeValues = ['pdf', 'docx', 'jpg', 'png'] as const;
@@ -16,7 +18,8 @@ const complianceTemplateItemSchema = z.object({
     reminderDaysBeforeExpiry: z.coerce.number().int().min(0).optional(),
     expiryDurationDays: z.coerce.number().int().min(1).optional(),
     isInternalOnly: z.boolean().optional(),
-    metadata: z.record(z.string(), z.unknown()).optional(),
+    regulatoryRefs: z.array(z.enum(COMPLIANCE_STANDARD_KEYS)).max(10).optional(),
+    metadata: jsonValueSchema.optional(),
 });
 
 const complianceTemplateItemsSchema = z

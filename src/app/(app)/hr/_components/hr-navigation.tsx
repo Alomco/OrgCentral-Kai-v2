@@ -18,6 +18,7 @@ const HR_NAVIGATION_ITEMS = [
     { href: '/hr/policies', label: 'Policies', audience: 'member' },
     { href: '/hr/reports', label: 'Reports', audience: 'admin' },
     { href: '/hr/compliance', label: 'Compliance', audience: 'compliance' },
+    { href: '/hr/documents', label: 'Documents', audience: 'compliance' },
     { href: '/hr/employees', label: 'Employees', audience: 'admin' },
     { href: '/hr/onboarding', label: 'Onboarding', audience: 'onboarding' },
     { href: '/hr/offboarding', label: 'Offboarding', audience: 'admin' },

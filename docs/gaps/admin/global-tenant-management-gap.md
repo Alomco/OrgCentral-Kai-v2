@@ -11,14 +11,17 @@
 - List view only; tenant detail/actions are tracked in `global-tenant-detail-gap.md`.
 
 ## Status (as of 2026-02-01)
-- ❌ Not started — no global tenant list route in orgcentral.
+- ✅ Completed — global tenant list route, filters, and actions are live.
 
 ## Impact
 - No UI to browse, approve, or archive tenants.
 
 ## TODO
-- [ ] Define tenant list query/filter requirements with explicit allowlists.
-- [ ] Implement list/search/approve/archive controllers with audit logging and pagination.
-- [ ] Build tenant list UI with filters, bulk actions, and status chips.
-- [ ] Add safe defaults (rate limits, export controls, activity logs).
-- [ ] Add tests for scoping and action permissions.
+- [x] Define tenant list query/filter requirements with explicit allowlists.
+- [x] Implement list/search/approve/archive controllers with audit logging and pagination.
+- [x] Build tenant list UI with filters, bulk actions, and status chips.
+- [x] Add safe defaults (rate limits, export controls, activity logs).
+- [x] Add tests for scoping and action permissions.
+
+## Notes
+- List page uses break-glass approvals for suspend/archive actions and rate limits on status changes.

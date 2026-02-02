@@ -3,13 +3,13 @@
 ## Current wiring (orgcentral)
 - User view: orgcentral/src/app/(app)/hr/compliance/page.tsx
   - Items list: orgcentral/src/app/(app)/hr/compliance/_components/compliance-items-panel.tsx
-  - Detail page (mock data): orgcentral/src/app/(app)/hr/compliance/[itemId]/page.tsx
+  - Detail page (real data): orgcentral/src/app/(app)/hr/compliance/[itemId]/page.tsx
   - Detail utils: orgcentral/src/app/(app)/hr/compliance/[itemId]/compliance-item-utils.ts
 - Admin view:
   - Templates manager: orgcentral/src/app/(app)/hr/compliance/_components/compliance-templates-manager.tsx
   - Review queue: orgcentral/src/app/(app)/hr/compliance/_components/compliance-review-queue-panel.tsx
-  - Bulk assign UI (not wired): orgcentral/src/app/(app)/hr/compliance/_components/bulk-assign-dialog.tsx
-  - Expiry panel (unused): orgcentral/src/app/(app)/hr/compliance/_components/compliance-expiry-panel.tsx
+  - Bulk assign UI (wired): orgcentral/src/app/(app)/hr/compliance/_components/bulk-assign-dialog.tsx
+  - Expiry panel (wired): orgcentral/src/app/(app)/hr/compliance/_components/compliance-expiry-panel.tsx
 - API/use-cases:
   - Update item API: orgcentral/src/app/api/hr/compliance/update/route.ts
   - Assign items API: orgcentral/src/app/api/hr/compliance/assign/route.ts
@@ -23,29 +23,29 @@
   - old/src/app/(app)/hr/admin/ComplianceManagementHub.tsx
 
 ## Gaps (new project only)
-1) No user-facing submission UI for compliance items (document upload, completion date, yes/no, acknowledgement, notes).
-   - ComplianceItemsPanel is read-only and the detail page uses mock data.
-2) Compliance item detail page status mapping is incompatible with current status codes (COMPLETED/OVERDUE vs COMPLETE/MISSING/PENDING_REVIEW).
-3) Compliance items list does not resolve template metadata (name, type, guidance, mandatory, internal-only) and shows templateItemId only.
-4) Bulk assign dialog is rendered with empty templates/employees and no onAssign handler, so it cannot assign packs.
-5) Expiry management panel exists but is not connected to data or shown on the compliance page.
-6) Category management UI is missing; templates use free-text categoryKey with no picker or upsert flow.
-7) Compliance reporting and analytics are missing - no comprehensive reporting on compliance status across the organization.
-8) Automated compliance reminders and notifications are limited - may lack sophisticated reminder workflows.
-9) Compliance audit trail is incomplete - may lack comprehensive logging of all compliance-related actions.
-10) Integration with regulatory requirements is missing - no mapping to specific regulations or standards.
+1) ✅ User-facing submission UI for compliance items (document upload via vault, completion date, yes/no, acknowledgement, notes).
+   - ComplianceItemsPanel remains list-only; submissions happen on the detail page.
+2) ✅ Compliance item detail page status mapping aligned with current status codes (COMPLETE/MISSING/PENDING_REVIEW/EXPIRED).
+3) ✅ Compliance items list resolves template metadata (name, type, guidance, mandatory, internal-only).
+4) ✅ Bulk assign dialog wired with templates/employees and assign handler.
+5) ✅ Expiry management panel connected to data and mounted on the compliance page.
+6) ✅ Category management UI added (list/upsert).
+7) ✅ Compliance reporting and analytics implemented (org-level summaries + KPIs).
+8) ✅ Automated compliance reminders include configurable cadence/escalation (default 30/14/7/1) with per-org overrides.
+9) ⚠️ Compliance audit trail is partial - update/assign/review logged; reminder/expiry events still pending.
+10) ✅ Regulatory requirements mapped to categories and template items (regulatoryRefs).
 
 ## Gap details (parity notes)
 
 ### Document management complexity
 Old Project: Highly configurable compliance items (Document, CompletionDate, YesNo, Acknowledgement) with upload flows and rich status tracking (Complete, Pending, Missing, Pending Review, N/A, Expired, Expiring Soon) in old/src/app/(app)/hr/compliance/page.tsx.
-New Project: Compliance types exist in orgcentral/src/server/types/compliance-types.ts, but the UI is read-only and the detail page uses mock data.
-Gap: The old project supported fully interactive document workflows and status transitions; the new project does not surface those capabilities.
+New Project: Submission UI and detail views now use real data with vault-backed evidence uploads.
+Gap: Expiring Soon is still not a first-class status; expiry warnings are handled via the expiring-items panel instead of a dedicated status.
 
 ### Status granularity and expiry lifecycle
 Old Project: Displayed Expiring Soon and Expired with date-based warnings and per-item status controls.
-New Project: ComplianceItemStatus omits Expiring Soon and the detail page maps to non-existent status labels (orgcentral/src/app/(app)/hr/compliance/[itemId]/compliance-item-utils.ts).
-Gap: Status presentation is inconsistent and expiry lifecycle states are not represented or computed in the UI.
+New Project: ComplianceItemStatus omits Expiring Soon; expiry warnings are surfaced via the expiring-items panel instead of a status.
+Gap: Expiring Soon remains a UI-only warning and is not a stored status.
 
 ### Template library and category tooling
 Old Project: Admin task library with category/item builder UI, template import, and category metadata in old/src/app/(app)/hr/admin/ComplianceManagementHub.tsx.
@@ -59,8 +59,8 @@ Gap: Employees see less context and may see items that should be internal-only.
 
 ### Review workflow evidence coverage
 Old Project: Review dialog showed submitted evidence (files, yes/no values, completion dates) and required actionable feedback.
-New Project: Review queue shows attachments as raw strings and only updates status/notes without capturing completedAt or evidence context (orgcentral/src/app/(app)/hr/compliance/actions/review-item.ts).
-Gap: Reviewers lack the evidence context needed to validate submissions and expiry logic is not updated on approval.
+New Project: Review queue now renders vault-linked attachments with classification/retention/version metadata and preserves completedAt in review actions.
+Gap: Evidence context is mostly restored; remaining work is to add richer expiry/audit snapshots for reminder/expiry events.
 
 ### Assignment and visibility at scale
 Old Project: Assignment dialog and employee logs provided visibility into who was pending and which items were assigned.
@@ -69,13 +69,13 @@ Gap: No operational visibility or bulk assignment workflow for compliance at org
 
 ### Reporting and Analytics
 Old Project: Had comprehensive reporting capabilities across HR modules.
-New Project: Compliance reporting may be limited to basic status displays.
-Gap: Missing comprehensive reporting on compliance status, trends, and organizational compliance metrics.
+New Project: Compliance reporting and KPIs are now surfaced in HR reports and dashboard views.
+Gap: Advanced analytics and predictive insights are still out of scope for compliance reporting.
 
 ### Regulatory Integration
 Old Project: May have had basic compliance tracking.
-New Project: No clear evidence of mapping to specific regulations or standards.
-Gap: Missing integration with regulatory requirements like SOX, HIPAA, GDPR, etc.
+New Project: Compliance templates and categories now map to standards via regulatoryRefs.
+Gap: None for regulatory mapping (implemented); audit trails for reminder/expiry events still pending.
 
 ## Scope notes
 - Compliance reporting surfaces are tracked in `orgcentral/docs/gaps/hr/reporting-analytics-gap.md`.
@@ -91,7 +91,7 @@ Gap: Missing integration with regulatory requirements like SOX, HIPAA, GDPR, etc
 - [x] Analyze and add a category manager (list/upsert categories) to avoid free-text category keys.
 - [x] Implement compliance reporting data sources and metrics (org-level summaries, trends).
 - [x] Enhance automated compliance reminders with configurable workflows.
-- [ ] Implement complete compliance audit trail with comprehensive logging. (Partial: update/assign/category events logged; review/expiry still pending.)
+- [ ] Implement complete compliance audit trail with comprehensive logging. (Partial: update/assign/category/review logged; reminder/expiry still pending.)
 - [x] Add integration with regulatory requirements and standards mapping.
 
 ## Actionable TODOs with targets
@@ -103,8 +103,8 @@ Gap: Missing integration with regulatory requirements like SOX, HIPAA, GDPR, etc
 - [x] Surface expiry data in `orgcentral/src/app/(app)/hr/compliance/_components/compliance-expiry-panel.tsx` and mount it on `orgcentral/src/app/(app)/hr/compliance/page.tsx` with a real expiring-items query.
 - [x] Add category manager UI with list/upsert API in `orgcentral/src/app/(app)/hr/compliance/_components/compliance-category-manager.tsx`.
 - [x] Build compliance reporting queries + summaries in `src/server/use-cases/hr/compliance/*` and expose via adapter controllers for HR reports.
-- [x] Add configurable reminder policies (cadence, escalation rules) in reminder worker/config with audit logging.
-- [ ] Log compliance events (submission, approval, expiry, evidence changes) with classification/residency metadata. (Partial: update/assign/category logged.)
+- [x] Add configurable reminder policies (cadence, escalation rules) in reminder worker/config.
+- [ ] Log compliance events (submission, approval, reminder, expiry, evidence changes) with classification/residency metadata. (Partial: update/assign/category/review logged.)
 - [x] Map compliance templates/items to regulatory standards and expose for reporting and audits.
 
 ## Related gaps
@@ -115,16 +115,16 @@ Gap: Missing integration with regulatory requirements like SOX, HIPAA, GDPR, etc
 
 | # | Gap | Status | Implementation |
 |---|-----|--------|----------------|
-| 1 | User-facing submission UI | ✅ CLOSED | `compliance-item-submission-form.tsx` with all types (Document, Date, YesNo, Acknowledgement) |
+| 1 | User-facing submission UI | ✅ CLOSED | `compliance-item-submission-form.tsx` with vault uploads + metadata for Document/Date/YesNo/Acknowledgement |
 | 2 | Detail page mock data / status mapping | ✅ CLOSED | Real data via repositories; correct `ComplianceItemStatus` mapping |
 | 3 | Template metadata joined to items | ✅ CLOSED | `getComplianceItemsWithTemplates` joins name/type/guidance/isInternalOnly |
 | 4 | Bulk assign dialog wiring | ✅ CLOSED | Templates/employees passed from page; API route called |
 | 5 | Expiry panel not connected | ✅ CLOSED | `compliance-expiry-panel-loader.tsx` with real 30-day expiry query |
 | 6 | Category management UI | ✅ CLOSED | `compliance-category-manager.tsx` with list/upsert API |
 | 7 | Compliance reporting and analytics | ✅ CLOSED | Org-wide analytics summary + KPI cards on reports/dashboard |
-| 8 | Automated compliance reminders | ✅ CLOSED | Configurable reminder settings (window/escalation/notify) wired into workflow |
-| 9 | Compliance audit trail | ⚠️ PARTIAL | Update/assign/category events logged; review/expiry still pending |
-| 10 | Regulatory requirements integration | ✅ CLOSED | Category mapping to regulatory standards in UI + types |
+| 8 | Automated compliance reminders | ✅ CLOSED | Daily cadence with default 30/14/7/1 escalations + per-org overrides |
+| 9 | Compliance audit trail | ⚠️ PARTIAL | Update/assign/category/review events logged; reminder/expiry still pending |
+| 10 | Regulatory requirements integration | ✅ CLOSED | Category + template item regulatoryRefs mapped for audits |
 
 ### Implemented gaps from this document ✅
 - User-facing submission UI
@@ -135,4 +135,4 @@ Gap: Missing integration with regulatory requirements like SOX, HIPAA, GDPR, etc
 - Category management UI
 
 ### Remaining Work
-1. **High Priority:** Complete compliance audit trail for review/expiry events
+1. **High Priority:** Complete compliance audit trail for reminder/expiry events

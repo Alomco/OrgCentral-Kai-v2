@@ -1,4 +1,4 @@
-import type { ComplianceItemStatus, ComplianceLogItem } from '@/server/types/compliance-types';
+import type { ComplianceAttachmentInput, ComplianceItemStatus, ComplianceLogItem } from '@/server/types/compliance-types';
 import type { Prisma } from '@prisma/client';
 
 export interface ComplianceAssignmentInput {
@@ -14,7 +14,7 @@ export interface ComplianceAssignmentInput {
 export interface ComplianceItemUpdateInput {
     status?: ComplianceItemStatus;
     notes?: string | null;
-    attachments?: string[] | null;
+    attachments?: ComplianceAttachmentInput[] | null;
     completedAt?: Date | null;
     reviewedBy?: string | null;
     reviewedAt?: Date | null;

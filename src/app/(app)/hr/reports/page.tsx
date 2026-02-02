@@ -23,6 +23,7 @@ import { getTimeEntriesForUi } from '@/server/use-cases/hr/time-tracking/get-tim
 import { getTrainingRecordsForUi } from '@/server/use-cases/hr/training/get-training-records.cached';
 import { listHrPoliciesForUi } from '@/server/use-cases/hr/policies/list-hr-policies.cached';
 import { listComplianceItemsForOrgForUi } from '@/server/use-cases/hr/compliance/list-compliance-items-for-org.cached';
+import { listDocumentsForUi } from '@/server/use-cases/records/documents/list-documents.cached';
 
 export const metadata: Metadata = {
     title: 'HR Reports',
@@ -48,6 +49,7 @@ export default async function HrReportsPage() {
         trainingResult,
         policyResult,
         complianceResult,
+        documentResult,
     ] = await Promise.all([
         getEmployeeDirectoryStatsForUi({ authorization }).catch(() => ({
             total: 0,
@@ -61,6 +63,7 @@ export default async function HrReportsPage() {
         getTrainingRecordsForUi({ authorization }).catch(() => ({ records: [] })),
         listHrPoliciesForUi({ authorization }).catch(() => ({ policies: [] })),
         listComplianceItemsForOrgForUi({ authorization }).catch(() => ({ items: [] })),
+        listDocumentsForUi({ authorization }).catch(() => ({ documents: [] })),
     ]);
 
     const employeeStats = employeeStatsResult;
@@ -70,6 +73,7 @@ export default async function HrReportsPage() {
     const trainingRecords = trainingResult.records;
     const policies = policyResult.policies;
     const complianceItems = complianceResult.items;
+    const documents = documentResult.documents;
 
     const metrics = buildReportsMetrics({
         employeeStats,
@@ -79,6 +83,7 @@ export default async function HrReportsPage() {
         trainingRecords,
         policies,
         complianceItems,
+        documents,
     });
 
     return (
@@ -106,6 +111,11 @@ export default async function HrReportsPage() {
                         <Button asChild variant="outline">
                             <Link href="/api/hr/reports/export?format=csv" download>
                                 Export CSV
+                            </Link>
+                        </Button>
+                        <Button asChild variant="outline">
+                            <Link href="/api/hr/reports/export?format=pdf" download>
+                                Export PDF
                             </Link>
                         </Button>
                         <Button asChild variant="outline">

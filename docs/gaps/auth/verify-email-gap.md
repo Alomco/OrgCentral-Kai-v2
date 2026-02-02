@@ -4,7 +4,7 @@
 - old/src/app/(auth)/verify-email/page.tsx
 
 ## New project status (orgcentral)
-- No /verify-email route under orgcentral/src/app/(auth)
+- /verify-email route exists but is currently disabled (`notFound()`).
 
 ## Decision (2026-01-31)
 - Invite-only access. Verification is handled through admin-led onboarding flows.

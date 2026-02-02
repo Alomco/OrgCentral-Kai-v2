@@ -1,4 +1,5 @@
 import type { PrismaJsonValue } from '@/server/types/prisma';
+import type { RetentionPolicy, SecurityClassification } from '@/server/types/records/document-vault';
 import type { ComplianceStandardKey } from '@/server/types/hr/compliance-standards';
 
 export type ComplianceSubDocumentType = 'DOCUMENT' | 'COMPLETION_DATE' | 'YES_NO' | 'ACKNOWLEDGEMENT';
@@ -15,6 +16,7 @@ export interface ComplianceTemplateItem {
     reminderDaysBeforeExpiry?: number;
     expiryDurationDays?: number;
     isInternalOnly?: boolean;
+    regulatoryRefs?: ComplianceStandardKey[];
     metadata?: PrismaJsonValue;
 }
 
@@ -68,8 +70,23 @@ export interface ComplianceLogItem {
     reviewedBy?: string | null;
     reviewedAt?: Date | null;
     notes?: string | null;
-    attachments?: string[] | null;
+    attachments?: ComplianceAttachment[] | null;
     metadata?: PrismaJsonValue;
     createdAt: Date;
     updatedAt: Date;
 }
+
+export interface ComplianceAttachment {
+    documentId: string;
+    fileName: string;
+    mimeType?: string | null;
+    sizeBytes?: number | null;
+    classification: SecurityClassification;
+    retentionPolicy: RetentionPolicy;
+    version: number;
+    uploadedAt: Date;
+}
+
+export type ComplianceAttachmentInput = Omit<ComplianceAttachment, 'uploadedAt'> & {
+    uploadedAt: string;
+};

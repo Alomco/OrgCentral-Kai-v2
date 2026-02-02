@@ -7,9 +7,44 @@
     border-width: var(--ui-border-width) !important;
 }
 
+[data-ui-style="clean-corporate"] [data-slot="popover-content"],
+[data-ui-style="clean-corporate"] [data-slot="dropdown-menu-content"],
+[data-ui-style="clean-corporate"] [data-slot="dropdown-menu-sub-content"],
+[data-ui-style="clean-corporate"] [data-slot="select-content"],
+[data-ui-style="clean-corporate"] [data-slot="context-menu-content"],
+[data-ui-style="clean-corporate"] [data-slot="context-menu-sub-content"],
+[data-ui-style="clean-corporate"] [data-slot="menubar-content"],
+[data-ui-style="clean-corporate"] [data-slot="menubar-sub-content"],
+[data-ui-style="clean-corporate"] [data-slot="navigation-menu-content"],
+[data-ui-style="clean-corporate"] [data-slot="hover-card-content"],
+[data-ui-style="clean-corporate"] [data-slot="tooltip-content"],
+[data-ui-style="clean-corporate"] [data-slot="command"] {
+    background-color: oklch(var(--popover) / 0.98) !important;
+    border-color: oklch(var(--border) / 0.6) !important;
+    box-shadow: var(--ui-surface-item-shadow) !important;
+}
+
+[data-ui-style="clean-corporate"] [data-slot="dialog-content"],
+[data-ui-style="clean-corporate"] [data-slot="alert-dialog-content"],
+[data-ui-style="clean-corporate"] [data-slot="sheet-content"],
+[data-ui-style="clean-corporate"] [data-slot="drawer-content"] {
+    background-color: oklch(var(--popover) / 0.98) !important;
+    border-color: oklch(var(--border) / 0.6) !important;
+    box-shadow: var(--ui-surface-item-shadow) !important;
+}
+
 [data-ui-style] [data-slot="button"] {
     border-width: var(--ui-border-width) !important;
     transition: all var(--ui-transition) !important;
+}
+
+[data-ui-style="clean-corporate"] [data-slot="button"] {
+    box-shadow: var(--ui-card-shadow) !important;
+}
+
+[data-ui-style="clean-corporate"] [data-slot="button"]:hover,
+[data-ui-style="clean-corporate"] [data-slot="button"]:active {
+    transform: none !important;
 }
 
 [data-ui-style] .transition,
