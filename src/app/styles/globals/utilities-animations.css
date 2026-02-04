@@ -100,7 +100,59 @@
     box-shadow: 0 0 20px oklch(var(--accent) / 0.4);
   }
 
+  /* View Transitions (global) */
+  :root {
+    --motion-page-duration: 180ms;
+    --motion-title-duration: 220ms;
+    --motion-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  }
+
+  @keyframes viewFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(2px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes viewFadeOut {
+    from {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(-2px);
+    }
+  }
+
+  ::view-transition-old(page) {
+    animation: viewFadeOut var(--motion-page-duration) var(--motion-ease-standard) both;
+  }
+
+  ::view-transition-new(page) {
+    animation: viewFadeIn var(--motion-page-duration) var(--motion-ease-standard) both;
+  }
+
+  ::view-transition-old(page-title) {
+    animation: viewFadeOut var(--motion-title-duration) var(--motion-ease-standard) both;
+  }
+
+  ::view-transition-new(page-title) {
+    animation: viewFadeIn var(--motion-title-duration) var(--motion-ease-standard) both;
+  }
+
   @media (prefers-reduced-motion: reduce) {
+    ::view-transition-old(page),
+    ::view-transition-new(page),
+    ::view-transition-old(page-title),
+    ::view-transition-new(page-title) {
+      animation: none;
+    }
+
     .glass-card-wrapper {
       animation: none;
     }

@@ -13,7 +13,8 @@ import { markAllHrNotificationsReadAction as markAllReadAdapter } from '@/server
 import { deleteHrNotificationAction as deleteAdapter } from '@/server/api-adapters/hr/notifications/delete-hr-notification';
 import { getHrNotificationsAction } from '@/server/api-adapters/hr/notifications/get-hr-notifications';
 import { getSessionContext } from '@/server/use-cases/auth/sessions/get-session';
-import type { HRNotificationDTO } from '@/server/types/hr/notifications';
+import type { HRNotificationDTO, HRNotificationTypeCode } from '@/server/types/hr/notifications';
+import { HR_NOTIFICATION_TYPE_VALUES } from '@/server/types/hr/notifications';
 import { notificationFilterSchema, type NotificationFilters } from './_schemas/filter-schema';
 import type { NotificationSummary } from '@/components/notifications/notification-item';
 
@@ -21,6 +22,7 @@ const AUDIT_PREFIX = 'action:hr:notifications';
 const RESOURCE_TYPE = 'hr.notifications';
 const NOTIFICATIONS_PATH = '/hr/notifications';
 const NOTIFICATIONS_LIMIT = 50;
+const VALID_NOTIFICATION_TYPES = new Set<HRNotificationTypeCode>(HR_NOTIFICATION_TYPE_VALUES);
 
 const markReadSchema = z.object({
   notificationId: z.string(),
@@ -33,6 +35,13 @@ const markAllReadSchema = z.object({
 const deleteSchema = z.object({
   notificationId: z.string(),
 });
+
+function normalizeNotificationType(type: string): HRNotificationTypeCode {
+  if (VALID_NOTIFICATION_TYPES.has(type as HRNotificationTypeCode)) {
+    return type as HRNotificationTypeCode;
+  }
+  return 'other';
+}
 
 export async function listHrNotifications(
   input: Partial<NotificationFilters> = {},
@@ -66,15 +75,24 @@ export async function listHrNotifications(
     id: notification.id,
     title: notification.title,
     message: notification.message,
-    type: notification.type,
+    type: normalizeNotificationType(notification.type),
     priority: notification.priority,
     isRead: notification.isRead,
     createdAt: notification.createdAt,
     actionUrl: notification.actionUrl ?? undefined,
     actionLabel: notification.actionLabel ?? undefined,
   }));
+  const query = filters.q?.trim().toLowerCase();
+  const filteredNotifications = query
+    ? notifications.filter((notification) => {
+      const haystack = [notification.title, notification.message, notification.actionLabel]
+        .filter((value): value is string => Boolean(value))
+        .map((value) => value.toLowerCase());
+      return haystack.some((value) => value.includes(query));
+    })
+    : notifications;
 
-  return { notifications, unreadCount: result.unreadCount };
+  return { notifications: filteredNotifications, unreadCount: result.unreadCount };
 }
 
 export async function markHrNotificationRead(

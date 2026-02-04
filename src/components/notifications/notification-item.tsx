@@ -63,7 +63,9 @@ const PRIORITY_LABELS = {
 
 export function NotificationItem({ notification, compact = false, onRead }: NotificationItemProps) {
   const [isPending, startTransition] = useTransition();
-  const Icon = TYPE_ICONS[notification.type];
+  const Icon = Object.prototype.hasOwnProperty.call(TYPE_ICONS, notification.type)
+    ? TYPE_ICONS[notification.type]
+    : Bell;
 
   const handleMarkRead = (event: React.MouseEvent) => {
     event.stopPropagation();

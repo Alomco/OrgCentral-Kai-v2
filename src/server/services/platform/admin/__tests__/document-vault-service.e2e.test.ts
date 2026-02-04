@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import {
     listTenantDocumentsService,
@@ -6,154 +6,23 @@ import {
 } from '@/server/services/platform/admin/document-vault-service';
 import { approveBreakGlassApproval } from '@/server/use-cases/platform/admin/break-glass/approve-break-glass';
 import { requestBreakGlassApproval } from '@/server/use-cases/platform/admin/break-glass/request-break-glass';
-import type { DocumentVaultRecord } from '@/server/types/records/document-vault';
-import type { RepositoryAuthorizationContext } from '@/server/types/repository-authorization';
-import type { BreakGlassApproval } from '@/server/types/platform/break-glass';
-import type { IBreakGlassRepository } from '@/server/repositories/contracts/platform/admin/break-glass-repository-contract';
-import type { IDocumentVaultRepository } from '@/server/repositories/contracts/records/document-vault-repository-contract';
-import type { IPlatformTenantRepository } from '@/server/repositories/contracts/platform/admin/platform-tenant-repository-contract';
-import type { PlatformTenantDetail } from '@/server/types/platform/tenant-admin';
+import {
+    buildAuthorization,
+    documentRecord,
+    InMemoryBreakGlassRepository,
+    InMemoryDocumentVaultRepository,
+    InMemoryTenantRepository,
+    tenant,
+} from './document-vault-service.e2e.fixtures';
 
-const baseAuthorization: Omit<RepositoryAuthorizationContext, 'userId' | 'permissions'> = {
-    orgId: '00000000-0000-0000-0000-000000000999',
-    roleKey: 'globalAdmin',
-    dataResidency: 'UK_ONLY',
-    dataClassification: 'OFFICIAL',
-    auditSource: 'test',
-    tenantScope: {
-        orgId: '00000000-0000-0000-0000-000000000999',
-        dataResidency: 'UK_ONLY',
-        dataClassification: 'OFFICIAL',
-        auditSource: 'test',
-    },
-    auditBatchId: undefined,
-    mfaVerified: true,
-    ipAddress: '127.0.0.1',
-    userAgent: 'vitest',
-    authenticatedAt: new Date(),
-    sessionExpiresAt: new Date(Date.now() + 1000 * 60),
-    lastActivityAt: new Date(),
-    sessionId: 'session',
-    sessionToken: 'token',
-    authorizedAt: new Date(),
-    authorizationReason: 'test',
-};
-
-const tenant: PlatformTenantDetail = {
-    id: '00000000-0000-0000-0000-000000000123',
-    name: 'Tenant',
-    slug: 'tenant',
-    status: 'ACTIVE',
-    complianceTier: 'STANDARD',
-    dataResidency: 'UK_ONLY',
-    dataClassification: 'OFFICIAL',
-    regionCode: 'UK',
-    ownerEmail: 'owner@example.com',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    subscription: null,
-    governanceTags: null,
-    securityControls: null,
-};
-
-const documentRecord: DocumentVaultRecord = {
-    id: '00000000-0000-0000-0000-000000000456',
-    orgId: tenant.id,
-    ownerOrgId: null,
-    ownerUserId: null,
-    type: 'POLICY',
-    classification: 'OFFICIAL',
-    retentionPolicy: 'ONE_YEAR',
-    retentionExpires: null,
-    blobPointer: 'blob://document.pdf',
-    checksum: 'checksum',
-    mimeType: 'application/pdf',
-    sizeBytes: 512,
-    fileName: 'document.pdf',
-    version: 1,
-    latestVersionId: null,
-    encrypted: false,
-    encryptedKeyRef: null,
-    sensitivityLevel: 1,
-    dataCategory: null,
-    lawfulBasis: null,
-    dataSubject: null,
-    metadata: null,
-    createdAt: new Date(),
-};
-
-class InMemoryBreakGlassRepository implements IBreakGlassRepository {
-    private readonly approvals = new Map<string, BreakGlassApproval>();
-
-    async listApprovals(): Promise<BreakGlassApproval[]> {
-        return Array.from(this.approvals.values());
-    }
-
-    async getApproval(_: RepositoryAuthorizationContext, approvalId: string): Promise<BreakGlassApproval | null> {
-        return this.approvals.get(approvalId) ?? null;
-    }
-
-    async createApproval(_: RepositoryAuthorizationContext, approval: BreakGlassApproval): Promise<BreakGlassApproval> {
-        this.approvals.set(approval.id, approval);
-        return approval;
-    }
-
-    async updateApproval(_: RepositoryAuthorizationContext, approval: BreakGlassApproval): Promise<BreakGlassApproval> {
-        this.approvals.set(approval.id, approval);
-        return approval;
-    }
-}
-
-class InMemoryTenantRepository implements IPlatformTenantRepository {
-    constructor(private readonly tenantRecord: PlatformTenantDetail) {}
-
-    async listTenants(): Promise<never> {
-        throw new Error('Not implemented');
-    }
-
-    async getTenantDetail(): Promise<PlatformTenantDetail | null> {
-        return this.tenantRecord;
-    }
-
-    async updateTenantStatus(): Promise<never> {
-        throw new Error('Not implemented');
-    }
-
-    async getTenantMetrics(): Promise<never> {
-        throw new Error('Not implemented');
-    }
-}
-
-class InMemoryDocumentVaultRepository implements IDocumentVaultRepository {
-    constructor(private readonly records: DocumentVaultRecord[]) {}
-
-    async findById(id: string): Promise<DocumentVaultRecord | null> {
-        return this.records.find((record) => record.id === id) ?? null;
-    }
-
-    async findByBlobPointer(): Promise<DocumentVaultRecord | null> {
-        return null;
-    }
-
-    async findAll(filters?: { orgId?: string }): Promise<DocumentVaultRecord[]> {
-        if (!filters?.orgId) {
-            return this.records;
-        }
-        return this.records.filter((record) => record.orgId === filters.orgId);
-    }
-
-    async create(): Promise<DocumentVaultRecord> {
-        throw new Error('Not implemented');
-    }
-
-    async update(): Promise<DocumentVaultRecord> {
-        throw new Error('Not implemented');
-    }
-
-    async delete(): Promise<DocumentVaultRecord> {
-        throw new Error('Not implemented');
-    }
-}
+vi.mock('@/server/services/security/security-event-service.provider', () => ({
+    getSecurityEventService: () => ({
+        logSecurityEvent: vi.fn().mockResolvedValue(undefined),
+        getSecurityEvent: vi.fn().mockResolvedValue(undefined),
+        getSecurityEventsByOrg: vi.fn().mockResolvedValue([]),
+        countSecurityEventsByOrg: vi.fn().mockResolvedValue(0),
+    }),
+}));
 
 describe('document vault admin break-glass flow', () => {
     it('requests, approves, and consumes break-glass for list + download', async () => {
@@ -161,22 +30,13 @@ describe('document vault admin break-glass flow', () => {
         const tenantRepository = new InMemoryTenantRepository(tenant);
         const documentVaultRepository = new InMemoryDocumentVaultRepository([documentRecord]);
 
-        const requester: RepositoryAuthorizationContext = {
-            ...baseAuthorization,
-            userId: '00000000-0000-0000-0000-000000000111',
-            permissions: {
-                platformBreakGlass: ['request'],
-                platformDocuments: ['read', 'download'],
-            },
-        };
-
-        const approver: RepositoryAuthorizationContext = {
-            ...baseAuthorization,
-            userId: '00000000-0000-0000-0000-000000000222',
-            permissions: {
-                platformBreakGlass: ['approve'],
-            },
-        };
+        const requester = buildAuthorization('22222222-2222-4222-8222-222222222222', {
+            platformBreakGlass: ['request'],
+            platformDocuments: ['read', 'download'],
+        });
+        const approver = buildAuthorization('33333333-3333-4333-8333-333333333333', {
+            platformBreakGlass: ['approve'],
+        });
 
         const listApproval = await requestBreakGlassApproval(
             { breakGlassRepository, tenantRepository },
@@ -245,5 +105,123 @@ describe('document vault admin break-glass flow', () => {
 
         const downloadConsumed = await breakGlassRepository.getApproval(requester, downloadApproval.approval.id);
         expect(downloadConsumed?.status).toBe('CONSUMED');
+    });
+
+    it('rejects list requests when approval is missing', async () => {
+        const breakGlassRepository = new InMemoryBreakGlassRepository();
+        const tenantRepository = new InMemoryTenantRepository(tenant);
+        const documentVaultRepository = new InMemoryDocumentVaultRepository([documentRecord]);
+        const requester = buildAuthorization('44444444-4444-4444-8444-444444444444', {
+            platformDocuments: ['read'],
+            platformBreakGlass: ['read'],
+        });
+
+        await expect(
+            listTenantDocumentsService(
+                requester,
+                tenant.id,
+                '55555555-5555-4555-8555-555555555555',
+                undefined,
+                { documentVaultRepository, breakGlassRepository, tenantRepository },
+            ),
+        ).rejects.toThrow('Break-glass approval not found.');
+    });
+
+    it('rejects downloads when approval is expired', async () => {
+        const breakGlassRepository = new InMemoryBreakGlassRepository();
+        const tenantRepository = new InMemoryTenantRepository(tenant);
+        const documentVaultRepository = new InMemoryDocumentVaultRepository([documentRecord]);
+        const requester = buildAuthorization('66666666-6666-4666-8666-666666666666', {
+            platformBreakGlass: ['request'],
+            platformDocuments: ['download'],
+        });
+        const approver = buildAuthorization('77777777-7777-4777-8777-777777777777', {
+            platformBreakGlass: ['approve'],
+        });
+
+        const approval = await requestBreakGlassApproval(
+            { breakGlassRepository, tenantRepository },
+            {
+                authorization: requester,
+                request: {
+                    scope: 'document-vault',
+                    reason: 'Document vault access',
+                    targetOrgId: tenant.id,
+                    action: 'document-vault.download',
+                    resourceId: documentRecord.id,
+                    expiresInMinutes: 30,
+                },
+            },
+        );
+
+        const approved = await approveBreakGlassApproval(
+            { breakGlassRepository },
+            { authorization: approver, request: { approvalId: approval.approval.id } },
+        );
+
+        await breakGlassRepository.updateApproval(requester, {
+            ...approved.approval,
+            expiresAt: new Date(Date.now() - 1000).toISOString(),
+        });
+
+        await expect(
+            presignTenantDocumentDownloadService(
+                requester,
+                {
+                    tenantId: tenant.id,
+                    documentId: documentRecord.id,
+                    breakGlassApprovalId: approval.approval.id,
+                },
+                { documentVaultRepository, breakGlassRepository, tenantRepository },
+            ),
+        ).rejects.toThrow('Break-glass approval has expired.');
+    });
+
+    it('rejects list requests when approval is expired', async () => {
+        const breakGlassRepository = new InMemoryBreakGlassRepository();
+        const tenantRepository = new InMemoryTenantRepository(tenant);
+        const documentVaultRepository = new InMemoryDocumentVaultRepository([documentRecord]);
+        const requester = buildAuthorization('88888888-8888-4888-8888-888888888888', {
+            platformBreakGlass: ['request'],
+            platformDocuments: ['read'],
+        });
+        const approver = buildAuthorization('99999999-9999-4999-8999-999999999999', {
+            platformBreakGlass: ['approve'],
+        });
+
+        const approval = await requestBreakGlassApproval(
+            { breakGlassRepository, tenantRepository },
+            {
+                authorization: requester,
+                request: {
+                    scope: 'document-vault',
+                    reason: 'Document vault access',
+                    targetOrgId: tenant.id,
+                    action: 'document-vault.list',
+                    resourceId: tenant.id,
+                    expiresInMinutes: 30,
+                },
+            },
+        );
+
+        const approved = await approveBreakGlassApproval(
+            { breakGlassRepository },
+            { authorization: approver, request: { approvalId: approval.approval.id } },
+        );
+
+        await breakGlassRepository.updateApproval(requester, {
+            ...approved.approval,
+            expiresAt: new Date(Date.now() - 1000).toISOString(),
+        });
+
+        await expect(
+            listTenantDocumentsService(
+                requester,
+                tenant.id,
+                approval.approval.id,
+                undefined,
+                { documentVaultRepository, breakGlassRepository, tenantRepository },
+            ),
+        ).rejects.toThrow('Break-glass approval has expired.');
     });
 });

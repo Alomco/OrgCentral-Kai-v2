@@ -15,8 +15,8 @@
   background-image: linear-gradient(oklch(var(--foreground) / 0.12) 1px, transparent 1px),
     linear-gradient(90deg, oklch(var(--foreground) / 0.12) 1px, transparent 1px);
   background-size: 36px 36px;
-  -webkit-mask-image: radial-gradient(circle at 50% 40%, rgba(0, 0, 0, 0.45), transparent 60%);
-  mask-image: radial-gradient(circle at 50% 40%, rgba(0, 0, 0, 0.45), transparent 60%);
+  -webkit-mask-image: radial-gradient(circle at 50% 40%, oklch(0 0 0 / 0.45), transparent 60%);
+  mask-image: radial-gradient(circle at 50% 40%, oklch(0 0 0 / 0.45), transparent 60%);
   opacity: 0.35;
   animation: drift 18s linear infinite;
 }

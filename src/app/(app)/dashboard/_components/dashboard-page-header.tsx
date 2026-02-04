@@ -1,4 +1,5 @@
 import { Badge } from '@/components/ui/badge';
+import motionStyles from '@/styles/motion/view-transitions.module.css';
 
 export function DashboardPageHeader(props: {
     organizationId: string;
@@ -11,7 +12,7 @@ export function DashboardPageHeader(props: {
     return (
         <header className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0 space-y-3">
-                <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl leading-tight">
+                <h1 className={`text-4xl font-bold tracking-tight text-foreground sm:text-5xl leading-tight ${motionStyles.sharedTitle}`}>
                     Dashboard
                 </h1>
                 <p className="text-base text-muted-foreground max-w-2xl leading-relaxed">

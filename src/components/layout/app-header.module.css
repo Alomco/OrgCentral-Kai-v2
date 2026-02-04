@@ -4,18 +4,18 @@
     top: 0;
     z-index: var(--z-sticky);
     display: flex;
-    height: 4.25rem;
+    height: 4rem;
     width: 100%;
     align-items: center;
-    gap: 1.5rem;
-    padding: 0 1.5rem;
+    gap: 1rem;
+    padding: 0 1.25rem;
     overflow: hidden;
     isolation: isolate;
     border-bottom: 1px solid oklch(var(--border) / 0.3);
     background-color: var(--ui-surface-container-fill);
     -webkit-backdrop-filter: blur(var(--ui-backdrop-blur)) saturate(180%);
     backdrop-filter: blur(var(--ui-backdrop-blur)) saturate(180%);
-    box-shadow: var(--ui-surface-container-shadow);
+    box-shadow: none;
 }
 
 .header::before {

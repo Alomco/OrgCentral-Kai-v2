@@ -39,15 +39,15 @@ export type AccentTokens = readonly [
     sidebarRing: ColorTokenValue,
 ];
 
-export const WHITE = '0 0% 100%' as ColorTokenValue;
-export const HSL_CHART_CYAN = '200 98% 39%' as ColorTokenValue;
-export const HSL_CHART_YELLOW = '48 96% 53%' as ColorTokenValue;
-export const HSL_CHART_ORANGE = '31 87% 51%' as ColorTokenValue;
+export const WHITE = '1.0000 0.0000 0.00' as ColorTokenValue;
+export const HSL_CHART_CYAN = '0.5863 0.1366 241.18' as ColorTokenValue;
+export const HSL_CHART_YELLOW = '0.8611 0.1734 91.96' as ColorTokenValue;
+export const HSL_CHART_ORANGE = '0.7194 0.1662 58.52' as ColorTokenValue;
 
-export const NEON_FOREGROUND = '240 84% 5%' as ColorTokenValue;
-export const ROYAL_FOREGROUND = '270 84% 5%' as ColorTokenValue;
-export const GALAXY_FOREGROUND = '230 84% 5%' as ColorTokenValue;
-export const TANGERINE_FOREGROUND = '35 84% 5%' as ColorTokenValue;
+export const NEON_FOREGROUND = '0.1115 0.0531 273.63' as ColorTokenValue;
+export const ROYAL_FOREGROUND = '0.1307 0.0526 306.57' as ColorTokenValue;
+export const GALAXY_FOREGROUND = '0.1278 0.0424 266.02' as ColorTokenValue;
+export const TANGERINE_FOREGROUND = '0.1743 0.0305 78.88' as ColorTokenValue;
 export const INK = '0.12 0.02 255' as ColorTokenValue;
 export const LIGHT_MUTED_FOREGROUND = '0.5 0.02 255' as ColorTokenValue;
 export const DARK_MUTED_FOREGROUND = '0.7 0.02 255' as ColorTokenValue;

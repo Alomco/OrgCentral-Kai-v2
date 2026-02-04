@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils'
 import type { NavItem } from './app-sidebar-nav'
 
 const activeIconTileClassName =
-    'bg-sidebar-primary/20 text-sidebar-primary-foreground shadow-[0_0_0_1px_oklch(var(--primary)/0.35),0_10px_22px_-16px_oklch(var(--primary)/0.45)]'
+    'bg-sidebar-primary/20 text-sidebar-primary-foreground ring-1 ring-primary/25'
 
 export function StandardNavItem({ item, isActive, open, isSubItem = false }: {
     item: NavItem
@@ -25,13 +25,10 @@ export function StandardNavItem({ item, isActive, open, isSubItem = false }: {
             isActive={isActive}
             tooltip={item.label}
             className={cn(
-                'w-full justify-start rounded-lg transition-all duration-300 ease-in-out group/navitem h-auto',
+                'w-full justify-start rounded-lg transition-all duration-200 ease-in-out group/navitem h-auto',
                 'group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-0',
-                !isSubItem &&
-                'hover:translate-x-1 hover:scale-[1.02] group-data-[collapsible=icon]:hover:translate-x-0 group-data-[collapsible=icon]:hover:scale-105',
-                isSubItem && 'hover:translate-x-1 hover:scale-[1.02]',
                 isActive &&
-                'relative bg-sidebar-accent/50 shadow-[0_0_0_1px_oklch(var(--sidebar-border)/0.55),0_12px_24px_-20px_oklch(var(--primary)/0.35)] before:absolute before:inset-y-2 before:left-2 before:w-1 before:rounded-full before:bg-primary/40 before:shadow-[0_0_10px_oklch(var(--primary)/0.3)]',
+                'relative bg-sidebar-accent/40 ring-1 ring-sidebar-border/60 before:absolute before:inset-y-2 before:left-2 before:w-1 before:rounded-full before:bg-primary/40',
                 !isActive &&
                 'hover:bg-sidebar-accent/30'
             )}
@@ -47,7 +44,7 @@ export function StandardNavItem({ item, isActive, open, isSubItem = false }: {
                 <div
                     className={cn(
                         'flex items-center justify-center rounded-lg shrink-0 transition-all duration-300',
-                        'group-hover/navitem:scale-110 group-hover/navitem:shadow-lg',
+                        'group-hover/navitem:bg-sidebar-accent/40',
                         isSubItem ? 'w-8 h-8' : !open ? 'w-10 h-10' : 'w-9 h-9',
                         'group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:h-10',
                         isActive
@@ -60,7 +57,7 @@ export function StandardNavItem({ item, isActive, open, isSubItem = false }: {
                             'shrink-0 transition-all duration-300',
                             isSubItem ? 'h-4 w-4' : 'h-5 w-5',
                             'group-data-[collapsible=icon]:h-5 group-data-[collapsible=icon]:w-5',
-                            isActive && 'drop-shadow-lg'
+                            isActive && 'text-sidebar-foreground'
                         )}
                     />
                 </div>

@@ -1,5 +1,5 @@
 # OrgCentral Github Copilot Instructions chat(Short)
-Always use MCP/tools thoughtfully. Keep knowledge updated with .agent and .github folders. and check .agent\ARCHITECTURE.md every time to use skills, agents, and tools effectively.
+Always use MCP/tools thoughtfully. Keep knowledge updated with .agent and .github folders. and check .agent\ARCHITECTURE.md every time to use brainstroming, dynamic questioning, skills, agents, and tools effectively.
 ## Default rules
 - Keep files <=250 LOC; split into focused modules.
 - No `console.log`; use structured logging.
@@ -33,6 +33,13 @@ Always use MCP/tools thoughtfully. Keep knowledge updated with .agent and .githu
 
 after every chat response, suggest next step or optimization.
 
+## UI/UX Pro Max Trigger
+- When the user mentions "ui ux pro max" (or "ui-ux-pro-max"), perform a full UI/UX analysis using the ui-ux-pro-max workflow:
+   - Generate a design system via the search script.
+   - Run targeted UX guideline searches (accessibility, density, hierarchy).
+   - Apply stack guidance.
+   - Implement fixes with clear before/after reasoning.
+
 ## React Query Patterns
 - Queries live in small *api* modules with typed keys (e.g. \\
 oleKeys.list(orgId)\\).
@@ -61,8 +68,8 @@ outer.refresh().
 outer.refresh().
 ## HR Policies Search + URL Sync
 - Server-side search: /api/hr/policies accepts `?q=` and optional `nocat=1` to disable auto category mapping.
-- Auto-map common q values to categories (benefits, conduct/ethics, security, health/safety, procedures, compliance). Keep client UI chip “Category: …” and a Clear button that sets `nocat=1` while preserving q.
-- Client query: compose `policyKeys.list(q,nocat)` and fetch `/api/hr/policies?q=…&nocat=…`.
+- Auto-map common q values to categories (benefits, conduct/ethics, security, health/safety, procedures, compliance). Keep client UI chip ï¿½Category: ï¿½ï¿½ and a Clear button that sets `nocat=1` while preserving q.
+- Client query: compose `policyKeys.list(q,nocat)` and fetch `/api/hr/policies?q=ï¿½&nocat=ï¿½`.
 
 ## Local UI State (Zustand)
 - Persist UI-only prefs (e.g., default `nocat` behavior) under `src/app/(app)/hr/policies/_components/policies-ui.store.ts` using the safe storage helpers. Never store server data.
@@ -73,4 +80,5 @@ outer.refresh().
 ## Lists & Key Composition
 - Members list keys must use membersSearchKey(params) to canonicalize query params before composing memberKeys.list(orgId, key); use the same key for optimistic updates and invalidations.
 - Audit Log: include an sr-only hint element with id kbd-gg-hint; the Top button should set ria-describedby="kbd-gg-hint" and support the gg keyboard shortcut.
-- Policies/Compliance: pass q through URL, client Query Keys, and API; keep filters in the URL and avoid outer.refresh().
+- Policies/Compliance: pass q through URL, client Query Keys, and API; keep filters in the URL and avoid 
+outer.refresh().

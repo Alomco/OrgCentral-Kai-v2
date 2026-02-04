@@ -1,0 +1,7 @@
+.motionRoot {
+  view-transition-name: page;
+}
+
+.sharedTitle {
+  view-transition-name: page-title;
+}

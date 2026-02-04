@@ -81,7 +81,7 @@ export const onboardingJobStepSchema = z.object({
         .optional()
         .refine(
             (value) => {
-                if (!value || value.trim() === '') {return true;}
+                if (!value || value.trim() === '') { return true; }
                 const date = new Date(value);
                 return !Number.isNaN(date.getTime());
             },
@@ -93,6 +93,7 @@ export const onboardingJobStepSchema = z.object({
     salaryBasis: z.enum(['ANNUAL', 'HOURLY']).optional(),
     paySchedule: z.enum(['MONTHLY', 'BI_WEEKLY']).optional(),
     managerEmployeeNumber: z.string().trim().max(64).optional(),
+    mentorEmployeeNumber: z.string().trim().max(64).optional(),
 });
 
 export type OnboardingJobStepValues = z.infer<typeof onboardingJobStepSchema>;
@@ -104,6 +105,10 @@ export const onboardingAssignmentsStepSchema = z.object({
     eligibleLeaveTypes: z.array(z.string().trim().min(1)).max(20).optional(),
     onboardingTemplateId: z.uuid().optional(),
     includeTemplate: z.preprocess(booleanFromFormValue, z.boolean()).optional(),
+    workflowTemplateId: z.uuid().optional(),
+    emailSequenceTemplateId: z.uuid().optional(),
+    documentTemplateIds: z.array(z.uuid()).max(20).optional(),
+    provisioningTaskTypes: z.array(z.string().trim().min(1)).max(20).optional(),
 }).superRefine((values, context) => {
     if (values.includeTemplate && !values.onboardingTemplateId) {
         context.addIssue({
@@ -139,10 +144,15 @@ export const onboardingWizardSchema = z.object({
     salaryBasis: onboardingJobStepSchema.shape.salaryBasis,
     paySchedule: onboardingJobStepSchema.shape.paySchedule,
     managerEmployeeNumber: onboardingJobStepSchema.shape.managerEmployeeNumber,
+    mentorEmployeeNumber: onboardingJobStepSchema.shape.mentorEmployeeNumber,
     // Step 3: Assignments
     eligibleLeaveTypes: onboardingAssignmentsStepSchema.shape.eligibleLeaveTypes,
     onboardingTemplateId: onboardingAssignmentsStepSchema.shape.onboardingTemplateId,
     includeTemplate: onboardingAssignmentsStepSchema.shape.includeTemplate,
+    workflowTemplateId: onboardingAssignmentsStepSchema.shape.workflowTemplateId,
+    emailSequenceTemplateId: onboardingAssignmentsStepSchema.shape.emailSequenceTemplateId,
+    documentTemplateIds: onboardingAssignmentsStepSchema.shape.documentTemplateIds,
+    provisioningTaskTypes: onboardingAssignmentsStepSchema.shape.provisioningTaskTypes,
 }).superRefine((values, context) => {
     if (values.useOnboarding && values.includeTemplate && !values.onboardingTemplateId) {
         context.addIssue({
@@ -205,7 +215,12 @@ export const defaultOnboardingWizardValues: OnboardingWizardValues = {
     salaryBasis: 'ANNUAL',
     paySchedule: 'MONTHLY',
     managerEmployeeNumber: undefined,
+    mentorEmployeeNumber: undefined,
     eligibleLeaveTypes: [],
     onboardingTemplateId: undefined,
     includeTemplate: false,
+    workflowTemplateId: undefined,
+    emailSequenceTemplateId: undefined,
+    documentTemplateIds: [],
+    provisioningTaskTypes: [],
 };

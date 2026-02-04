@@ -1,16 +1,18 @@
 'use client';
 
-import { memo, useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Trash2, CheckCheck } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { NotificationItem, type NotificationSummary } from '@/components/notifications/notification-item';
+import type { NotificationSummary } from '@/components/notifications/notification-item';
 import { deleteHrNotification, listHrNotifications, markHrNotificationRead } from '../actions';
 import type { NotificationFilters } from '../_schemas/filter-schema';
 import { buildHrNotificationsQueryKey, HR_NOTIFICATIONS_QUERY_KEY } from '../notification-query';
+import { NotificationRow } from './notification-row';
 
 interface NotificationListProps {
   initialNotifications: NotificationSummary[];
@@ -23,6 +25,7 @@ export function NotificationList({
   initialUnreadCount,
   filters,
 }: NotificationListProps) {
+  const router = useRouter();
   const queryClient = useQueryClient();
   const queryKey = useMemo(() => buildHrNotificationsQueryKey(filters), [filters]);
   const { data } = useQuery({
@@ -32,7 +35,12 @@ export function NotificationList({
   });
 
   const notifications = data.notifications;
+  const totalUnreadCount = data.unreadCount;
+  const unreadInResults = notifications.filter((notification) => !notification.isRead).length;
+  const totalCount = notifications.length;
   const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
+  const hasSelection = selectedIds.size > 0;
+  const hasFilters = Boolean(filters.q ?? filters.type ?? filters.priority ?? (filters.unreadOnly ?? false));
 
   const updateNotifications = useCallback((updater: (items: NotificationSummary[]) => NotificationSummary[]) => {
     queryClient.setQueryData<{ notifications: NotificationSummary[]; unreadCount: number }>(
@@ -139,30 +147,45 @@ export function NotificationList({
 
   if (notifications.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 text-center text-muted-foreground border rounded-lg border-dashed">
+      <div className="flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-border/60 bg-card/40 py-12 text-center text-muted-foreground">
         <p className="text-lg font-medium">You&apos;re all caught up</p>
         <p className="text-sm">No notifications match these filters.</p>
+        {hasFilters ? (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => router.push('/hr/notifications')}
+            className="mt-2 h-8"
+          >
+            Clear filters
+          </Button>
+        ) : null}
       </div>
     );
   }
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col gap-2 rounded-lg bg-muted/30 p-2 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-wrap items-center gap-3 px-2">
+      <div className="flex flex-col gap-3 rounded-xl border border-border/60 bg-card/60 p-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-wrap items-center gap-3 px-2" role="status" aria-live="polite">
           <Checkbox
             checked={selectedIds.size === notifications.length && notifications.length > 0}
             onCheckedChange={toggleSelectAll}
             aria-label="Select all"
           />
           <span className="text-sm text-muted-foreground">
-            {selectedIds.size} selected
+            Selected {selectedIds.size} of {totalCount}
           </span>
-          <span className="text-xs text-muted-foreground">Select items, then choose an action.</span>
+          <span className="text-xs text-muted-foreground">
+            Unread in results {unreadInResults}
+          </span>
+          <span className="text-xs text-muted-foreground">
+            Unread total {totalUnreadCount}
+          </span>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          {selectedIds.size > 0 ? (
+          {hasSelection ? (
             <>
               <Button
                 variant="outline"
@@ -172,7 +195,7 @@ export function NotificationList({
                 className="h-8"
               >
                 <CheckCheck className="mr-2 h-4 w-4" />
-                Mark Read
+                Mark read
               </Button>
               <Button
                 variant="outline"
@@ -206,35 +229,3 @@ export function NotificationList({
     </div>
   );
 }
-
-interface NotificationRowProps {
-  notification: NotificationSummary;
-  selected: boolean;
-  onToggle: () => void;
-  onRead: (id: string) => void;
-}
-
-const NotificationRow = memo(function NotificationRow({
-  notification,
-  selected,
-  onToggle,
-  onRead,
-}: NotificationRowProps) {
-  return (
-    <div className="flex items-start gap-3">
-      <div className="pt-1 pl-2">
-        <Checkbox
-          checked={selected}
-          onCheckedChange={onToggle}
-          aria-label="Select notification"
-        />
-      </div>
-      <div className="flex-1">
-        <NotificationItem
-          notification={notification}
-          onRead={onRead}
-        />
-      </div>
-    </div>
-  );
-});

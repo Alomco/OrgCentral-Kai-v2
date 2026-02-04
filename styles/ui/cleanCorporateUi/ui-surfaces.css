@@ -3,8 +3,8 @@
     --ui-surface-container-opacity: clamp(0.78, calc(var(--ui-card-opacity) - 0.12), 0.94);
     --ui-surface-item-opacity: clamp(0.86, calc(var(--ui-card-opacity) - 0.04), 0.98);
     --ui-surface-interactive-opacity: clamp(0.92, calc(var(--ui-card-opacity) + 0.02), 1);
-    --ui-popup-opacity-min: 0.95;
-    --ui-surface-popover-opacity: clamp(var(--ui-popup-opacity-min), calc(var(--ui-card-opacity) + 0.02), 1);
+    --ui-popup-opacity-min: 1;
+    --ui-surface-popover-opacity: 1;
     --ui-surface-container-fill: oklch(var(--card) / var(--ui-surface-container-opacity));
     --ui-surface-item-fill: oklch(var(--card) / var(--ui-surface-item-opacity));
     --ui-surface-interactive-fill: oklch(var(--card) / var(--ui-surface-interactive-opacity));

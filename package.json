@@ -104,6 +104,7 @@
     "react-qr-code": "^2.0.14",
     "react-resizable-panels": "^3.0.6",
     "recharts": "2.15.4",
+    "import-in-the-middle": "2.0.0",
     "require-in-the-middle": "^8.0.1",
     "resend": "^6.4.2",
     "rrule": "^2.8.1",
@@ -157,5 +158,11 @@
     "typescript-eslint": "^8.46.4",
     "vitest": "^4.0.9",
     "zod-prisma-types": "^3.3.10"
+  },
+  "pnpm": {
+    "overrides": {
+      "import-in-the-middle": "2.0.0",
+      "require-in-the-middle": "8.0.1"
+    }
   }
 }

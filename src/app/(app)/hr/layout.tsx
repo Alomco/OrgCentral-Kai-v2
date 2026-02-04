@@ -12,13 +12,13 @@ export default function HrLayout({ children }: { children: ReactNode }) {
             <div className="relative isolate hr-page-shell">
                 <div
                     aria-hidden="true"
-                    className="pointer-events-none absolute inset-0 -z-20 gradient-mesh opacity-60 dark:opacity-70 saturate-150 blur-3xl"
+                    className="pointer-events-none absolute inset-0 -z-20 gradient-mesh opacity-35 dark:opacity-45 saturate-110 blur-2xl"
                 />
                 <div
                     aria-hidden="true"
                     className="pointer-events-none absolute inset-0 -z-10 page-mesh"
                 />
-                <div id="hr-main-content" tabIndex={-1} className="relative mx-auto w-full max-w-6xl px-6 py-6">
+                <div id="hr-main-content" tabIndex={-1} className="relative mx-auto w-full max-w-[1400px] px-4 py-6 sm:px-6">
                     {children}
                 </div>
             </div>

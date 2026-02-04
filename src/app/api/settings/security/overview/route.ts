@@ -1,3 +1,4 @@
+import { unstable_noStore as noStore } from 'next/cache';
 import { NextResponse } from 'next/server';
 
 import { getSessionContext } from '@/server/use-cases/auth/sessions/get-session';
@@ -13,6 +14,7 @@ function noStoreJson<TBody>(body: TBody, init?: { status?: number }): NextRespon
 }
 
 export async function GET(request: Request): Promise<Response> {
+    noStore();
     try {
         const { session, authorization } = await getSessionContext(
             {},

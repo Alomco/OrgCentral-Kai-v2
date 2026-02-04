@@ -19,9 +19,14 @@ import { hasPermission } from '@/lib/security/permission-check';
 
 import { HrPageHeader } from '../_components/hr-page-header';
 import { ChecklistTemplatesPanel } from './_components/checklist-templates-panel';
+import { DocumentTemplatesPanel } from './_components/document-templates-panel';
+import { EmailSequencesPanel } from './_components/email-sequences-panel';
 import { InviteEmployeePanel } from './_components/invite-employee-panel';
+import { OnboardingFeedbackPanel } from './_components/onboarding-feedback-panel';
 import { OnboardingInvitationsPanel } from './_components/onboarding-invitations-panel';
 import { OnboardingFiltersClient } from './_components/onboarding-filters.client';
+import { OnboardingMetricsPanel } from './_components/onboarding-metrics-panel';
+import { WorkflowTemplatesPanel } from './_components/workflow-templates-panel';
 
 function PanelSkeleton() {
     return (
@@ -98,6 +103,31 @@ export default async function HrOnboardingPage() {
                     </Suspense>
                 ) : null}
             </div>
+
+            {canManageTemplates ? (
+                <div className="space-y-4">
+                    <div className="text-sm font-medium text-muted-foreground">Onboarding configuration</div>
+                    <div className="grid gap-6 lg:grid-cols-2">
+                        <Suspense fallback={<PanelSkeleton />}>
+                            <WorkflowTemplatesPanel authorization={authorization} />
+                        </Suspense>
+                        <Suspense fallback={<PanelSkeleton />}>
+                            <EmailSequencesPanel authorization={authorization} />
+                        </Suspense>
+                        <Suspense fallback={<PanelSkeleton />}>
+                            <DocumentTemplatesPanel authorization={authorization} />
+                        </Suspense>
+                        <Suspense fallback={<PanelSkeleton />}>
+                            <OnboardingMetricsPanel authorization={authorization} />
+                        </Suspense>
+                    </div>
+                    <div className="grid gap-6 lg:grid-cols-2">
+                        <Suspense fallback={<PanelSkeleton />}>
+                            <OnboardingFeedbackPanel authorization={authorization} />
+                        </Suspense>
+                    </div>
+                </div>
+            ) : null}
 
             {canInviteMembers ? (
                 <div className="space-y-3">

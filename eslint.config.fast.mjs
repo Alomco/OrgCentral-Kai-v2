@@ -14,6 +14,7 @@ export default defineConfig([
     "next-env.d.ts",
     ".tmp/**",
     "node_modules/**",
+    ".agents/**",
     "src/components/ui/**",
     "src/hooks/use-mobile.ts",
     "**/*.test.*",

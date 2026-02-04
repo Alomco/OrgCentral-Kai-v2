@@ -19,14 +19,22 @@
 [data-slot="hover-card-content"],
 [data-slot="tooltip-content"],
 [data-slot="command"] {
-    background-color: oklch(var(--popover) / 1) !important;
+    background-color: var(--color-popover) !important;
+    background-image: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    opacity: 1 !important;
 }
 
 [data-slot="dialog-content"],
 [data-slot="alert-dialog-content"],
 [data-slot="sheet-content"],
 [data-slot="drawer-content"] {
-    background-color: oklch(var(--popover) / 1) !important;
+    background-color: var(--color-popover) !important;
+    background-image: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    opacity: 1 !important;
 }
 
 [data-ui-style="clean-corporate"] [data-slot="popover-content"],
@@ -114,6 +122,89 @@
 [data-ui-style="material-motion"] [data-slot="popover-content"] {
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
     transition-duration: 300ms !important;
+}
+
+/* Clean corporate: remove glass/alpha backgrounds across pages */
+[data-ui-style="clean-corporate"] .bg-card\/20,
+[data-ui-style="clean-corporate"] .bg-card\/30,
+[data-ui-style="clean-corporate"] .bg-card\/40,
+[data-ui-style="clean-corporate"] .bg-card\/50,
+[data-ui-style="clean-corporate"] .bg-card\/60,
+[data-ui-style="clean-corporate"] .bg-card\/70,
+[data-ui-style="clean-corporate"] .bg-card\/80,
+[data-ui-style="clean-corporate"] .bg-card\/90,
+[data-ui-style="clean-corporate"] .bg-card\/95 {
+    background-color: oklch(var(--card)) !important;
+}
+
+[data-ui-style="clean-corporate"] .bg-popover\/20,
+[data-ui-style="clean-corporate"] .bg-popover\/30,
+[data-ui-style="clean-corporate"] .bg-popover\/40,
+[data-ui-style="clean-corporate"] .bg-popover\/50,
+[data-ui-style="clean-corporate"] .bg-popover\/60,
+[data-ui-style="clean-corporate"] .bg-popover\/70,
+[data-ui-style="clean-corporate"] .bg-popover\/80,
+[data-ui-style="clean-corporate"] .bg-popover\/90,
+[data-ui-style="clean-corporate"] .bg-popover\/95 {
+    background-color: oklch(var(--popover)) !important;
+}
+
+[data-ui-style="clean-corporate"] .bg-muted\/20,
+[data-ui-style="clean-corporate"] .bg-muted\/30,
+[data-ui-style="clean-corporate"] .bg-muted\/40,
+[data-ui-style="clean-corporate"] .bg-muted\/50,
+[data-ui-style="clean-corporate"] .bg-muted\/60 {
+    background-color: oklch(var(--muted)) !important;
+}
+
+[data-ui-style="clean-corporate"] .bg-primary\/5,
+[data-ui-style="clean-corporate"] .bg-primary\/10,
+[data-ui-style="clean-corporate"] .bg-primary\/15,
+[data-ui-style="clean-corporate"] .bg-primary\/20 {
+    background-color: oklch(var(--secondary)) !important;
+}
+
+[data-ui-style="clean-corporate"] .bg-secondary\/20,
+[data-ui-style="clean-corporate"] .bg-secondary\/30 {
+    background-color: oklch(var(--secondary)) !important;
+}
+
+[data-ui-style="clean-corporate"] .bg-accent\/5,
+[data-ui-style="clean-corporate"] .bg-accent\/10,
+[data-ui-style="clean-corporate"] .bg-accent\/15,
+[data-ui-style="clean-corporate"] .bg-accent\/20 {
+    background-color: oklch(var(--secondary)) !important;
+}
+
+[data-ui-style="clean-corporate"] .bg-destructive\/5,
+[data-ui-style="clean-corporate"] .bg-destructive\/10,
+[data-ui-style="clean-corporate"] .bg-destructive\/20 {
+    background-color: oklch(var(--muted)) !important;
+}
+
+[data-ui-style="clean-corporate"] .bg-background\/20,
+[data-ui-style="clean-corporate"] .bg-background\/30,
+[data-ui-style="clean-corporate"] .bg-background\/40,
+[data-ui-style="clean-corporate"] .bg-background\/50,
+[data-ui-style="clean-corporate"] .bg-background\/60,
+[data-ui-style="clean-corporate"] .bg-background\/70,
+[data-ui-style="clean-corporate"] .bg-background\/80,
+[data-ui-style="clean-corporate"] .bg-background\/90,
+[data-ui-style="clean-corporate"] .bg-background\/95 {
+    background-color: oklch(var(--background)) !important;
+}
+
+[data-ui-style="clean-corporate"] .glass,
+[data-ui-style="clean-corporate"] .glass-card,
+[data-ui-style="clean-corporate"] .glass-cta {
+    background: oklch(var(--card)) !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+}
+
+[data-ui-style="clean-corporate"] [class*="backdrop-blur"] {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
 }
 
 [data-ui-style] [data-slot="card"]:hover,

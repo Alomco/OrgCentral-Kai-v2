@@ -1,3 +1,14 @@
 export { PrismaChecklistTemplateRepository } from './prisma-checklist-template-repository';
 export { PrismaChecklistInstanceRepository } from './prisma-checklist-instance-repository';
 export { PrismaOnboardingInvitationRepository } from './prisma-invitation-repository';
+export { PrismaMentorAssignmentRepository } from './prisma-mentor-assignment-repository';
+export { PrismaProvisioningTaskRepository } from './prisma-provisioning-task-repository';
+export { PrismaOnboardingWorkflowTemplateRepository } from './prisma-workflow-template-repository';
+export { PrismaOnboardingWorkflowRunRepository } from './prisma-workflow-run-repository';
+export { PrismaEmailSequenceTemplateRepository } from './prisma-email-sequence-template-repository';
+export { PrismaEmailSequenceEnrollmentRepository } from './prisma-email-sequence-enrollment-repository';
+export { PrismaEmailSequenceDeliveryRepository } from './prisma-email-sequence-delivery-repository';
+export { PrismaOnboardingMetricDefinitionRepository } from './prisma-onboarding-metric-definition-repository';
+export { PrismaOnboardingMetricResultRepository } from './prisma-onboarding-metric-result-repository';
+export { PrismaOnboardingFeedbackRepository } from './prisma-onboarding-feedback-repository';
+export { PrismaDocumentTemplateAssignmentRepository } from './prisma-document-template-assignment-repository';

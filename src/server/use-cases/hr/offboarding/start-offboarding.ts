@@ -3,6 +3,14 @@ import type { RepositoryAuthorizationContext } from '@/server/repositories/secur
 import type { IEmployeeProfileRepository } from '@/server/repositories/contracts/hr/people/employee-profile-repository-contract';
 import type { IChecklistTemplateRepository } from '@/server/repositories/contracts/hr/onboarding/checklist-template-repository-contract';
 import type { IChecklistInstanceRepository } from '@/server/repositories/contracts/hr/onboarding/checklist-instance-repository-contract';
+import type { IProvisioningTaskRepository } from '@/server/repositories/contracts/hr/onboarding/provisioning-task-repository-contract';
+import type { IOnboardingWorkflowTemplateRepository, IOnboardingWorkflowRunRepository } from '@/server/repositories/contracts/hr/onboarding/workflow-template-repository-contract';
+import type {
+    IEmailSequenceTemplateRepository,
+    IEmailSequenceEnrollmentRepository,
+    IEmailSequenceDeliveryRepository,
+} from '@/server/repositories/contracts/hr/onboarding/email-sequence-repository-contract';
+import type { IOnboardingMetricDefinitionRepository, IOnboardingMetricResultRepository } from '@/server/repositories/contracts/hr/onboarding/onboarding-metric-repository-contract';
 import type { IOffboardingRepository } from '@/server/repositories/contracts/hr/offboarding';
 import type { IUserSessionRepository } from '@/server/repositories/contracts/auth/sessions/user-session-repository-contract';
 import type { ChecklistTemplateItem, ChecklistItemProgress } from '@/server/types/onboarding-types';
@@ -12,6 +20,7 @@ import type { JsonRecord } from '@/server/types/json';
 import { assertOffboardingStarter } from '@/server/security/authorization/hr-guards/offboarding';
 import { recordAuditEvent } from '@/server/logging/audit-logger';
 import { revokeOffboardingAccess } from './offboarding-access';
+import { applyOffboardingAutomation } from './apply-offboarding-automation';
 
 export type OffboardingMode = 'DIRECT' | 'CHECKLIST';
 
@@ -22,6 +31,9 @@ export interface StartOffboardingInput {
     templateId?: string;
     reason: string;
     metadata?: JsonRecord | null;
+    workflowTemplateId?: string | null;
+    emailSequenceTemplateId?: string | null;
+    provisioningTaskTypes?: string[] | null;
 }
 
 export interface StartOffboardingDependencies {
@@ -31,6 +43,14 @@ export interface StartOffboardingDependencies {
     checklistInstanceRepository?: IChecklistInstanceRepository;
     userSessionRepository?: IUserSessionRepository;
     membershipService?: MembershipServiceContract;
+    provisioningTaskRepository?: IProvisioningTaskRepository;
+    workflowTemplateRepository?: IOnboardingWorkflowTemplateRepository;
+    workflowRunRepository?: IOnboardingWorkflowRunRepository;
+    emailSequenceTemplateRepository?: IEmailSequenceTemplateRepository;
+    emailSequenceEnrollmentRepository?: IEmailSequenceEnrollmentRepository;
+    emailSequenceDeliveryRepository?: IEmailSequenceDeliveryRepository;
+    onboardingMetricDefinitionRepository?: IOnboardingMetricDefinitionRepository;
+    onboardingMetricResultRepository?: IOnboardingMetricResultRepository;
 }
 
 export interface StartOffboardingResult {
@@ -203,6 +223,39 @@ export async function startOffboarding(
             reason: input.reason,
         },
     });
+
+    if (
+        deps.provisioningTaskRepository &&
+        deps.workflowTemplateRepository &&
+        deps.workflowRunRepository &&
+        deps.emailSequenceTemplateRepository &&
+        deps.emailSequenceEnrollmentRepository &&
+        deps.emailSequenceDeliveryRepository &&
+        deps.onboardingMetricDefinitionRepository &&
+        deps.onboardingMetricResultRepository
+    ) {
+        await applyOffboardingAutomation(
+            {
+                provisioningTaskRepository: deps.provisioningTaskRepository,
+                workflowTemplateRepository: deps.workflowTemplateRepository,
+                workflowRunRepository: deps.workflowRunRepository,
+                emailSequenceTemplateRepository: deps.emailSequenceTemplateRepository,
+                emailSequenceEnrollmentRepository: deps.emailSequenceEnrollmentRepository,
+                emailSequenceDeliveryRepository: deps.emailSequenceDeliveryRepository,
+                onboardingMetricDefinitionRepository: deps.onboardingMetricDefinitionRepository,
+                onboardingMetricResultRepository: deps.onboardingMetricResultRepository,
+            },
+            {
+                authorization: input.authorization,
+                employeeId: profile.id,
+                offboardingId: offboarding.id,
+                targetEmail: profile.email ?? profile.personalEmail ?? undefined,
+                workflowTemplateId: input.workflowTemplateId ?? undefined,
+                emailSequenceTemplateId: input.emailSequenceTemplateId ?? undefined,
+                provisioningTaskTypes: input.provisioningTaskTypes ?? undefined,
+            },
+        );
+    }
 
     return { offboarding, checklistInstanceId };
 }

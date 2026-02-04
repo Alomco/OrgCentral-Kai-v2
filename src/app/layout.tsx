@@ -7,6 +7,7 @@ import { TenantThemeRegistry } from "@/components/theme/tenant-theme-registry";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { UiStyleProvider } from "@/components/theme/ui-style-provider";
 import { Providers } from "./providers";
+import motionStyles from "@/styles/motion/view-transitions.module.css";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -34,7 +35,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`} suppressHydrationWarning>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased ${motionStyles.motionRoot}`}
+        suppressHydrationWarning
+      >
         <Providers>
           <ThemeProvider>
             <UiStyleProvider>

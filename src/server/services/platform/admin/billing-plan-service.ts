@@ -125,11 +125,8 @@ export class BillingPlanService extends AbstractBaseService implements BillingPl
     }
 }
 
-const sharedDependencies: BillingPlanServiceDependencies = {
-    ...buildBillingPlanServiceDependencies(),
-    billingGateway: buildBillingGateway(),
-};
-const sharedService = new BillingPlanService(sharedDependencies);
+let sharedDependencies: BillingPlanServiceDependencies | null = null;
+let sharedService: BillingPlanService | null = null;
 
 function buildBillingGateway(): BillingGateway {
     const config = resolveBillingConfig();
@@ -139,12 +136,25 @@ function buildBillingGateway(): BillingGateway {
     return new StripeBillingGateway(config);
 }
 
+function getSharedDependencies(): BillingPlanServiceDependencies {
+    sharedDependencies ??= {
+        ...buildBillingPlanServiceDependencies(),
+        billingGateway: buildBillingGateway(),
+    };
+    return sharedDependencies;
+}
+
+function getSharedService(): BillingPlanService {
+    sharedService ??= new BillingPlanService(getSharedDependencies());
+    return sharedService;
+}
+
 function resolveDependencies(
     overrides?: Partial<BillingPlanServiceDependencies>,
     options?: BillingPlanServiceDependencyOptions,
 ): BillingPlanServiceDependencies {
     if (!overrides && !options) {
-        return sharedDependencies;
+        return getSharedDependencies();
     }
 
     const repoDependencies = buildBillingPlanServiceDependencies({
@@ -154,7 +164,7 @@ function resolveDependencies(
 
     return {
         ...repoDependencies,
-        billingGateway: overrides?.billingGateway ?? sharedDependencies.billingGateway,
+        billingGateway: overrides?.billingGateway ?? getSharedDependencies().billingGateway,
     };
 }
 
@@ -163,7 +173,7 @@ export function getBillingPlanService(
     options?: BillingPlanServiceDependencyOptions,
 ): BillingPlanService {
     if (!overrides && !options) {
-        return sharedService;
+        return getSharedService();
     }
     return new BillingPlanService(resolveDependencies(overrides, options));
 }

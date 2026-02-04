@@ -4,6 +4,7 @@ import { HR_NOTIFICATION_PRIORITY_VALUES, HR_NOTIFICATION_TYPE_VALUES } from '@/
 const MAX_NOTIFICATION_LIMIT = 50;
 
 export const notificationFilterSchema = z.object({
+  q: z.string().trim().min(1).optional(),
   unreadOnly: z.coerce.boolean().optional(),
   type: z.enum(HR_NOTIFICATION_TYPE_VALUES).optional(),
   priority: z.enum(HR_NOTIFICATION_PRIORITY_VALUES).optional(),

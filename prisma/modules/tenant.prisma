@@ -112,6 +112,18 @@ model Organization {
   checklistTemplates     ChecklistTemplate[] @relation("OrgChecklistTemplates")
   checklistInstances     ChecklistInstance[] @relation("OrgChecklistInstances")
   offboardingRecords     Offboarding[]
+  mentorAssignments      MentorAssignment[]
+  provisioningTasks      ProvisioningTask[]
+  onboardingWorkflowTemplates OnboardingWorkflowTemplate[]
+  onboardingWorkflowRuns OnboardingWorkflowRun[]
+  emailSequenceTemplates EmailSequenceTemplate[]
+  emailSequenceEnrollments EmailSequenceEnrollment[]
+  emailSequenceDeliveries EmailSequenceDelivery[]
+  onboardingMetricDefinitions OnboardingMetricDefinition[]
+  onboardingMetricResults OnboardingMetricResult[]
+  onboardingFeedback     OnboardingFeedback[]
+  documentTemplates      DocumentTemplate[]
+  documentTemplateAssignments DocumentTemplateAssignment[]
   complianceTemplates    ComplianceTemplate[] @relation("OrgComplianceTemplates")
   complianceReminderSettings ComplianceReminderSettings?
   complianceCategories   ComplianceCategory[] @relation("OrgComplianceCategories")

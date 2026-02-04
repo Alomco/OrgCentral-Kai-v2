@@ -15,8 +15,10 @@ import { FieldError } from '../../_components/field-error';
 import { createComplianceTemplateAction } from '../actions/compliance-templates';
 import type { ComplianceTemplateCreateState } from '../compliance-template-form-utils';
 import { ComplianceTemplateItemsBuilder } from './compliance-template-items-builder';
+import { ComplianceTemplateQuickSteps } from './compliance-template-quick-steps';
 import { ComplianceTemplateRow } from './compliance-template-row';
 import { ComplianceTemplateGuideCard } from './compliance-template-guide-card';
+import { ComplianceTemplateEmptyState } from './compliance-template-empty-state';
 import { ComplianceTemplateListHeader } from './compliance-template-list-header';
 import { listTemplatesQuery, templatesKey } from '../compliance-templates.api';
 
@@ -129,10 +131,7 @@ export function ComplianceTemplatesManager(props: { templates: ComplianceTemplat
                             </Alert>
                         ) : null}
 
-                        <div className="rounded-lg border border-border/60 bg-muted/20 p-3 text-sm text-muted-foreground">
-                            <p className="font-medium text-foreground">Quick steps</p>
-                            <p className="mt-1">Name the template, add optional metadata, then list each required item.</p>
-                        </div>
+                        <ComplianceTemplateQuickSteps />
 
                         <form
                             ref={formReference}
@@ -236,15 +235,7 @@ export function ComplianceTemplatesManager(props: { templates: ComplianceTemplat
                 />
                 <CardContent>
                     {templates.length === 0 ? (
-                        <div className="rounded-lg border border-dashed border-border/60 bg-muted/30 p-6 text-sm text-muted-foreground">
-                            <p className="font-medium text-foreground">No templates yet</p>
-                            <p className="mt-1">Create your first template or seed a starter pack to get going.</p>
-                            <div className="mt-4 flex flex-wrap items-center gap-2">
-                                <Button asChild size="sm">
-                                    <a href="#create-template">Create template</a>
-                                </Button>
-                            </div>
-                        </div>
+                        <ComplianceTemplateEmptyState />
                     ) : (
                         <div className="space-y-4">
                             {templates.map((template) => (

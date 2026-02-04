@@ -49,8 +49,7 @@ function formatOklchToken(color: OklchColor): string | null {
 
 function toOklchToken(value: string): string {
     const parsedOklch = parse(`oklch(${value})`);
-    const oklchFromOklch = parsedOklch ? toOklch(parsedOklch) : null;
-    const oklchToken = oklchFromOklch ?? toOklch(`hsl(${value})`);
+    const oklchToken = parsedOklch ? toOklch(parsedOklch) : null;
 
     const formatted = oklchToken ? formatOklchToken(oklchToken) : null;
     return formatted ?? value;

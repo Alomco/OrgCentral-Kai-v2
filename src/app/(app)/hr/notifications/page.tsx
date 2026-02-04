@@ -50,7 +50,8 @@ export default async function NotificationsPage({ searchParams }: PageProps) {
   const notificationsPromise = listHrNotifications(filters);
 
   return (
-    <div className="flex flex-col h-full space-y-6">
+    <div className="flex h-full flex-col space-y-6 px-4 sm:px-6">
+      <div className="mx-auto w-full max-w-[1400px] space-y-6">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -81,6 +82,7 @@ export default async function NotificationsPage({ searchParams }: PageProps) {
       <Suspense fallback={<NotificationsLoading />}>
         <NotificationListSection notificationsPromise={notificationsPromise} filters={filters} />
       </Suspense>
+      </div>
     </div>
   );
 }

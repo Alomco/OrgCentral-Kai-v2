@@ -4,6 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardHeader } from '@/components/ui/card';
 import { Stepper } from '@/components/ui/stepper';
 import type { ChecklistTemplate } from '@/server/types/onboarding-types';
+import type { OnboardingWorkflowTemplateRecord } from '@/server/types/hr/onboarding-workflow-templates';
+import type { EmailSequenceTemplateRecord } from '@/server/types/hr/onboarding-email-sequences';
+import type { DocumentTemplateRecord } from '@/server/types/records/document-templates';
 import { type Department } from './job-step';
 import { type LeaveType } from './assignments-step';
 import { OnboardingWizardContent } from './onboarding-wizard-content';
@@ -29,6 +32,14 @@ export interface OnboardingWizardProps {
     leaveTypes?: LeaveType[];
     /** Available checklist templates */
     checklistTemplates?: ChecklistTemplate[];
+    /** Available workflow templates */
+    workflowTemplates?: OnboardingWorkflowTemplateRecord[];
+    /** Available email sequences */
+    emailSequenceTemplates?: EmailSequenceTemplateRecord[];
+    /** Available document templates */
+    documentTemplates?: DocumentTemplateRecord[];
+    /** Provisioning task options */
+    provisioningTaskOptions?: { value: string; label: string }[];
     /** Whether the user can manage templates */
     canManageTemplates?: boolean;
     /** Whether onboarding details can be used */
@@ -49,6 +60,10 @@ export function OnboardingWizard({
     managers = [],
     leaveTypes,
     checklistTemplates = [],
+    workflowTemplates = [],
+    emailSequenceTemplates = [],
+    documentTemplates = [],
+    provisioningTaskOptions = [],
     canManageTemplates = false,
     canManageOnboarding = false,
     onEmailCheck,
@@ -119,6 +134,10 @@ export function OnboardingWizard({
                 managers={managers}
                 leaveTypes={leaveTypes}
                 checklistTemplates={checklistTemplates}
+                workflowTemplates={workflowTemplates}
+                emailSequenceTemplates={emailSequenceTemplates}
+                documentTemplates={documentTemplates}
+                provisioningTaskOptions={provisioningTaskOptions}
                 canManageTemplates={canManageTemplates && state.values.useOnboarding}
                 roleOptions={resolvedRoleOptions}
                 onValuesChange={handleValuesChange}

@@ -267,6 +267,7 @@ const eslintConfig = defineConfig([
   },
   globalIgnores([
     "node_modules/**", // vendor libraries stay untouched
+    ".agents/**",
     "components.json", // shadcn-ui registry config
     ".next/**",
     ".tmp/**",

@@ -45,6 +45,11 @@
     --ui-transition-easing: ease-out;
     --ui-border-opacity: 0.4;
     --ui-card-opacity: 1;
+    --ui-surface-container-opacity: 1;
+    --ui-surface-item-opacity: 1;
+    --ui-surface-interactive-opacity: 1;
+    --ui-popup-opacity-min: 1;
+    --ui-surface-popover-opacity: 1;
     --ui-hover-scale: 1;
     --ui-hover-lift: 0px;
     --ui-active-scale: 0.99;
@@ -53,6 +58,10 @@
     --ui-border-width: 1px;
     --ui-surface-tint: var(--border);
     --ui-surface-fill: oklch(var(--card));
+    --ui-surface-container-fill: oklch(var(--card));
+    --ui-surface-item-fill: oklch(var(--card));
+    --ui-surface-interactive-fill: oklch(var(--card));
+    --ui-surface-popover-fill: oklch(var(--popover));
     --ui-surface-depth-color: var(--foreground);
     --ui-surface-outline-weak: inset 0 0 0 1px oklch(var(--border) / 0.3), inset 0 1px 0 oklch(var(--background) / 0.5);
     --ui-surface-outline: inset 0 0 0 1px oklch(var(--border) / 0.4), inset 0 1px 0 oklch(var(--background) / 0.6);

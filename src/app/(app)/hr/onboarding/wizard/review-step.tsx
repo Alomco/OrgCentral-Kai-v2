@@ -4,6 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 import type { OnboardingWizardValues } from './wizard.schema';
 import type { ChecklistTemplate } from '@/server/types/onboarding-types';
+import type { OnboardingWorkflowTemplateRecord } from '@/server/types/hr/onboarding-workflow-templates';
+import type { EmailSequenceTemplateRecord } from '@/server/types/hr/onboarding-email-sequences';
+import type { DocumentTemplateRecord } from '@/server/types/records/document-templates';
 import type { LeaveType } from './assignments-step';
 import { ReviewAssignmentsSection, ReviewIdentitySection, ReviewJobSection } from './review-sections';
 import type { WizardStepId } from './onboarding-wizard-steps';
@@ -11,6 +14,9 @@ import type { WizardStepId } from './onboarding-wizard-steps';
 export interface ReviewStepProps {
     values: OnboardingWizardValues;
     checklistTemplates?: ChecklistTemplate[];
+    workflowTemplates?: OnboardingWorkflowTemplateRecord[];
+    emailSequenceTemplates?: EmailSequenceTemplateRecord[];
+    documentTemplates?: DocumentTemplateRecord[];
     leaveTypes?: LeaveType[];
     onEditStep?: (stepIndex: number) => void;
     stepIndexById: Map<string, number>;
@@ -19,11 +25,21 @@ export interface ReviewStepProps {
 export function ReviewStep({
     values,
     checklistTemplates = [],
+    workflowTemplates = [],
+    emailSequenceTemplates = [],
+    documentTemplates = [],
     leaveTypes = [],
     onEditStep,
     stepIndexById,
 }: ReviewStepProps) {
     const selectedTemplate = checklistTemplates.find((t) => t.id === values.onboardingTemplateId);
+    const selectedWorkflow = workflowTemplates.find((t) => t.id === values.workflowTemplateId);
+    const selectedEmailSequence = emailSequenceTemplates.find(
+        (t) => t.id === values.emailSequenceTemplateId,
+    );
+    const selectedDocuments = documentTemplates.filter((document_) =>
+        (values.documentTemplateIds ?? []).includes(document_.id),
+    );
     const selectedLeaveTypes = values.eligibleLeaveTypes ?? [];
     const getStepIndex = (id: WizardStepId) => stepIndexById.get(id);
 
@@ -56,6 +72,9 @@ export function ReviewStep({
                         leaveTypes={leaveTypes}
                         selectedLeaveTypes={selectedLeaveTypes}
                         selectedTemplate={selectedTemplate}
+                        selectedWorkflow={selectedWorkflow}
+                        selectedEmailSequence={selectedEmailSequence}
+                        selectedDocuments={selectedDocuments}
                         onEditStep={onEditStep}
                         stepIndex={getStepIndex('assignments')}
                     />
@@ -77,6 +96,18 @@ export function ReviewStep({
                         ) : null}
                         {values.useOnboarding && values.includeTemplate && selectedTemplate ? (
                             <li>- The onboarding checklist will be assigned automatically</li>
+                        ) : null}
+                        {values.useOnboarding && selectedWorkflow ? (
+                            <li>- The onboarding workflow will start using the selected template</li>
+                        ) : null}
+                        {values.useOnboarding && selectedEmailSequence ? (
+                            <li>- Automated onboarding emails will be scheduled</li>
+                        ) : null}
+                        {values.useOnboarding && selectedDocuments.length > 0 ? (
+                            <li>- Required onboarding documents will be assigned</li>
+                        ) : null}
+                        {values.useOnboarding && (values.provisioningTaskTypes?.length ?? 0) > 0 ? (
+                            <li>- IT provisioning tasks will be created for the employee</li>
                         ) : null}
                         {values.useOnboarding && selectedLeaveTypes.length > 0 ? (
                             <li>- Leave balances will be initialized for the assigned leave types</li>

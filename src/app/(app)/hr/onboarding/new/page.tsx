@@ -16,6 +16,9 @@ import {
 import { getSessionContextOrRedirect } from '@/server/ui/auth/session-redirect';
 import { hasPermission } from '@/lib/security/permission-check';
 import { getChecklistTemplatesForUi } from '@/server/use-cases/hr/onboarding/templates/get-checklist-templates.cached';
+import { getWorkflowTemplatesForUi } from '@/server/use-cases/hr/onboarding/workflows/get-workflow-templates.cached';
+import { getEmailSequenceTemplatesForUi } from '@/server/use-cases/hr/onboarding/email-sequences/get-email-sequence-templates.cached';
+import { getDocumentTemplatesForUi } from '@/server/use-cases/records/documents/list-document-templates.cached';
 import { listEmployeeDirectoryForUi } from '@/server/use-cases/hr/people/list-employee-directory.cached';
 import type { EmployeeProfile } from '@/server/types/hr-types';
 import { getDepartmentService } from '@/server/services/org/departments/department-service.provider';
@@ -128,6 +131,32 @@ export default async function OnboardingWizardPage() {
         leaveTypes = [];
     }
 
+    const workflowTemplatesResult = await getWorkflowTemplatesForUi({
+        authorization,
+        templateType: 'ONBOARDING',
+        isActive: true,
+    });
+
+    const emailSequenceTemplatesResult = await getEmailSequenceTemplatesForUi({
+        authorization,
+        trigger: 'ONBOARDING_INVITE',
+        isActive: true,
+    });
+
+    const documentTemplatesResult = await getDocumentTemplatesForUi({
+        authorization,
+        isActive: true,
+        type: 'ONBOARDING',
+    });
+
+    const provisioningTaskOptions = [
+        { value: 'ACCOUNT', label: 'Create user account' },
+        { value: 'EQUIPMENT', label: 'Provision equipment' },
+        { value: 'ACCESS', label: 'Grant system access' },
+        { value: 'LICENSE', label: 'Assign licenses' },
+        { value: 'SOFTWARE', label: 'Install software' },
+    ];
+
     return (
         <div className="space-y-6">
             <Breadcrumb>
@@ -162,6 +191,10 @@ export default async function OnboardingWizardPage() {
                         roleOptions={[{ name: 'member', description: 'Standard employee access.' }]}
                         defaultRole="member"
                         checklistTemplates={templatesResult.templates}
+                        workflowTemplates={workflowTemplatesResult.templates}
+                        emailSequenceTemplates={emailSequenceTemplatesResult.templates}
+                        documentTemplates={documentTemplatesResult.templates}
+                        provisioningTaskOptions={provisioningTaskOptions}
                         departments={departments}
                         managers={managers}
                         leaveTypes={leaveTypes}

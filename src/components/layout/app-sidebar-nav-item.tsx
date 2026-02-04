@@ -37,7 +37,7 @@ interface NavItemRenderProps extends SharedNavState {
 }
 
 const activeIconTileClassName =
-    'bg-sidebar-primary/20 text-sidebar-primary-foreground shadow-[0_0_0_1px_oklch(var(--primary)/0.35),0_10px_22px_-16px_oklch(var(--primary)/0.45)]'
+    'bg-sidebar-primary/20 text-sidebar-primary-foreground ring-1 ring-primary/25'
 
 const inactiveIconTileClassName =
     'bg-sidebar-accent/30 text-sidebar-foreground/70 group-hover/navitem:bg-sidebar-accent/45 group-hover/navitem:text-sidebar-foreground'
@@ -55,18 +55,17 @@ function CollapsedAccordionNavItem({ item, isActive }: NavItemRenderProps) {
                     className={cn(
                         'w-full justify-center rounded-lg transition-all duration-300 ease-in-out group/navitem h-auto',
                         'group-data-[collapsible=icon]:justify-center',
-                        'hover:scale-105',
                         isActive &&
-                        'bg-sidebar-accent/50 shadow-[0_0_0_1px_oklch(var(--sidebar-border)/0.6),0_12px_24px_-20px_oklch(var(--primary)/0.35)]',
+                        'bg-sidebar-accent/40 ring-1 ring-sidebar-border/60',
                         !isActive &&
-                        'hover:bg-sidebar-accent/35'
+                        'hover:bg-sidebar-accent/30'
                     )}
                 >
                     <div className="flex w-full items-center justify-center">
                         <div
                             className={cn(
                                 'flex items-center justify-center rounded-lg shrink-0 transition-all duration-300',
-                                'group-hover/navitem:scale-110 group-hover/navitem:shadow-lg',
+                                'group-hover/navitem:bg-sidebar-accent/40',
                                 'w-10 h-10',
                                 isActive
                                     ? activeIconTileClassName
@@ -110,18 +109,18 @@ function ExpandedAccordionNavItem({ item, isActive, pathname, open }: NavItemRen
                 className={cn(
                     'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium',
                     'transition-all duration-300 ease-in-out',
-                    'hover:bg-sidebar-accent/30 hover:scale-[1.02]',
+                    'hover:bg-sidebar-accent/30',
                     'group/nav',
                     '[&[data-state=open]>svg]:rotate-180 [&>svg]:transition-transform [&>svg]:duration-300',
                     isActive &&
-                    'relative bg-sidebar-accent/50 shadow-[0_0_0_1px_oklch(var(--sidebar-border)/0.55),0_12px_24px_-20px_oklch(var(--primary)/0.35)] before:absolute before:inset-y-2 before:left-2 before:w-1 before:rounded-full before:bg-primary/40 before:shadow-[0_0_10px_oklch(var(--primary)/0.3)]'
+                    'relative bg-sidebar-accent/40 ring-1 ring-sidebar-border/60 before:absolute before:inset-y-2 before:left-2 before:w-1 before:rounded-full before:bg-primary/40'
                 )}
             >
                 <div className="flex flex-1 items-center gap-3">
                     <div
                         className={cn(
                             'flex items-center justify-center rounded-lg transition-all duration-300 shrink-0',
-                            'w-9 h-9 group-hover/nav:scale-110 group-hover/nav:shadow-lg',
+                            'w-9 h-9 group-hover/nav:bg-sidebar-accent/40',
                             isActive
                                 ? activeIconTileClassName
                                 : 'bg-sidebar-accent/30 text-sidebar-foreground/70 group-hover/nav:bg-sidebar-accent/45 group-hover/nav:text-sidebar-foreground'

@@ -40,7 +40,7 @@
     transition: all var(--ui-transition);
     border-bottom: 1px solid oklch(var(--sidebar-border) / 0.5);
     background-color: var(--ui-surface-container-fill);
-    box-shadow: var(--ui-surface-container-shadow);
+    box-shadow: none;
 }
 
 .sidebarHeader::after {
@@ -75,11 +75,7 @@
 
 .sidebarTrigger:hover {
     background-color: oklch(var(--sidebar-accent) / 0.75);
-    transform: scale(1.1);
-    box-shadow: 
-        0 4px 16px oklch(var(--primary) / 0.25),
-        0 2px 8px oklch(var(--accent) / 0.2),
-        inset 0 1px 0 oklch(var(--primary) / 0.2);
+    box-shadow: none;
 }
 
 .logoLink {

@@ -10,6 +10,9 @@ import { FieldError } from '../../_components/field-error';
 import type { OnboardingWizardValues } from './wizard.schema';
 import type { FieldErrors } from '../../_components/form-errors';
 import type { ChecklistTemplate } from '@/server/types/onboarding-types';
+import type { OnboardingWorkflowTemplateRecord } from '@/server/types/hr/onboarding-workflow-templates';
+import type { EmailSequenceTemplateRecord } from '@/server/types/hr/onboarding-email-sequences';
+import type { DocumentTemplateRecord } from '@/server/types/records/document-templates';
 import type { LeaveTypeOption } from '@/server/types/hr/leave-type-options';
 
 export type LeaveType = LeaveTypeOption;
@@ -20,6 +23,10 @@ export interface AssignmentsStepProps {
     onValuesChange: (updates: Partial<OnboardingWizardValues>) => void;
     leaveTypes?: LeaveType[];
     checklistTemplates?: ChecklistTemplate[];
+    workflowTemplates?: OnboardingWorkflowTemplateRecord[];
+    emailSequenceTemplates?: EmailSequenceTemplateRecord[];
+    documentTemplates?: DocumentTemplateRecord[];
+    provisioningTaskOptions?: { value: string; label: string }[];
     canManageTemplates?: boolean;
     disabled?: boolean;
 }
@@ -30,11 +37,18 @@ export function AssignmentsStep({
     onValuesChange,
     leaveTypes = [],
     checklistTemplates = [],
+    workflowTemplates = [],
+    emailSequenceTemplates = [],
+    documentTemplates = [],
+    provisioningTaskOptions = [],
     canManageTemplates = false,
     disabled = false,
 }: AssignmentsStepProps) {
     const leaveTypesError = fieldErrors?.eligibleLeaveTypes;
     const templateError = fieldErrors?.onboardingTemplateId;
+    const workflowTemplateError = fieldErrors?.workflowTemplateId;
+    const emailSequenceError = fieldErrors?.emailSequenceTemplateId;
+    const documentTemplateError = fieldErrors?.documentTemplateIds;
 
     const handleLeaveTypeToggle = (code: string, checked: boolean) => {
         const currentTypes = values.eligibleLeaveTypes ?? [];
@@ -55,6 +69,22 @@ export function AssignmentsStep({
 
     const selectedLeaveTypes = values.eligibleLeaveTypes ?? [];
     const allSelected = leaveTypes.length > 0 && selectedLeaveTypes.length === leaveTypes.length;
+    const selectedDocuments = values.documentTemplateIds ?? [];
+    const selectedProvisioningTasks = values.provisioningTaskTypes ?? [];
+
+    const handleDocumentToggle = (templateId: string, checked: boolean) => {
+        const updated = checked
+            ? [...selectedDocuments, templateId]
+            : selectedDocuments.filter((id) => id !== templateId);
+        onValuesChange({ documentTemplateIds: updated });
+    };
+
+    const handleProvisioningToggle = (taskType: string, checked: boolean) => {
+        const updated = checked
+            ? [...selectedProvisioningTasks, taskType]
+            : selectedProvisioningTasks.filter((value) => value !== taskType);
+        onValuesChange({ provisioningTaskTypes: updated });
+    };
 
     return (
         <div className="space-y-6">
@@ -206,6 +236,166 @@ export function AssignmentsStep({
                                 </SelectContent>
                             </Select>
                             <FieldError id="wizard-onboardingTemplateId-error" message={templateError} />
+                        </div>
+                    )}
+                </CardContent>
+            </Card>
+
+            {/* Workflow Template */}
+            <Card>
+                <CardHeader className="pb-3">
+                    <CardTitle className="text-base">Workflow Template</CardTitle>
+                    <CardDescription>
+                        Choose a workflow template to customize the onboarding stages and approvals.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                    <Label htmlFor="wizard-workflowTemplateId">Template</Label>
+                    <Select
+                        value={values.workflowTemplateId ?? ''}
+                        onValueChange={(value) => onValuesChange({ workflowTemplateId: value || undefined })}
+                        disabled={disabled || workflowTemplates.length === 0}
+                    >
+                        <SelectTrigger
+                            id="wizard-workflowTemplateId"
+                            aria-invalid={Boolean(workflowTemplateError)}
+                            aria-describedby={workflowTemplateError ? 'wizard-workflowTemplateId-error' : undefined}
+                        >
+                            <SelectValue
+                                placeholder={workflowTemplates.length === 0 ? 'No templates available' : 'Select a template'}
+                            />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {workflowTemplates.map((template) => (
+                                <SelectItem key={template.id} value={template.id}>
+                                    <div className="flex flex-col">
+                                        <span>{template.name}</span>
+                                        <span className="text-xs text-muted-foreground">
+                                            {template.templateType} • v{template.version}
+                                        </span>
+                                    </div>
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                    <FieldError id="wizard-workflowTemplateId-error" message={workflowTemplateError} />
+                </CardContent>
+            </Card>
+
+            {/* Email Sequence */}
+            <Card>
+                <CardHeader className="pb-3">
+                    <CardTitle className="text-base">Email Sequence</CardTitle>
+                    <CardDescription>
+                        Select an automated email sequence to guide the employee during onboarding.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                    <Label htmlFor="wizard-emailSequenceTemplateId">Sequence</Label>
+                    <Select
+                        value={values.emailSequenceTemplateId ?? ''}
+                        onValueChange={(value) => onValuesChange({ emailSequenceTemplateId: value || undefined })}
+                        disabled={disabled || emailSequenceTemplates.length === 0}
+                    >
+                        <SelectTrigger
+                            id="wizard-emailSequenceTemplateId"
+                            aria-invalid={Boolean(emailSequenceError)}
+                            aria-describedby={emailSequenceError ? 'wizard-emailSequenceTemplateId-error' : undefined}
+                        >
+                            <SelectValue
+                                placeholder={emailSequenceTemplates.length === 0 ? 'No sequences available' : 'Select a sequence'}
+                            />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {emailSequenceTemplates.map((template) => (
+                                <SelectItem key={template.id} value={template.id}>
+                                    <div className="flex flex-col">
+                                        <span>{template.name}</span>
+                                        <span className="text-xs text-muted-foreground">{template.trigger}</span>
+                                    </div>
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                    <FieldError id="wizard-emailSequenceTemplateId-error" message={emailSequenceError} />
+                </CardContent>
+            </Card>
+
+            {/* Document Templates */}
+            <Card>
+                <CardHeader className="pb-3">
+                    <CardTitle className="text-base">Required Documents</CardTitle>
+                    <CardDescription>
+                        Select document templates that must be completed during onboarding.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    {documentTemplates.length === 0 ? (
+                        <p className="text-sm text-muted-foreground">No document templates are configured yet.</p>
+                    ) : (
+                        <div className="grid gap-3 sm:grid-cols-2">
+                            {documentTemplates.map((template) => {
+                                const isChecked = selectedDocuments.includes(template.id);
+                                return (
+                                    <div
+                                        key={template.id}
+                                        className="flex items-start gap-3 rounded-lg border p-3 transition-colors hover:bg-muted/50"
+                                    >
+                                        <Checkbox
+                                            id={`doc-${template.id}`}
+                                            checked={isChecked}
+                                            onCheckedChange={(checked) =>
+                                                handleDocumentToggle(template.id, checked === true)}
+                                            disabled={disabled}
+                                        />
+                                        <div className="grid gap-0.5">
+                                            <Label htmlFor={`doc-${template.id}`} className="cursor-pointer font-medium">
+                                                {template.name}
+                                            </Label>
+                                            <p className="text-xs text-muted-foreground">{template.type}</p>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
+                    <FieldError id="wizard-documentTemplateIds-error" message={documentTemplateError} />
+                </CardContent>
+            </Card>
+
+            {/* Provisioning Tasks */}
+            <Card>
+                <CardHeader className="pb-3">
+                    <CardTitle className="text-base">IT Provisioning</CardTitle>
+                    <CardDescription>
+                        Select the provisioning tasks required for the employee.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    {provisioningTaskOptions.length === 0 ? (
+                        <p className="text-sm text-muted-foreground">No provisioning tasks configured.</p>
+                    ) : (
+                        <div className="grid gap-3 sm:grid-cols-2">
+                            {provisioningTaskOptions.map((option) => {
+                                const isChecked = selectedProvisioningTasks.includes(option.value);
+                                return (
+                                    <div
+                                        key={option.value}
+                                        className="flex items-start gap-3 rounded-lg border p-3 transition-colors hover:bg-muted/50"
+                                    >
+                                        <Checkbox
+                                            id={`task-${option.value}`}
+                                            checked={isChecked}
+                                            onCheckedChange={(checked) =>
+                                                handleProvisioningToggle(option.value, checked === true)}
+                                            disabled={disabled}
+                                        />
+                                        <Label htmlFor={`task-${option.value}`} className="cursor-pointer font-medium">
+                                            {option.label}
+                                        </Label>
+                                    </div>
+                                );
+                            })}
                         </div>
                     )}
                 </CardContent>

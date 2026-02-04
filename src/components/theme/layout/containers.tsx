@@ -10,6 +10,7 @@
 import type { ReactNode } from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
+import motionStyles from '@/styles/motion/view-transitions.module.css';
 
 // ============================================================================
 // Page Container
@@ -70,7 +71,9 @@ export function PageHeader({ title, description, actions, icon, className }: Pag
                     </div>
                 )}
                 <div className="min-w-0 space-y-1">
-                    <h1 className="text-2xl font-bold tracking-tight lg:text-3xl">{title}</h1>
+                    <h1 className={cn('text-2xl font-bold tracking-tight lg:text-3xl', motionStyles.sharedTitle)}>
+                        {title}
+                    </h1>
                     {description && (
                         <p className="text-sm leading-relaxed text-muted-foreground">{description}</p>
                     )}

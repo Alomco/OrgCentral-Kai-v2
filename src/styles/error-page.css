@@ -88,17 +88,17 @@
 
 /* Glassmorphism effect for cards */
 .error-glass {
-  background: rgba(255, 255, 255, 0.25);
+  background: oklch(1 0 0 / 0.25);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  border: 1px solid oklch(1 0 0 / 0.18);
+  box-shadow: 0 8px 32px 0 oklch(var(--primary) / 0.25);
 }
 
 .dark .error-glass {
-  background: rgba(0, 0, 0, 0.25);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  background: oklch(0 0 0 / 0.25);
+  border: 1px solid oklch(1 0 0 / 0.1);
+  box-shadow: 0 8px 32px 0 oklch(0 0 0 / 0.45);
 }
 
 /* Gradient text effect */
@@ -116,7 +116,7 @@
 
 .error-hover-lift:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 10px 25px oklch(0 0 0 / 0.15);
 }
 
 /* Button hover animations */
@@ -233,7 +233,7 @@
 
 /* Accessibility improvements */
 .error-focus-visible:focus-visible {
-  outline: 2px solid #3b82f6;
+  outline: 2px solid oklch(var(--ring));
   outline-offset: 2px;
   border-radius: 0.375rem;
 }
@@ -256,6 +256,6 @@
   }
   
   .error-button {
-    border: 1px solid #000;
+    border: 1px solid oklch(0 0 0);
   }
 }

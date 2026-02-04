@@ -39,8 +39,8 @@ const modalVariants = cva('', {
         },
         variant: {
             default: '',
-            glass: 'bg-card/80 backdrop-blur-xl border-border/30',
-            gradient: 'bg-gradient-to-br from-card via-card to-card/95',
+            glass: 'bg-card border-border/40',
+            gradient: 'bg-gradient-to-br from-card via-card to-card',
         },
     },
     defaultVariants: {

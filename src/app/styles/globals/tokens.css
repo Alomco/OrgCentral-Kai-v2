@@ -27,30 +27,30 @@
   --radius: 0.618rem; /* φ⁻¹ */
   --radius-2xl: calc(var(--radius) + 8px);
   /* WCAG 2.2 AA Compliant Color System - Enhanced Contrast */
-  --background: 1 0 0;
-  --foreground: 0.2 0.02 255;
+  --background: 0.968 0.022 245;
+  --foreground: 0.18 0.02 255;
 
   /* Cards with subtle gradient capability */
-  --card: 1 0 0;
+  --card: 0.992 0.008 245;
   --card-foreground: 0.2 0.02 255;
 
-  --popover: 1 0 0;
+  --popover: 0.99 0.01 245;
   --popover-foreground: 0.2 0.02 255;
 
   /* Primary: WCAG 2.2 AA Compliant Corporate Blue - Enhanced contrast ratio */
-  --primary: 0.55 0.17 250;
+  --primary: 0.52 0.18 252;
   --primary-foreground: 0.98 0 0;
 
   /* Secondary: WCAG 2.2 AA Compliant neutral - Better contrast */
-  --secondary: 0.95 0.01 250;
-  --secondary-foreground: 0.28 0.02 250;
+  --secondary: 0.958 0.014 250;
+  --secondary-foreground: 0.24 0.02 250;
 
   /* Muted: WCAG 2.2 AA Compliant slate-gray - Better contrast */
-  --muted: 0.96 0.01 255;
-  --muted-foreground: 0.5 0.02 255;
+  --muted: 0.95 0.014 255;
+  --muted-foreground: 0.38 0.02 255;
 
   /* Accent: WCAG 2.2 AA Compliant Blue-Teal - Enhanced contrast ratio */
-  --accent: 0.53 0.14 200;
+  --accent: 0.54 0.16 210;
   --accent-foreground: 0.98 0 0;
 
   /* Destructive: WCAG 2.2 AA Compliant Red - Enhanced contrast */
@@ -58,32 +58,32 @@
   --destructive-foreground: 0.98 0 0;
 
   /* Border: WCAG 2.2 AA Compliant - Better contrast */
-  --border: 0.6 0.01 255;
-  --input: 0.6 0.01 255;
-  --ring: 0.55 0.17 250;
+  --border: 0.9 0.006 255;
+  --input: 0.9 0.006 255;
+  --ring: 0.56 0.2 252;
 
   /* Charts: WCAG 2.2 AA Compliant Palette - Enhanced contrast ratios */
-  --chart-1: 0.55 0.17 250;
+  --chart-1: 0.53 0.2 252;
   /* Blue - Enhanced contrast */
-  --chart-2: 0.58 0.14 200;
+  --chart-2: 0.6 0.17 210;
   /* Teal - Enhanced contrast */
-  --chart-3: 0.58 0.12 150;
+  --chart-3: 0.6 0.15 150;
   /* Green - Enhanced contrast */
-  --chart-4: 0.75 0.14 90;
+  --chart-4: 0.78 0.16 90;
   /* Yellow - Enhanced contrast */
-  --chart-5: 0.68 0.16 40;
+  --chart-5: 0.7 0.18 40;
   /* Orange - Enhanced contrast */
 
   /* Sidebar: WCAG 2.2 AA Compliant - Better contrast ratios */
-  --sidebar: 0.97 0.01 255;
+  --sidebar: 0.955 0.018 245;
   --sidebar-background: var(--sidebar);
-  --sidebar-foreground: 0.28 0.02 255;
-  --sidebar-primary: 0.55 0.17 250;
+  --sidebar-foreground: 0.24 0.02 255;
+  --sidebar-primary: 0.53 0.2 252;
   --sidebar-primary-foreground: 0.98 0 0;
-  --sidebar-accent: 0.94 0.01 250;
-  --sidebar-accent-foreground: 0.28 0.02 255;
-  --sidebar-border: 0.88 0.01 255;
-  --sidebar-ring: 0.55 0.17 250;
+  --sidebar-accent: 0.94 0.016 245;
+  --sidebar-accent-foreground: 0.24 0.02 255;
+  --sidebar-border: 0.9 0.008 255;
+  --sidebar-ring: 0.56 0.2 252;
 
   --app-background-gradient: linear-gradient(135deg,
     oklch(var(--background)) 0%,
@@ -96,6 +96,41 @@
   --app-gradient-warm: linear-gradient(135deg, oklch(var(--accent)) 0%, oklch(var(--primary)) 100%);
   --app-shadow-primary: 0 8px 25px oklch(var(--primary) / 0.4);
   --app-shadow-primary-strong: 0 15px 35px oklch(var(--primary) / 0.6);
+
+  /* Tailwind color variable bridges (ensure bg/text utilities resolve) */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-background: var(--sidebar-background);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
 }
 
 select {
@@ -119,21 +154,21 @@ select {
 
 .dark {
   /* Dark Mode: WCAG 2.2 AA Compliant Slate-Blue with enhanced contrast */
-  --background: 0.14 0.01 255;
+  --background: 0.12 0.01 255;
   /* Deep slate - Enhanced contrast */
   --foreground: 0.96 0.01 255;
   /* Enhanced contrast light text */
 
-  --card: 0.18 0.01 255;
+  --card: 0.16 0.01 255;
   --card-foreground: 0.96 0.01 255;
   /* Enhanced contrast card text */
 
-  --popover: 0.18 0.01 255;
+  --popover: 0.16 0.01 255;
   --popover-foreground: 0.96 0.01 255;
   /* Enhanced contrast popover text */
 
   /* Primary: WCAG 2.2 AA Compliant blue in dark mode - Enhanced contrast */
-  --primary: 0.54 0.14 250;
+  --primary: 0.56 0.16 250;
   --primary-foreground: 0.98 0 0;
 
   /* Secondary: WCAG 2.2 AA Compliant dark slate - Enhanced contrast */
@@ -143,10 +178,10 @@ select {
 
   /* Muted: WCAG 2.2 AA Compliant darker slate - Enhanced contrast */
   --muted: 0.24 0.02 255;
-  --muted-foreground: 0.7 0.02 255;
+  --muted-foreground: 0.72 0.02 255;
   /* Enhanced contrast muted text */
   /* Accent: WCAG 2.2 AA Compliant teal in dark mode - Enhanced contrast */
-  --accent: 0.52 0.12 200;
+  --accent: 0.54 0.14 200;
   --accent-foreground: 0.98 0 0;
 
   /* Destructive: WCAG 2.2 AA Compliant red - Enhanced contrast */
@@ -154,33 +189,33 @@ select {
   --destructive-foreground: 0.98 0 0;
 
   /* Border: WCAG 2.2 AA Compliant subtle slate - Enhanced contrast */
-  --border: 0.52 0.01 255;
-  --input: 0.52 0.01 255;
-  --ring: 0.7 0.14 250;
+  --border: 0.42 0.01 255;
+  --input: 0.42 0.01 255;
+  --ring: 0.72 0.16 250;
 
   /* Charts: WCAG 2.2 AA Compliant dark mode palette - Enhanced contrast */
-  --chart-1: 0.66 0.14 200;
+  --chart-1: 0.66 0.15 200;
   /* Teal - Enhanced contrast */
-  --chart-2: 0.7 0.14 250;
+  --chart-2: 0.7 0.16 250;
   /* Blue - Enhanced contrast */
-  --chart-3: 0.68 0.12 150;
+  --chart-3: 0.68 0.13 150;
   /* Green - Enhanced contrast */
-  --chart-4: 0.8 0.14 90;
+  --chart-4: 0.8 0.15 90;
   /* Yellow - Enhanced contrast */
-  --chart-5: 0.72 0.16 40;
+  --chart-5: 0.72 0.17 40;
   /* Orange - Enhanced contrast */
 
   /* Sidebar: WCAG 2.2 AA Compliant deep slate with enhanced contrast */
-  --sidebar: 0.18 0.01 255;
+  --sidebar: 0.16 0.01 255;
   --sidebar-background: var(--sidebar);
   --sidebar-foreground: 0.96 0.01 255;
   /* Enhanced contrast sidebar text */
-  --sidebar-primary: 0.54 0.14 250;
+  --sidebar-primary: 0.56 0.16 250;
   --sidebar-primary-foreground: 0.98 0 0;
   --sidebar-accent: 0.24 0.02 255;
   --sidebar-accent-foreground: 0.96 0.01 255;
-  --sidebar-border: 0.52 0.01 255;
-  --sidebar-ring: 0.54 0.14 250;
+  --sidebar-border: 0.42 0.01 255;
+  --sidebar-ring: 0.56 0.16 250;
 
   --app-background-gradient: linear-gradient(135deg,
     oklch(var(--background)) 0%,

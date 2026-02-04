@@ -10,6 +10,19 @@ import type { IOnboardingInvitationRepository } from '@/server/repositories/cont
 import type { IOrganizationRepository } from '@/server/repositories/contracts/org/organization/organization-repository-contract';
 import type { IUserRepository } from '@/server/repositories/contracts/org/users/user-repository-contract';
 import type { CompleteOnboardingInviteDependencies } from '@/server/use-cases/hr/onboarding/complete-onboarding-invite';
+import {
+    PrismaMentorAssignmentRepository,
+    PrismaProvisioningTaskRepository,
+    PrismaOnboardingWorkflowTemplateRepository,
+    PrismaOnboardingWorkflowRunRepository,
+    PrismaEmailSequenceTemplateRepository,
+    PrismaEmailSequenceEnrollmentRepository,
+    PrismaEmailSequenceDeliveryRepository,
+    PrismaOnboardingMetricDefinitionRepository,
+    PrismaOnboardingMetricResultRepository,
+    PrismaDocumentTemplateAssignmentRepository,
+} from '@/server/repositories/prisma/hr/onboarding';
+import { PrismaDocumentTemplateRepository } from '@/server/repositories/prisma/records/documents';
 
 const { profileRepo: profileRepository, contractRepo: employmentContractRepository } = buildPeopleServiceDependencies();
 const {
@@ -21,6 +34,17 @@ const { organizationRepository } = buildOrganizationServiceDependencies();
 const { userRepository } = buildUserServiceDependencies();
 const { membershipRepository } = buildMembershipRepositoryDependencies();
 const billingService = resolveBillingService() ?? undefined;
+const mentorAssignmentRepository = new PrismaMentorAssignmentRepository();
+const provisioningTaskRepository = new PrismaProvisioningTaskRepository();
+const workflowTemplateRepository = new PrismaOnboardingWorkflowTemplateRepository();
+const workflowRunRepository = new PrismaOnboardingWorkflowRunRepository();
+const emailSequenceTemplateRepository = new PrismaEmailSequenceTemplateRepository();
+const emailSequenceEnrollmentRepository = new PrismaEmailSequenceEnrollmentRepository();
+const emailSequenceDeliveryRepository = new PrismaEmailSequenceDeliveryRepository();
+const onboardingMetricDefinitionRepository = new PrismaOnboardingMetricDefinitionRepository();
+const onboardingMetricResultRepository = new PrismaOnboardingMetricResultRepository();
+const documentTemplateAssignmentRepository = new PrismaDocumentTemplateAssignmentRepository();
+const documentTemplateRepository = new PrismaDocumentTemplateRepository();
 
 export interface ResolvedOnboardingControllerDependencies {
     session: GetSessionDependencies;
@@ -78,5 +102,16 @@ export function getCompleteOnboardingInviteDependencies(): CompleteOnboardingInv
         employmentContractRepository,
         checklistTemplateRepository,
         checklistInstanceRepository,
+        mentorAssignmentRepository,
+        provisioningTaskRepository,
+        workflowTemplateRepository,
+        workflowRunRepository,
+        emailSequenceTemplateRepository,
+        emailSequenceEnrollmentRepository,
+        emailSequenceDeliveryRepository,
+        documentTemplateAssignmentRepository,
+        documentTemplateRepository,
+        onboardingMetricDefinitionRepository,
+        onboardingMetricResultRepository,
     };
 }

@@ -67,6 +67,32 @@
 }
 
 /* ============================================================================
+ * Clean corporate variants (shorter, subtler motion)
+ * ============================================================================ */
+
+@keyframes slideUpCorporate {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideDownCorporate {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================================================================
  * Animation Classes
  * ============================================================================ */
 
@@ -89,6 +115,35 @@
 .bounceIn {
     animation: bounceIn 450ms ease-out forwards;
 }
+
+[data-ui-style="clean-corporate"] .fadeIn {
+    animation-duration: var(--ui-transition-duration);
+}
+
+[data-ui-style="clean-corporate"] .slideUp {
+    animation-name: slideUpCorporate;
+    animation-duration: var(--ui-transition-duration);
+}
+
+[data-ui-style="clean-corporate"] .slideDown {
+    animation-name: slideDownCorporate;
+    animation-duration: var(--ui-transition-duration);
+}
+
+[data-ui-style="clean-corporate"] .scaleIn {
+    animation-duration: var(--ui-transition-duration);
+}
+
+[data-ui-style="clean-corporate"] .bounceIn {
+    animation-name: scaleIn;
+    animation-duration: var(--ui-transition-duration);
+}
+
+[data-ui-style="clean-corporate"] .delay100 { animation-delay: 50ms; }
+[data-ui-style="clean-corporate"] .delay200 { animation-delay: 100ms; }
+[data-ui-style="clean-corporate"] .delay300 { animation-delay: 150ms; }
+[data-ui-style="clean-corporate"] .delay400 { animation-delay: 200ms; }
+[data-ui-style="clean-corporate"] .delay500 { animation-delay: 250ms; }
 
 /* Stagger delays */
 .delay100 { animation-delay: 100ms; opacity: 0; }

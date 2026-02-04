@@ -31,6 +31,11 @@ export interface SendOnboardingInviteInput {
     paySchedule?: string;
     eligibleLeaveTypes?: string[];
     onboardingTemplateId?: string | null;
+    mentorEmployeeNumber?: string | null;
+    workflowTemplateId?: string | null;
+    emailSequenceTemplateId?: string | null;
+    documentTemplateIds?: string[];
+    provisioningTaskTypes?: string[];
     roles?: string[];
     request?: {
         ipAddress?: string;
@@ -123,6 +128,11 @@ export async function sendOnboardingInvite(
             paySchedule: input.paySchedule,
             eligibleLeaveTypes: input.eligibleLeaveTypes,
             onboardingTemplateId: input.onboardingTemplateId ?? undefined,
+            mentorEmployeeNumber: input.mentorEmployeeNumber ?? undefined,
+            workflowTemplateId: input.workflowTemplateId ?? undefined,
+            emailSequenceTemplateId: input.emailSequenceTemplateId ?? undefined,
+            documentTemplateIds: input.documentTemplateIds,
+            provisioningTaskTypes: input.provisioningTaskTypes,
             roles: roles.length > 0 ? roles : ['member'],
         },
         metadata: withInvitationKind(

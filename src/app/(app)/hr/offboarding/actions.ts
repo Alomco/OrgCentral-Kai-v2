@@ -8,7 +8,18 @@ import { getSessionContext } from '@/server/use-cases/auth/sessions/get-session'
 import { HR_ACTION, HR_RESOURCE } from '@/server/security/authorization/hr-resource-registry';
 import { PrismaOffboardingRepository } from '@/server/repositories/prisma/hr/offboarding';
 import { PrismaEmployeeProfileRepository } from '@/server/repositories/prisma/hr/people/prisma-employee-profile-repository';
-import { PrismaChecklistTemplateRepository, PrismaChecklistInstanceRepository } from '@/server/repositories/prisma/hr/onboarding';
+import {
+    PrismaChecklistTemplateRepository,
+    PrismaChecklistInstanceRepository,
+    PrismaProvisioningTaskRepository,
+    PrismaOnboardingWorkflowTemplateRepository,
+    PrismaOnboardingWorkflowRunRepository,
+    PrismaEmailSequenceTemplateRepository,
+    PrismaEmailSequenceEnrollmentRepository,
+    PrismaEmailSequenceDeliveryRepository,
+    PrismaOnboardingMetricDefinitionRepository,
+    PrismaOnboardingMetricResultRepository,
+} from '@/server/repositories/prisma/hr/onboarding';
 import { createUserSessionRepository } from '@/server/repositories/providers/auth/user-session-repository-provider';
 import { getMembershipService } from '@/server/services/org/membership/membership-service.provider';
 import {
@@ -83,6 +94,14 @@ export async function startOffboardingAction(
         const employeeProfileRepository = new PrismaEmployeeProfileRepository();
         const checklistTemplateRepository = new PrismaChecklistTemplateRepository();
         const checklistInstanceRepository = new PrismaChecklistInstanceRepository();
+        const provisioningTaskRepository = new PrismaProvisioningTaskRepository();
+        const workflowTemplateRepository = new PrismaOnboardingWorkflowTemplateRepository();
+        const workflowRunRepository = new PrismaOnboardingWorkflowRunRepository();
+        const emailSequenceTemplateRepository = new PrismaEmailSequenceTemplateRepository();
+        const emailSequenceEnrollmentRepository = new PrismaEmailSequenceEnrollmentRepository();
+        const emailSequenceDeliveryRepository = new PrismaEmailSequenceDeliveryRepository();
+        const onboardingMetricDefinitionRepository = new PrismaOnboardingMetricDefinitionRepository();
+        const onboardingMetricResultRepository = new PrismaOnboardingMetricResultRepository();
         const userSessionRepository = createUserSessionRepository();
         const membershipService = getMembershipService();
 
@@ -92,6 +111,14 @@ export async function startOffboardingAction(
                 employeeProfileRepository,
                 checklistTemplateRepository,
                 checklistInstanceRepository,
+                provisioningTaskRepository,
+                workflowTemplateRepository,
+                workflowRunRepository,
+                emailSequenceTemplateRepository,
+                emailSequenceEnrollmentRepository,
+                emailSequenceDeliveryRepository,
+                onboardingMetricDefinitionRepository,
+                onboardingMetricResultRepository,
                 userSessionRepository,
                 membershipService,
             },

@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
+import motionStyles from '@/styles/motion/view-transitions.module.css';
 
 export interface HrPageHeaderProps {
     title: string;
@@ -52,6 +53,7 @@ export function HrPageHeader({
                         'to-[oklch(var(--primary))]',
                         'bg-clip-text text-transparent',
                         'bg-size-[200%_100%]',
+                        motionStyles.sharedTitle,
                     )}>
                         {title}
                     </h1>

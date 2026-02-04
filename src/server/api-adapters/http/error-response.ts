@@ -9,6 +9,7 @@ import {
     type ErrorDetails,
 } from '@/server/errors';
 import { appLogger } from '@/server/logging/structured-logger';
+import { throwIfNextPrerenderBailout } from '@/server/api-adapters/http/next-prerender-bailout';
 
 export interface ErrorResponseBody {
     error: {
@@ -123,6 +124,8 @@ function toDescriptor(error: unknown): ErrorDescriptor {
 }
 
 export function buildErrorResponse(error: unknown): NextResponse<ErrorResponseBody> {
+    throwIfNextPrerenderBailout(error);
+
     const descriptor = toDescriptor(error);
 
     if (descriptor.status >= 500) {

@@ -32,7 +32,7 @@ export default function HeroSection() {
                         asChild
                         variant="outline"
                         size="lg"
-                        className="h-auto rounded-full border-2 border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm px-8 py-4 text-lg font-semibold text-slate-800 dark:text-slate-200 transition-all duration-300 hover:-translate-y-1 hover:border-[#667eea]/50 hover:bg-[#667eea]/10 dark:hover:bg-[#667eea]/20"
+                        className="h-auto rounded-full border-2 border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm px-8 py-4 text-lg font-semibold text-slate-800 dark:text-slate-200 transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:bg-primary/10 dark:hover:bg-primary/20"
                     >
                         <Link href="#features">Explore Features</Link>
                     </Button>

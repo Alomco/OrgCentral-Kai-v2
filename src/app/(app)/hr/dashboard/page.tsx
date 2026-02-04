@@ -27,6 +27,7 @@ import { QuickActions, QuickActionsSkeleton } from './_components/quick-actions-
 import { RecentActivityFeed, RecentActivitySkeleton } from './_components/recent-activity-feed';
 import { ManagerSnapshot, ManagerSnapshotSkeleton } from './_components/manager-snapshot';
 import { getPeopleService } from '@/server/services/hr/people/people-service.provider';
+import motionStyles from '@/styles/motion/view-transitions.module.css';
 
 export const metadata: Metadata = {
     title: 'HR Dashboard',
@@ -74,6 +75,10 @@ async function DashboardContent() {
                     </BreadcrumbItem>
                 </BreadcrumbList>
             </Breadcrumb>
+
+            <h2 className={"text-2xl font-semibold tracking-tight text-foreground " + motionStyles.sharedTitle}>
+                Dashboard
+            </h2>
 
             {/* Welcome Card */}
             <Suspense fallback={<WelcomeSkeleton />}>

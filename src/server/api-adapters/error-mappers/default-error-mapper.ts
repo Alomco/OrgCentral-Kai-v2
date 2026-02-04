@@ -1,9 +1,12 @@
 import { NextResponse } from 'next/server';
 import { ZodError } from 'zod';
 import { AuthorizationError } from '@/server/errors';
+import { throwIfNextPrerenderBailout } from '@/server/api-adapters/http/next-prerender-bailout';
 
 export const DefaultErrorMapper = {
     mapErrorToResponse(error: unknown): NextResponse {
+        throwIfNextPrerenderBailout(error);
+
         if (error instanceof ZodError) {
             return NextResponse.json(
                 {

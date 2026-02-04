@@ -1,3 +1,4 @@
+import { unstable_noStore as noStore } from 'next/cache';
 import { NextResponse } from 'next/server';
 
 import { auth } from '@/server/lib/auth';
@@ -7,6 +8,7 @@ import { getSessionContext } from '@/server/use-cases/auth/sessions/get-session'
 const CREDENTIAL_PROVIDER_ID = 'credential';
 
 export async function GET(request: Request): Promise<Response> {
+    noStore();
     try {
         await getSessionContext({}, {
             headers: request.headers,

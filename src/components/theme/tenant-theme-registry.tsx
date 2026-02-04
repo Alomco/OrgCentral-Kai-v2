@@ -22,9 +22,17 @@ export type TenantThemeRegistryProps =
  */
 const tenantOverrideKeys = themeTokenKeys;
 
+
+function normalizeTokenValue(value: string): string {
+    return value.trim();
+}
+
 function buildCssVariables(tokens: ThemeTokenMap, keys: readonly ThemeTokenKey[]): string {
     return keys
-        .map((key) => `--${key}: ${tokens[key]};`)
+        .map((key) => {
+            const normalized = normalizeTokenValue(tokens[key]);
+            return `--${key}: ${normalized}; --color-${key}: oklch(${normalized});`;
+        })
         .join(' ');
 }
 

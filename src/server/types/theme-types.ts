@@ -7,7 +7,7 @@ import type { UiStyleKey } from '@/server/theme/ui-style-presets';
 export interface OrgThemeSettings {
     /** Selected theme preset ID */
     presetId?: string;
-    /** Custom color overrides (OKLCH or HSL format) */
+    /** Custom color overrides (OKLCH format) */
     customOverrides?: Partial<ThemeTokenMap>;
     /** Default UI style preset */
     uiStyleId?: UiStyleKey;

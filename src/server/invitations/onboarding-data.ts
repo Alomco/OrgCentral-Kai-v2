@@ -11,6 +11,7 @@ const MAX_SALARY_BASIS = 16;
 const MAX_PAY_SCHEDULE = 16;
 const MAX_ROLE = 60;
 const MAX_LEAVE_TYPE = 60;
+const MAX_TEMPLATE_ID = 80;
 
 const trimmedString = z.string().trim();
 const requiredString = (max: number) => trimmedString.min(1).max(max);
@@ -46,6 +47,11 @@ const onboardingDataInputSchema = z.object({
     payFrequency: optionalNullableString(MAX_PAY_SCHEDULE),
     eligibleLeaveTypes: z.array(requiredString(MAX_LEAVE_TYPE)).max(20).optional(),
     onboardingTemplateId: optionalNullableString(MAX_EMPLOYEE_ID),
+    mentorEmployeeNumber: optionalNullableString(MAX_EMPLOYEE_ID),
+    workflowTemplateId: optionalNullableString(MAX_TEMPLATE_ID),
+    emailSequenceTemplateId: optionalNullableString(MAX_TEMPLATE_ID),
+    documentTemplateIds: z.array(requiredString(MAX_TEMPLATE_ID)).max(20).optional(),
+    provisioningTaskTypes: z.array(requiredString(MAX_ROLE)).max(20).optional(),
     roles: z.array(requiredString(MAX_ROLE)).max(10).optional(),
 });
 
@@ -62,6 +68,7 @@ export interface InvitationOnboardingData {
     employmentType?: string;
     startDate?: string;
     managerEmployeeNumber?: string;
+    mentorEmployeeNumber?: string;
     annualSalary?: number;
     hourlyRate?: number;
     salaryCurrency?: string;
@@ -69,6 +76,10 @@ export interface InvitationOnboardingData {
     paySchedule?: string;
     eligibleLeaveTypes?: string[];
     onboardingTemplateId?: string;
+    workflowTemplateId?: string;
+    emailSequenceTemplateId?: string;
+    documentTemplateIds?: string[];
+    provisioningTaskTypes?: string[];
     roles?: string[];
 }
 
@@ -155,6 +166,11 @@ function normalizeOnboardingData(input: OnboardingDataInput): InvitationOnboardi
         paySchedule,
         eligibleLeaveTypes: input.eligibleLeaveTypes,
         onboardingTemplateId: resolveOptionalString(input.onboardingTemplateId),
+        mentorEmployeeNumber: resolveOptionalString(input.mentorEmployeeNumber),
+        workflowTemplateId: resolveOptionalString(input.workflowTemplateId),
+        emailSequenceTemplateId: resolveOptionalString(input.emailSequenceTemplateId),
+        documentTemplateIds: input.documentTemplateIds,
+        provisioningTaskTypes: input.provisioningTaskTypes,
         roles: input.roles,
     };
 }

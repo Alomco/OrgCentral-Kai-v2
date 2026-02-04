@@ -30,7 +30,7 @@ export default function HeroSection() {
                         asChild
                         variant="outline"
                         size="lg"
-                        className="bg-transparent border-2 border-slate-200 backdrop-blur-md hover:bg-[#667eea]/10 hover:border-[#667eea]/30 hover:-translate-y-1 transition-all duration-300 rounded-full text-lg h-auto py-4 px-8 text-slate-800"
+                        className="bg-transparent border-2 border-slate-200 backdrop-blur-md hover:bg-primary/10 hover:border-primary/30 hover:-translate-y-1 transition-all duration-300 rounded-full text-lg h-auto py-4 px-8 text-slate-800"
                     >
                         <Link href="#features">Explore Features</Link>
                     </Button>

@@ -10,6 +10,7 @@
 import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import { CurrentYear } from '@/components/theme/primitives/current-year';
 import styles from './footer.module.css';
 
 // ============================================================================
@@ -43,11 +44,13 @@ export interface FooterProps {
  */
 export function Footer({
     brandName = 'OrgCentral',
-    year = new Date().getFullYear(),
+    year,
     links = [],
     socialContent,
     className,
 }: FooterProps) {
+    const resolvedYear = typeof year === 'number' ? year : <CurrentYear />;
+
     return (
         <footer className={cn(styles.footer, className)}>
             <div className={styles.footerContent}>
@@ -58,7 +61,7 @@ export function Footer({
                         <span>{brandName}</span>
                     </div>
                     <p className={styles.footerCopyright}>
-                        © {year} {brandName}. All rights reserved.
+                        © {resolvedYear} {brandName}. All rights reserved.
                     </p>
                 </div>
 
@@ -100,7 +103,7 @@ export interface MinimalFooterProps {
 export function MinimalFooter({ className }: MinimalFooterProps) {
     return (
         <footer className={cn('py-4 px-6 text-center text-sm text-muted-foreground', className)}>
-            <p>© {new Date().getFullYear()} OrgCentral. Built with ❤️</p>
+            <p>© <CurrentYear /> OrgCentral. Built with ❤️</p>
         </footer>
     );
 }

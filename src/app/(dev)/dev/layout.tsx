@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { Suspense, type ReactNode } from 'react';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
@@ -18,7 +18,15 @@ import { FloatingParticles } from '@/components/theme/decorative/particles';
 import { GradientOrb } from '@/components/theme/decorative/effects';
 import { ThemeSwitcher } from '@/components/theme/theme-switcher';
 
-export default async function DevelopmentLayout({ children }: { children: ReactNode }) {
+export default function DevelopmentLayout({ children }: { children: ReactNode }) {
+    return (
+        <Suspense fallback={<div className="min-h-screen bg-background" />}>
+            <DevelopmentLayoutShell>{children}</DevelopmentLayoutShell>
+        </Suspense>
+    );
+}
+
+async function DevelopmentLayoutShell({ children }: { children: ReactNode }) {
     const headerStore = await headers();
     const { session, authorization } = await getSessionContextOrRedirect(
         {},

@@ -9,6 +9,7 @@ import type { OnboardingWizardValues } from './wizard.schema';
 import type { FieldErrors } from '../../_components/form-errors';
 import type { ManagerOption } from './wizard.types';
 import { ManagerSelect } from './manager-select';
+import { MentorSelect } from './mentor-select';
 
 import { EMPLOYMENT_TYPES } from './job-step-options';
 import { JobCompensationSection } from './job-compensation-section';
@@ -40,6 +41,7 @@ export function JobStep({
     const employmentTypeError = fieldErrors?.employmentType;
     const startDateError = fieldErrors?.startDate;
     const managerError = fieldErrors?.managerEmployeeNumber;
+    const mentorError = fieldErrors?.mentorEmployeeNumber;
 
     return (
         <div className="space-y-6">
@@ -143,6 +145,14 @@ export function JobStep({
                         managers={managers}
                         disabled={disabled}
                         onChange={(value) => onValuesChange({ managerEmployeeNumber: value })}
+                    />
+
+                    <MentorSelect
+                        value={values.mentorEmployeeNumber}
+                        error={mentorError}
+                        mentors={managers}
+                        disabled={disabled}
+                        onChange={(value) => onValuesChange({ mentorEmployeeNumber: value })}
                     />
                 </div>
             </div>

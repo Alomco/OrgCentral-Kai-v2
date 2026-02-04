@@ -3,6 +3,9 @@
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { CardContent } from '@/components/ui/card';
 import type { ChecklistTemplate } from '@/server/types/onboarding-types';
+import type { OnboardingWorkflowTemplateRecord } from '@/server/types/hr/onboarding-workflow-templates';
+import type { EmailSequenceTemplateRecord } from '@/server/types/hr/onboarding-email-sequences';
+import type { DocumentTemplateRecord } from '@/server/types/records/document-templates';
 
 import { IdentityStep } from './identity-step';
 import { JobStep, type Department } from './job-step';
@@ -19,6 +22,10 @@ export interface OnboardingWizardBodyProps {
     managers: ManagerOption[];
     leaveTypes: LeaveType[] | undefined;
     checklistTemplates: ChecklistTemplate[];
+    workflowTemplates: OnboardingWorkflowTemplateRecord[];
+    emailSequenceTemplates: EmailSequenceTemplateRecord[];
+    documentTemplates: DocumentTemplateRecord[];
+    provisioningTaskOptions: { value: string; label: string }[];
     canManageTemplates: boolean;
     roleOptions: InviteRoleOption[];
     isSubmitting: boolean;
@@ -34,6 +41,10 @@ export function OnboardingWizardBody({
     managers,
     leaveTypes,
     checklistTemplates,
+    workflowTemplates,
+    emailSequenceTemplates,
+    documentTemplates,
+    provisioningTaskOptions,
     canManageTemplates,
     roleOptions,
     isSubmitting,
@@ -78,6 +89,10 @@ export function OnboardingWizardBody({
                     onValuesChange={onValuesChange}
                     leaveTypes={leaveTypes}
                     checklistTemplates={checklistTemplates}
+                    workflowTemplates={workflowTemplates}
+                    emailSequenceTemplates={emailSequenceTemplates}
+                    documentTemplates={documentTemplates}
+                    provisioningTaskOptions={provisioningTaskOptions}
                     canManageTemplates={canManageTemplates}
                     disabled={isSubmitting}
                 />
@@ -87,6 +102,9 @@ export function OnboardingWizardBody({
                 <ReviewStep
                     values={state.values}
                     checklistTemplates={checklistTemplates}
+                    workflowTemplates={workflowTemplates}
+                    emailSequenceTemplates={emailSequenceTemplates}
+                    documentTemplates={documentTemplates}
                     leaveTypes={leaveTypes}
                     onEditStep={onEditStep}
                     stepIndexById={new Map([

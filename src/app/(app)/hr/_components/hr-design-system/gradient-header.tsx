@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 
 import { cn } from '@/lib/utils';
+import motionStyles from '@/styles/motion/view-transitions.module.css';
 
 export interface HrGradientHeaderProps {
     title: string;
@@ -42,6 +43,7 @@ export function HrGradientHeader({
                         'bg-linear-to-r from-[oklch(var(--foreground))] via-[oklch(var(--primary))] to-[oklch(var(--accent))]',
                         'bg-clip-text text-transparent',
                         'bg-size-[200%_auto] animate-[gradient-shift_3s_ease_infinite]',
+                        motionStyles.sharedTitle,
                     )}>
                         {title}
                     </h1>

@@ -8,6 +8,9 @@ import { User, Briefcase, ListChecks, PlaneTakeoff } from 'lucide-react';
 import type { OnboardingWizardValues } from './wizard.schema';
 import type { ChecklistTemplate } from '@/server/types/onboarding-types';
 import type { LeaveType } from './assignments-step';
+import type { OnboardingWorkflowTemplateRecord } from '@/server/types/hr/onboarding-workflow-templates';
+import type { EmailSequenceTemplateRecord } from '@/server/types/hr/onboarding-email-sequences';
+import type { DocumentTemplateRecord } from '@/server/types/records/document-templates';
 import {
     EMPLOYMENT_TYPE_LABELS,
     LEAVE_TYPE_LABELS,
@@ -128,6 +131,8 @@ export function ReviewJobSection({ values, onEditStep, stepIndex }: ReviewJobSec
                 <Separator />
                 <ReviewField label="Manager" value={values.managerEmployeeNumber} />
                 <Separator />
+                <ReviewField label="Mentor" value={values.mentorEmployeeNumber} />
+                <Separator />
                 <ReviewField
                     label="Pay basis"
                     value={values.salaryBasis ? SALARY_BASIS_LABELS[values.salaryBasis] : undefined}
@@ -157,6 +162,9 @@ export interface ReviewAssignmentsSectionProps {
     leaveTypes: LeaveType[];
     selectedLeaveTypes: string[];
     selectedTemplate?: ChecklistTemplate;
+    selectedWorkflow?: OnboardingWorkflowTemplateRecord;
+    selectedEmailSequence?: EmailSequenceTemplateRecord;
+    selectedDocuments?: DocumentTemplateRecord[];
     onEditStep?: (stepIndex: number) => void;
     stepIndex?: number;
 }
@@ -166,6 +174,9 @@ export function ReviewAssignmentsSection({
     leaveTypes,
     selectedLeaveTypes,
     selectedTemplate,
+    selectedWorkflow,
+    selectedEmailSequence,
+    selectedDocuments = [],
     onEditStep,
     stepIndex,
 }: ReviewAssignmentsSectionProps) {
@@ -213,6 +224,62 @@ export function ReviewAssignmentsSection({
                         </div>
                     ) : (
                         <p className="text-sm text-muted-foreground">No checklist assigned</p>
+                    )}
+                </div>
+
+                <Separator />
+
+                <div>
+                    <div className="mb-2 flex items-center gap-2 text-sm text-muted-foreground">
+                        <ListChecks className="h-3.5 w-3.5" />
+                        Workflow Template
+                    </div>
+                    {selectedWorkflow ? (
+                        <div>
+                            <p className="text-sm font-medium">{selectedWorkflow.name}</p>
+                            <p className="text-xs text-muted-foreground">
+                                {selectedWorkflow.templateType} • v{selectedWorkflow.version}
+                            </p>
+                        </div>
+                    ) : (
+                        <p className="text-sm text-muted-foreground">No workflow template selected</p>
+                    )}
+                </div>
+
+                <Separator />
+
+                <div>
+                    <div className="mb-2 flex items-center gap-2 text-sm text-muted-foreground">
+                        <ListChecks className="h-3.5 w-3.5" />
+                        Email Sequence
+                    </div>
+                    {selectedEmailSequence ? (
+                        <div>
+                            <p className="text-sm font-medium">{selectedEmailSequence.name}</p>
+                            <p className="text-xs text-muted-foreground">{selectedEmailSequence.trigger}</p>
+                        </div>
+                    ) : (
+                        <p className="text-sm text-muted-foreground">No email sequence selected</p>
+                    )}
+                </div>
+
+                <Separator />
+
+                <div>
+                    <div className="mb-2 flex items-center gap-2 text-sm text-muted-foreground">
+                        <ListChecks className="h-3.5 w-3.5" />
+                        Required Documents
+                    </div>
+                    {selectedDocuments.length > 0 ? (
+                        <div className="flex flex-wrap gap-1.5">
+                            {selectedDocuments.map((document_) => (
+                                <Badge key={document_.id} variant="secondary">
+                                    {document_.name}
+                                </Badge>
+                            ))}
+                        </div>
+                    ) : (
+                        <p className="text-sm text-muted-foreground">No documents assigned</p>
                     )}
                 </div>
             </div>

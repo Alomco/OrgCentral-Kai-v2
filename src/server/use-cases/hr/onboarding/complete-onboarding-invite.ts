@@ -10,6 +10,23 @@ import type {
 import type {
     IOnboardingInvitationRepository,
 } from '@/server/repositories/contracts/hr/onboarding/invitation-repository-contract';
+import type { IMentorAssignmentRepository } from '@/server/repositories/contracts/hr/onboarding/mentor-assignment-repository-contract';
+import type { IProvisioningTaskRepository } from '@/server/repositories/contracts/hr/onboarding/provisioning-task-repository-contract';
+import type {
+    IOnboardingWorkflowTemplateRepository,
+    IOnboardingWorkflowRunRepository,
+} from '@/server/repositories/contracts/hr/onboarding/workflow-template-repository-contract';
+import type {
+    IEmailSequenceTemplateRepository,
+    IEmailSequenceEnrollmentRepository,
+    IEmailSequenceDeliveryRepository,
+} from '@/server/repositories/contracts/hr/onboarding/email-sequence-repository-contract';
+import type { IDocumentTemplateAssignmentRepository } from '@/server/repositories/contracts/hr/onboarding/document-template-assignment-repository-contract';
+import type { IDocumentTemplateRepository } from '@/server/repositories/contracts/records/document-template-repository-contract';
+import type {
+    IOnboardingMetricDefinitionRepository,
+    IOnboardingMetricResultRepository,
+} from '@/server/repositories/contracts/hr/onboarding/onboarding-metric-repository-contract';
 import type { IOrganizationRepository } from '@/server/repositories/contracts/org/organization/organization-repository-contract';
 import type { IMembershipRepository } from '@/server/repositories/contracts/org/membership';
 import type { BillingServiceContract } from '@/server/services/billing/billing-service.provider';
@@ -37,6 +54,7 @@ import {
     handleExistingProfile,
     linkProfileIfNeeded,
 } from './complete-onboarding-invite.flow';
+import { applyOnboardingAutomation } from './apply-onboarding-automation';
 
 export interface CompleteOnboardingInviteInput {
     inviteToken: string;
@@ -58,6 +76,17 @@ export interface CompleteOnboardingInviteDependencies {
     checklistTemplateRepository?: IChecklistTemplateRepository;
     checklistInstanceRepository?: IChecklistInstanceRepository;
     transactionRunner?: CreateEmployeeProfileTransactionRunner;
+    mentorAssignmentRepository: IMentorAssignmentRepository;
+    provisioningTaskRepository: IProvisioningTaskRepository;
+    workflowTemplateRepository: IOnboardingWorkflowTemplateRepository;
+    workflowRunRepository: IOnboardingWorkflowRunRepository;
+    emailSequenceTemplateRepository: IEmailSequenceTemplateRepository;
+    emailSequenceEnrollmentRepository: IEmailSequenceEnrollmentRepository;
+    emailSequenceDeliveryRepository: IEmailSequenceDeliveryRepository;
+    documentTemplateAssignmentRepository: IDocumentTemplateAssignmentRepository;
+    documentTemplateRepository: IDocumentTemplateRepository;
+    onboardingMetricDefinitionRepository: IOnboardingMetricDefinitionRepository;
+    onboardingMetricResultRepository: IOnboardingMetricResultRepository;
 }
 
 export interface CompleteOnboardingInviteResult {
@@ -70,6 +99,11 @@ export interface CompleteOnboardingInviteResult {
     alreadyMember: boolean;
     contractCreated?: boolean;
     checklistInstanceId?: string;
+    workflowRunId?: string;
+    emailSequenceEnrollmentId?: string;
+    provisioningTaskIds?: string[];
+    documentAssignmentIds?: string[];
+    metricsRecorded?: string[];
 }
 
 export async function completeOnboardingInvite(
@@ -186,6 +220,30 @@ export async function completeOnboardingInvite(
 
     await deps.onboardingInvitationRepository.markAccepted(organization.id, invitation.token, input.userId);
 
+    const automationResult = await applyOnboardingAutomation(
+        {
+            employeeProfileRepository: deps.employeeProfileRepository,
+            mentorAssignmentRepository: deps.mentorAssignmentRepository,
+            provisioningTaskRepository: deps.provisioningTaskRepository,
+            workflowTemplateRepository: deps.workflowTemplateRepository,
+            workflowRunRepository: deps.workflowRunRepository,
+            emailSequenceTemplateRepository: deps.emailSequenceTemplateRepository,
+            emailSequenceEnrollmentRepository: deps.emailSequenceEnrollmentRepository,
+            emailSequenceDeliveryRepository: deps.emailSequenceDeliveryRepository,
+            documentTemplateAssignmentRepository: deps.documentTemplateAssignmentRepository,
+            documentTemplateRepository: deps.documentTemplateRepository,
+            onboardingMetricDefinitionRepository: deps.onboardingMetricDefinitionRepository,
+            onboardingMetricResultRepository: deps.onboardingMetricResultRepository,
+        },
+        {
+            authorization,
+            employeeId: profile.id,
+            invitationToken: invitation.token,
+            targetEmail: payload.email ?? invitation.targetEmail,
+            payload,
+        },
+    );
+
     await recordAuditEvent({
         orgId: organization.id,
         userId: input.userId,
@@ -200,6 +258,12 @@ export async function completeOnboardingInvite(
             alreadyMember: membershipResult.alreadyMember,
             contractCreated: Boolean(creationResult.contractCreated),
             checklistCreated: Boolean(creationResult.checklistInstanceId),
+            mentorAssigned: automationResult.mentorAssigned,
+            workflowRunId: automationResult.workflowRunId,
+            emailSequenceEnrollmentId: automationResult.emailSequenceEnrollmentId,
+            provisioningTaskCount: automationResult.provisioningTaskIds.length,
+            documentAssignmentCount: automationResult.documentAssignmentIds.length,
+            metricsRecorded: automationResult.metricsRecorded,
             ipAddress: input.request?.ipAddress,
             userAgent: input.request?.userAgent,
         },
@@ -215,6 +279,11 @@ export async function completeOnboardingInvite(
         alreadyMember: membershipResult.alreadyMember,
         contractCreated: creationResult.contractCreated,
         checklistInstanceId: creationResult.checklistInstanceId,
+        workflowRunId: automationResult.workflowRunId,
+        emailSequenceEnrollmentId: automationResult.emailSequenceEnrollmentId,
+        provisioningTaskIds: automationResult.provisioningTaskIds,
+        documentAssignmentIds: automationResult.documentAssignmentIds,
+        metricsRecorded: automationResult.metricsRecorded,
     } satisfies CompleteOnboardingInviteResult;
 }
 

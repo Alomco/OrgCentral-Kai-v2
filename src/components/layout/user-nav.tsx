@@ -76,7 +76,7 @@ export function UserNav({ session, authorization }: UserNavProps) {
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent
-                className="w-64 border border-border/60 bg-popover/95 text-popover-foreground shadow-lg backdrop-blur-md"
+                className="w-64 border border-border/60 bg-popover text-popover-foreground shadow-lg"
                 align="end"
                 sideOffset={8}
                 forceMount
