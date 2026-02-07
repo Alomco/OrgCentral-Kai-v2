@@ -37,10 +37,14 @@ export function useTwoFactorSetupState() {
 
     useEffect(() => {
         let isMounted = true;
+        const abortController = new AbortController();
         const loadStatus = async () => {
             setIsPasswordLoading(true);
             try {
-                const response = await fetch('/api/auth/password-status', { method: 'GET' });
+                const response = await fetch('/api/auth/password-status', {
+                    method: 'GET',
+                    signal: abortController.signal,
+                });
                 const data = await response.json() as PasswordStatusResponse;
                 if (!isMounted) {
                     return;
@@ -56,7 +60,10 @@ export function useTwoFactorSetupState() {
                 }
                 setHasPassword(data.hasPassword);
                 setProviders(Array.isArray(data.providers) ? data.providers : []);
-            } catch {
+            } catch (error: unknown) {
+                if (error instanceof DOMException && error.name === 'AbortError') {
+                    return;
+                }
                 if (!isMounted) {
                     return;
                 }
@@ -73,6 +80,7 @@ export function useTwoFactorSetupState() {
         loadStatus().catch(() => undefined);
         return () => {
             isMounted = false;
+            abortController.abort();
         };
     }, []);
 

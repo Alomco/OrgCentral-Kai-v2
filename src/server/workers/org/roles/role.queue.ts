@@ -1,4 +1,4 @@
-import type { JobsOptions } from 'bullmq';
+import type { JobsOptions } from '@/server/lib/queueing/in-memory-queue';
 import { getSharedQueue } from '@/server/lib/queue';
 import { WORKER_QUEUE_NAMES } from '@/server/lib/worker-constants';
 import type { RoleUpdateEnvelope } from './role-worker.types';
@@ -28,3 +28,4 @@ export function getRoleQueueClient(): RoleQueueContract {
         },
     };
 }
+

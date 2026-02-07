@@ -7,5 +7,10 @@ export function resolveAuthBaseURL(): string {
 }
 
 export function isAuthSyncEnabled(): boolean {
-    return Boolean(process.env.BULLMQ_REDIS_URL ?? process.env.REDIS_URL);
+    const value = process.env.AUTH_SYNC_ENABLED;
+    if (!value) {
+        return true;
+    }
+    const normalized = value.trim().toLowerCase();
+    return normalized === '1' || normalized === 'true' || normalized === 'yes' || normalized === 'on';
 }

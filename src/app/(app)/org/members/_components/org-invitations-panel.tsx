@@ -1,6 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { InfoButton } from '@/components/ui/info-button';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
 import { listOrgInvitations } from '@/server/use-cases/auth/invitations/list-org-invitations';
 import { PrismaInvitationRepository } from '@/server/repositories/prisma/auth/invitations';
@@ -46,7 +47,18 @@ export async function OrgInvitationsPanel({ authorization }: OrgInvitationsPanel
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Invitations</CardTitle>
+                <div className="flex items-center justify-between gap-2">
+                    <CardTitle>Invitations</CardTitle>
+                    <InfoButton
+                        label="Invitations"
+                        sections={[
+                            { label: 'What', text: 'Track pending invites and expiration.' },
+                            { label: 'Prereqs', text: 'Tokens are hidden for security.' },
+                            { label: 'Next', text: 'Resend or revoke as needed.' },
+                            { label: 'Compliance', text: 'Invite actions are logged.' },
+                        ]}
+                    />
+                </div>
                 <CardDescription>Manage pending invitations. Tokens are hidden here.</CardDescription>
             </CardHeader>
             <CardContent>

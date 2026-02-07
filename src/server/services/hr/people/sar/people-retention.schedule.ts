@@ -1,4 +1,4 @@
-import type { JobsOptions } from 'bullmq';
+import type { JobsOptions } from '@/server/lib/queueing/in-memory-queue';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
 import { getRetentionQueueClient } from './people-retention.queue-registry';
 import { runPeopleRetentionSweepJob } from './people-sar.jobs';
@@ -10,7 +10,7 @@ const DEFAULT_CRON = '0 2 * * *'; // 02:00 UTC nightly
 export interface NightlyRetentionScheduleOptions {
   cron?: string;
   jobOptions?: Omit<JobsOptions, 'repeat'>;
-  queueOptions?: PeopleSarProviderOptions['bullQueueOptions'];
+  queueOptions?: PeopleSarProviderOptions['queueOptions'];
   schedulerOverrides?: Partial<PeopleRetentionSchedulerDeps>;
   providerOptions?: PeopleSarProviderOptions;
 }

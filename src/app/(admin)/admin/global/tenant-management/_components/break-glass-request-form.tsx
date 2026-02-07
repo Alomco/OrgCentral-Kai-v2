@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { InfoButton } from '@/components/ui/info-button';
 
 import { requestBreakGlassAction, type BreakGlassActionState } from '../actions';
 
@@ -25,7 +26,18 @@ export function BreakGlassRequestForm() {
     return (
         <form action={action} className="space-y-4 rounded-2xl border border-border/50 bg-card/60 p-4">
             <div className="space-y-1">
-                <h3 className="text-sm font-semibold">Request break-glass approval</h3>
+                <div className="flex items-center justify-between gap-2">
+                    <h3 className="text-sm font-semibold">Request break-glass approval</h3>
+                    <InfoButton
+                        label="Tenant status break-glass"
+                        sections={[
+                            { label: 'What', text: 'Approval to suspend or archive a tenant.' },
+                            { label: 'Prereqs', text: 'Platform tenant access and justification.' },
+                            { label: 'Next', text: 'Use the approval ID when taking action.' },
+                            { label: 'Compliance', text: 'Approvals are audited.' },
+                        ]}
+                    />
+                </div>
                 <p className="text-xs text-muted-foreground">
                     Required for suspending or archiving tenants.
                 </p>
@@ -67,7 +79,18 @@ export function BreakGlassRequestForm() {
                     />
                 </div>
                 <div className="space-y-2">
-                    <Label htmlFor="expiresInMinutes">Expires in</Label>
+                    <div className="flex items-center justify-between gap-2">
+                        <Label htmlFor="expiresInMinutes">Expires in</Label>
+                        <InfoButton
+                            label="Approval expiry"
+                            sections={[
+                                { label: 'What', text: 'How long the approval is valid.' },
+                                { label: 'Prereqs', text: '15 to 240 minutes per policy.' },
+                                { label: 'Next', text: 'Request a new approval if needed.' },
+                                { label: 'Compliance', text: 'Short windows reduce access risk.' },
+                            ]}
+                        />
+                    </div>
                     <Input
                         id="expiresInMinutes"
                         name="expiresInMinutes"

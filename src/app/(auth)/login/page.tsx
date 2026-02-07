@@ -10,6 +10,7 @@ import { LoginForm } from "@/components/auth/LoginForm";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { registerCacheTag } from "@/server/lib/cache-tags";
+import { CACHE_SCOPE_AUTH_LOGIN_PAGE } from '@/server/repositories/cache-scopes';
 import { auth } from '@/server/lib/auth';
 import { sanitizeNextPath } from '@/server/ui/auth/role-redirect';
 
@@ -46,7 +47,7 @@ async function LoginPageContent({ initialOrgSlug, reason }: LoginPageContentProp
     cacheLife("seconds");
     registerCacheTag({
         orgId: "public",
-        scope: "auth:login-page",
+        scope: CACHE_SCOPE_AUTH_LOGIN_PAGE,
         classification: "OFFICIAL",
         residency: "UK_ONLY",
     });

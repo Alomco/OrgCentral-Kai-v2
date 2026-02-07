@@ -9,6 +9,7 @@ export interface BetterAuthService {
 interface BetterAuthServiceOptions {
     baseURL?: string;
     trustProxyHeaders?: boolean;
+    maxCachedAuthHandlers?: number;
 }
 
 function resolveBaseURLFromRequest(request: NextRequest, trustProxyHeaders: boolean): string {
@@ -29,6 +30,7 @@ function resolveBaseURLFromRequest(request: NextRequest, trustProxyHeaders: bool
 
 export function createBetterAuthService(options: BetterAuthServiceOptions = {}): BetterAuthService {
     const authByBaseURL = new Map<string, ReturnType<typeof createAuth>>();
+    const maxCachedAuthHandlers = resolveMaxCachedAuthHandlers(options.maxCachedAuthHandlers);
 
     const envBaseURL =
         options.baseURL ??
@@ -46,6 +48,8 @@ export function createBetterAuthService(options: BetterAuthServiceOptions = {}):
         if (cached) {
             return cached;
         }
+
+        pruneOldestAuthHandlers(authByBaseURL, maxCachedAuthHandlers);
 
         const created = createAuth(baseURL);
         authByBaseURL.set(baseURL, created);
@@ -74,4 +78,24 @@ const sharedService = createBetterAuthService();
 
 export function getBetterAuthService(): BetterAuthService {
     return sharedService;
+}
+
+function resolveMaxCachedAuthHandlers(value?: number): number {
+    if (!Number.isFinite(value) || typeof value !== 'number' || value <= 0) {
+        return 16;
+    }
+    return Math.max(1, Math.floor(value));
+}
+
+function pruneOldestAuthHandlers(
+    authByBaseURL: Map<string, ReturnType<typeof createAuth>>,
+    maxCachedAuthHandlers: number,
+): void {
+    while (authByBaseURL.size >= maxCachedAuthHandlers) {
+        const oldest = authByBaseURL.keys().next().value;
+        if (!oldest) {
+            break;
+        }
+        authByBaseURL.delete(oldest);
+    }
 }

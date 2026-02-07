@@ -1,4 +1,4 @@
-import type { JobsOptions } from 'bullmq';
+import type { JobsOptions } from '@/server/lib/queueing/in-memory-queue';
 import { getLeaveAccrualQueueClient as getClient } from '@/server/lib/queues/hr/leave-accrual-queue';
 import type { QueueRegistryOptions } from '@/server/lib/queue-registry';
 import type { LeaveAccrualEnvelope } from './accrual.types';
@@ -12,3 +12,4 @@ export function getLeaveAccrualQueueClient(
 ): LeaveAccrualQueueClient {
     return getClient(options);
 }
+

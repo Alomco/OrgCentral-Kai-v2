@@ -1,8 +1,11 @@
 import { invalidateCache, registerCacheTag } from '@/server/lib/cache-tags';
-import { CACHE_SCOPE_NOTIFICATION_PREFERENCES } from '@/server/repositories/cache-scopes';
+import {
+    CACHE_SCOPE_NOTIFICATIONS,
+    CACHE_SCOPE_NOTIFICATION_PREFERENCES,
+} from '@/server/repositories/cache-scopes';
 import type { DataClassificationLevel, DataResidencyZone } from '@/server/types/tenant';
 
-export const NOTIFICATION_CACHE_SCOPE = 'notifications';
+export const NOTIFICATION_CACHE_SCOPE = CACHE_SCOPE_NOTIFICATIONS;
 export const NOTIFICATION_PREFERENCES_CACHE_SCOPE = CACHE_SCOPE_NOTIFICATION_PREFERENCES;
 
 export interface NotificationCacheContext {

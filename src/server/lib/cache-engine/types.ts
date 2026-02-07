@@ -38,17 +38,11 @@ export interface CacheEngine {
     bumpTagVersion?(tag: string): Promise<number | null>;
 }
 
-export type CacheEngineKind = 'next' | 'redis' | 'noop';
+export type CacheEngineKind = 'next';
 
 export interface CacheEngineFactoryOptions {
-    /** Override CACHE_ENGINE for tests / scripts. */
+    /** Present for backward compatibility; only 'next' is supported. */
     kind?: CacheEngineKind;
-
-    /**
-     * Redis connection URL used by the redis engine.
-     * Defaults to REDIS_URL (or localhost fallback).
-     */
-    redisUrl?: string;
 }
 
 export function isSensitivePayload(payload: CacheTagPayload): boolean {

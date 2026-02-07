@@ -1,12 +1,13 @@
 import { buildOrganizationServiceDependencies } from '@/server/repositories/providers/org/organization-service-dependencies';
 import { invalidateOrgCache } from '@/server/lib/cache-tags';
+import { CACHE_SCOPE_ORG_SETTINGS } from '@/server/repositories/cache-scopes';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
 import type { PrismaInputJsonObject, PrismaJsonValue } from '@/server/types/prisma';
 import { normalizeOrgSettings, type OrgSettings } from './org-settings-model';
 
 export type { OrgSettings } from './org-settings-model';
 
-export const ORG_SETTINGS_CACHE_SCOPE = 'org:settings';
+export const ORG_SETTINGS_CACHE_SCOPE = CACHE_SCOPE_ORG_SETTINGS;
 
 const { organizationRepository } = buildOrganizationServiceDependencies();
 

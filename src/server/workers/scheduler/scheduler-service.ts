@@ -1,4 +1,4 @@
-import type { JobsOptions, RepeatOptions } from 'bullmq';
+import type { JobsOptions, RepeatOptions } from '@/server/lib/queueing/in-memory-queue';
 import type { WorkerQueueName } from '@/server/lib/worker-constants';
 import { getQueue, type QueueRegistryOptions } from '@/server/lib/queue-registry';
 
@@ -92,3 +92,4 @@ export class SchedulerService {
         return Math.floor(amount * multipliers[unit]);
     }
 }
+

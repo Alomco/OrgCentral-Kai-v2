@@ -1,4 +1,4 @@
-import type { JobsOptions } from 'bullmq';
+import type { JobsOptions } from '@/server/lib/queueing/in-memory-queue';
 import { WORKER_QUEUE_NAMES } from '@/server/lib/worker-constants';
 import { getQueue, type QueueRegistryOptions } from '@/server/lib/queue-registry';
 import { NOTIFICATION_DISPATCH_JOB_NAME, type NotificationDispatchEnvelope } from './dispatch.types';
@@ -22,3 +22,4 @@ export function getNotificationDispatchQueueClient(
         },
     };
 }
+

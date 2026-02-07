@@ -1,50 +1,46 @@
 # Caching Architecture (TL;DR)
 
-## The rule
+## Rules
 - Caching is **use-case owned**.
-- UI/components **never import** `next/cache` and never touch cache tags directly.
-- Repositories focus on data access; they do **not** own caching policy.
-- Sensitive data must be **no-store** (never cached).
+- UI/components should not manage server cache tags directly.
+- Sensitive data must be **no-store** (`classification !== 'OFFICIAL'`).
+- Mutations must invalidate server tags and client query keys.
 
-## The entry points
-- **Tag + invalidate API (stable surface):** `src/server/lib/cache-tags.ts`
-  - `registerCacheTag(payload)` (read paths)
-  - `invalidateCache(payload)` / `invalidateOrgCache(orgId, scope, classification, residency)` (write paths)
-- **Pluggable cache engine (single swap point):** `src/server/lib/cache-engine/index.ts`
-  - Default engine is **Next.js** (`CACHE_ENGINE=next`)
-  - Other engines can be added without changing use-cases.
+## Runtime model (current)
+- Cache engine is hard-locked to Next.js in `src/server/lib/cache-engine/index.ts`.
+- Cache tag API SSOT:
+  - `src/server/lib/cache-tags.ts`
+  - `registerCacheTag(payload)` for read paths
+  - `invalidateOrgCache(orgId, scope, classification, residency)` for writes
+- Cache scopes SSOT:
+  - `src/server/constants/cache-scopes.ts`
 
-## How to use it (in use-cases)
-### Reads
-- After you validate auth/tenant context, register tags for what you are returning:
-  - `registerCacheTag({ orgId, scope, classification, residency })`
-- Prefer small per-domain helpers so use-cases stay clean (example pattern exists in notifications).
+## Server restart behavior
+- Restart is **cache-cold but correct**:
+  - In-memory singletons reset on restart.
+  - Next cache data may be cold after restart depending runtime/platform.
+  - Requests still resolve from source of truth (DB/services), then repopulate cache.
+- Sensitive (`non-OFFICIAL`) reads call `unstable_noStore()` and skip tag registration, so restart cannot serve stale sensitive cache entries.
 
-**Sensitive data**
-- If `classification !== 'OFFICIAL'`, the Next.js cache engine will call `unstable_noStore()` and **skip tag registration**, so the data is not cached and server restarts never affect correctness.
+## React Query coordination
+- React Query state is client-side and independent of server process restarts.
+- Freshness remains correct because:
+  - Mutations invalidate typed query keys (`invalidateQueries`).
+  - Server-side writes invalidate Next cache tags (`invalidateOrgCache`).
+  - Query defaults in `src/lib/react-query.ts` re-fetch stale data.
+- Valid exceptions to `invalidateQueries`:
+  - optimistic flows that fully update cache via `setQueryData`
+  - one-shot redirect mutations (for example bootstrap flows)
 
-### Writes
-- After a successful mutation, invalidate the scopes that are now stale:
-  - `await invalidateOrgCache(orgId, scope, classification, residency)`
-
-## What NOT to do
-- Do not call `cacheTag`, `cacheLife`, or `revalidateTag` outside the cache engine.
-- Do not “default” classification/residency when tagging or invalidating; always use the tenant context.
-- Do not put caching policy inside Prisma repositories.
-
-## Why this is modular
-- Use-cases depend on the **stable API** (`cache-tags.ts`).
-- `cache-tags.ts` delegates to a **CacheEngine** chosen in one place.
-- Swapping caching technology is an **entry-point change** (engine selection), not a codebase-wide rewrite.
-
-## Config
-- `CACHE_ENGINE=next` (recommended/default)
-- `CACHE_ENGINE=noop` (tests, scripts, workers)
-- `CACHE_ENGINE=redis` (tag-versioning engine for app-level caching; does not replace Next’s internal Data Cache)
+## Do and don't
+- Do always pass real tenant context (`orgId`, `classification`, `residency`) into tag helpers.
+- Do use module query-key builders and invalidate narrowly.
+- Do not use `router.refresh()` as a cache strategy in client flows.
+- Do not add Redis/noop cache engines back into runtime.
 
 ## Files to know
 - `src/server/lib/cache-tags.ts`
-- `src/server/lib/cache-engine/types.ts`
 - `src/server/lib/cache-engine/index.ts`
 - `src/server/lib/cache-engine/backends/next-cache-engine.ts`
-
+- `src/server/constants/cache-scopes.ts`
+- `src/lib/react-query.ts`

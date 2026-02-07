@@ -1,9 +1,14 @@
 import type { DataClassificationLevel, DataResidencyZone } from '@/server/types/tenant';
 import { buildCacheTag, invalidateCache, registerCacheTag } from '@/server/lib/cache-tags';
+import {
+  CACHE_SCOPE_COMPLIANCE_ITEMS,
+  CACHE_SCOPE_COMPLIANCE_STATUS,
+  type CacheScope,
+} from '@/server/constants/cache-scopes';
 
 export const HR_COMPLIANCE_CACHE_SCOPES = {
-  status: 'hr-compliance-status',
-  items: 'hr-compliance-items',
+  status: CACHE_SCOPE_COMPLIANCE_STATUS,
+  items: CACHE_SCOPE_COMPLIANCE_ITEMS,
 } as const;
 
 export type HrComplianceCacheScopeKey = keyof typeof HR_COMPLIANCE_CACHE_SCOPES;
@@ -17,8 +22,8 @@ export interface ComplianceCacheContext {
 export function resolveComplianceCacheScopes(options?: {
   includeStatus?: boolean;
   includeItems?: boolean;
-}): string[] {
-  const scopes = new Set<string>();
+}): CacheScope[] {
+  const scopes = new Set<CacheScope>();
 
   if (options?.includeStatus ?? true) {
     scopes.add(HR_COMPLIANCE_CACHE_SCOPES.status);

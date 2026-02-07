@@ -6,11 +6,13 @@ import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { InfoButton } from '@/components/ui/info-button';
 import { runColdStartSeeder } from '../actions';
 import {
     SEED_CATEGORY_DEFINITIONS,
     SEED_CATEGORY_MAP,
 } from '@/lib/seed/cold-start-plan';
+import { DEMO_DATA_INFO, PLATFORM_ESSENTIALS_INFO, RUN_SEEDER_INFO } from './cold-start-info';
 import type {
     ColdStartSeedPlanResponse,
     SeedCategoryId,
@@ -117,7 +119,13 @@ export function ColdStartSeeder({ orgId }: ColdStartSeederProps) {
                     <section className="space-y-3">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Platform essentials</p>
+                                <div className="flex items-center gap-2">
+                                    <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Platform essentials</p>
+                                    <InfoButton
+                                        label="Platform essentials"
+                                        sections={PLATFORM_ESSENTIALS_INFO}
+                                    />
+                                </div>
                                 <p className="text-sm text-muted-foreground">Baseline data for a working org.</p>
                             </div>
                         </div>
@@ -139,7 +147,13 @@ export function ColdStartSeeder({ orgId }: ColdStartSeederProps) {
                     <section className="space-y-3">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Demo data</p>
+                                <div className="flex items-center gap-2">
+                                    <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Demo data</p>
+                                    <InfoButton
+                                        label="Demo data"
+                                        sections={DEMO_DATA_INFO}
+                                    />
+                                </div>
                                 <p className="text-sm text-muted-foreground">Optional sample data for walkthroughs.</p>
                             </div>
                         </div>
@@ -163,6 +177,10 @@ export function ColdStartSeeder({ orgId }: ColdStartSeederProps) {
                             <p className="text-sm font-medium">Target organization</p>
                             <p className="text-xs text-muted-foreground">Org ID: {orgId}</p>
                         </div>
+                        <InfoButton
+                            label="Run cold start seeder"
+                            sections={RUN_SEEDER_INFO}
+                        />
                         <Button onClick={handleRun} disabled={isPending} className="min-w-40">
                             {isPending ? (
                                 <span className="inline-flex items-center gap-2">

@@ -5,8 +5,10 @@ import { cacheLife, unstable_noStore as noStore } from 'next/cache';
 import { PageContainer } from '@/components/theme/layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { InfoButton } from '@/components/ui/info-button';
 import { getSessionContextOrRedirect } from '@/server/ui/auth/session-redirect';
 import { registerCacheTag } from '@/server/lib/cache-tags';
+import { CACHE_SCOPE_PLATFORM_TOOLS } from '@/server/repositories/cache-scopes';
 import { listPlatformToolsService, listPlatformToolExecutionsService } from '@/server/services/platform/admin/platform-tools-service';
 import type { RepositoryAuthorizationContext } from '@/server/types/repository-authorization';
 
@@ -45,7 +47,18 @@ export default async function PlatformToolsPage() {
 
             <Card>
                 <CardHeader>
-                    <CardTitle>Allowlisted tools</CardTitle>
+                    <CardTitle className="flex items-center justify-between">
+                        <span>Allowlisted tools</span>
+                        <InfoButton
+                            label="Allowlisted tools"
+                            sections={[
+                                { label: 'What', text: 'Approved operational tools for admins.' },
+                                { label: 'Prereqs', text: 'Tool IDs allowlisted and permissioned.' },
+                                { label: 'Next', text: 'Use Execute tool with the correct scope.' },
+                                { label: 'Compliance', text: 'Tool use is audited and may need approvals.' },
+                            ]}
+                        />
+                    </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3 text-sm">
                     {tools.map((tool) => (
@@ -55,6 +68,20 @@ export default async function PlatformToolsPage() {
                                 <p className="text-xs text-muted-foreground">{tool.description}</p>
                             </div>
                             <div className="flex items-center gap-2">
+                                <InfoButton
+                                    label={`Tool: ${tool.label}`}
+                                    sections={[
+                                        { label: 'What', text: tool.description },
+                                        {
+                                            label: 'Prereqs',
+                                            text: tool.requiresBreakGlass
+                                                ? 'Break-glass approval required.'
+                                                : 'Standard permissions required.',
+                                        },
+                                        { label: 'Next', text: 'Run via Execute tool; confirm dry-run first.' },
+                                        { label: 'Compliance', text: 'Executions are logged and reviewed.' },
+                                    ]}
+                                />
                                 {tool.requiresBreakGlass ? <Badge variant="secondary">Break-glass</Badge> : null}
                                 {tool.requiresMfa ? <Badge variant="outline">MFA</Badge> : null}
                             </div>
@@ -65,7 +92,18 @@ export default async function PlatformToolsPage() {
 
             <Card>
                 <CardHeader>
-                    <CardTitle>Execution history</CardTitle>
+                    <CardTitle className="flex items-center justify-between">
+                        <span>Execution history</span>
+                        <InfoButton
+                            label="Execution history"
+                            sections={[
+                                { label: 'What', text: 'Recent executions and outcomes.' },
+                                { label: 'Prereqs', text: 'Executions run in this org.' },
+                                { label: 'Next', text: 'Investigate failures and follow runbooks.' },
+                                { label: 'Compliance', text: 'History is retained for audit review.' },
+                            ]}
+                        />
+                    </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2 text-sm text-muted-foreground">
                     {executions.length === 0 ? (
@@ -98,7 +136,7 @@ async function loadPlatformToolsCached(authorization: RepositoryAuthorizationCon
     cacheLife('minutes');
     registerCacheTag({
         orgId: authorization.orgId,
-        scope: 'platform:tools',
+        scope: CACHE_SCOPE_PLATFORM_TOOLS,
         classification: authorization.dataClassification,
         residency: authorization.dataResidency,
     });

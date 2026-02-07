@@ -10,6 +10,10 @@ import {
 } from '@/server/services/platform/admin/impersonation-service';
 import { requestBreakGlassService } from '@/server/services/platform/admin/break-glass-service';
 import { invalidateCache } from '@/server/lib/cache-tags';
+import {
+    CACHE_SCOPE_PLATFORM_BREAK_GLASS,
+    CACHE_SCOPE_PLATFORM_IMPERSONATION,
+} from '@/server/repositories/cache-scopes';
 import { ValidationError } from '@/server/errors';
 
 export interface ImpersonationActionState {
@@ -25,7 +29,6 @@ export interface ImpersonationBreakGlassState {
 
 const INITIAL_STATE: ImpersonationActionState = { status: 'idle' };
 const BREAK_GLASS_STATE: ImpersonationBreakGlassState = { status: 'idle' };
-const IMPERSONATION_SCOPE = 'platform:impersonation';
 const IMPERSONATION_PATH = '/admin/global/user-impersonation';
 
 export async function requestImpersonationBreakGlassAction(
@@ -57,7 +60,7 @@ export async function requestImpersonationBreakGlassAction(
 
         await invalidateCache({
             orgId: authorization.orgId,
-            scope: 'platform:break-glass',
+            scope: CACHE_SCOPE_PLATFORM_BREAK_GLASS,
             classification: authorization.dataClassification,
             residency: authorization.dataResidency,
         });
@@ -97,7 +100,7 @@ export async function requestImpersonationAction(
 
         await invalidateCache({
             orgId: authorization.orgId,
-            scope: IMPERSONATION_SCOPE,
+            scope: CACHE_SCOPE_PLATFORM_IMPERSONATION,
             classification: authorization.dataClassification,
             residency: authorization.dataResidency,
         });
@@ -132,7 +135,7 @@ export async function approveImpersonationAction(
 
         await invalidateCache({
             orgId: authorization.orgId,
-            scope: IMPERSONATION_SCOPE,
+            scope: CACHE_SCOPE_PLATFORM_IMPERSONATION,
             classification: authorization.dataClassification,
             residency: authorization.dataResidency,
         });
@@ -168,7 +171,7 @@ export async function stopImpersonationAction(
 
         await invalidateCache({
             orgId: authorization.orgId,
-            scope: IMPERSONATION_SCOPE,
+            scope: CACHE_SCOPE_PLATFORM_IMPERSONATION,
             classification: authorization.dataClassification,
             residency: authorization.dataResidency,
         });

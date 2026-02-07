@@ -11,6 +11,7 @@ import { TenantThemeRegistry } from '@/components/theme/tenant-theme-registry';
 import styles from './not-invited.module.css';
 import notInvitedImage from '@/assets/errors/not_invited.webp';
 import { registerCacheTag } from '@/server/lib/cache-tags';
+import { CACHE_SCOPE_AUTH_NOT_INVITED } from '@/server/repositories/cache-scopes';
 import {
     IllustrationFallback,
     NotInvitedFallback,
@@ -112,7 +113,7 @@ async function NotInvitedContent({ next, tenant }: NotInvitedContentProps) {
     cacheLife('seconds');
     registerCacheTag({
         orgId: tenant.orgId,
-        scope: 'auth:not-invited',
+        scope: CACHE_SCOPE_AUTH_NOT_INVITED,
         classification: tenant.classification,
         residency: tenant.residency,
     });

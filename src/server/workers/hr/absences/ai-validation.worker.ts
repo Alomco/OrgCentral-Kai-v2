@@ -1,4 +1,4 @@
-import { Worker, type WorkerOptions } from 'bullmq';
+import { Worker, type WorkerOptions } from '@/server/lib/queueing/in-memory-queue';
 import { buildAbsenceAiValidationDependencies } from '@/server/use-cases/hr/absences/ai-validation.provider';
 import type { AbsenceAiValidationResult } from './ai-validation.types';
 import { AbsenceAiValidationService } from './ai-validation.service';
@@ -38,8 +38,8 @@ export function registerAbsenceAiWorker(options?: AbsenceAiWorkerOptions): Worke
     const processor = createAbsenceAiProcessor(service);
 
     return new Worker(queueClient.queue.name, processor as never, {
-        connection: queueClient.queue.opts.connection,
         concurrency: options?.worker?.concurrency ?? 2,
         ...options?.worker,
     });
 }
+

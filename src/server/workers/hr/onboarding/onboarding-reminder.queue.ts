@@ -1,4 +1,4 @@
-import type { JobsOptions } from 'bullmq';
+import type { JobsOptions } from '@/server/lib/queueing/in-memory-queue';
 import { getOnboardingReminderQueueClient as getClient } from '@/server/lib/queues/hr/onboarding-reminder-queue';
 import type { QueueRegistryOptions } from '@/server/lib/queue-registry';
 import type { OnboardingReminderEnvelope } from './onboarding-reminder.types';
@@ -12,3 +12,4 @@ export function getOnboardingReminderQueueClient(
 ): OnboardingReminderQueueClient {
     return getClient(options);
 }
+

@@ -7,6 +7,7 @@ import { getRoleService } from '@/server/services/org';
 import { getUserService, type UserServiceContract } from '@/server/services/org/users/user-service.provider';
 import { resolveAllowedInviteRoles } from '@/server/services/org/membership/membership-service.policy';
 import { assertOnboardingInviteSender } from '@/server/security/authorization/hr-guards/onboarding';
+import { InfoButton } from '@/components/ui/info-button';
 import { MembersListClient } from './_components/members-list.client';
 import { OnboardingWizardPanel } from '../../hr/onboarding/_components/onboarding-wizard-panel';
 import { OrgInvitationsPanel } from './_components/org-invitations-panel';
@@ -103,9 +104,9 @@ export default async function OrgMembersPage({
     return (
         <div className="space-y-6 p-6">
             <div>
-                <p className="text-xs uppercase tracking-[0.18em] text-[oklch(var(--muted-foreground))]">Members</p>
-                <h1 className="text-2xl font-semibold text-[oklch(var(--foreground))]">Organization members</h1>
-                <p className="text-sm text-[oklch(var(--muted-foreground))]">Users with access to this organization.</p>
+                <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Members</p>
+                <h1 className="text-2xl font-semibold text-foreground">Organization members</h1>
+                <p className="text-sm text-muted-foreground">Users with access to this organization.</p>
             </div>
 
             <OnboardingWizardPanel
@@ -123,13 +124,24 @@ export default async function OrgMembersPage({
             <div className="rounded-2xl bg-[oklch(var(--card)/0.6)] p-6 backdrop-blur">
                 <OrgMembersFilters query={query} roleNames={filterRoleNames} />
                 <div className="mt-2 flex flex-wrap items-center gap-3">
-                    <a
-                        href={"/api/org/" + authorization.orgId + "/members/export?" + buildOrgMembersSearchParams(query).toString()}
-                        className="inline-flex h-8 items-center rounded-md border px-3 text-xs"
-                        aria-label="Export filtered members as CSV"
-                    >
-                        Export CSV
-                    </a>
+                    <div className="flex items-center gap-2">
+                        <a
+                            href={"/api/org/" + authorization.orgId + "/members/export?" + buildOrgMembersSearchParams(query).toString()}
+                            className="inline-flex h-8 items-center rounded-md border px-3 text-xs"
+                            aria-label="Export filtered members as CSV"
+                        >
+                            Export CSV
+                        </a>
+                        <InfoButton
+                            label="Member export"
+                            sections={[
+                                { label: 'What', text: 'Download the filtered member list as CSV.' },
+                                { label: 'Prereqs', text: 'Respects current filters and sort.' },
+                                { label: 'Next', text: 'Store exports securely.' },
+                                { label: 'Compliance', text: 'Exports contain personal data.' },
+                            ]}
+                        />
+                    </div>
                     <OrgMembersTopControls />
                 </div>
                 <OrgMembersBulkActions orgId={authorization.orgId} currentQueryKey={buildOrgMembersSearchParams(query).toString()} roleNames={filterRoleNames} />

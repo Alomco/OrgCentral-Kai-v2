@@ -6,6 +6,7 @@ import { headers } from 'next/headers';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { InfoButton } from '@/components/ui/info-button';
 import { registerOrgCacheTag } from '@/server/lib/cache-tags';
 import { PrismaAbacPolicyRepository } from '@/server/repositories/prisma/org/abac/prisma-abac-policy-repository';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
@@ -38,11 +39,11 @@ export default async function OrgPermissionsPage() {
     return (
         <div className="space-y-6 p-6">
             <div>
-                <p className="text-xs uppercase tracking-[0.18em] text-[oklch(var(--muted-foreground))]">Access</p>
-                <h1 className="text-2xl font-semibold text-[oklch(var(--foreground))]">
+                <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Access</p>
+                <h1 className="text-2xl font-semibold text-foreground">
                     Permissions registry
                 </h1>
-                <p className="text-sm text-[oklch(var(--muted-foreground))]">
+                <p className="text-sm text-muted-foreground">
                     Govern access by defining resources, actions, and ABAC policies for this organization.
                 </p>
             </div>
@@ -130,7 +131,18 @@ async function AbacSummaryPanel({ policiesPromise }: { policiesPromise: Promise<
             <CardHeader>
                 <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
-                        <CardTitle>ABAC policies</CardTitle>
+                        <div className="flex items-center gap-2">
+                            <CardTitle>ABAC policies</CardTitle>
+                            <InfoButton
+                                label="ABAC policies"
+                                sections={[
+                                    { label: 'What', text: 'Attribute-based rules that allow or deny actions.' },
+                                    { label: 'Prereqs', text: 'Policies evaluate after role grants.' },
+                                    { label: 'Next', text: 'Use the editor to adjust rules.' },
+                                    { label: 'Compliance', text: 'Policy changes are tracked.' },
+                                ]}
+                            />
+                        </div>
                         <CardDescription>Review and edit attribute-based access policies.</CardDescription>
                     </div>
                     <Button asChild size="sm" variant="secondary">
@@ -161,7 +173,7 @@ async function AbacSummaryPanel({ policiesPromise }: { policiesPromise: Promise<
                                     >
                                         {policy.effect.toUpperCase()}
                                     </span>
-                                    <span className="text-xs font-semibold text-[oklch(var(--foreground))] break-all">
+                                    <span className="text-xs font-semibold text-foreground break-all">
                                         {policy.id}
                                     </span>
                                 </div>
@@ -181,6 +193,6 @@ async function AbacSummaryPanel({ policiesPromise }: { policiesPromise: Promise<
 }
 
 function PanelSkeleton() {
-    return <div className="h-44 w-full animate-pulse rounded-2xl bg-[oklch(var(--muted))]" />;
+    return <div className="h-44 w-full animate-pulse rounded-2xl bg-muted" />;
 }
 

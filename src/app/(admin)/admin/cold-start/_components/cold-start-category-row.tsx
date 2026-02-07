@@ -1,5 +1,6 @@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
+import { InfoButton } from '@/components/ui/info-button';
 import {
     Select,
     SelectContent,
@@ -14,6 +15,7 @@ import type {
     SeedDatasetSize,
 } from '@/server/types/seeder/cold-start';
 import { DATASET_LABELS } from './cold-start-seeder.helpers';
+import { buildCategoryInfo } from './cold-start-info';
 
 interface CategoryRowProps {
     selection: SeedCategorySelection;
@@ -44,7 +46,16 @@ export function ColdStartCategoryRow({
                         onCheckedChange={(checked) => onToggle(selection.id, checked === true)}
                     />
                     <span className="space-y-1">
-                        <span className="block text-sm font-medium text-foreground">{definition.label}</span>
+                        <span className="flex items-center gap-2 text-sm font-medium text-foreground">
+                            {definition.label}
+                            <InfoButton
+                                label={definition.label}
+                                sections={buildCategoryInfo({
+                                    description: definition.description,
+                                    requiresEmployees,
+                                })}
+                            />
+                        </span>
                         <span className="block text-xs text-muted-foreground">{definition.description}</span>
                         {showDependencyWarning ? (
                             <span className="block text-xs text-amber-600">

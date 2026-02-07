@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { UserPlus } from 'lucide-react';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -31,6 +31,7 @@ export function EmployeeInvitationPanel({
     const [dialogOpen, setDialogOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [copied, setCopied] = useState(false);
+    const copiedTimeoutReference = useRef<ReturnType<typeof setTimeout> | null>(null);
     const [formData, setFormData] = useState<InvitationFormData>({
         email: '',
         firstName: '',
@@ -42,6 +43,13 @@ export function EmployeeInvitationPanel({
     const updateFormData = (updates: Partial<InvitationFormData>) => {
         setFormData((previous) => ({ ...previous, ...updates }));
     };
+
+    useEffect(() => () => {
+        if (copiedTimeoutReference.current !== null) {
+            clearTimeout(copiedTimeoutReference.current);
+            copiedTimeoutReference.current = null;
+        }
+    }, []);
 
     const handleSubmit = async () => {
         if (!formData.email || !formData.firstName || !onSendInvite) { return; }
@@ -66,7 +74,13 @@ export function EmployeeInvitationPanel({
         // Placeholder - would copy actual invite link
         await navigator.clipboard.writeText(`${window.location.origin}/invite/sample-token`);
         setCopied(true);
-        setTimeout(() => { setCopied(false); }, 2000);
+        if (copiedTimeoutReference.current !== null) {
+            clearTimeout(copiedTimeoutReference.current);
+        }
+        copiedTimeoutReference.current = setTimeout(() => {
+            setCopied(false);
+            copiedTimeoutReference.current = null;
+        }, 2000);
     };
 
     const activeInvites = pendingInvites.filter((index) => index.status === 'pending');

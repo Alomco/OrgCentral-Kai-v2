@@ -1,6 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
 import { getBillingSubscriptionForUi, getUpcomingInvoiceForUi } from '../billing-store';
+import { BillingSubscriptionActions } from './billing-subscription-actions.client';
 
 export async function BillingOverviewPanel({
   authorization,
@@ -16,9 +17,8 @@ export async function BillingOverviewPanel({
     return (
       <div className="rounded-2xl border border-border bg-card/35 p-5 text-sm text-muted-foreground">
         <p className="text-foreground">No active subscription detected.</p>
-        <p className="mt-1 text-xs">
-          Start a subscription from the billing portal or complete checkout.
-        </p>
+        <p className="mt-1 text-xs">Start a subscription to enable billing features.</p>
+        <BillingSubscriptionActions orgId={authorization.orgId} status={null} />
       </div>
     );
   }
@@ -65,6 +65,7 @@ export async function BillingOverviewPanel({
           Payment failed. Update your payment method to avoid service interruption.
         </div>
       ) : null}
+      <BillingSubscriptionActions orgId={authorization.orgId} status={subscription.status} />
     </div>
   );
 }

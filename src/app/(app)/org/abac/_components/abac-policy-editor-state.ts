@@ -37,6 +37,7 @@ export function useAbacPolicyEditor({
     const policyCounter = useRef(initialDrafts.length);
     const conditionCounter = useRef(0);
     const fileInputReference = useRef<HTMLInputElement | null>(null);
+    const restoreDefaultsTimeoutReference = useRef<number | null>(null);
 
     useEffect(() => {
         let cancelled = false;
@@ -51,6 +52,10 @@ export function useAbacPolicyEditor({
         });
         return () => {
             cancelled = true;
+            if (restoreDefaultsTimeoutReference.current !== null) {
+                window.clearTimeout(restoreDefaultsTimeoutReference.current);
+                restoreDefaultsTimeoutReference.current = null;
+            }
         };
     }, [initialDrafts]);
 
@@ -163,13 +168,21 @@ export function useAbacPolicyEditor({
                 status: 'info',
                 message: 'Click “Restore defaults” again to confirm replacing current policies.',
             });
-            window.setTimeout(() => {
+            if (restoreDefaultsTimeoutReference.current !== null) {
+                window.clearTimeout(restoreDefaultsTimeoutReference.current);
+            }
+            restoreDefaultsTimeoutReference.current = window.setTimeout(() => {
                 setRestoreDefaultsPending(false);
+                restoreDefaultsTimeoutReference.current = null;
             }, 8000);
             return;
         }
 
         setRestoreDefaultsPending(false);
+        if (restoreDefaultsTimeoutReference.current !== null) {
+            window.clearTimeout(restoreDefaultsTimeoutReference.current);
+            restoreDefaultsTimeoutReference.current = null;
+        }
 
         const defaults = buildDrafts(defaultPolicies);
         setDrafts(defaults);

@@ -23,6 +23,7 @@ export interface BillingSetupIntentResult {
 export interface BillingPaymentMethodsResult {
   success: true;
   paymentMethods: PaymentMethodData[];
+  billingConfigured: boolean;
 }
 
 export async function createBillingSetupIntentController(
@@ -81,7 +82,11 @@ export async function listBillingPaymentMethodsController(
 
   const result = await listBillingPaymentMethods({}, { authorization });
 
-  return { success: true, paymentMethods: result.paymentMethods };
+  return {
+    success: true,
+    paymentMethods: result.paymentMethods,
+    billingConfigured: result.billingConfigured,
+  };
 }
 
 export async function removeBillingPaymentMethodController(

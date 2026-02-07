@@ -1,4 +1,4 @@
-import { type Job } from 'bullmq';
+import { type Job } from '@/server/lib/queueing/in-memory-queue';
 import { type RepositoryAuthorizationContext } from '@/server/repositories/security';
 import { AbstractOrgWorker } from '@/server/workers/abstract-org-worker';
 import { WORKER_QUEUE_NAMES } from '@/server/workers/constants';
@@ -37,3 +37,4 @@ export class RoleUpdateWorker extends AbstractOrgWorker<RoleUpdatePayload, RoleU
         // await this.dependencies.permissionCache.invalidateOrg(context.orgId);
     }
 }
+

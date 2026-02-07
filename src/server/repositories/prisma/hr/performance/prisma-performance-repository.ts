@@ -15,6 +15,7 @@ import { registerOrgCacheTag } from '@/server/lib/cache-tags';
 import { CACHE_SCOPE_PERFORMANCE_GOALS, CACHE_SCOPE_PERFORMANCE_REVIEWS } from '@/server/repositories/cache-scopes';
 import { buildGoalUpdateData, buildReviewUpdateData } from './prisma-performance-repository.helpers';
 import type { DataClassificationLevel, DataResidencyZone } from '@/server/types/tenant';
+import type { CacheScope } from '@/server/repositories/cache-scopes';
 
 type ReviewDelegate = PrismaClient['performanceReview'];
 type GoalDelegate = PrismaClient['performanceGoal'];
@@ -48,7 +49,7 @@ export class PrismaPerformanceRepository extends BasePrismaRepository implements
             return null;
         }
 
-        const reviewScope: string = CACHE_SCOPE_PERFORMANCE_REVIEWS;
+        const reviewScope = CACHE_SCOPE_PERFORMANCE_REVIEWS;
         registerOrgCacheTag(
             this.orgId,
             reviewScope,
@@ -64,7 +65,7 @@ export class PrismaPerformanceRepository extends BasePrismaRepository implements
             orderBy: { scheduledDate: 'desc' },
         });
 
-        const reviewScope: string = CACHE_SCOPE_PERFORMANCE_REVIEWS;
+        const reviewScope = CACHE_SCOPE_PERFORMANCE_REVIEWS;
         registerOrgCacheTag(
             this.orgId,
             reviewScope,
@@ -85,7 +86,7 @@ export class PrismaPerformanceRepository extends BasePrismaRepository implements
             orderBy: { targetDate: 'asc' },
         });
 
-        const goalScope: string = CACHE_SCOPE_PERFORMANCE_GOALS;
+        const goalScope = CACHE_SCOPE_PERFORMANCE_GOALS;
         registerOrgCacheTag(
             this.orgId,
             goalScope,
@@ -97,7 +98,7 @@ export class PrismaPerformanceRepository extends BasePrismaRepository implements
     }
 
     async createReview(data: CreateReviewDTO) {
-        const scopes: string[] = [
+        const scopes: CacheScope[] = [
             CACHE_SCOPE_PERFORMANCE_REVIEWS,
             CACHE_SCOPE_PERFORMANCE_GOALS,
         ];
@@ -135,7 +136,7 @@ export class PrismaPerformanceRepository extends BasePrismaRepository implements
     }
 
     async updateReview(id: string, data: UpdateReviewDTO) {
-        const scopes: string[] = [
+        const scopes: CacheScope[] = [
             CACHE_SCOPE_PERFORMANCE_REVIEWS,
             CACHE_SCOPE_PERFORMANCE_GOALS,
         ];
@@ -155,7 +156,7 @@ export class PrismaPerformanceRepository extends BasePrismaRepository implements
     }
 
     async addGoal(reviewId: string, goal: CreateGoalDTO) {
-        const scopes: string[] = [
+        const scopes: CacheScope[] = [
             CACHE_SCOPE_PERFORMANCE_REVIEWS,
             CACHE_SCOPE_PERFORMANCE_GOALS,
         ];
@@ -183,7 +184,7 @@ export class PrismaPerformanceRepository extends BasePrismaRepository implements
     }
 
     async updateGoal(goalId: string, data: UpdateGoalDTO) {
-        const scopes: string[] = [
+        const scopes: CacheScope[] = [
             CACHE_SCOPE_PERFORMANCE_REVIEWS,
             CACHE_SCOPE_PERFORMANCE_GOALS,
         ];
@@ -203,7 +204,7 @@ export class PrismaPerformanceRepository extends BasePrismaRepository implements
     }
 
     async deleteGoal(goalId: string): Promise<void> {
-        const scopes: string[] = [
+        const scopes: CacheScope[] = [
             CACHE_SCOPE_PERFORMANCE_REVIEWS,
             CACHE_SCOPE_PERFORMANCE_GOALS,
         ];
@@ -218,7 +219,7 @@ export class PrismaPerformanceRepository extends BasePrismaRepository implements
     }
 
     async deleteReview(id: string): Promise<void> {
-        const scopes: string[] = [
+        const scopes: CacheScope[] = [
             CACHE_SCOPE_PERFORMANCE_REVIEWS,
             CACHE_SCOPE_PERFORMANCE_GOALS,
         ];

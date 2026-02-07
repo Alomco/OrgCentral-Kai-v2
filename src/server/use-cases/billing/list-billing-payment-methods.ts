@@ -10,6 +10,7 @@ export interface ListBillingPaymentMethodsInput {
 
 export interface ListBillingPaymentMethodsResult {
   paymentMethods: PaymentMethodData[];
+  billingConfigured: boolean;
 }
 
 export interface ListBillingPaymentMethodsDependencies {
@@ -22,8 +23,14 @@ export async function listBillingPaymentMethods(
 ): Promise<ListBillingPaymentMethodsResult> {
   const service = dependencies.service ?? resolveBillingService();
   if (!service) {
-    return { paymentMethods: [] };
+    return {
+      paymentMethods: [],
+      billingConfigured: false,
+    };
   }
   const paymentMethods = await service.listPaymentMethods(input);
-  return { paymentMethods };
+  return {
+    paymentMethods,
+    billingConfigured: true,
+  };
 }

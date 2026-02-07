@@ -1,7 +1,14 @@
+import {
+    CACHE_SCOPE_ABSENCES,
+    CACHE_SCOPE_HR_ABSENCE_AI_VALIDATION,
+    CACHE_SCOPE_LEAVE_BALANCES,
+    type CacheScope,
+} from '@/server/constants/cache-scopes';
+
 export const HR_ABSENCE_CACHE_SCOPES = {
-    absences: 'hr-absences',
-    leaveBalances: 'leave-balances',
-    aiValidation: 'hr:absences:ai-validation',
+    absences: CACHE_SCOPE_ABSENCES,
+    leaveBalances: CACHE_SCOPE_LEAVE_BALANCES,
+    aiValidation: CACHE_SCOPE_HR_ABSENCE_AI_VALIDATION,
 } as const;
 
 export type HrAbsenceCacheScopeKey = keyof typeof HR_ABSENCE_CACHE_SCOPES;
@@ -9,8 +16,8 @@ export type HrAbsenceCacheScopeKey = keyof typeof HR_ABSENCE_CACHE_SCOPES;
 export function resolveAbsenceCacheScopes(options?: {
     includeLeaveBalances?: boolean;
     includeAiValidation?: boolean;
-}): string[] {
-    const scopes = new Set<string>();
+}): CacheScope[] {
+    const scopes = new Set<CacheScope>();
     scopes.add(HR_ABSENCE_CACHE_SCOPES.absences);
 
     if (options?.includeLeaveBalances) {

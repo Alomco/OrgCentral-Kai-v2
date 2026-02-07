@@ -4,6 +4,7 @@ import { useActionState, useEffect, useRef } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { InfoButton } from '@/components/ui/info-button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
@@ -168,7 +169,18 @@ export function HrSettingsForm(props: {
                         <Separator />
 
                         <div className="space-y-2">
-                            <Label htmlFor="approvalWorkflowsJson">Approval workflows (advanced)</Label>
+                            <div className="flex items-center justify-between gap-2">
+                                <Label htmlFor="approvalWorkflowsJson">Approval workflows (advanced)</Label>
+                                <InfoButton
+                                    label="Approval workflows"
+                                    sections={[
+                                        { label: 'What', text: 'JSON overrides for approval routing.' },
+                                        { label: 'Prereqs', text: 'Provided by HR ops.' },
+                                        { label: 'Next', text: 'Validate format before saving.' },
+                                        { label: 'Compliance', text: 'Changes affect audit routing.' },
+                                    ]}
+                                />
+                            </div>
                             <Textarea
                                 id="approvalWorkflowsJson"
                                 name="approvalWorkflowsJson"

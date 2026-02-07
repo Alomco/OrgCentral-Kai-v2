@@ -5,6 +5,7 @@ import type { FormEvent } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { Button } from '@/components/ui/button';
+import { InfoButton } from '@/components/ui/info-button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
@@ -142,7 +143,18 @@ export function PermissionResourceUpdateForm(props: { orgId: string; resource: P
             <fieldset disabled={pending} className="space-y-3">
                 <div className="grid gap-3 sm:grid-cols-2">
                     <div className="space-y-1">
-                        <Label htmlFor={`permission-resource-name-${props.resource.id}`}>Resource key</Label>
+                        <div className="flex items-center justify-between gap-2">
+                            <Label htmlFor={`permission-resource-name-${props.resource.id}`}>Resource key</Label>
+                            <InfoButton
+                                label="Resource key"
+                                sections={[
+                                    { label: 'What', text: 'Canonical key used in checks and policies.' },
+                                    { label: 'Prereqs', text: 'Stick to dot-notation namespaces.' },
+                                    { label: 'Next', text: 'Update policies if you rename keys.' },
+                                    { label: 'Compliance', text: 'Renames impact audit trails.' },
+                                ]}
+                            />
+                        </div>
                         <Input
                             id={`permission-resource-name-${props.resource.id}`}
                             name="resource"

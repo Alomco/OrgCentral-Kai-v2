@@ -1,23 +1,27 @@
 import type { DataClassificationLevel, DataResidencyZone } from '@/server/types/tenant';
 import { getCacheEngine } from '@/server/lib/cache-engine';
 import { isSensitivePayload } from '@/server/lib/cache-engine/types';
+import type { CacheScope } from '@/server/constants/cache-scopes';
+export type { CacheScope } from '@/server/constants/cache-scopes';
 
-/**
- * Cache scope for different types of data
- * Common values: 'org-profile', 'leave-entitlements', 'leave-requests', 'members'
- * Can also be any custom string value
- */
-export type CacheScope = string;
-
-export interface CacheTagPayload {
+export interface OrgCacheContext {
     orgId: string;
-    scope: CacheScope;
     classification: DataClassificationLevel;
     residency: DataResidencyZone;
 }
 
+export interface OrgScopedCachePayload extends OrgCacheContext {
+    scope: CacheScope;
+}
+
+export type CacheTagPayload = OrgScopedCachePayload;
+
 export function buildCacheTag({ orgId, scope, classification, residency }: CacheTagPayload): string {
     return `org:${orgId}:${classification}:${residency}:${scope}`;
+}
+
+export function buildOrgScopedCacheTag(payload: OrgScopedCachePayload): string {
+    return buildCacheTag(payload);
 }
 
 export function registerCacheTag(payload: CacheTagPayload): void {
@@ -28,6 +32,10 @@ export function registerCacheTag(payload: CacheTagPayload): void {
 export async function invalidateCache(payload: CacheTagPayload): Promise<void> {
     const engine = getCacheEngine();
     await engine.invalidateTag(buildCacheTag(payload));
+}
+
+export async function invalidateOrgScopedCache(payload: OrgScopedCachePayload): Promise<void> {
+    await invalidateCache(payload);
 }
 
 /**
@@ -53,4 +61,8 @@ export function registerOrgCacheTag(
     residency: DataResidencyZone,
 ): void {
     registerCacheTag({ orgId, scope, classification, residency });
+}
+
+export function registerOrgScopedCacheTag(payload: OrgScopedCachePayload): void {
+    registerCacheTag(payload);
 }

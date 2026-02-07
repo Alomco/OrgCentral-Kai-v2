@@ -1,6 +1,8 @@
 export {
+    buildQueueRegistryOptions,
+    createQueueRegistration,
     getQueue,
     shutdownQueueRegistry,
+    type QueueRegistration,
     type QueueRegistryOptions,
-    type RedisConnectionOptions,
 } from '@/server/lib/queue-registry';

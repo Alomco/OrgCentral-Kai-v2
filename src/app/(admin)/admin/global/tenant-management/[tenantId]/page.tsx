@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { getSessionContextOrRedirect } from '@/server/ui/auth/session-redirect';
 import { getPlatformTenantDetailService } from '@/server/services/platform/admin/tenant-management-service';
 import { registerCacheTag } from '@/server/lib/cache-tags';
+import { buildPlatformTenantCacheScope } from '@/server/repositories/cache-scopes';
 import { getAuditLogService } from '@/server/services/org/audit/audit-log-service.provider';
 import type { RepositoryAuthorizationContext } from '@/server/types/repository-authorization';
 
@@ -133,7 +134,7 @@ async function loadTenantDetailCached(
     cacheLife('minutes');
     registerCacheTag({
         orgId: authorization.orgId,
-        scope: `platform:tenant:${tenantId}`,
+        scope: buildPlatformTenantCacheScope(tenantId),
         classification: authorization.dataClassification,
         residency: authorization.dataResidency,
     });

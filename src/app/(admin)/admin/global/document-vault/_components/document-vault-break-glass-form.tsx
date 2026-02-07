@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { InfoButton } from '@/components/ui/info-button';
 
 import { requestDocumentVaultBreakGlassAction, type DocumentVaultBreakGlassState } from '../actions';
 
@@ -26,7 +27,18 @@ export function DocumentVaultBreakGlassForm() {
     return (
         <form action={action} className="space-y-4 rounded-2xl border border-border/50 bg-card/60 p-4">
             <div className="space-y-1">
-                <h3 className="text-sm font-semibold">Request break-glass approval</h3>
+                <div className="flex items-center justify-between gap-2">
+                    <h3 className="text-sm font-semibold">Request break-glass approval</h3>
+                    <InfoButton
+                        label="Document vault break-glass"
+                        sections={[
+                            { label: 'What', text: 'Create time-boxed approval for vault access.' },
+                            { label: 'Prereqs', text: 'Platform document access permission.' },
+                            { label: 'Next', text: 'Use approval ID to list or download.' },
+                            { label: 'Compliance', text: 'Approval is audited and auto-expires.' },
+                        ]}
+                    />
+                </div>
                 <p className="text-xs text-muted-foreground">
                     Required before listing metadata or downloading a tenant document.
                 </p>
@@ -34,7 +46,18 @@ export function DocumentVaultBreakGlassForm() {
 
             <div className="grid gap-3 md:grid-cols-2">
                 <div className="space-y-2">
-                    <Label htmlFor="accessType">Access type</Label>
+                    <div className="flex items-center justify-between gap-2">
+                        <Label htmlFor="accessType">Access type</Label>
+                        <InfoButton
+                            label="Access type"
+                            sections={[
+                                { label: 'What', text: 'Choose listing or download access.' },
+                                { label: 'Prereqs', text: 'Valid tenant and document IDs as needed.' },
+                                { label: 'Next', text: 'Select DOWNLOAD for file retrieval.' },
+                                { label: 'Compliance', text: 'Downloads have stricter audit.' },
+                            ]}
+                        />
+                    </div>
                     <select
                         id="accessType"
                         name="accessType"
@@ -79,7 +102,18 @@ export function DocumentVaultBreakGlassForm() {
                     />
                 </div>
                 <div className="space-y-2">
-                    <Label htmlFor="expiresInMinutes">Expires in</Label>
+                    <div className="flex items-center justify-between gap-2">
+                        <Label htmlFor="expiresInMinutes">Expires in</Label>
+                        <InfoButton
+                            label="Approval expiry"
+                            sections={[
+                                { label: 'What', text: 'How long the approval is valid.' },
+                                { label: 'Prereqs', text: '15 to 240 minutes per policy.' },
+                                { label: 'Next', text: 'Request a new approval if it expires.' },
+                                { label: 'Compliance', text: 'Short windows reduce access risk.' },
+                            ]}
+                        />
+                    </div>
                     <Input
                         id="expiresInMinutes"
                         name="expiresInMinutes"

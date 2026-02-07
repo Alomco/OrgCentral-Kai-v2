@@ -23,10 +23,13 @@ export function LeaveRequestAttachmentsAdmin({ requestId }: Props) {
 
 	useEffect(() => {
 		let cancelled = false;
+		const abortController = new AbortController();
 		const load = async () => {
 			setLoading(true);
 			setError(null);
-			const res = await fetch(`/api/hr/leave/${requestId}/attachments`);
+			const res = await fetch(`/api/hr/leave/${requestId}/attachments`, {
+				signal: abortController.signal,
+			});
 			if (!res.ok) {
 				throw new Error(await res.text());
 			}
@@ -36,6 +39,9 @@ export function LeaveRequestAttachmentsAdmin({ requestId }: Props) {
 		};
 
 		load().catch((error: unknown) => {
+			if (error instanceof DOMException && error.name === 'AbortError') {
+				return;
+			}
 			if (cancelled) { return; }
 			setError(error instanceof Error ? error.message : 'Unable to load attachments');
 			setLoading(false);
@@ -43,6 +49,7 @@ export function LeaveRequestAttachmentsAdmin({ requestId }: Props) {
 
 		return () => {
 			cancelled = true;
+			abortController.abort();
 		};
 	}, [requestId]);
 
@@ -61,7 +68,16 @@ export function LeaveRequestAttachmentsAdmin({ requestId }: Props) {
 						type="button"
 						size="sm"
 						variant="ghost"
-						onClick={() => window.open(`/api/hr/leave/attachments/${attachment.id}/download`, '_blank')}
+						onClick={() => {
+							const downloadWindow = window.open(
+								`/api/hr/leave/attachments/${attachment.id}/download`,
+								'_blank',
+								'noopener,noreferrer',
+							);
+							if (downloadWindow) {
+								downloadWindow.opener = null;
+							}
+						}}
 					>
 						Download
 					</Button>

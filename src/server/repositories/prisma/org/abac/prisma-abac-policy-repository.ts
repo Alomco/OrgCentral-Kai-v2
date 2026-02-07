@@ -4,6 +4,7 @@ import type { IAbacPolicyRepository } from '@/server/repositories/contracts/org/
 import type { AbacPolicy } from '@/server/security/abac-types';
 import { normalizeAbacPolicies } from '@/server/security/abac-policy-normalizer';
 import type { PrismaInputJsonValue } from '@/server/types/prisma';
+import { CACHE_SCOPE_ABAC_POLICIES } from '@/server/repositories/cache-scopes';
 
 export class PrismaAbacPolicyRepository extends BasePrismaRepository implements IAbacPolicyRepository {
   async getPoliciesForOrg(orgId: string): Promise<AbacPolicy[]> {
@@ -51,6 +52,6 @@ export class PrismaAbacPolicyRepository extends BasePrismaRepository implements 
       });
     }, { orgId, policyCount: policies.length });
 
-    await this.invalidateAfterWrite(orgId, ['abac.policies']);
+    await this.invalidateAfterWrite(orgId, [CACHE_SCOPE_ABAC_POLICIES]);
   }
 }

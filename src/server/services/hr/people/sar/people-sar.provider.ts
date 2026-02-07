@@ -3,8 +3,8 @@ import { PeopleSarExporter } from './people-sar-exporter';
 import type { PeopleRetentionSchedulerDeps, RetentionJobQueue } from './people-retention-scheduler';
 import { PeopleRetentionScheduler } from './people-retention-scheduler';
 import {
-  createBullMqRetentionQueue,
-  type BullMqRetentionQueueOptions,
+  createRetentionQueue,
+  type RetentionQueueOptions,
 } from './people-retention.queue';
 import { getRetentionQueueClient } from './people-retention.queue-registry';
 import { buildPeopleServiceDependencies, type PeopleServiceDependencyOptions } from '@/server/repositories/providers/hr/people-service-dependencies';
@@ -12,7 +12,7 @@ import { buildPeopleServiceDependencies, type PeopleServiceDependencyOptions } f
 export interface PeopleSarProviderOptions {
   prismaOptions?: PeopleServiceDependencyOptions['prismaOptions'];
   queue?: RetentionJobQueue;
-  bullQueueOptions?: BullMqRetentionQueueOptions;
+  queueOptions?: RetentionQueueOptions;
 }
 
 export function getPeopleSarExporter(
@@ -50,8 +50,8 @@ export function getPeopleRetentionScheduler(
   const queue =
     options?.queue ??
     overrides?.queue ??
-    (options?.bullQueueOptions
-      ? createBullMqRetentionQueue(options.bullQueueOptions)
+    (options?.queueOptions
+      ? createRetentionQueue(options.queueOptions)
       : getRetentionQueueClient().jobQueue);
 
   return new PeopleRetentionScheduler({

@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { getSessionContextOrRedirect } from '@/server/ui/auth/session-redirect';
 import { requestBreakGlassService } from '@/server/services/platform/admin/break-glass-service';
 import { invalidateCache } from '@/server/lib/cache-tags';
+import { CACHE_SCOPE_PLATFORM_BREAK_GLASS } from '@/server/repositories/cache-scopes';
 import { ValidationError } from '@/server/errors';
 
 export interface DocumentVaultBreakGlassState {
@@ -84,7 +85,7 @@ export async function requestDocumentVaultBreakGlassAction(
 
         await invalidateCache({
             orgId: authorization.orgId,
-            scope: 'platform:break-glass',
+            scope: CACHE_SCOPE_PLATFORM_BREAK_GLASS,
             classification: authorization.dataClassification,
             residency: authorization.dataResidency,
         });

@@ -34,5 +34,6 @@ export interface PolicyEvaluationResult {
 export interface SecurityPolicyEngineOptions {
   enableCaching?: boolean;
   cacheTtlMs?: number;
+  cacheMaxEntries?: number;
   logPolicyEvaluations?: boolean;
 }

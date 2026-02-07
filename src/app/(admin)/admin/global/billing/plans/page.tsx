@@ -7,6 +7,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { getSessionContextOrRedirect } from '@/server/ui/auth/session-redirect';
 import { registerCacheTag } from '@/server/lib/cache-tags';
+import {
+    CACHE_SCOPE_PLATFORM_BILLING_ASSIGNMENTS,
+    CACHE_SCOPE_PLATFORM_BILLING_PLANS,
+} from '@/server/repositories/cache-scopes';
 import { listBillingPlansService, listBillingAssignmentsService } from '@/server/services/platform/admin/billing-plan-service';
 import type { RepositoryAuthorizationContext } from '@/server/types/repository-authorization';
 
@@ -111,13 +115,13 @@ async function loadBillingPlansCached(authorization: RepositoryAuthorizationCont
     cacheLife('minutes');
     registerCacheTag({
         orgId: authorization.orgId,
-        scope: 'platform:billing-plans',
+        scope: CACHE_SCOPE_PLATFORM_BILLING_PLANS,
         classification: authorization.dataClassification,
         residency: authorization.dataResidency,
     });
     registerCacheTag({
         orgId: authorization.orgId,
-        scope: 'platform:billing-assignments',
+        scope: CACHE_SCOPE_PLATFORM_BILLING_ASSIGNMENTS,
         classification: authorization.dataClassification,
         residency: authorization.dataResidency,
     });

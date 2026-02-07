@@ -1,4 +1,4 @@
-import type { WorkerOptions } from 'bullmq';
+import type { WorkerOptions } from '@/server/lib/queueing/in-memory-queue';
 
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
 import { AbstractOrgWorker } from '@/server/workers/abstract-org-worker';
@@ -43,3 +43,4 @@ export function registerIntegrationSyncWorker(options?: IntegrationSyncWorkerOpt
     const worker = new IntegrationSyncWorker();
     return worker.registerWorker(options?.worker);
 }
+

@@ -1,4 +1,4 @@
-import type { JobsOptions, Queue } from 'bullmq';
+import type { JobsOptions, Queue } from '@/server/lib/queueing/in-memory-queue';
 import { WORKER_QUEUE_NAMES } from '@/server/lib/worker-constants';
 import { getQueue, type QueueRegistryOptions } from '@/server/lib/queue-registry';
 import type { AbsenceAiValidationJob } from './ai-validation.types';
@@ -30,7 +30,6 @@ let client: AbsenceAiQueueClient | null = null;
 function resolveOptions(overrides?: AbsenceAiQueueOptions): AbsenceAiQueueOptions {
     return {
         queueName: overrides?.queueName ?? WORKER_QUEUE_NAMES.HR_ABSENCE_AI_VALIDATION,
-        connection: overrides?.connection,
         defaultJobOptions: overrides?.defaultJobOptions,
     };
 }
@@ -39,3 +38,4 @@ export function getAbsenceAiQueueClient(options?: AbsenceAiQueueOptions): Absenc
     client ??= createAbsenceAiQueueClient(resolveOptions(options));
     return client;
 }
+

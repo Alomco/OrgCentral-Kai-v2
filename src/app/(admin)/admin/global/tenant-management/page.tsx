@@ -5,8 +5,10 @@ import { cacheLife, unstable_noStore as noStore } from 'next/cache';
 import { PageContainer } from '@/components/theme/layout';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { InfoButton } from '@/components/ui/info-button';
 import { getSessionContextOrRedirect } from '@/server/ui/auth/session-redirect';
 import { registerCacheTag } from '@/server/lib/cache-tags';
+import { CACHE_SCOPE_PLATFORM_TENANTS } from '@/server/repositories/cache-scopes';
 import { listPlatformTenantsService } from '@/server/services/platform/admin/tenant-management-service';
 import type { RepositoryAuthorizationContext } from '@/server/types/repository-authorization';
 
@@ -46,7 +48,18 @@ export default async function TenantManagementPage({ searchParams }: TenantManag
 
             <form className="flex flex-wrap items-end gap-3" method="get">
                 <div className="space-y-1">
-                    <label htmlFor="q" className="text-xs font-semibold text-muted-foreground">Search tenants</label>
+                    <div className="flex items-center justify-between gap-2">
+                        <label htmlFor="q" className="text-xs font-semibold text-muted-foreground">Search tenants</label>
+                        <InfoButton
+                            label="Tenant search"
+                            sections={[
+                                { label: 'What', text: 'Find tenants by name, slug, or owner email.' },
+                                { label: 'Prereqs', text: 'Platform tenant read access.' },
+                                { label: 'Next', text: 'Open a tenant to review status.' },
+                                { label: 'Compliance', text: 'Search activity is logged.' },
+                            ]}
+                        />
+                    </div>
                     <Input id="q" name="q" placeholder="Name, slug, or owner email" />
                 </div>
                 <Button type="submit" size="sm">Filter</Button>
@@ -77,7 +90,7 @@ async function loadTenantsCached(
     cacheLife('minutes');
     registerCacheTag({
         orgId: authorization.orgId,
-        scope: 'platform:tenants',
+        scope: CACHE_SCOPE_PLATFORM_TENANTS,
         classification: authorization.dataClassification,
         residency: authorization.dataResidency,
     });

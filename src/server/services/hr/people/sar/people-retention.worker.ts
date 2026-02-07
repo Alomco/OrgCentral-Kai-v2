@@ -1,4 +1,4 @@
-import { Worker, type WorkerOptions } from 'bullmq';
+import { Worker, type WorkerOptions } from '@/server/lib/queueing/in-memory-queue';
 import { getRetentionQueueClient } from './people-retention.queue-registry';
 import { processNightlyRetentionSweepJob, type NightlyRetentionScheduleOptions } from './people-retention.schedule';
 
@@ -23,7 +23,6 @@ export function registerRetentionSweepWorker(options?: RetentionWorkerOptions): 
       await processNightlyRetentionSweepJob(job.data, options?.scheduleOptions);
     },
     {
-      connection: queueClient.queue.opts.connection,
       concurrency: options?.worker?.concurrency ?? 1,
       ...options?.worker,
     },

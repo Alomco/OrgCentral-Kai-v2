@@ -4,6 +4,7 @@ import { useActionState, useEffect, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { Button } from '@/components/ui/button';
+import { InfoButton } from '@/components/ui/info-button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
@@ -50,8 +51,19 @@ export function PermissionResourceCreateForm({ orgId }: { orgId: string }) {
             aria-busy={pending}
         >
             <div>
-                <p className="text-sm font-semibold text-[oklch(var(--foreground))]">Add resource</p>
-                <p className="text-xs text-[oklch(var(--muted-foreground))]">Use dot-notation keys that align with your ABAC policies.</p>
+                <div className="flex items-center gap-2">
+                    <p className="text-sm font-semibold text-foreground">Add resource</p>
+                    <InfoButton
+                        label="Permission resources"
+                        sections={[
+                            { label: 'What', text: 'Register resources used in access checks.' },
+                            { label: 'Prereqs', text: 'Use dot-notation to match policy keys.' },
+                            { label: 'Next', text: 'Define actions before writing policies.' },
+                            { label: 'Compliance', text: 'Registry changes are audited.' },
+                        ]}
+                    />
+                </div>
+                <p className="text-xs text-muted-foreground">Use dot-notation keys that align with your ABAC policies.</p>
             </div>
 
             <fieldset disabled={pending} className="space-y-4">

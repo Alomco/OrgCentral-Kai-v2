@@ -5,6 +5,7 @@ import { UploadCloud } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { InfoButton } from '@/components/ui/info-button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
@@ -102,7 +103,18 @@ export function DocumentVaultUploadForm({ onUploaded }: DocumentVaultUploadFormP
                                 </select>
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="document-classification">Classification</Label>
+                                <div className="flex items-center justify-between gap-2">
+                                    <Label htmlFor="document-classification">Classification</Label>
+                                    <InfoButton
+                                        label="Classification"
+                                        sections={[
+                                            { label: 'What', text: 'Security level for document access.' },
+                                            { label: 'Prereqs', text: 'Must match tenant policy.' },
+                                            { label: 'Next', text: 'Choose the lowest level that fits.' },
+                                            { label: 'Compliance', text: 'Higher levels restrict access.' },
+                                        ]}
+                                    />
+                                </div>
                                 <select
                                     id="document-classification"
                                     name="classification"
@@ -115,7 +127,18 @@ export function DocumentVaultUploadForm({ onUploaded }: DocumentVaultUploadFormP
                                 </select>
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="document-retention">Retention policy</Label>
+                                <div className="flex items-center justify-between gap-2">
+                                    <Label htmlFor="document-retention">Retention policy</Label>
+                                    <InfoButton
+                                        label="Retention policy"
+                                        sections={[
+                                            { label: 'What', text: 'How long the document is kept.' },
+                                            { label: 'Prereqs', text: 'Align with legal requirements.' },
+                                            { label: 'Next', text: 'Pick the required retention period.' },
+                                            { label: 'Compliance', text: 'Retention affects legal obligations.' },
+                                        ]}
+                                    />
+                                </div>
                                 <select
                                     id="document-retention"
                                     name="retentionPolicy"
@@ -152,11 +175,33 @@ export function DocumentVaultUploadForm({ onUploaded }: DocumentVaultUploadFormP
                         </div>
                         <div className="grid gap-4 md:grid-cols-2">
                             <div className="space-y-2">
-                                <Label htmlFor="document-category">Data category (optional)</Label>
+                                <div className="flex items-center justify-between gap-2">
+                                    <Label htmlFor="document-category">Data category (optional)</Label>
+                                    <InfoButton
+                                        label="Data category"
+                                        sections={[
+                                            { label: 'What', text: 'Category used for legal basis reporting.' },
+                                            { label: 'Prereqs', text: 'Use approved HR categories.' },
+                                            { label: 'Next', text: 'Keep it broad but accurate.' },
+                                            { label: 'Compliance', text: 'Used in compliance reporting.' },
+                                        ]}
+                                    />
+                                </div>
                                 <Input id="document-category" name="dataCategory" placeholder="e.g. Employment" />
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="document-lawful">Lawful basis (optional)</Label>
+                                <div className="flex items-center justify-between gap-2">
+                                    <Label htmlFor="document-lawful">Lawful basis (optional)</Label>
+                                    <InfoButton
+                                        label="Lawful basis"
+                                        sections={[
+                                            { label: 'What', text: 'Legal basis for processing.' },
+                                            { label: 'Prereqs', text: 'Select the applicable basis.' },
+                                            { label: 'Next', text: 'Ensure documentation exists.' },
+                                            { label: 'Compliance', text: 'Audited in compliance reviews.' },
+                                        ]}
+                                    />
+                                </div>
                                 <Input id="document-lawful" name="lawfulBasis" placeholder="e.g. Contractual necessity" />
                             </div>
                         </div>

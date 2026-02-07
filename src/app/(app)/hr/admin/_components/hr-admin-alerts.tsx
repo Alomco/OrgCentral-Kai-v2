@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { InfoButton } from '@/components/ui/info-button';
 import type { AdminDashboardStats } from '../actions.types';
 
 interface HrAdminAlertsProps {
@@ -56,6 +57,15 @@ export function HrAdminAlerts({ stats }: HrAdminAlertsProps) {
                     <CardTitle className="text-base flex items-center gap-2">
                         <AlertTriangle className="h-4 w-4" />
                         Alerts & Actions
+                        <InfoButton
+                            label="Alerts and actions"
+                            sections={[
+                                { label: 'What', text: 'Items that need HR admin attention.' },
+                                { label: 'Prereqs', text: 'Compliance and leave workflows enabled.' },
+                                { label: 'Next', text: 'Open each item and resolve blockers.' },
+                                { label: 'Compliance', text: 'Changes are logged for audit.' },
+                            ]}
+                        />
                     </CardTitle>
                     <CardDescription>Items requiring attention</CardDescription>
                 </div>

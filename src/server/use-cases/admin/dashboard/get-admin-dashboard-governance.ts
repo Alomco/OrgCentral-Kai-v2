@@ -2,15 +2,17 @@ import { cacheLife, unstable_noStore as noStore } from 'next/cache';
 
 import { CACHE_LIFE_SHORT } from '@/server/repositories/cache-profiles';
 import { registerOrgCacheTag } from '@/server/lib/cache-tags';
-import { CACHE_SCOPE_SECURITY_EVENTS, CACHE_SCOPE_SECURITY_METRICS } from '@/server/repositories/cache-scopes';
+import {
+    CACHE_SCOPE_ORG_INVITATIONS,
+    CACHE_SCOPE_SECURITY_EVENTS,
+    CACHE_SCOPE_SECURITY_METRICS,
+} from '@/server/repositories/cache-scopes';
 import { toCacheSafeAuthorizationContext } from '@/server/repositories/security/cache-authorization';
 import type { RepositoryAuthorizationContext } from '@/server/types/repository-authorization';
 import type { GovernanceAlert } from '@/server/types/admin-dashboard';
 import { listInvitations } from '@/server/services/org/invitations/invitation-service';
 import { listPendingReviewComplianceItemsForUi } from '@/server/use-cases/hr/compliance/list-pending-review-items.cached';
 import { resolveDateRange, resolveSecurityEventRepository, resolveSecurityMetricsService } from './admin-dashboard-helpers';
-
-const INVITATION_SCOPE = 'org-invitations';
 
 async function buildGovernanceAlerts(
     authorization: RepositoryAuthorizationContext,
@@ -84,7 +86,7 @@ export async function getAdminDashboardGovernanceAlerts(
 
         registerOrgCacheTag(input.orgId, CACHE_SCOPE_SECURITY_EVENTS, input.dataClassification, input.dataResidency);
         registerOrgCacheTag(input.orgId, CACHE_SCOPE_SECURITY_METRICS, input.dataClassification, input.dataResidency);
-        registerOrgCacheTag(input.orgId, INVITATION_SCOPE, input.dataClassification, input.dataResidency);
+        registerOrgCacheTag(input.orgId, CACHE_SCOPE_ORG_INVITATIONS, input.dataClassification, input.dataResidency);
 
         return buildGovernanceAlerts(input);
     }

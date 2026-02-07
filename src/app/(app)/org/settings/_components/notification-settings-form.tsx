@@ -2,6 +2,7 @@
 
 import { useActionState } from 'react';
 import { Button } from '@/components/ui/button';
+import { InfoButton } from '@/components/ui/info-button';
 
 export interface NotificationSettingsState {
     status: 'idle' | 'success' | 'error';
@@ -32,11 +33,22 @@ export function NotificationSettingsForm({
 
     return (
         <form action={formAction} className="space-y-4 rounded-2xl border border-border bg-card/60 p-6 shadow-sm">
-            <div>
-                <p className="text-sm font-semibold text-foreground">Notification defaults</p>
-                <p className="text-xs text-muted-foreground">
-                    Control admin digests and critical alerts for your organization.
-                </p>
+            <div className="flex items-start justify-between gap-3">
+                <div>
+                    <p className="text-sm font-semibold text-foreground">Notification defaults</p>
+                    <p className="text-xs text-muted-foreground">
+                        Control admin digests and critical alerts for your organization.
+                    </p>
+                </div>
+                <InfoButton
+                    label="Notification defaults"
+                    sections={[
+                        { label: 'What', text: 'Set org-wide admin notification preferences.' },
+                        { label: 'Prereqs', text: 'Applies to new admins by default.' },
+                        { label: 'Next', text: 'Admins can still adjust personal settings.' },
+                        { label: 'Compliance', text: 'Keep alert coverage for audit readiness.' },
+                    ]}
+                />
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
                 <label className="flex flex-col gap-2 rounded-xl border border-border px-4 py-3">

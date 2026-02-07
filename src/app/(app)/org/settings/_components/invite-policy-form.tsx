@@ -3,6 +3,7 @@
 import { useActionState } from 'react';
 
 import { Button } from '@/components/ui/button';
+import { InfoButton } from '@/components/ui/info-button';
 
 export interface InvitePolicyState {
     status: 'idle' | 'success' | 'error';
@@ -28,7 +29,18 @@ export function InvitePolicyForm({
         <form action={formAction} className="space-y-4 rounded-2xl border border-border bg-card/60 p-6 shadow-sm">
             <div className="flex items-center justify-between gap-4">
                 <div>
-                    <p className="text-sm font-semibold text-foreground">Allow invite links</p>
+                    <div className="flex items-center gap-2">
+                        <p className="text-sm font-semibold text-foreground">Allow invite links</p>
+                        <InfoButton
+                            label="Invite links"
+                            sections={[
+                                { label: 'What', text: 'Create shareable links for self-serve invites.' },
+                                { label: 'Prereqs', text: 'Admins can revoke links at any time.' },
+                                { label: 'Next', text: 'Rotate links if shared outside the org.' },
+                                { label: 'Compliance', text: 'Invite creation is logged.' },
+                            ]}
+                        />
+                    </div>
                     <p className="text-xs text-muted-foreground">
                         When enabled, admins can share invite links without pre-approving emails.
                     </p>

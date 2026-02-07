@@ -8,13 +8,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
-import { Switch } from '@/components/ui/switch';
 import type { LeavePolicy } from '@/server/types/leave-types';
 
 import { updateLeavePolicyAction } from '../leave-policy-actions';
 import type { LeavePolicyInlineState } from '../leave-policy-form-utils';
 import { formatPolicyType, toDateInputValue } from './leave-policy-form-utils';
 import { LEAVE_POLICIES_QUERY_KEY } from '../leave-policy-query';
+import { LeavePolicyToggleField } from './leave-policy-toggle-field';
 
 const initialInlineState: LeavePolicyInlineState = { status: 'idle' };
 
@@ -118,110 +118,56 @@ export function LeavePolicyUpdateForm(props: {
                     </div>
                 </div>
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                    <div className="flex flex-wrap items-center gap-2 rounded-md border px-3 py-2">
-                        <input
-                            ref={requiresApprovalReference}
-                            type="hidden"
-                            name="requiresApproval"
-                            value={props.policy.requiresApproval ? 'on' : 'off'}
-                            key={`leave-policy-requires-${props.policy.id}-${props.policy.requiresApproval ? 'on' : 'off'}`}
-                        />
-                        <Switch
-                            id={`leave-policy-requires-${props.policy.id}`}
-                            key={`leave-policy-requires-switch-${props.policy.id}-${props.policy.requiresApproval ? 'on' : 'off'}`}
-                            defaultChecked={props.policy.requiresApproval}
-                            onCheckedChange={(checked) => {
-                                if (requiresApprovalReference.current) {
-                                    requiresApprovalReference.current.value = checked ? 'on' : 'off';
-                                }
-                            }}
-                            disabled={pending}
-                        />
-                        <Label
-                            htmlFor={`leave-policy-requires-${props.policy.id}`}
-                            className="text-xs text-muted-foreground"
-                        >
-                            Requires approval
-                        </Label>
-                    </div>
-                    <div className="flex flex-wrap items-center gap-2 rounded-md border px-3 py-2">
-                        <input
-                            ref={isDefaultReference}
-                            type="hidden"
-                            name="isDefault"
-                            value={props.policy.isDefault ? 'on' : 'off'}
-                            key={`leave-policy-default-${props.policy.id}-${props.policy.isDefault ? 'on' : 'off'}`}
-                        />
-                        <Switch
-                            id={`leave-policy-default-${props.policy.id}`}
-                            key={`leave-policy-default-switch-${props.policy.id}-${props.policy.isDefault ? 'on' : 'off'}`}
-                            defaultChecked={props.policy.isDefault}
-                            onCheckedChange={(checked) => {
-                                if (isDefaultReference.current) {
-                                    isDefaultReference.current.value = checked ? 'on' : 'off';
-                                }
-                            }}
-                            disabled={pending}
-                        />
-                        <Label
-                            htmlFor={`leave-policy-default-${props.policy.id}`}
-                            className="text-xs text-muted-foreground"
-                        >
-                            Default policy
-                        </Label>
-                    </div>
-                    <div className="flex flex-wrap items-center gap-2 rounded-md border px-3 py-2">
-                        <input
-                            ref={statutoryReference}
-                            type="hidden"
-                            name="statutoryCompliance"
-                            value={props.policy.statutoryCompliance ? 'on' : 'off'}
-                            key={`leave-policy-statutory-${props.policy.id}-${props.policy.statutoryCompliance ? 'on' : 'off'}`}
-                        />
-                        <Switch
-                            id={`leave-policy-statutory-${props.policy.id}`}
-                            key={`leave-policy-statutory-switch-${props.policy.id}-${props.policy.statutoryCompliance ? 'on' : 'off'}`}
-                            defaultChecked={Boolean(props.policy.statutoryCompliance)}
-                            onCheckedChange={(checked) => {
-                                if (statutoryReference.current) {
-                                    statutoryReference.current.value = checked ? 'on' : 'off';
-                                }
-                            }}
-                            disabled={pending}
-                        />
-                        <Label
-                            htmlFor={`leave-policy-statutory-${props.policy.id}`}
-                            className="text-xs text-muted-foreground"
-                        >
-                            Statutory compliance
-                        </Label>
-                    </div>
-                    <div className="flex flex-wrap items-center gap-2 rounded-md border px-3 py-2">
-                        <input
-                            ref={allowNegativeReference}
-                            type="hidden"
-                            name="allowNegativeBalance"
-                            value={props.policy.allowNegativeBalance ? 'on' : 'off'}
-                            key={`leave-policy-negative-${props.policy.id}-${props.policy.allowNegativeBalance ? 'on' : 'off'}`}
-                        />
-                        <Switch
-                            id={`leave-policy-negative-${props.policy.id}`}
-                            key={`leave-policy-negative-switch-${props.policy.id}-${props.policy.allowNegativeBalance ? 'on' : 'off'}`}
-                            defaultChecked={Boolean(props.policy.allowNegativeBalance)}
-                            onCheckedChange={(checked) => {
-                                if (allowNegativeReference.current) {
-                                    allowNegativeReference.current.value = checked ? 'on' : 'off';
-                                }
-                            }}
-                            disabled={pending}
-                        />
-                        <Label
-                            htmlFor={`leave-policy-negative-${props.policy.id}`}
-                            className="text-xs text-muted-foreground"
-                        >
-                            Allow negative balance
-                        </Label>
-                    </div>
+                    <LeavePolicyToggleField
+                        id={`leave-policy-requires-${props.policy.id}`}
+                        hiddenInputName="requiresApproval"
+                        hiddenInputValue={props.policy.requiresApproval ? 'on' : 'off'}
+                        hiddenInputReference={requiresApprovalReference}
+                        defaultChecked={props.policy.requiresApproval}
+                        disabled={pending}
+                        label="Requires approval"
+                        infoLabel="Requires approval"
+                        infoSections={[
+                            { label: 'What', text: 'Requires approval before booking.' },
+                            { label: 'Prereqs', text: 'Approval workflows enabled.' },
+                            { label: 'Next', text: 'Enable for controlled leave types.' },
+                            { label: 'Compliance', text: 'Approvals are audited.' },
+                        ]}
+                    />
+                    <LeavePolicyToggleField
+                        id={`leave-policy-default-${props.policy.id}`}
+                        hiddenInputName="isDefault"
+                        hiddenInputValue={props.policy.isDefault ? 'on' : 'off'}
+                        hiddenInputReference={isDefaultReference}
+                        defaultChecked={props.policy.isDefault}
+                        disabled={pending}
+                        label="Default policy"
+                    />
+                    <LeavePolicyToggleField
+                        id={`leave-policy-statutory-${props.policy.id}`}
+                        hiddenInputName="statutoryCompliance"
+                        hiddenInputValue={props.policy.statutoryCompliance ? 'on' : 'off'}
+                        hiddenInputReference={statutoryReference}
+                        defaultChecked={Boolean(props.policy.statutoryCompliance)}
+                        disabled={pending}
+                        label="Statutory compliance"
+                        infoLabel="Statutory compliance"
+                        infoSections={[
+                            { label: 'What', text: 'Applies statutory rules to this policy.' },
+                            { label: 'Prereqs', text: 'Use for legally mandated leave.' },
+                            { label: 'Next', text: 'Review accrual limits.' },
+                            { label: 'Compliance', text: 'Keeps policy aligned with law.' },
+                        ]}
+                    />
+                    <LeavePolicyToggleField
+                        id={`leave-policy-negative-${props.policy.id}`}
+                        hiddenInputName="allowNegativeBalance"
+                        hiddenInputValue={props.policy.allowNegativeBalance ? 'on' : 'off'}
+                        hiddenInputReference={allowNegativeReference}
+                        defaultChecked={Boolean(props.policy.allowNegativeBalance)}
+                        disabled={pending}
+                        label="Allow negative balance"
+                    />
                 </div>
             </fieldset>
 

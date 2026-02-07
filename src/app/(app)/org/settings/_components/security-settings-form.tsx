@@ -2,6 +2,7 @@
 
 import { useActionState } from 'react';
 import { Button } from '@/components/ui/button';
+import { InfoButton } from '@/components/ui/info-button';
 
 export interface SecuritySettingsState {
     status: 'idle' | 'success' | 'error';
@@ -34,11 +35,22 @@ export function SecuritySettingsForm({
 
     return (
         <form action={formAction} className="space-y-4 rounded-2xl border border-border bg-card/60 p-6 shadow-sm">
-            <div>
-                <p className="text-sm font-semibold text-foreground">Security defaults</p>
-                <p className="text-xs text-muted-foreground">
-                    Define baseline security requirements for the organization.
-                </p>
+            <div className="flex items-start justify-between gap-3">
+                <div>
+                    <p className="text-sm font-semibold text-foreground">Security defaults</p>
+                    <p className="text-xs text-muted-foreground">
+                        Define baseline security requirements for the organization.
+                    </p>
+                </div>
+                <InfoButton
+                    label="Security defaults"
+                    sections={[
+                        { label: 'What', text: 'Baseline MFA, session, and network controls.' },
+                        { label: 'Prereqs', text: 'Review access impact with IT/security.' },
+                        { label: 'Next', text: 'Notify members before tightening policies.' },
+                        { label: 'Compliance', text: 'Changes are audited for org security.' },
+                    ]}
+                />
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
                 <label className="flex items-center justify-between gap-4 rounded-xl border border-border px-4 py-3">

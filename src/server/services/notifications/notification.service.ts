@@ -1,4 +1,4 @@
-import type { JobsOptions } from 'bullmq';
+import type { JobsOptions } from '@/server/lib/queueing/in-memory-queue';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
 import { AbstractBaseService, type ServiceExecutionContext } from '@/server/services/abstract-base-service';
 import type { WorkerJobMetadata } from '@/server/workers/abstract-org-worker';

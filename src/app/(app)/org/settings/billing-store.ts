@@ -16,6 +16,11 @@ import { listBillingInvoices } from '@/server/use-cases/billing/list-billing-inv
 import { getUpcomingBillingInvoice } from '@/server/use-cases/billing/get-upcoming-billing-invoice';
 import type { BillingInvoicePreview } from '@/server/services/billing/billing-gateway';
 
+export interface BillingPaymentMethodsViewModel {
+  paymentMethods: PaymentMethodData[];
+  billingConfigured: boolean;
+}
+
 export async function getBillingSubscriptionForUi(
   authorization: RepositoryAuthorizationContext,
 ): Promise<OrganizationSubscriptionData | null> {
@@ -43,8 +48,10 @@ export async function getBillingSubscriptionForUi(
 
 export async function getBillingPaymentMethodsForUi(
   authorization: RepositoryAuthorizationContext,
-): Promise<PaymentMethodData[]> {
-  async function loadCached(input: RepositoryAuthorizationContext): Promise<PaymentMethodData[]> {
+): Promise<BillingPaymentMethodsViewModel> {
+  async function loadCached(
+    input: RepositoryAuthorizationContext,
+  ): Promise<BillingPaymentMethodsViewModel> {
     'use cache';
     cacheLife('minutes');
     registerOrgCacheTag(
@@ -53,14 +60,12 @@ export async function getBillingPaymentMethodsForUi(
       input.dataClassification,
       input.dataResidency,
     );
-    const result = await listBillingPaymentMethods({}, { authorization: input });
-    return result.paymentMethods;
+    return listBillingPaymentMethods({}, { authorization: input });
   }
 
   if (authorization.dataClassification !== 'OFFICIAL') {
     noStore();
-    const result = await listBillingPaymentMethods({}, { authorization });
-    return result.paymentMethods;
+    return listBillingPaymentMethods({}, { authorization });
   }
 
   return loadCached(toCacheSafeAuthorizationContext(authorization));

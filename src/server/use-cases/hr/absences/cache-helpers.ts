@@ -4,10 +4,11 @@ import {
     resolveAbsenceCacheScopes,
 } from '@/server/lib/cache-tags/hr-absences';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
+import type { CacheScope } from '@/server/repositories/cache-scopes';
 
 export async function invalidateAbsenceScopeCache(
     authorization: RepositoryAuthorizationContext,
-    additionalScopes: readonly string[] = [],
+    additionalScopes: readonly CacheScope[] = [],
 ): Promise<void> {
     const scopes = new Set(resolveAbsenceCacheScopes());
     for (const scope of additionalScopes) {
@@ -24,10 +25,10 @@ export async function invalidateAbsenceScopeCache(
     }
 }
 
-export function buildLeaveBalanceScopes(): string[] {
+export function buildLeaveBalanceScopes(): CacheScope[] {
     return [HR_ABSENCE_CACHE_SCOPES.leaveBalances];
 }
 
-export function buildAiValidationScopes(): string[] {
+export function buildAiValidationScopes(): CacheScope[] {
     return [HR_ABSENCE_CACHE_SCOPES.aiValidation];
 }

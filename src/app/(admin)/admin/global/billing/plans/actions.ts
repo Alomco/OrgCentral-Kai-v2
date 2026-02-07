@@ -10,6 +10,10 @@ import {
 } from '@/server/services/platform/admin/billing-plan-service';
 import { parseBillingPlanAssign, parseBillingPlanCreate, parseBillingPlanUpdate } from '@/server/validators/platform/admin/billing-plan-validators';
 import { invalidateCache } from '@/server/lib/cache-tags';
+import {
+    CACHE_SCOPE_PLATFORM_BILLING_ASSIGNMENTS,
+    CACHE_SCOPE_PLATFORM_BILLING_PLANS,
+} from '@/server/repositories/cache-scopes';
 import { ValidationError } from '@/server/errors';
 
 export interface BillingPlanActionState {
@@ -18,7 +22,7 @@ export interface BillingPlanActionState {
 }
 
 const INITIAL_STATE: BillingPlanActionState = { status: 'idle' };
-const BILLING_PLANS_SCOPE = 'platform:billing-plans';
+const BILLING_PLANS_SCOPE = CACHE_SCOPE_PLATFORM_BILLING_PLANS;
 const BILLING_PLANS_PATH = '/admin/global/billing/plans';
 
 export async function createBillingPlanAction(
@@ -134,7 +138,7 @@ export async function assignBillingPlanAction(
 
         await invalidateCache({
             orgId: authorization.orgId,
-            scope: 'platform:billing-assignments',
+            scope: CACHE_SCOPE_PLATFORM_BILLING_ASSIGNMENTS,
             classification: authorization.dataClassification,
             residency: authorization.dataResidency,
         });

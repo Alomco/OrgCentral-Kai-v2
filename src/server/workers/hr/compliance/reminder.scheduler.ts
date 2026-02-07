@@ -1,4 +1,4 @@
-import type { JobsOptions } from 'bullmq';
+import type { JobsOptions } from '@/server/lib/queueing/in-memory-queue';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
 import type { QueueRegistryOptions } from '@/server/lib/queue-registry';
 import { WORKER_CACHE_SCOPES, WORKER_QUEUE_NAMES, DEFAULT_WORKER_TIMEZONE } from '@/server/lib/worker-constants';
@@ -89,3 +89,4 @@ function buildEnvelope(
 function buildJobId(orgId: string): string {
     return `${WORKER_QUEUE_NAMES.HR_COMPLIANCE_REMINDER}:${orgId}`;
 }
+

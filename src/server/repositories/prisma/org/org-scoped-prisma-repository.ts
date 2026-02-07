@@ -3,6 +3,7 @@ import type { RepositoryAuthorizationContext, TenantScopedRecord } from '@/serve
 import { RepositoryAuthorizer } from '@/server/repositories/security/repository-authorizer';
 import { registerOrgCacheTag, invalidateOrgCache } from '@/server/lib/cache-tags';
 import type { PrismaClientInstance } from '@/server/types/prisma';
+import type { CacheScope } from '@/server/repositories/cache-scopes';
 
 export interface OrgScopedRepositoryOptions extends BasePrismaRepositoryOptions {
     prisma?: PrismaClientInstance;
@@ -36,13 +37,13 @@ export abstract class OrgScopedPrismaRepository extends BasePrismaRepository {
         return this.assertTenantRecord(record, contextOrOrg, resourceType);
     }
 
-    protected tagCache(context: RepositoryAuthorizationContext, ...tags: string[]): void {
+    protected tagCache(context: RepositoryAuthorizationContext, ...tags: CacheScope[]): void {
         for (const tag of tags) {
             registerOrgCacheTag(context.orgId, tag, context.dataClassification, context.dataResidency);
         }
     }
 
-    protected async invalidateCache(context: RepositoryAuthorizationContext, ...tags: string[]): Promise<void> {
+    protected async invalidateCache(context: RepositoryAuthorizationContext, ...tags: CacheScope[]): Promise<void> {
         await Promise.all(
             tags.map((tag) => invalidateOrgCache(context.orgId, tag, context.dataClassification, context.dataResidency)),
         );

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { RefreshCcw, Shield, X } from "lucide-react";
 import { useQuery } from '@tanstack/react-query';
@@ -23,6 +23,25 @@ export function DevelopmentSecurityWidget() {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const toastTimeoutReference = useRef<number | null>(null);
+
+  useEffect(() => () => {
+    if (toastTimeoutReference.current !== null) {
+      window.clearTimeout(toastTimeoutReference.current);
+      toastTimeoutReference.current = null;
+    }
+  }, []);
+
+  const showToast = useCallback((message: string, durationMs: number) => {
+    if (toastTimeoutReference.current !== null) {
+      window.clearTimeout(toastTimeoutReference.current);
+    }
+    setToast(message);
+    toastTimeoutReference.current = window.setTimeout(() => {
+      setToast(null);
+      toastTimeoutReference.current = null;
+    }, durationMs);
+  }, []);
 
   const isDevelopment = process.env.NODE_ENV === "development";
 
@@ -82,15 +101,13 @@ export function DevelopmentSecurityWidget() {
       return;
     }
     const ok = await copyToClipboard(JSON.stringify(payload, null, 2));
-    setToast(ok ? "Copied debug JSON" : "Clipboard blocked");
-    window.setTimeout(() => setToast(null), TOAST_LONG_MS);
-  }, [payload]);
+    showToast(ok ? "Copied debug JSON" : "Clipboard blocked", TOAST_LONG_MS);
+  }, [payload, showToast]);
 
   const handleCopyValue = useCallback(async (value: string) => {
     const ok = await copyToClipboard(value);
-    setToast(ok ? "Copied" : "Clipboard blocked");
-    window.setTimeout(() => setToast(null), TOAST_SHORT_MS);
-  }, []);
+    showToast(ok ? "Copied" : "Clipboard blocked", TOAST_SHORT_MS);
+  }, [showToast]);
 
   const component = useMemo(() => {
     if (!isDevelopment) {

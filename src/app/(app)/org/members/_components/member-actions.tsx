@@ -3,6 +3,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { MembershipStatus } from '@prisma/client';
 
+import { InfoButton } from '@/components/ui/info-button';
 import { updateMember, memberKeys, membersSearchKey, type MembersResponse } from './members.api';
 
 function readFormString(formData: FormData, key: string): string {
@@ -93,40 +94,51 @@ export function MemberActions(props: { orgId: string; userId: string; initialRol
 
     return (
         <div className="mt-2 grid gap-2">
-            <div className="text-[11px] text-[oklch(var(--muted-foreground))]">Status: {props.status}</div>
+            <div className="text-[11px] text-muted-foreground">Status: {props.status}</div>
 
             <form action={(formData) => updateRoles.mutate(formData)} className="flex flex-col gap-2">
                 <label className="grid gap-1">
-                    <span className="text-[11px] font-medium text-[oklch(var(--muted-foreground))]">Role</span>
+                    <span className="flex items-center justify-between gap-2 text-[11px] font-medium text-muted-foreground">
+                        Role
+                        <InfoButton
+                            label="Member role"
+                            sections={[
+                                { label: 'What', text: 'Update the member role for access control.' },
+                                { label: 'Prereqs', text: 'Only one role is supported today.' },
+                                { label: 'Next', text: 'Review permissions after changes.' },
+                                { label: 'Compliance', text: 'Role changes are audited.' },
+                            ]}
+                        />
+                    </span>
                     <input
                         name="roles"
                         defaultValue={props.initialRoles}
-                        className="h-9 w-full rounded-md border border-[oklch(var(--border))] bg-[oklch(var(--background))] px-3 text-sm text-[oklch(var(--foreground))]"
+                        className="h-9 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground"
                     />
                 </label>
-                <span className="text-[11px] text-[oklch(var(--muted-foreground))]">Only one role is currently supported.</span>
+                <span className="text-[11px] text-muted-foreground">Only one role is currently supported.</span>
                 {updateRoles.isError ? (
-                    <p className="text-xs text-[oklch(var(--muted-foreground))]">
+                    <p className="text-xs text-muted-foreground">
                         {updateRoles.error instanceof Error ? updateRoles.error.message : 'Unable to update roles'}
                     </p>
                 ) : null}
-                <button type="submit" disabled={updateRoles.isPending} className="h-9 w-fit rounded-md bg-[oklch(var(--primary))] px-3 text-sm font-medium text-[oklch(var(--primary-foreground))] disabled:opacity-70">
+                <button type="submit" disabled={updateRoles.isPending} className="h-9 w-fit rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground disabled:opacity-70">
                     Update roles
                 </button>
             </form>
 
             <div className="flex flex-wrap gap-2">
                 <form action={() => suspend.mutate()}>
-                    <button type="submit" disabled={!canSuspend || suspend.isPending} className="h-9 w-fit rounded-md border border-[oklch(var(--border))] bg-[oklch(var(--background))] px-3 text-sm font-medium text-[oklch(var(--foreground))] disabled:opacity-70">
+                    <button type="submit" disabled={!canSuspend || suspend.isPending} className="h-9 w-fit rounded-md border border-border bg-background px-3 text-sm font-medium text-foreground disabled:opacity-70">
                         Suspend
                     </button>
                 </form>
                 <form action={() => resume.mutate()}>
-                    <button type="submit" disabled={!canResume || resume.isPending} className="h-9 w-fit rounded-md border border-[oklch(var(--border))] bg-[oklch(var(--background))] px-3 text-sm font-medium text-[oklch(var(--foreground))] disabled:opacity-70">
+                    <button type="submit" disabled={!canResume || resume.isPending} className="h-9 w-fit rounded-md border border-border bg-background px-3 text-sm font-medium text-foreground disabled:opacity-70">
                         Resume
                     </button>
                 </form>
-                <button type="button" onClick={() => removeFromOrg.mutate()} disabled={removeFromOrg.isPending} className="h-9 w-fit rounded-md border border-[oklch(var(--border))] bg-[oklch(var(--background))] px-3 text-sm font-medium text-[oklch(var(--foreground))] disabled:opacity-70">Remove from org</button>
+                <button type="button" onClick={() => removeFromOrg.mutate()} disabled={removeFromOrg.isPending} className="h-9 w-fit rounded-md border border-border bg-background px-3 text-sm font-medium text-foreground disabled:opacity-70">Remove from org</button>
             </div>
         </div>
     );

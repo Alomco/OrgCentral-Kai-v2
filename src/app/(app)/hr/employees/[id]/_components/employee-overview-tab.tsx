@@ -136,7 +136,7 @@ function DetailItem({ label, value }: { label: string; value: string }) {
     return (
         <div>
             <div className="text-xs font-medium text-muted-foreground">{label}</div>
-            <div className="mt-1 text-sm break-words">{value}</div>
+            <div className="mt-1 text-sm wrap-break-word">{value}</div>
         </div>
     );
 }

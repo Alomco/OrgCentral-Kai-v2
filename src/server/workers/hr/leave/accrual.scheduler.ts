@@ -1,4 +1,4 @@
-import type { JobsOptions } from 'bullmq';
+import type { JobsOptions } from '@/server/lib/queueing/in-memory-queue';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
 import type { QueueRegistryOptions } from '@/server/lib/queue-registry';
 import { DEFAULT_WORKER_TIMEZONE, WORKER_CACHE_SCOPES, WORKER_QUEUE_NAMES } from '@/server/lib/worker-constants';
@@ -88,3 +88,4 @@ function buildEnvelope(
 function buildJobId(orgId: string): string {
     return `${WORKER_QUEUE_NAMES.HR_LEAVE_ACCRUAL}:${orgId}`;
 }
+

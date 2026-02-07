@@ -8,6 +8,7 @@ export interface PermissionResolutionServiceDependencies {
 
 export interface PermissionResolutionOptions {
     cacheTtlMs?: number;
+    cacheMaxEntries?: number;
 }
 
 interface CachedPermissions {
@@ -16,16 +17,19 @@ interface CachedPermissions {
 }
 
 const DEFAULT_CACHE_TTL_MS = 5 * 60 * 1000;
+const DEFAULT_CACHE_MAX_ENTRIES = 5_000;
 
 export class PermissionResolutionService {
     private readonly cache = new Map<string, CachedPermissions>();
     private readonly cacheTtlMs: number;
+    private readonly cacheMaxEntries: number;
 
     constructor(
         private readonly dependencies: PermissionResolutionServiceDependencies,
         options: PermissionResolutionOptions = {},
     ) {
         this.cacheTtlMs = options.cacheTtlMs ?? DEFAULT_CACHE_TTL_MS;
+        this.cacheMaxEntries = this.resolveCacheMaxEntries(options.cacheMaxEntries);
     }
 
     async resolveMembershipPermissions(member: GuardMembershipRecord): Promise<OrgPermissionMap> {
@@ -37,14 +41,19 @@ export class PermissionResolutionService {
     }
 
     async resolveRolePermissions(orgId: string, roleId: string): Promise<OrgPermissionMap> {
+        const now = Date.now();
+        this.pruneExpiredCacheEntries(now);
         const cacheKey = `${orgId}:${roleId}`;
         const cached = this.cache.get(cacheKey);
-        if (cached && cached.expiresAt > Date.now()) {
+        if (cached && cached.expiresAt > now) {
             return cached.value;
+        }
+        if (cached) {
+            this.cache.delete(cacheKey);
         }
 
         const permissions = await this.resolveRolePermissionsRecursive(orgId, roleId, new Set());
-        this.cache.set(cacheKey, { value: permissions, expiresAt: Date.now() + this.cacheTtlMs });
+        this.setCacheEntry(cacheKey, permissions, now);
         return permissions;
     }
 
@@ -113,5 +122,36 @@ export class PermissionResolutionService {
             const current = new Set([...(target[resource] ?? []), ...actions]);
             target[resource] = Array.from(current);
         }
+    }
+
+    private pruneExpiredCacheEntries(now: number): void {
+        for (const [key, entry] of this.cache.entries()) {
+            if (entry.expiresAt <= now) {
+                this.cache.delete(key);
+            }
+        }
+    }
+
+    private setCacheEntry(cacheKey: string, value: OrgPermissionMap, now: number): void {
+        this.cache.delete(cacheKey);
+        this.cache.set(cacheKey, {
+            value,
+            expiresAt: now + this.cacheTtlMs,
+        });
+
+        while (this.cache.size > this.cacheMaxEntries) {
+            const oldestKey = this.cache.keys().next().value;
+            if (!oldestKey) {
+                break;
+            }
+            this.cache.delete(oldestKey);
+        }
+    }
+
+    private resolveCacheMaxEntries(value?: number): number {
+        if (!Number.isFinite(value) || typeof value !== 'number' || value <= 0) {
+            return DEFAULT_CACHE_MAX_ENTRIES;
+        }
+        return Math.max(1, Math.floor(value));
     }
 }

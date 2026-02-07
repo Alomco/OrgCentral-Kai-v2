@@ -1,6 +1,5 @@
-import { Worker, type Job, type Processor, type WorkerOptions } from 'bullmq';
+import { Worker, type Job, type Processor, type WorkerOptions } from '@/server/lib/queueing/in-memory-queue';
 import type { ZodType } from 'zod';
-import type { CacheScope } from '@/server/lib/cache-tags';
 import {
     RepositoryAuthorizer,
     type RepositoryAuthorizationContext,
@@ -12,7 +11,7 @@ import { getQueue, type QueueRegistryOptions } from '@/server/lib/queue-registry
 
 export interface WorkerJobMetadata {
     correlationId?: string;
-    cacheScopes?: CacheScope[];
+    cacheScopes?: string[];
     attributes?: Record<string, unknown>;
 }
 
@@ -58,7 +57,7 @@ export abstract class AbstractOrgWorker<
         job: Job<TEnvelope>,
     ): Promise<unknown>;
 
-    registerWorker(workerOptions?: WorkerOptions): Worker {
+    registerWorker(workerOptions?: WorkerOptions): Worker<TEnvelope> {
         const queue = getQueue(this.queueName, this.queueOptions);
         const processor: Processor<TEnvelope> = async (job) => {
             const envelope = this.schema.parse(job.data);
@@ -72,8 +71,7 @@ export abstract class AbstractOrgWorker<
             );
         };
 
-        return new Worker(queue.name, processor, {
-            connection: queue.opts.connection,
+        return new Worker<TEnvelope, unknown, string>(queue.name, processor, {
             concurrency: workerOptions?.concurrency ?? 2,
             ...workerOptions,
         });
@@ -110,3 +108,4 @@ export abstract class AbstractOrgWorker<
         } satisfies ServiceExecutionContext;
     }
 }
+

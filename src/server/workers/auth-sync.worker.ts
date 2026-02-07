@@ -1,5 +1,4 @@
-import { Worker, type Job, type Processor, type WorkerOptions } from 'bullmq';
-import { getSharedRedisConnection } from '@/server/lib/queue';
+import { Worker, type Job, type Processor, type WorkerOptions } from '@/server/lib/queueing/in-memory-queue';
 import { appLogger } from '@/server/logging/structured-logger';
 import { getAuthSyncQueueClient } from '@/server/workers/auth-sync.queue';
 import {
@@ -30,7 +29,6 @@ export function registerAuthSyncWorker(
     options?: AuthSyncWorkerOptions,
 ): Worker<AuthSyncJobData, void, AuthSyncJobName> {
     const queueClient = getAuthSyncQueueClient();
-    const connection = getSharedRedisConnection();
 
     const processor: AuthSyncProcessor = async (job) => {
         if (isAuthSyncJobOfType(job, AUTH_SYNC_JOB_NAMES.SYNC_USER)) {
@@ -47,7 +45,6 @@ export function registerAuthSyncWorker(
     };
 
     return new Worker<AuthSyncJobData, void, AuthSyncJobName>(queueClient.queue.name, processor, {
-        connection,
         concurrency: options?.worker?.concurrency ?? 4,
         ...options?.worker,
     });
@@ -68,3 +65,4 @@ function isAuthSyncJobOfType<Name extends AuthSyncJobName>(
 ): job is Job<AuthSyncJobDataMap[Name], void, Name> {
     return job.name === expectedName;
 }
+

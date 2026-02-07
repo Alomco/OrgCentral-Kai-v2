@@ -7,7 +7,7 @@ export async function BillingPaymentMethodsPanel({
 }: {
   authorization: RepositoryAuthorizationContext;
 }) {
-  const paymentMethods = await getBillingPaymentMethodsForUi(authorization);
+  const paymentMethodsView = await getBillingPaymentMethodsForUi(authorization);
 
   return (
     <div className="rounded-2xl border border-border bg-card/60 p-5 shadow-sm">
@@ -19,7 +19,10 @@ export async function BillingPaymentMethodsPanel({
           </p>
         </div>
       </div>
-      <BillingPaymentMethodsClient orgId={authorization.orgId} paymentMethods={paymentMethods}
+      <BillingPaymentMethodsClient
+        orgId={authorization.orgId}
+        paymentMethods={paymentMethodsView.paymentMethods}
+        billingConfigured={paymentMethodsView.billingConfigured}
         canManage={true}
         publishableKey={process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? ''}
       />

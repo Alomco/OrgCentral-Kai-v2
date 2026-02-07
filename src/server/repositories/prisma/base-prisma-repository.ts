@@ -3,13 +3,14 @@ import { prisma as defaultPrismaClient } from '@/server/lib/prisma';
 import { RepositoryAuthorizationError } from '@/server/repositories/security/repository-errors';
 import type { RepositoryAuthorizationContext } from '@/server/types/repository-authorization';
 import { getTenantAccessGuard } from '@/server/repositories/security/tenant-guard';
+import type { CacheScope } from '@/server/repositories/cache-scopes';
 
 export interface BasePrismaRepositoryOptions {
     prisma?: PrismaClientInstance;
     /**
      * Optional hook invoked after a repository write to support cache invalidation or telemetry.
      */
-    onAfterWrite?: (orgId: string, scopes?: string[]) => Promise<void> | void;
+    onAfterWrite?: (orgId: string, scopes?: CacheScope[]) => Promise<void> | void;
     /**
      * Optional tracer hook to wrap repository operations. Accepts either a span name + handler, or span name + metadata.
      */
@@ -73,7 +74,7 @@ export abstract class BasePrismaRepository {
         return handler();
     }
 
-    protected async invalidateAfterWrite(orgId: string, scopes: string[]): Promise<void> {
+    protected async invalidateAfterWrite(orgId: string, scopes: CacheScope[]): Promise<void> {
         if (!this.onAfterWrite) {
             return;
         }

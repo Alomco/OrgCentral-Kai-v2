@@ -3,6 +3,7 @@ import { PrismaPerformanceRepository } from '@/server/repositories/prisma/hr/per
 import { invalidateOrgCache } from '@/server/lib/cache-tags';
 import type { PerformanceRepository } from '@/server/repositories/contracts/hr/performance/performance-repository.contract';
 import type { RepositoryAuthorizationContext } from '@/server/types/repository-authorization';
+import type { CacheScope } from '@/server/repositories/cache-scopes';
 
 export interface PerformanceRepositoryDependencies {
   repositoryFactory: (authorization: RepositoryAuthorizationContext) => PerformanceRepository;
@@ -25,7 +26,7 @@ export function buildPerformanceServiceDependencies(
 
       return new PrismaPerformanceRepository(orgId, dataClassification, dataResidency, {
         ...(options?.prismaOptions ?? {}),
-        onAfterWrite: options?.prismaOptions?.onAfterWrite ?? (async (tenantId: string, scopes?: string[]) => {
+        onAfterWrite: options?.prismaOptions?.onAfterWrite ?? (async (tenantId: string, scopes?: CacheScope[]) => {
           if (!scopes?.length) {
             return;
           }

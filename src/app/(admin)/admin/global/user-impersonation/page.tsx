@@ -5,8 +5,10 @@ import { cacheLife, unstable_noStore as noStore } from 'next/cache';
 import { PageContainer } from '@/components/theme/layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { InfoButton } from '@/components/ui/info-button';
 import { getSessionContextOrRedirect } from '@/server/ui/auth/session-redirect';
 import { registerCacheTag } from '@/server/lib/cache-tags';
+import { CACHE_SCOPE_PLATFORM_IMPERSONATION } from '@/server/repositories/cache-scopes';
 import { listImpersonationRequestsService, listImpersonationSessionsService } from '@/server/services/platform/admin/impersonation-service';
 import type { RepositoryAuthorizationContext } from '@/server/types/repository-authorization';
 
@@ -47,7 +49,18 @@ export default async function UserImpersonationPage() {
 
             <Card>
                 <CardHeader>
-                    <CardTitle>Pending requests</CardTitle>
+                    <CardTitle className="flex items-center justify-between">
+                        <span>Pending requests</span>
+                        <InfoButton
+                            label="Impersonation approvals"
+                            sections={[
+                                { label: 'What', text: 'Requests awaiting approval.' },
+                                { label: 'Prereqs', text: 'Break-glass approval and MFA.' },
+                                { label: 'Next', text: 'Review scope, approve or reject.' },
+                                { label: 'Compliance', text: 'Approvals are time-boxed and audited.' },
+                            ]}
+                        />
+                    </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     {requests.length === 0 ? (
@@ -76,7 +89,18 @@ export default async function UserImpersonationPage() {
 
             <Card>
                 <CardHeader>
-                    <CardTitle>Active sessions</CardTitle>
+                    <CardTitle className="flex items-center justify-between">
+                        <span>Active sessions</span>
+                        <InfoButton
+                            label="Active impersonation sessions"
+                            sections={[
+                                { label: 'What', text: 'Time-limited sessions in progress.' },
+                                { label: 'Prereqs', text: 'Approved request with an active session.' },
+                                { label: 'Next', text: 'Stop sessions when work is done.' },
+                                { label: 'Compliance', text: 'Sessions are logged and auto-expire.' },
+                            ]}
+                        />
+                    </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     {sessions.length === 0 ? (
@@ -120,7 +144,7 @@ async function loadImpersonationDataCached(authorization: RepositoryAuthorizatio
     cacheLife('minutes');
     registerCacheTag({
         orgId: authorization.orgId,
-        scope: 'platform:impersonation',
+        scope: CACHE_SCOPE_PLATFORM_IMPERSONATION,
         classification: authorization.dataClassification,
         residency: authorization.dataResidency,
     });

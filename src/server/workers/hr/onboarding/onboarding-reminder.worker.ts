@@ -1,4 +1,4 @@
-import type { WorkerOptions } from 'bullmq';
+import type { WorkerOptions } from '@/server/lib/queueing/in-memory-queue';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
 import { AbstractOrgWorker } from '@/server/workers/abstract-org-worker';
 import { WORKER_QUEUE_NAMES } from '@/server/workers/constants';
@@ -31,3 +31,4 @@ export function registerOnboardingReminderWorker(options?: { worker?: WorkerOpti
     const worker = new OnboardingReminderWorker(options);
     return worker.registerWorker(options?.worker);
 }
+

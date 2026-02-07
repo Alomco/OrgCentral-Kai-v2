@@ -1,5 +1,6 @@
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { InfoButton } from '@/components/ui/info-button';
 
 const legacyChecks = [
     {
@@ -29,7 +30,18 @@ export function LegacyMappingPanel() {
         <Card>
             <CardHeader>
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                    <CardTitle>Legacy mapping checklist</CardTitle>
+                    <div className="flex items-center gap-2">
+                        <CardTitle>Legacy mapping checklist</CardTitle>
+                        <InfoButton
+                            label="Legacy mapping"
+                            sections={[
+                                { label: 'What', text: 'Checklist for migrating legacy permissions.' },
+                                { label: 'Prereqs', text: 'Confirm parity with existing roles.' },
+                                { label: 'Next', text: 'Complete checks before deprecations.' },
+                                { label: 'Compliance', text: 'Migration steps must be auditable.' },
+                            ]}
+                        />
+                    </div>
                     <Badge variant="outline">Pending</Badge>
                 </div>
                 <CardDescription>
@@ -37,11 +49,11 @@ export function LegacyMappingPanel() {
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                <ul className="space-y-3 text-sm text-[oklch(var(--foreground))]">
+                <ul className="space-y-3 text-sm text-foreground">
                     {legacyChecks.map((check) => (
                         <li key={check.title} className="rounded-lg border border-dashed p-3">
                             <div className="font-medium">{check.title}</div>
-                            <p className="text-xs text-[oklch(var(--muted-foreground))]">
+                            <p className="text-xs text-muted-foreground">
                                 {check.description}
                             </p>
                         </li>

@@ -1,4 +1,4 @@
-import type { Job, WorkerOptions } from 'bullmq';
+import type { Job, WorkerOptions } from '@/server/lib/queueing/in-memory-queue';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
 import { AbstractOrgWorker } from '@/server/workers/abstract-org-worker';
 import { WORKER_QUEUE_NAMES } from '@/server/lib/worker-constants';
@@ -46,3 +46,4 @@ export function registerNotificationDispatchWorker(options?: NotificationDispatc
     const worker = new NotificationDispatchWorker(options);
     return worker.registerWorker(options?.worker);
 }
+

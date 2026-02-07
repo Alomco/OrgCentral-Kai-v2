@@ -1,4 +1,4 @@
-import type { JobsOptions } from 'bullmq';
+import type { QueueJobOptions } from '@/server/types/queueing';
 import type { NotificationDispatchPayload, JsonValue } from '@/server/types/notification-dispatch';
 import type { RepositoryAuthorizationContext } from '@/server/types/repository-authorization';
 
@@ -12,7 +12,7 @@ export interface NotificationDispatchInput {
     authorization: RepositoryAuthorizationContext;
     notification: NotificationDispatchPayload;
     metadata?: NotificationDispatchMetadata;
-    jobOptions?: JobsOptions;
+    jobOptions?: QueueJobOptions;
 }
 
 export interface NotificationSendInput {

@@ -26,13 +26,16 @@ export type {
 export class SecurityPolicyEngine {
   private readonly enableCaching: boolean;
   private readonly cacheTtlMs: number;
+  private readonly cacheMaxEntries: number;
   private readonly logPolicyEvaluations: boolean;
   private policyCache = new Map<string, { result: PolicyEvaluationResult; timestamp: number }>();
   private policies: SecurityPolicy[] = [];
+  private static readonly DEFAULT_CACHE_MAX_ENTRIES = 5_000;
 
   constructor(options: SecurityPolicyEngineOptions = {}) {
     this.enableCaching = options.enableCaching ?? true;
     this.cacheTtlMs = options.cacheTtlMs ?? 5 * 60 * 1000; // 5 minutes
+    this.cacheMaxEntries = SecurityPolicyEngine.resolveCacheMaxEntries(options.cacheMaxEntries);
     this.logPolicyEvaluations = options.logPolicyEvaluations ?? true;
   }
 
@@ -40,7 +43,12 @@ export class SecurityPolicyEngine {
    * Adds a security policy to the engine
    */
   public addPolicy(policy: SecurityPolicy): void {
-    this.policies.push(policy);
+    const existingIndex = this.policies.findIndex(existing => existing.id === policy.id);
+    if (existingIndex >= 0) {
+      this.policies[existingIndex] = policy;
+    } else {
+      this.policies.push(policy);
+    }
     // Sort policies by priority (lower numbers = higher priority)
     this.policies.sort((a, b) => a.priority - b.priority);
   }
@@ -50,6 +58,7 @@ export class SecurityPolicyEngine {
    */
   public removePolicy(policyId: string): void {
     this.policies = this.policies.filter(policy => policy.id !== policyId);
+    this.policyCache.clear();
   }
 
   /**
@@ -62,12 +71,17 @@ export class SecurityPolicyEngine {
     resourceId?: string
   ): Promise<PolicyEvaluationResult> {
     const cacheKey = buildPolicyCacheKey(context, operation, resourceType, resourceId);
+    const now = Date.now();
     
     // Check cache if enabled
     if (this.enableCaching) {
+      this.pruneExpiredCacheEntries(now);
       const cached = this.policyCache.get(cacheKey);
-      if (cached && Date.now() - cached.timestamp < this.cacheTtlMs) {
+      if (cached && now - cached.timestamp < this.cacheTtlMs) {
         return cached.result;
+      }
+      if (cached) {
+        this.policyCache.delete(cacheKey);
       }
     }
 
@@ -97,7 +111,7 @@ export class SecurityPolicyEngine {
         });
         if (denialResult) {
           if (this.enableCaching) {
-            this.policyCache.set(cacheKey, { result: denialResult, timestamp: Date.now() });
+            this.setCachedResult(cacheKey, denialResult, now);
           }
           return denialResult;
         }
@@ -118,7 +132,7 @@ export class SecurityPolicyEngine {
     };
 
     if (this.enableCaching) {
-      this.policyCache.set(cacheKey, { result, timestamp: Date.now() });
+      this.setCachedResult(cacheKey, result, now);
     }
 
     if (this.logPolicyEvaluations) {
@@ -184,6 +198,34 @@ export class SecurityPolicyEngine {
     const config = securityConfigProvider.getOrgConfig(orgId);
     const policies = buildDefaultSecurityPolicies(orgId, config);
     policies.forEach(policy => this.addPolicy(policy));
+  }
+
+  private pruneExpiredCacheEntries(now: number): void {
+    for (const [key, value] of this.policyCache.entries()) {
+      if (now - value.timestamp >= this.cacheTtlMs) {
+        this.policyCache.delete(key);
+      }
+    }
+  }
+
+  private setCachedResult(cacheKey: string, result: PolicyEvaluationResult, now: number): void {
+    this.policyCache.delete(cacheKey);
+    this.policyCache.set(cacheKey, { result, timestamp: now });
+
+    while (this.policyCache.size > this.cacheMaxEntries) {
+      const oldestKey = this.policyCache.keys().next().value;
+      if (!oldestKey) {
+        break;
+      }
+      this.policyCache.delete(oldestKey);
+    }
+  }
+
+  private static resolveCacheMaxEntries(value?: number): number {
+    if (!Number.isFinite(value) || typeof value !== 'number' || value <= 0) {
+      return SecurityPolicyEngine.DEFAULT_CACHE_MAX_ENTRIES;
+    }
+    return Math.max(1, Math.floor(value));
   }
 }
 

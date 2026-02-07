@@ -20,6 +20,7 @@ import {
 interface BillingPaymentMethodsClientProps {
   orgId: string;
   paymentMethods: PaymentMethodData[];
+  billingConfigured: boolean;
   canManage: boolean;
   publishableKey: string;
 }
@@ -27,32 +28,31 @@ interface BillingPaymentMethodsClientProps {
 export function BillingPaymentMethodsClient({
   orgId,
   paymentMethods,
+  billingConfigured,
   canManage,
   publishableKey,
 }: BillingPaymentMethodsClientProps) {
   const queryClient = useQueryClient();
-
-  // Query payment methods with initial SSR data
-  const { data } = useQuery({ ...listPaymentMethodsQuery(orgId), initialData: paymentMethods });
-  const methods = data;
-
+  const { data } = useQuery({
+    ...listPaymentMethodsQuery(orgId),
+    initialData: { paymentMethods, billingConfigured },
+  });
+  const methods = data.paymentMethods;
+  const isBillingConfigured = data.billingConfigured;
   const stripePromise = useMemo(
     () => (publishableKey ? loadStripe(publishableKey) : null),
     [publishableKey],
   );
   const [completedClientSecret, setCompletedClientSecret] = useState<string | null>(null);
-
   const setupIntent = useMutation({
     mutationFn: () => createSetupIntent(orgId),
   });
-
   const setDefault = useMutation({
     mutationFn: (pmId: string) => setDefaultPaymentMethod(orgId, pmId),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: billingKeys.paymentMethods(orgId) });
     },
   });
-
   const remove = useMutation({
     mutationFn: (pmId: string) => removePaymentMethod(orgId, pmId),
     onSuccess: async () => {
@@ -63,12 +63,10 @@ export function BillingPaymentMethodsClient({
   const feedback = [setupIntent.error?.message, setDefault.error?.message, remove.error?.message]
     .filter(Boolean)
     .join(' ');
-
   const clientSecret = setupIntent.data?.clientSecret ?? null;
   const showSetupForm = Boolean(
     clientSecret && stripePromise && completedClientSecret !== clientSecret,
   );
-
   const handleCreateSetupIntent = () => {
     setupIntent.mutate(undefined, {
       onSuccess: () => setCompletedClientSecret(null),
@@ -126,8 +124,10 @@ export function BillingPaymentMethodsClient({
             </div>
           ))}
         </div>
-      ) : (
+      ) : isBillingConfigured ? (
         <p className="text-sm text-muted-foreground">No payment methods saved yet.</p>
+      ) : (
+        <p className="text-sm text-muted-foreground">Billing not configured.</p>
       )}
 
       {feedback ? <p className="text-xs text-muted-foreground">{feedback}</p> : null}
@@ -136,7 +136,7 @@ export function BillingPaymentMethodsClient({
         <Button
           type="button"
           size="sm"
-          disabled={!canManage || setupIntent.isPending || !publishableKey}
+          disabled={!canManage || !isBillingConfigured || setupIntent.isPending || !publishableKey}
           onClick={handleCreateSetupIntent}
         >
           {setupIntent.isPending ? <Spinner className="mr-2" /> : null}
@@ -144,6 +144,9 @@ export function BillingPaymentMethodsClient({
         </Button>
         {!publishableKey ? (
           <span className="text-xs text-muted-foreground">Stripe publishable key missing.</span>
+        ) : null}
+        {!isBillingConfigured ? (
+          <span className="text-xs text-muted-foreground">Billing not configured.</span>
         ) : null}
         {!canManage ? (
           <span className="text-xs text-muted-foreground">Subscribe to enable payment methods.</span>

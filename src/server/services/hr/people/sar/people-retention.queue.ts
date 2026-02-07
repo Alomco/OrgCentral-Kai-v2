@@ -1,10 +1,15 @@
-import { Queue, type JobsOptions, type QueueOptions } from 'bullmq';
+import { Queue, type JobsOptions } from '@/server/lib/queueing/in-memory-queue';
+import {
+  getWorkerQueueMaxPendingJobs,
+  WORKER_QUEUE_NAMES,
+  type WorkerQueueName,
+} from '@/server/lib/worker-constants';
 import type { RetentionJobQueue } from './people-retention-scheduler';
 
-export interface BullMqRetentionQueueOptions {
-  queueName?: string;
-  connection?: QueueOptions['connection'];
+export interface RetentionQueueOptions {
+  queueName?: WorkerQueueName;
   defaultJobOptions?: JobsOptions;
+  maxPendingJobs?: number;
 }
 
 export interface RetentionQueueClient {
@@ -12,16 +17,13 @@ export interface RetentionQueueClient {
   jobQueue: RetentionJobQueue;
 }
 
-const defaultConnectionUrl =
-  process.env.BULLMQ_REDIS_URL ?? process.env.REDIS_URL ?? 'redis://localhost:6379';
-
-export function createBullMqRetentionQueueClient(
-  options: BullMqRetentionQueueOptions = {},
+export function createRetentionQueueClient(
+  options: RetentionQueueOptions = {},
 ): RetentionQueueClient {
-  const queueName = options.queueName ?? 'hr-people-retention';
+  const queueName = options.queueName ?? WORKER_QUEUE_NAMES.HR_PEOPLE_RETENTION;
   const queue = new Queue(queueName, {
-    connection: options.connection ?? { url: defaultConnectionUrl },
     defaultJobOptions: options.defaultJobOptions,
+    maxPendingJobs: options.maxPendingJobs ?? getWorkerQueueMaxPendingJobs(queueName),
   });
 
   const jobQueue: RetentionJobQueue = {
@@ -36,6 +38,6 @@ export function createBullMqRetentionQueueClient(
   return { queue, jobQueue };
 }
 
-export function createBullMqRetentionQueue(options?: BullMqRetentionQueueOptions): RetentionJobQueue {
-  return createBullMqRetentionQueueClient(options).jobQueue;
+export function createRetentionQueue(options?: RetentionQueueOptions): RetentionJobQueue {
+  return createRetentionQueueClient(options).jobQueue;
 }

@@ -6,6 +6,11 @@ import { getSessionContextOrRedirect } from '@/server/ui/auth/session-redirect';
 import { requestBreakGlassService } from '@/server/services/platform/admin/break-glass-service';
 import { updatePlatformTenantStatusService } from '@/server/services/platform/admin/tenant-management-service';
 import { invalidateCache } from '@/server/lib/cache-tags';
+import {
+    CACHE_SCOPE_PLATFORM_BREAK_GLASS,
+    CACHE_SCOPE_PLATFORM_TENANTS,
+    buildPlatformTenantCacheScope,
+} from '@/server/repositories/cache-scopes';
 import { ValidationError } from '@/server/errors';
 import { parseTenantStatusAction } from '@/server/validators/platform/admin/tenant-validators';
 
@@ -52,7 +57,7 @@ export async function requestBreakGlassAction(
 
         await invalidateCache({
             orgId: authorization.orgId,
-            scope: 'platform:break-glass',
+            scope: CACHE_SCOPE_PLATFORM_BREAK_GLASS,
             classification: authorization.dataClassification,
             residency: authorization.dataResidency,
         });
@@ -98,13 +103,13 @@ export async function updateTenantStatusAction(
 
         await invalidateCache({
             orgId: authorization.orgId,
-            scope: 'platform:tenants',
+            scope: CACHE_SCOPE_PLATFORM_TENANTS,
             classification: authorization.dataClassification,
             residency: authorization.dataResidency,
         });
         await invalidateCache({
             orgId: authorization.orgId,
-            scope: `platform:tenant:${tenantId}`,
+            scope: buildPlatformTenantCacheScope(tenantId),
             classification: authorization.dataClassification,
             residency: authorization.dataResidency,
         });

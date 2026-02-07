@@ -7,6 +7,7 @@ import { CheckCircle, XCircle, Clock } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { InfoButton } from '@/components/ui/info-button';
 import { approveTimeEntryAction, getPendingTimeEntriesAction, rejectTimeEntryAction } from '../actions';
 import type { PendingTimeEntry } from '../pending-entries';
 
@@ -71,6 +72,15 @@ export function TimeEntryApprovalPanel({
                     <CardTitle className="text-base flex items-center gap-2">
                         <Clock className="h-4 w-4" />
                         Timesheet Approvals
+                        <InfoButton
+                            label="Timesheet approvals"
+                            sections={[
+                                { label: 'What', text: 'Entries awaiting approval.' },
+                                { label: 'Prereqs', text: 'Time tracking enabled.' },
+                                { label: 'Next', text: 'Approve or reject promptly.' },
+                                { label: 'Compliance', text: 'Decisions are logged.' },
+                            ]}
+                        />
                     </CardTitle>
                     <CardDescription>Completed entries awaiting review.</CardDescription>
                 </div>
@@ -120,7 +130,7 @@ const TimeEntryApprovalRow = memo(function TimeEntryApprovalRow({
                 <div className="flex items-center gap-2 min-w-0">
                     <p className="font-medium text-sm truncate">{entry.employeeName}</p>
                     {entry.project ? (
-                        <Badge variant="outline" className="text-xs max-w-[160px] truncate">
+                        <Badge variant="outline" className="text-xs max-w-40 truncate">
                             {entry.project}
                         </Badge>
                     ) : null}

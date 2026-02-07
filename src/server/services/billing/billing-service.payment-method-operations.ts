@@ -42,11 +42,7 @@ export async function listPaymentMethodsOperation(
     return [];
   }
 
-  return syncPaymentMethodsFromStripe(
-    deps,
-    input.authorization,
-    customerId,
-  );
+  return syncPaymentMethodsFromStripe(deps, input.authorization, customerId);
 }
 
 export async function setDefaultPaymentMethodOperation(
@@ -192,13 +188,7 @@ async function assertPaymentMethodOwnership(
   expectedCustomerId: string,
   paymentMethodId: string,
 ): Promise<void> {
-  const localPaymentMethod = await deps.paymentMethodRepository.getByStripeId(
-    authorization,
-    paymentMethodId,
-  );
-  if (!localPaymentMethod) {
-    throw new ValidationError(PAYMENT_METHOD_NOT_FOUND_MESSAGE);
-  }
+  await ensureLocalPaymentMethodExists(deps, authorization, expectedCustomerId, paymentMethodId);
 
   const stripeCustomerId = await deps.billingGateway.getPaymentMethodCustomerId(paymentMethodId);
   if (stripeCustomerId === expectedCustomerId) {
@@ -214,4 +204,31 @@ async function assertPaymentMethodOwnership(
   });
 
   throw new ValidationError(PAYMENT_METHOD_OWNERSHIP_MISMATCH_MESSAGE);
+}
+
+async function ensureLocalPaymentMethodExists(
+  deps: BillingServiceDependencies,
+  authorization: RepositoryAuthorizationContext,
+  stripeCustomerId: string,
+  paymentMethodId: string,
+): Promise<void> {
+  const localPaymentMethod = await deps.paymentMethodRepository.getByStripeId(authorization, paymentMethodId);
+  if (localPaymentMethod) {
+    return;
+  }
+
+  appLogger.info('billing.payment-method.missing-local.sync-retry', {
+    orgId: authorization.orgId,
+    userId: authorization.userId,
+    paymentMethodId,
+    stripeCustomerId,
+  });
+  await syncPaymentMethodsFromStripe(deps, authorization, stripeCustomerId);
+
+  const syncedPaymentMethod = await deps.paymentMethodRepository.getByStripeId(authorization, paymentMethodId);
+  if (syncedPaymentMethod) {
+    return;
+  }
+
+  throw new ValidationError(PAYMENT_METHOD_NOT_FOUND_MESSAGE);
 }

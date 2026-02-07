@@ -1,6 +1,7 @@
 import Link from 'next/link';
 
 import { Badge } from '@/components/ui/badge';
+import { InfoButton } from '@/components/ui/info-button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import type { PlatformTenantListItem } from '@/server/types/platform/tenant-admin';
 
@@ -16,7 +17,18 @@ export function TenantTable({ tenants }: { tenants: PlatformTenantListItem[] }) 
                         <TableHead>Status</TableHead>
                         <TableHead>Residency</TableHead>
                         <TableHead>Classification</TableHead>
-                        <TableHead>Actions</TableHead>
+                        <TableHead className="flex items-center gap-2">
+                            Actions
+                            <InfoButton
+                                label="Tenant actions"
+                                sections={[
+                                    { label: 'What', text: 'Suspend, restore, or archive access.' },
+                                    { label: 'Prereqs', text: 'Break-glass approval for suspend or archive.' },
+                                    { label: 'Next', text: 'Confirm impact before submitting.' },
+                                    { label: 'Compliance', text: 'Actions are audited and timestamped.' },
+                                ]}
+                            />
+                        </TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>

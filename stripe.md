@@ -64,3 +64,9 @@ This is the main entry point for checkout, portal, subscription reads, seat sync
 ## Security Notes
 - All org endpoints enforce `orgId` scoping via session authorization.
 - Webhook uses Stripe signature verification.
+
+## Automatic Tax
+- Stripe Automatic Tax is currently disabled in checkout.
+- To enable later: add `automatic_tax: { enabled: true }` to checkout session creation in
+  `src/server/services/billing/stripe-billing-gateway.ts` and ensure Stripe Tax is enabled
+  in the dashboard with registrations configured.

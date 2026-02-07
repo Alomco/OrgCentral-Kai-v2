@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState, useSyncExternalStore } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
 
+import { InfoButton } from '@/components/ui/info-button';
 import { memberKeys, updateMember, membersSearchKey } from './members.api';
 
 const SELECTABLE_MEMBER_SELECTOR = '[data-bulk-member="select"]';
@@ -134,18 +135,29 @@ export function OrgMembersBulkActions({ roleNames, orgId, currentQueryKey }: { r
             onSubmit={handleSubmit}
             className="mt-4 flex flex-col gap-3 rounded-xl border border-[oklch(var(--border)/0.6)] bg-[oklch(var(--background)/0.4)] p-4"
         >
-            <div className="text-xs font-medium uppercase tracking-[0.18em] text-[oklch(var(--muted-foreground))]">Bulk actions</div>
-            <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-[oklch(var(--muted-foreground))]">
-                <label className="flex items-center gap-2 text-xs font-medium text-[oklch(var(--muted-foreground))]">
-                    <input type="checkbox" checked={allSelected} onChange={handleToggleAll} className="h-4 w-4 rounded border-[oklch(var(--border))] text-[oklch(var(--primary))]" />
+            <div className="flex items-center justify-between gap-2">
+                <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">Bulk actions</div>
+                <InfoButton
+                    label="Bulk actions"
+                    sections={[
+                        { label: 'What', text: 'Apply changes to multiple selected members.' },
+                        { label: 'Prereqs', text: 'Select members before submitting.' },
+                        { label: 'Next', text: 'Use filters to target the right group.' },
+                        { label: 'Compliance', text: 'Bulk updates are audited.' },
+                    ]}
+                />
+            </div>
+            <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">
+                <label className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+                    <input type="checkbox" checked={allSelected} onChange={handleToggleAll} className="h-4 w-4 rounded border-border text-primary" />
                     Select all on page
                 </label>
                 <span>{selection.total > 0 ? (<>{selection.selected} of {selection.total} selected</>) : ('No members on this page')}</span>
             </div>
             <div className="flex flex-col gap-3 md:flex-row md:items-end md:flex-wrap">
-                <label className="flex flex-1 flex-col gap-1 text-xs font-medium text-[oklch(var(--muted-foreground))]">
+                <label className="flex flex-1 flex-col gap-1 text-xs font-medium text-muted-foreground">
                     New role
-                    <select name="roles" defaultValue="" className="h-9 w-full rounded-md border border-[oklch(var(--border))] bg-[oklch(var(--background))] px-3 text-sm text-[oklch(var(--foreground))]">
+                    <select name="roles" defaultValue="" className="h-9 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground">
                         <option value="">Select role</option>
                         {roleNames.map((role) => (
                             <option key={role} value={role}>{role}</option>
@@ -157,17 +169,17 @@ export function OrgMembersBulkActions({ roleNames, orgId, currentQueryKey }: { r
                         const select = document.querySelector<HTMLSelectElement>(ROLE_SELECTOR);
                         const role = select?.value ?? '';
                         bulk.mutate({ intent: BULK_INTENT_UPDATE_ROLES, role });
-                    }} disabled={bulk.isPending} className="h-9 rounded-md bg-[oklch(var(--primary))] px-3 text-sm font-medium text-[oklch(var(--primary-foreground))] disabled:opacity-70">Update roles</button>
-                    <button type="button" onClick={() => bulk.mutate({ intent: BULK_INTENT_SUSPEND })} disabled={bulk.isPending} className="h-9 rounded-md border border-[oklch(var(--border))] bg-[oklch(var(--background))] px-3 text-sm font-medium text-[oklch(var(--foreground))] disabled:opacity-70">Suspend</button>
-                    <button type="button" onClick={() => bulk.mutate({ intent: BULK_INTENT_RESUME })} disabled={bulk.isPending} className="h-9 rounded-md border border-[oklch(var(--border))] bg-[oklch(var(--background))] px-3 text-sm font-medium text-[oklch(var(--foreground))] disabled:opacity-70">Resume</button>
+                    }} disabled={bulk.isPending} className="h-9 rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground disabled:opacity-70">Update roles</button>
+                    <button type="button" onClick={() => bulk.mutate({ intent: BULK_INTENT_SUSPEND })} disabled={bulk.isPending} className="h-9 rounded-md border border-border bg-background px-3 text-sm font-medium text-foreground disabled:opacity-70">Suspend</button>
+                    <button type="button" onClick={() => bulk.mutate({ intent: BULK_INTENT_RESUME })} disabled={bulk.isPending} className="h-9 rounded-md border border-border bg-background px-3 text-sm font-medium text-foreground disabled:opacity-70">Resume</button>
                 </div>
             </div>
-            <p className="text-xs text-[oklch(var(--muted-foreground))]">Select members below to apply bulk updates.</p>
-            {clientMessage ? (<p className="text-xs text-[oklch(var(--destructive))]" role="alert">{clientMessage}</p>) : null}
+            <p className="text-xs text-muted-foreground">Select members below to apply bulk updates.</p>
+            {clientMessage ? (<p className="text-xs text-destructive" role="alert">{clientMessage}</p>) : null}
             {bulk.isError ? (
-                <p className="text-xs text-[oklch(var(--destructive))]">{getBulkErrorMessage(bulk.error)}</p>
+                <p className="text-xs text-destructive">{getBulkErrorMessage(bulk.error)}</p>
             ) : null}
-            {bulk.isSuccess ? (<p className="text-xs text-[oklch(var(--primary))]">Updated</p>) : null}
+            {bulk.isSuccess ? (<p className="text-xs text-primary">Updated</p>) : null}
         </form>
     );
 }

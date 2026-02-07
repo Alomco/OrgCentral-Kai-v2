@@ -2,6 +2,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { InfoButton } from '@/components/ui/info-button';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
 import type { LeaveRequest } from '@/server/types/leave-types';
 import { getLeaveRequestsForUi } from '@/server/use-cases/hr/leave/get-leave-requests.cached';
@@ -108,7 +109,18 @@ export async function LeaveRequestsPanel({
                                         <TableHead>Status</TableHead>
                                         <TableHead>Evidence</TableHead>
                                         <TableHead>Submitted</TableHead>
-                                        <TableHead>Approver/SLA</TableHead>
+                                        <TableHead className="flex items-center gap-2">
+                                            Approver/SLA
+                                            <InfoButton
+                                                label="Approver/SLA"
+                                                sections={[
+                                                    { label: 'What', text: 'Primary approver and SLA target.' },
+                                                    { label: 'Prereqs', text: 'Approver chain configured.' },
+                                                    { label: 'Next', text: 'Follow up if SLA is near.' },
+                                                    { label: 'Compliance', text: 'SLA is tracked in audits.' },
+                                                ]}
+                                            />
+                                        </TableHead>
                                         {approver || manager ? (
                                             <TableHead className="text-right">Actions</TableHead>
                                         ) : null}

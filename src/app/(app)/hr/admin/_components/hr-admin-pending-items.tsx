@@ -4,6 +4,7 @@ import { Clock, Calendar, FileCheck, ArrowRight, Timer } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { InfoButton } from '@/components/ui/info-button';
 import type { PendingApprovalItem } from '../actions.types';
 
 interface HrAdminPendingItemsProps {
@@ -70,6 +71,15 @@ export function HrAdminPendingItems({ items }: HrAdminPendingItemsProps) {
                     <CardTitle className="text-base flex items-center gap-2">
                         <Clock className="h-4 w-4" />
                         Pending Approvals
+                        <InfoButton
+                            label="Pending approvals"
+                            sections={[
+                                { label: 'What', text: 'Items awaiting HR admin review.' },
+                                { label: 'Prereqs', text: 'Approval workflows enabled.' },
+                                { label: 'Next', text: 'Open an item and approve or reject.' },
+                                { label: 'Compliance', text: 'Decisions are recorded for audit.' },
+                            ]}
+                        />
                     </CardTitle>
                     <CardDescription>Items awaiting your review</CardDescription>
                 </div>

@@ -5,6 +5,7 @@ import { headers } from 'next/headers';
 import { PageContainer } from '@/components/theme/layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { InfoButton, type InfoSection } from '@/components/ui/info-button';
 import { getSessionContextOrRedirect } from '@/server/ui/auth/session-redirect';
 import { getEnterpriseDashboardService } from '@/server/services/platform/admin/enterprise-dashboard-service';
 
@@ -36,25 +37,116 @@ export default async function EnterpriseDashboardPage() {
             </header>
 
             <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                <MetricCard title="Total tenants" value={summary.tenantMetrics.total} />
-                <MetricCard title="Active tenants" value={summary.tenantMetrics.active} />
-                <MetricCard title="Open tickets" value={summary.supportMetrics.openTickets} />
-                <MetricCard title="Billing plans" value={summary.billingPlans} />
+                <MetricCard
+                    title="Total tenants"
+                    value={summary.tenantMetrics.total}
+                    info={[
+                        { label: 'What', text: 'All tenants provisioned on the platform.' },
+                        { label: 'Prereqs', text: 'Tenant records created and scoped.' },
+                        { label: 'Next', text: 'Review inactive tenants for cleanup or outreach.' },
+                        { label: 'Compliance', text: 'Counts are audited and residency scoped.' },
+                    ]}
+                />
+                <MetricCard
+                    title="Active tenants"
+                    value={summary.tenantMetrics.active}
+                    info={[
+                        { label: 'What', text: 'Tenants marked ACTIVE.' },
+                        { label: 'Prereqs', text: 'Status set to ACTIVE.' },
+                        { label: 'Next', text: 'Investigate suspensions if count drops.' },
+                        { label: 'Compliance', text: 'Status changes require approved workflows.' },
+                    ]}
+                />
+                <MetricCard
+                    title="Open tickets"
+                    value={summary.supportMetrics.openTickets}
+                    info={[
+                        { label: 'What', text: 'Tickets not yet resolved.' },
+                        { label: 'Prereqs', text: 'Tickets logged in the support console.' },
+                        { label: 'Next', text: 'Assign owners and confirm severity/SLA.' },
+                        { label: 'Compliance', text: 'SLA tracking is audited.' },
+                    ]}
+                />
+                <MetricCard
+                    title="Billing plans"
+                    value={summary.billingPlans}
+                    info={[
+                        { label: 'What', text: 'Active plans in the billing catalog.' },
+                        { label: 'Prereqs', text: 'Billing catalog configured.' },
+                        { label: 'Next', text: 'Review coverage against tenant needs.' },
+                        { label: 'Compliance', text: 'Plan changes are logged and permissioned.' },
+                    ]}
+                />
             </section>
 
             <section className="grid gap-6 lg:grid-cols-2">
                 <Card>
                     <CardHeader>
                         <CardTitle className="flex items-center justify-between">
-                            Governance focus
+                            <span className="inline-flex items-center gap-2">
+                                Governance focus
+                                <InfoButton
+                                    label="Governance focus"
+                                    sections={[
+                                        { label: 'What', text: 'Governance signals needing admin attention.' },
+                                        { label: 'Prereqs', text: 'Tenant and support metrics enabled.' },
+                                        { label: 'Next', text: 'Open relevant workflows and act.' },
+                                        { label: 'Compliance', text: 'Signals align to audit and risk controls.' },
+                                    ]}
+                                />
+                            </span>
                             <Badge variant="secondary">Live</Badge>
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3 text-sm text-muted-foreground">
-                        <p>Suspended tenants: {summary.tenantMetrics.suspended}</p>
-                        <p>Decommissioned tenants: {summary.tenantMetrics.decommissioned}</p>
-                        <p>SLA breaches: {summary.supportMetrics.slaBreached}</p>
-                        <p>Pending impersonations: {summary.pendingImpersonations}</p>
+                        <div className="flex items-center justify-between gap-2">
+                            <span>Suspended tenants: {summary.tenantMetrics.suspended}</span>
+                            <InfoButton
+                                label="Suspended tenants"
+                                sections={[
+                                    { label: 'What', text: 'Tenants temporarily blocked from access.' },
+                                    { label: 'Prereqs', text: 'Suspension approved.' },
+                                    { label: 'Next', text: 'Review risk notes; restore or archive.' },
+                                    { label: 'Compliance', text: 'Suspensions require break-glass approval.' },
+                                ]}
+                            />
+                        </div>
+                        <div className="flex items-center justify-between gap-2">
+                            <span>Decommissioned tenants: {summary.tenantMetrics.decommissioned}</span>
+                            <InfoButton
+                                label="Decommissioned tenants"
+                                sections={[
+                                    { label: 'What', text: 'Tenants deprovisioned and archived.' },
+                                    { label: 'Prereqs', text: 'Decommission workflow completed.' },
+                                    { label: 'Next', text: 'Validate retention policy and export.' },
+                                    { label: 'Compliance', text: 'Archival actions are audited.' },
+                                ]}
+                            />
+                        </div>
+                        <div className="flex items-center justify-between gap-2">
+                            <span>SLA breaches: {summary.supportMetrics.slaBreached}</span>
+                            <InfoButton
+                                label="SLA breaches"
+                                sections={[
+                                    { label: 'What', text: 'Tickets past SLA response or resolution.' },
+                                    { label: 'Prereqs', text: 'SLA policies configured.' },
+                                    { label: 'Next', text: 'Escalate and document remediation.' },
+                                    { label: 'Compliance', text: 'Breaches appear in audit reports.' },
+                                ]}
+                            />
+                        </div>
+                        <div className="flex items-center justify-between gap-2">
+                            <span>Pending impersonations: {summary.pendingImpersonations}</span>
+                            <InfoButton
+                                label="Pending impersonations"
+                                sections={[
+                                    { label: 'What', text: 'Impersonation requests awaiting approval.' },
+                                    { label: 'Prereqs', text: 'Break-glass request submitted.' },
+                                    { label: 'Next', text: 'Review scope and approve if justified.' },
+                                    { label: 'Compliance', text: 'Approvals are time-boxed and audited.' },
+                                ]}
+                            />
+                        </div>
                     </CardContent>
                 </Card>
 
@@ -74,11 +166,14 @@ export default async function EnterpriseDashboardPage() {
     );
 }
 
-function MetricCard({ title, value }: { title: string; value: number }) {
+function MetricCard({ title, value, info }: { title: string; value: number; info: InfoSection[] }) {
     return (
         <Card>
             <CardHeader>
-                <CardTitle className="text-sm text-muted-foreground">{title}</CardTitle>
+                <CardTitle className="flex items-center justify-between text-sm text-muted-foreground">
+                    <span>{title}</span>
+                    <InfoButton label={title} sections={info} />
+                </CardTitle>
             </CardHeader>
             <CardContent>
                 <div className="text-3xl font-semibold text-foreground">{value}</div>

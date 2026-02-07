@@ -1,9 +1,14 @@
 import type { DataClassificationLevel, DataResidencyZone } from '@/server/types/tenant';
 import { buildCacheTag, invalidateCache, registerCacheTag } from '@/server/lib/cache-tags';
+import {
+  CACHE_SCOPE_PEOPLE_CONTRACTS,
+  CACHE_SCOPE_PEOPLE_PROFILES,
+  type CacheScope,
+} from '@/server/constants/cache-scopes';
 
 export const HR_PEOPLE_CACHE_SCOPES = {
-  profiles: 'hr-people-profiles',
-  contracts: 'hr-people-contracts',
+  profiles: CACHE_SCOPE_PEOPLE_PROFILES,
+  contracts: CACHE_SCOPE_PEOPLE_CONTRACTS,
 } as const;
 
 export type HrPeopleCacheScopeKey = keyof typeof HR_PEOPLE_CACHE_SCOPES;
@@ -17,8 +22,8 @@ export interface PeopleCacheContext {
 export function resolvePeopleCacheScopes(options?: {
   includeProfiles?: boolean;
   includeContracts?: boolean;
-}): string[] {
-  const scopes = new Set<string>();
+}): CacheScope[] {
+  const scopes = new Set<CacheScope>();
 
   if (options?.includeProfiles ?? true) {
     scopes.add(HR_PEOPLE_CACHE_SCOPES.profiles);

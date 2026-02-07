@@ -5,6 +5,7 @@ import { Paperclip, UploadCloud, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { InfoButton } from '@/components/ui/info-button';
 import { Label } from '@/components/ui/label';
 import { useDocumentVaultUpload } from '@/app/(app)/hr/_components/document-vault/use-document-vault-upload';
 import { createDocumentVaultRecord } from '@/app/(app)/hr/documents/document-vault.api';
@@ -144,7 +145,18 @@ export function ComplianceAttachmentsField({
         <div className="space-y-3">
             <div className="grid gap-3 sm:grid-cols-2">
                 <div className="space-y-1">
-                    <Label htmlFor="compliance-classification">Classification</Label>
+                    <div className="flex items-center justify-between gap-2">
+                        <Label htmlFor="compliance-classification">Classification</Label>
+                        <InfoButton
+                            label="Classification"
+                            sections={[
+                                { label: 'What', text: 'Security level for the attachment.' },
+                                { label: 'Prereqs', text: 'Must match tenant policy.' },
+                                { label: 'Next', text: 'Choose the lowest level that fits.' },
+                                { label: 'Compliance', text: 'Higher levels restrict access.' },
+                            ]}
+                        />
+                    </div>
                     <select
                         id="compliance-classification"
                         className="h-10 w-full rounded-md border bg-background px-3 text-sm"
@@ -158,7 +170,18 @@ export function ComplianceAttachmentsField({
                     </select>
                 </div>
                 <div className="space-y-1">
-                    <Label htmlFor="compliance-retention">Retention</Label>
+                    <div className="flex items-center justify-between gap-2">
+                        <Label htmlFor="compliance-retention">Retention</Label>
+                        <InfoButton
+                            label="Retention"
+                            sections={[
+                                { label: 'What', text: 'How long the attachment is kept.' },
+                                { label: 'Prereqs', text: 'Align with legal requirements.' },
+                                { label: 'Next', text: 'Pick the required retention period.' },
+                                { label: 'Compliance', text: 'Retention affects legal obligations.' },
+                            ]}
+                        />
+                    </div>
                     <select
                         id="compliance-retention"
                         className="h-10 w-full rounded-md border bg-background px-3 text-sm"

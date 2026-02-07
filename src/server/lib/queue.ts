@@ -1,31 +1,10 @@
-import { Queue, type QueueOptions } from 'bullmq';
-import Redis, { type RedisOptions } from 'ioredis';
-import { appLogger } from '@/server/logging/structured-logger';
+import { Queue, type QueueOptions } from '@/server/lib/queueing/in-memory-queue';
+import { registerQueueRuntimeCleanup } from '@/server/lib/queue-runtime-lifecycle';
+import { getWorkerQueueMaxPendingJobs, isWorkerQueueName } from '@/server/lib/worker-constants';
 
-const DEFAULT_REDIS_URL = process.env.BULLMQ_REDIS_URL ?? process.env.REDIS_URL ?? 'redis://localhost:6379';
-const SHARED_REDIS_OPTIONS: RedisOptions = {
-    maxRetriesPerRequest: null,
-    enableReadyCheck: false,
-};
-
-let sharedRedisConnection: Redis | null = null;
 const queueCache = new Map<string, Queue>();
 
-export type SharedQueueOptions = Omit<QueueOptions, 'connection'>;
-
-export function getSharedRedisConnection(): Redis {
-    sharedRedisConnection ??= new Redis(DEFAULT_REDIS_URL, {
-        ...SHARED_REDIS_OPTIONS,
-        lazyConnect: true,
-    });
-
-    sharedRedisConnection.on('error', (error) => {
-        appLogger.warn('Redis connection error', {
-            error: String(error),
-        });
-    });
-    return sharedRedisConnection;
-}
+export type SharedQueueOptions = QueueOptions;
 
 export function getSharedQueue(name: string, options?: SharedQueueOptions): Queue {
     const existing = queueCache.get(name);
@@ -33,11 +12,22 @@ export function getSharedQueue(name: string, options?: SharedQueueOptions): Queu
         return existing;
     }
 
+    const maxPendingJobs =
+        options?.maxPendingJobs ??
+        (isWorkerQueueName(name) ? getWorkerQueueMaxPendingJobs(name) : undefined);
     const queue = new Queue(name, {
-        connection: getSharedRedisConnection(),
         ...options,
+        maxPendingJobs,
     });
 
     queueCache.set(name, queue);
     return queue;
 }
+
+export async function shutdownSharedQueues(): Promise<void> {
+    const queues = Array.from(queueCache.values());
+    queueCache.clear();
+    await Promise.allSettled(queues.map((queue) => queue.close()));
+}
+
+registerQueueRuntimeCleanup('shared-queues', shutdownSharedQueues);

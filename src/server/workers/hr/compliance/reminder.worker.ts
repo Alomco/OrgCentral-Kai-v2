@@ -1,4 +1,4 @@
-import type { WorkerOptions } from 'bullmq';
+import type { WorkerOptions } from '@/server/lib/queueing/in-memory-queue';
 import { AbstractOrgWorker } from '@/server/workers/abstract-org-worker';
 import { WORKER_QUEUE_NAMES } from '@/server/lib/worker-constants';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
@@ -44,3 +44,4 @@ export function registerComplianceReminderWorker(options?: ComplianceReminderWor
     const worker = new ComplianceReminderWorker(options);
     return worker.registerWorker(options?.worker);
 }
+

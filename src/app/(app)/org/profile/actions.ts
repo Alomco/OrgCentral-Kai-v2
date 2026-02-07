@@ -6,6 +6,7 @@
 import { headers } from 'next/headers';
 import { z } from 'zod';
 import { invalidateOrgCache } from '@/server/lib/cache-tags';
+import { CACHE_SCOPE_ORG_PROFILE } from '@/server/repositories/cache-scopes';
 import { recordAuditEvent } from '@/server/logging/audit-logger';
 import { PrismaOrganizationRepository } from '@/server/repositories/prisma/org/organization/prisma-organization-repository';
 import { getSessionContext } from '@/server/use-cases/auth/sessions/get-session';
@@ -26,7 +27,6 @@ import {
 } from './contact-helpers';
 import type { OrgProfileActionState } from './actions.state';
 
-const ORG_PROFILE_CACHE_SCOPE = 'org:profile';
 const FIELD_ERROR_MESSAGE = 'Please correct the highlighted fields.';
 
 const orgProfileCoreFormSchema = organizationProfileUpdateSchema
@@ -149,7 +149,7 @@ export async function updateOrgProfileAction(
 
     await invalidateOrgCache(
         authorization.orgId,
-        ORG_PROFILE_CACHE_SCOPE,
+        CACHE_SCOPE_ORG_PROFILE,
         authorization.dataClassification,
         authorization.dataResidency,
     );

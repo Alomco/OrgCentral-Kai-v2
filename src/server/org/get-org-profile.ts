@@ -3,6 +3,7 @@ import { CACHE_LIFE_SHORT } from '@/server/repositories/cache-profiles';
 import { headers } from 'next/headers';
 
 import { registerOrgCacheTag } from '@/server/lib/cache-tags';
+import { CACHE_SCOPE_ORG_PROFILE } from '@/server/repositories/cache-scopes';
 import { PrismaOrganizationRepository } from '@/server/repositories/prisma/org/organization/prisma-organization-repository';
 import { getOrganization } from '@/server/use-cases/org/organization/get-organization';
 import { getSessionContext } from '@/server/use-cases/auth/sessions/get-session';
@@ -14,8 +15,6 @@ import type { OrgContext } from './org-context';
 export interface OrgProfile {
     organization: OrganizationData;
 }
-
-const ORG_PROFILE_CACHE_SCOPE = 'org:profile';
 
 export async function getOrgProfile(context: OrgContext): Promise<OrgProfile> {
     const headerStore = await headers();
@@ -41,7 +40,7 @@ export async function getOrgProfile(context: OrgContext): Promise<OrgProfile> {
         cacheLife(CACHE_LIFE_SHORT);
         registerOrgCacheTag(
             authorization.orgId,
-            ORG_PROFILE_CACHE_SCOPE,
+            CACHE_SCOPE_ORG_PROFILE,
             authorization.dataClassification,
             authorization.dataResidency,
         );

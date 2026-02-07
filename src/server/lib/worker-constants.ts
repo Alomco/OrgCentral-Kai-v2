@@ -15,6 +15,19 @@ export const WORKER_QUEUE_NAMES = {
 
 export type WorkerQueueName = (typeof WORKER_QUEUE_NAMES)[keyof typeof WORKER_QUEUE_NAMES];
 
+export const WORKER_QUEUE_MAX_PENDING_JOBS = {
+    [WORKER_QUEUE_NAMES.AUTH_SYNC]: 5_000,
+    [WORKER_QUEUE_NAMES.HR_ABSENCE_AI_VALIDATION]: 2_000,
+    [WORKER_QUEUE_NAMES.HR_LEAVE_ACCRUAL]: 1_000,
+    [WORKER_QUEUE_NAMES.HR_COMPLIANCE_REMINDER]: 1_000,
+    [WORKER_QUEUE_NAMES.HR_TRAINING_REMINDER]: 1_000,
+    [WORKER_QUEUE_NAMES.HR_ONBOARDING_REMINDER]: 1_000,
+    [WORKER_QUEUE_NAMES.HR_PEOPLE_RETENTION]: 500,
+    [WORKER_QUEUE_NAMES.HR_INTEGRATIONS_SYNC]: 1_500,
+    [WORKER_QUEUE_NAMES.NOTIFICATIONS_DISPATCH]: 10_000,
+    [WORKER_QUEUE_NAMES.ORG_ROLE_UPDATES]: 2_000,
+} as const satisfies Record<WorkerQueueName, number>;
+
 export const WORKER_CACHE_SCOPES = {
     HR_ABSENCES: 'hr:absences',
     HR_LEAVE: 'hr:leave',
@@ -29,3 +42,13 @@ export const WORKER_CACHE_SCOPES = {
 export type WorkerCacheScope = (typeof WORKER_CACHE_SCOPES)[keyof typeof WORKER_CACHE_SCOPES];
 
 export const DEFAULT_WORKER_TIMEZONE = 'Europe/London';
+
+const WORKER_QUEUE_NAME_SET = new Set<string>(Object.values(WORKER_QUEUE_NAMES));
+
+export function isWorkerQueueName(name: string): name is WorkerQueueName {
+    return WORKER_QUEUE_NAME_SET.has(name);
+}
+
+export function getWorkerQueueMaxPendingJobs(name: WorkerQueueName): number {
+    return WORKER_QUEUE_MAX_PENDING_JOBS[name];
+}

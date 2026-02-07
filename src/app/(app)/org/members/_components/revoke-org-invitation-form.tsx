@@ -14,6 +14,7 @@ import {
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
+import { InfoButton } from '@/components/ui/info-button';
 import { Spinner } from '@/components/ui/spinner';
 import { revokeOrgInvitationAction } from '../actions/revoke-invitation';
 import type { RevokeOrgInvitationActionState } from '../actions/invitation-actions.types';
@@ -45,7 +46,18 @@ export function RevokeOrgInvitationForm({ token }: { token: string }) {
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Revoke invitation?</AlertDialogTitle>
+                        <div className="flex items-center justify-between gap-2">
+                            <AlertDialogTitle>Revoke invitation?</AlertDialogTitle>
+                            <InfoButton
+                                label="Revoke invitation"
+                                sections={[
+                                    { label: 'What', text: 'Invalidate the invite token immediately.' },
+                                    { label: 'Prereqs', text: 'Recipient must request a new invite.' },
+                                    { label: 'Next', text: 'Reissue with the correct role if needed.' },
+                                    { label: 'Compliance', text: 'Revocations are audited.' },
+                                ]}
+                            />
+                        </div>
                         <AlertDialogDescription>
                             This will invalidate the invitation token and prevent it from being used.
                         </AlertDialogDescription>

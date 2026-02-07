@@ -1,9 +1,14 @@
 import type { DataClassificationLevel, DataResidencyZone } from '@/server/types/tenant';
 import { buildCacheTag, invalidateCache, registerCacheTag } from '@/server/lib/cache-tags';
+import {
+    CACHE_SCOPE_ORG_MEMBERSHIPS,
+    CACHE_SCOPE_ORG_USERS,
+    type CacheScope,
+} from '@/server/constants/cache-scopes';
 
 export const IDENTITY_CACHE_SCOPES = {
-    memberships: 'org-memberships',
-    users: 'org-users',
+    memberships: CACHE_SCOPE_ORG_MEMBERSHIPS,
+    users: CACHE_SCOPE_ORG_USERS,
 } as const;
 
 export type IdentityCacheScopeKey = keyof typeof IDENTITY_CACHE_SCOPES;
@@ -17,8 +22,8 @@ export interface IdentityCacheContext {
 export function resolveIdentityCacheScopes(options?: {
     includeMemberships?: boolean;
     includeUsers?: boolean;
-}): string[] {
-    const scopes = new Set<string>();
+}): CacheScope[] {
+    const scopes = new Set<CacheScope>();
 
     if (options?.includeMemberships ?? true) {
         scopes.add(IDENTITY_CACHE_SCOPES.memberships);

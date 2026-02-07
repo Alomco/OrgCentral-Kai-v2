@@ -6,6 +6,10 @@ import { getSessionContextOrRedirect } from '@/server/ui/auth/session-redirect';
 import { executePlatformToolService } from '@/server/services/platform/admin/platform-tools-service';
 import { requestBreakGlassService } from '@/server/services/platform/admin/break-glass-service';
 import { invalidateCache } from '@/server/lib/cache-tags';
+import {
+    CACHE_SCOPE_PLATFORM_BREAK_GLASS,
+    CACHE_SCOPE_PLATFORM_TOOLS,
+} from '@/server/repositories/cache-scopes';
 import { ValidationError } from '@/server/errors';
 
 export interface PlatformToolActionState {
@@ -48,7 +52,7 @@ export async function requestToolBreakGlassAction(
 
         await invalidateCache({
             orgId: authorization.orgId,
-            scope: 'platform:break-glass',
+            scope: CACHE_SCOPE_PLATFORM_BREAK_GLASS,
             classification: authorization.dataClassification,
             residency: authorization.dataResidency,
         });
@@ -90,7 +94,7 @@ export async function executePlatformToolAction(
 
         await invalidateCache({
             orgId: authorization.orgId,
-            scope: 'platform:tools',
+            scope: CACHE_SCOPE_PLATFORM_TOOLS,
             classification: authorization.dataClassification,
             residency: authorization.dataResidency,
         });

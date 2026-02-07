@@ -1,5 +1,6 @@
-import type { JobsOptions, Queue } from 'bullmq';
+import type { JobsOptions, Queue } from '@/server/lib/queueing/in-memory-queue';
 import { getSharedQueue } from '@/server/lib/queue';
+import { WORKER_QUEUE_NAMES } from '@/server/lib/worker-constants';
 import {
     AUTH_SYNC_JOB_NAMES,
     type AuthSyncSessionJobData,
@@ -18,7 +19,7 @@ const DEFAULT_JOB_OPTIONS: JobsOptions = {
     backoff: { type: 'exponential', delay: 1_000 },
 };
 
-const AUTH_SYNC_QUEUE_NAME = 'auth-sync';
+const AUTH_SYNC_QUEUE_NAME = WORKER_QUEUE_NAMES.AUTH_SYNC;
 
 export function getAuthSyncQueueClient(): AuthSyncQueueClient {
     const queue = getSharedQueue(AUTH_SYNC_QUEUE_NAME, {
@@ -35,3 +36,4 @@ export function getAuthSyncQueueClient(): AuthSyncQueueClient {
         },
     } satisfies AuthSyncQueueClient;
 }
+

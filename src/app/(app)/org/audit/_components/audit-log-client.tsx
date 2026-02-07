@@ -43,6 +43,8 @@ export function AuditLogClient({ orgId }: { orgId: string }) {
     queryFn: ({ pageParam }) => fetchAuditPage(orgId, params, pageParam as string | undefined),
     initialPageParam: undefined,
     getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+    maxPages: 10,
+    gcTime: 2 * 60_000,
   });
 
   const logs = data ? data.pages.flatMap((page) => page.logs) : [];

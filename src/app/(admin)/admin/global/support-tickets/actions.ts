@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { getSessionContextOrRedirect } from '@/server/ui/auth/session-redirect';
 import { createSupportTicketService, updateSupportTicketService } from '@/server/services/platform/admin/support-ticket-service';
 import { invalidateCache } from '@/server/lib/cache-tags';
+import { CACHE_SCOPE_PLATFORM_SUPPORT } from '@/server/repositories/cache-scopes';
 import { ValidationError } from '@/server/errors';
 import { parseSupportTicketCreate, parseSupportTicketUpdate } from '@/server/validators/platform/admin/support-ticket-validators';
 
@@ -46,7 +47,7 @@ export async function createSupportTicketAction(
 
         await invalidateCache({
             orgId: authorization.orgId,
-            scope: 'platform:support',
+            scope: CACHE_SCOPE_PLATFORM_SUPPORT,
             classification: authorization.dataClassification,
             residency: authorization.dataResidency,
         });
@@ -87,7 +88,7 @@ export async function updateSupportTicketAction(
 
         await invalidateCache({
             orgId: authorization.orgId,
-            scope: 'platform:support',
+            scope: CACHE_SCOPE_PLATFORM_SUPPORT,
             classification: authorization.dataClassification,
             residency: authorization.dataResidency,
         });

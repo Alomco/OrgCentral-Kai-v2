@@ -1,7 +1,8 @@
 import { buildCacheTag, invalidateCache, registerCacheTag } from '@/server/lib/cache-tags';
 import type { DataClassificationLevel, DataResidencyZone } from '@/server/types/tenant';
+import { CACHE_SCOPE_HR_NOTIFICATIONS } from '@/server/constants/cache-scopes';
 
-export const HR_NOTIFICATION_CACHE_SCOPE = 'hr-notifications';
+export const HR_NOTIFICATION_CACHE_SCOPE = CACHE_SCOPE_HR_NOTIFICATIONS;
 
 export interface HrNotificationCacheContext {
     orgId: string;
