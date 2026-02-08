@@ -1,7 +1,10 @@
 ---
 name: parallel-agents
 description: Multi-agent orchestration patterns. Use when multiple independent tasks can run with different domain expertise or when comprehensive analysis requires multiple perspectives.
-allowed-tools: Read, Glob, Grep
+allowed-tools:
+  - Read
+  - Glob
+  - Grep
 ---
 
 # Copilot Chat Parallel Agents
@@ -27,7 +30,7 @@ This skill enables coordinating multiple specialized agents through Copilot Chat
 
 ---
 
-## Native Agent Invocation
+## Subagent Invocation
 
 ### Single Agent
 ```
@@ -160,7 +163,7 @@ After all agents complete, synthesize:
 
 ## Key Benefits
 
-- ✅ **Single session** - All agents share context
+- ✅ **Single workflow** - You coordinate all subagents from one thread
 - ✅ **AI-controlled** - Copilot Chat orchestrates via your instructions
 - ✅ **Native integration** - Uses Copilot Chat subagents
 - ✅ **Repeatable runs** - Re-run with explicit context

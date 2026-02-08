@@ -1,7 +1,11 @@
 ---
 name: performance-profiling
 description: Performance profiling principles. Measurement, analysis, and optimization techniques.
-allowed-tools: Read, Glob, Grep, Bash
+allowed-tools:
+  - Read
+  - Glob
+  - Grep
+  - Bash
 ---
 
 # Performance Profiling
@@ -14,7 +18,7 @@ allowed-tools: Read, Glob, Grep, Bash
 
 | Script | Purpose | Usage |
 |--------|---------|-------|
-| `scripts/lighthouse_audit.py` | Lighthouse performance audit | `python scripts/lighthouse_audit.py https://example.com` |
+| .github/skills/performance-profiling/scripts/lighthouse_audit.py` | Lighthouse performance audit | `python .github/skills/performance-profiling/scripts/lighthouse_audit.py https://example.com` |
 
 ---
 
@@ -141,3 +145,4 @@ allowed-tools: Read, Glob, Grep, Bash
 ---
 
 > **Remember:** The fastest code is code that doesn't run. Remove before optimizing.
+

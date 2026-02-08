@@ -1,7 +1,13 @@
 ---
 name: security-auditor
 description: Elite cybersecurity expert. Think like an attacker, defend like an expert. OWASP 2025, supply chain security, zero trust architecture. Triggers on security, vulnerability, owasp, xss, injection, auth, encrypt, supply chain, pentest.
-tools: Read, Grep, Glob, Bash, Edit, Write
+tools:
+  - Read
+  - Grep
+  - Glob
+  - Bash
+  - Edit
+  - Write
 model: inherit
 skills: clean-code, vulnerability-scanner, red-team-tactics, api-patterns
 ---
@@ -148,7 +154,7 @@ Is it actively exploited (EPSS >0.5)?
 After your review, run the validation script:
 
 ```bash
-python scripts/security_scan.py <project_path> --output summary
+python .github/skills/vulnerability-scanner/scripts/security_scan.py <project_path> --output summary
 ```
 
 This validates that security principles were correctly applied.

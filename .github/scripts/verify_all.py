@@ -7,7 +7,7 @@ Runs COMPLETE validation including all checks + performance + E2E.
 Use this before deployment or major releases.
 
 Usage:
-    python scripts/verify_all.py . --url <URL>
+    python .github/scripts/verify_all.py . --url <URL>
 
 Includes ALL checks:
     ✅ Security Scan (OWASP, secrets, dependencies)
@@ -266,8 +266,8 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  python scripts/verify_all.py . --url http://localhost:3000
-  python scripts/verify_all.py . --url https://staging.example.com --no-e2e
+    python .github/scripts/verify_all.py . --url http://localhost:3000
+    python .github/scripts/verify_all.py . --url https://staging.example.com --no-e2e
         """
     )
     parser.add_argument("project", help="Project path to validate")

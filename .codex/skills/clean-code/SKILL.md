@@ -72,7 +72,7 @@ priority: CRITICAL
 
 ## Anti-Patterns (DON'T)
 
-| âŒ Pattern | âœ… Fix |
+| [ERR] Pattern | [OK] Fix |
 |-----------|-------|
 | Comment every line | Delete obvious comments |
 | Helper for one-liner | Inline the code |
@@ -85,7 +85,7 @@ priority: CRITICAL
 
 ---
 
-## ðŸ”´ Before Editing ANY File (THINK FIRST!)
+## [CRITICAL] Before Editing ANY File (THINK FIRST!)
 
 **Before changing a file, ask yourself:**
 
@@ -99,12 +99,12 @@ priority: CRITICAL
 **Quick Check:**
 ```
 File to edit: UserService.ts
-â””â”€â”€ Who imports this? â†’ UserController.ts, AuthController.ts
-â””â”€â”€ Do they need changes too? â†’ Check function signatures
+`-- Who imports this? -> UserController.ts, AuthController.ts
+`-- Do they need changes too? -> Check function signatures
 ```
 
-> ðŸ”´ **Rule:** Edit the file + all dependent files in the SAME task.
-> ðŸ”´ **Never leave broken imports or missing updates.**
+> [CRITICAL] **Rule:** Edit the file + all dependent files in the SAME task.
+> [CRITICAL] **Never leave broken imports or missing updates.**
 
 ---
 
@@ -123,27 +123,27 @@ File to edit: UserService.ts
 
 ---
 
-## ðŸ”´ Self-Check Before Completing (MANDATORY)
+## [CRITICAL] Self-Check Before Completing (MANDATORY)
 
 **Before saying "task complete", verify:**
 
 | Check | Question |
 |-------|----------|
-| âœ… **Goal met?** | Did I do exactly what user asked? |
-| âœ… **Files edited?** | Did I modify all necessary files? |
-| âœ… **Code works?** | Did I test/verify the change? |
-| âœ… **No errors?** | Lint and TypeScript pass? |
-| âœ… **Nothing forgotten?** | Any edge cases missed? |
+| [OK] **Goal met?** | Did I do exactly what user asked? |
+| [OK] **Files edited?** | Did I modify all necessary files? |
+| [OK] **Code works?** | Did I test/verify the change? |
+| [OK] **No errors?** | Lint and TypeScript pass? |
+| [OK] **Nothing forgotten?** | Any edge cases missed? |
 
-> ðŸ”´ **Rule:** If ANY check fails, fix it before completing.
+> [CRITICAL] **Rule:** If ANY check fails, fix it before completing.
 
 ---
 
 ## Verification Scripts (MANDATORY)
 
-> ðŸ”´ **CRITICAL:** Each agent runs ONLY their own skill's scripts after completing work.
+> [CRITICAL] **CRITICAL:** Each agent runs ONLY their own skill's scripts after completing work.
 
-### Agent â†’ Script Mapping
+### Agent -> Script Mapping
 
 | Agent | Script | Command |
 |-------|--------|---------|
@@ -162,12 +162,12 @@ File to edit: UserService.ts
 | **Any agent** | Type Coverage | `python .codex/skills/lint-and-validate/scripts/type_coverage.py .` |
 | **Any agent** | i18n Check | `python .codex/skills/i18n-localization/scripts/i18n_checker.py .` |
 
-> âŒ **WRONG:** `test-engineer` running `ux_audit.py`
-> âœ… **CORRECT:** `frontend-specialist` running `ux_audit.py`
+> [ERR] **WRONG:** `test-engineer` running `ux_audit.py`
+> [OK] **CORRECT:** `frontend-specialist` running `ux_audit.py`
 
 ---
 
-### ðŸ”´ Script Output Handling (READ â†’ SUMMARIZE â†’ ASK)
+### [CRITICAL] Script Output Handling (READ -> SUMMARIZE -> ASK)
 
 **When running a validation script, you MUST:**
 
@@ -178,14 +178,14 @@ File to edit: UserService.ts
 ```markdown
 ## Script Results: [script_name.py]
 
-### âŒ Errors Found (X items)
+### [ERR] Errors Found (X items)
 - [File:Line] Error description 1
 - [File:Line] Error description 2
 
-### âš ï¸ Warnings (Y items)
+### [WARN] Warnings (Y items)
 - [File:Line] Warning description
 
-### âœ… Passed (Z items)
+### [OK] Passed (Z items)
 - Check 1 passed
 - Check 2 passed
 
@@ -193,10 +193,10 @@ File to edit: UserService.ts
 ```
 
 4. **Wait for user confirmation** before fixing
-5. **After fixing** â†’ Re-run script to confirm
+5. **After fixing** -> Re-run script to confirm
 
-> ðŸ”´ **VIOLATION:** Running script and ignoring output = FAILED task.
-> ðŸ”´ **VIOLATION:** Auto-fixing without asking = Not allowed.
-> ðŸ”´ **Rule:** Always READ output â†’ SUMMARIZE â†’ ASK â†’ then fix.
+> [CRITICAL] **VIOLATION:** Running script and ignoring output = FAILED task.
+> [CRITICAL] **VIOLATION:** Auto-fixing without asking = Not allowed.
+> [CRITICAL] **Rule:** Always READ output -> SUMMARIZE -> ASK -> then fix.
 
 

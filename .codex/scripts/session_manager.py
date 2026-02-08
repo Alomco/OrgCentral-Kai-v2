@@ -85,22 +85,22 @@ def print_status(root: Path):
     features = detect_features(root)
     
     print("\n=== Project Status ===")
-    print(f"\nðŸ“ Project: {info.get('name', root.name)}")
-    print(f"ðŸ“‚ Path: {root}")
-    print(f"ðŸ·ï¸  Type: {', '.join(info.get('stack', ['Generic']))}")
-    print(f"ðŸ“Š Status: Active")
+    print(f"\n[FILES] Project: {info.get('name', root.name)}")
+    print(f"[PATH] Path: {root}")
+    print(f"[TYPE]  Type: {', '.join(info.get('stack', ['Generic']))}")
+    print(f"[STATS] Status: Active")
     
-    print("\nðŸ”§ Tech Stack:")
+    print("\n[STACK] Tech Stack:")
     for tech in info.get('stack', []):
-        print(f"   â€¢ {tech}")
+        print(f"   - {tech}")
         
-    print(f"\nâœ… Detected Modules/Features ({len(features)}):")
+    print(f"\n[OK] Detected Modules/Features ({len(features)}):")
     for feat in features:
-        print(f"   â€¢ {feat}")
+        print(f"   - {feat}")
     if not features:
         print("   (No distinct feature modules detected)")
         
-    print(f"\nðŸ“„ Files: {stats['total']} total files tracked")
+    print(f"\n Files: {stats['total']} total files tracked")
     print("\n====================\n")
 
 def main():

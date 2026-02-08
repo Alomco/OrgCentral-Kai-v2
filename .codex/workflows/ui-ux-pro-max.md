@@ -77,8 +77,8 @@ python3 .codex/.shared/ui-ux-pro-max/scripts/search.py "<query>" --design-system
 ```
 
 This creates:
-- `design-system/MASTER.md` â€” Global Source of Truth with all design rules
-- `design-system/pages/` â€” Folder for page-specific overrides
+- `design-system/MASTER.md` - Global Source of Truth with all design rules
+- `design-system/pages/` - Folder for page-specific overrides
 
 **With page-specific override:**
 ```bash
@@ -86,7 +86,7 @@ python3 .codex/.shared/ui-ux-pro-max/scripts/search.py "<query>" --design-system
 ```
 
 This also creates:
-- `design-system/pages/dashboard.md` â€” Page-specific deviations from Master
+- `design-system/pages/dashboard.md` - Page-specific deviations from Master
 
 **How hierarchical retrieval works:**
 1. When building a specific page (e.g., "Checkout"), first check `design-system/pages/checkout.md`
@@ -159,7 +159,7 @@ Available stacks: `html-tailwind`, `react`, `nextjs`, `vue`, `svelte`, `swiftui`
 
 ## Example Workflow
 
-**User request:** "LÃ m landing page cho dá»‹ch vá»¥ chÄƒm sÃ³c da chuyÃªn nghiá»‡p"
+**User request:** "Build a landing page for a professional skincare service"
 
 ### Step 1: Analyze Requirements
 - Product type: Beauty/Spa service
@@ -228,7 +228,7 @@ These are frequently overlooked issues that make UI look unprofessional:
 
 | Rule | Do | Don't |
 |------|----|----- |
-| **No emoji icons** | Use SVG icons (Heroicons, Lucide, Simple Icons) | Use emojis like ðŸŽ¨ ðŸš€ âš™ï¸ as UI icons |
+| **No emoji icons** | Use SVG icons (Heroicons, Lucide, Simple Icons) | Use emoji characters as UI icons |
 | **Stable hover states** | Use color/opacity transitions on hover | Use scale transforms that shift layout |
 | **Correct brand logos** | Research official SVG from Simple Icons | Guess or use incorrect logo paths |
 | **Consistent icon sizing** | Use fixed viewBox (24x24) with w-6 h-6 | Mix different icon sizes randomly |

@@ -53,7 +53,7 @@ $ARGUMENTS
 
 | Step | Agent | Action |
 |------|-------|--------|
-| 1 | `project-planner` | Create docs/PLAN.md |
+| 1 | `project-planner` | Create {task-slug}.md in project root |
 | 2 | (optional) `explorer-agent` | Codebase discovery if needed |
 
 > 🔴 **NO OTHER AGENTS during planning!** Only project-planner and explorer-agent.
@@ -61,9 +61,9 @@ $ARGUMENTS
 ### ⏸️ CHECKPOINT: User Approval
 
 ```
-After PLAN.md is complete, ASK:
+After the plan file is complete, ASK:
 
-"✅ Plan oluşturuldu: docs/PLAN.md
+"✅ Plan olusturuldu: {task-slug}.md
 
 Onaylıyor musunuz? (Y/N)
 - Y: Implementation başlatılır
@@ -86,7 +86,7 @@ Onaylıyor musunuz? (Y/N)
 
 | Agent | Domain | Use When |
 |-------|--------|----------|
-| `project-planner` | Planning | Task breakdown, PLAN.md |
+| `project-planner` | Planning | Task breakdown, {task-slug}.md |
 | `explorer-agent` | Discovery | Codebase mapping |
 | `frontend-specialist` | UI/UX | React, Vue, CSS, HTML |
 | `backend-specialist` | Server | API, Node.js, Python |
@@ -126,14 +126,14 @@ Identify ALL domains this task touches:
 
 | If Plan Exists | Action |
 |----------------|--------|
-| NO `docs/PLAN.md` | → Go to PHASE 1 (planning only) |
-| YES `docs/PLAN.md` + user approved | → Go to PHASE 2 (implementation) |
+| NO `{task-slug}.md` | → Go to PHASE 1 (planning only) |
+| YES `{task-slug}.md` + user approved | → Go to PHASE 2 (implementation) |
 
 ### Step 3: Execute Based on Phase
 
 **PHASE 1 (Planning):**
 ```
-Use the project-planner agent to create PLAN.md
+Use the project-planner agent to create {task-slug}.md in the project root
 → STOP after plan is created
 → ASK user for approval
 ```
@@ -157,7 +157,7 @@ When invoking ANY subagent, you MUST include:
 
 **Example with FULL context:**
 ```
-Use the project-planner agent to create PLAN.md:
+Use the project-planner agent to create {task-slug}.md:
 
 **CONTEXT:**
 - User Request: "Öğrenciler için sosyal platform, mock data ile"
@@ -165,7 +165,7 @@ Use the project-planner agent to create PLAN.md:
 - Previous Work: Orchestrator asked 6 questions, user chose all options
 - Current Plan: playful-roaming-dream.md exists in workspace with initial structure
 
-**TASK:** Create detailed PLAN.md based on ABOVE decisions. Do NOT infer from folder name.
+**TASK:** Create detailed {task-slug}.md based on ABOVE decisions. Do NOT infer from folder name.
 ```
 
 > ⚠️ **VIOLATION:** Invoking subagent without full context = subagent will make wrong assumptions!
@@ -211,7 +211,7 @@ Combine all agent outputs into unified report.
 3. **[Agent 3]**: Finding
 
 ### Deliverables
-- [ ] PLAN.md created
+- [ ] Plan file created
 - [ ] Code implemented
 - [ ] Tests passing
 - [ ] Scripts verified

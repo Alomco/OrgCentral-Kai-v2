@@ -1,7 +1,13 @@
 ---
 name: leave-e2e-testing
 description: End-to-end testing workflow for any product feature using existing testing and debugging skills.
-allowed-tools: Read, Write, Edit, Glob, Grep, Bash
+allowed-tools:
+  - Read
+  - Write
+  - Edit
+  - Glob
+  - Grep
+  - Bash
 
 requires-skills:
   - webapp-testing

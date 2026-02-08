@@ -1,7 +1,11 @@
 ---
 name: project-planner
 description: Smart project planning agent. Breaks down user requests into tasks, plans file structure, determines which agent does what, creates dependency graph. Use when starting new projects or planning major features.
-tools: Read, Grep, Glob, Bash
+tools:
+  - Read
+  - Grep
+  - Glob
+  - Bash
 model: inherit
 skills: clean-code, app-builder, plan-writing, brainstorming
 ---
@@ -129,7 +133,7 @@ File:         ./dashboard-analytics.md (project root)
 | 1 | **ANALYSIS** | Research, brainstorm, explore | Decisions | ❌ NO |
 | 2 | **PLANNING** | Create plan | `{task-slug}.md` | ❌ NO |
 | 3 | **SOLUTIONING** | Architecture, design | Design docs | ❌ NO |
-| 4 | **IMPLEMENTATION** | Code per PLAN.md | Working code | ✅ YES |
+| 4 | **IMPLEMENTATION** | Code per plan file | Working code | ✅ YES |
 | X | **VERIFICATION** | Test & validate | Verified project | ✅ Scripts |
 
 > 🔴 **Flow:** ANALYSIS → PLANNING → USER APPROVAL → SOLUTIONING → DESIGN APPROVAL → IMPLEMENTATION → VERIFICATION
@@ -160,7 +164,7 @@ File:         ./dashboard-analytics.md (project root)
 | 2 | Scripts | `security_scan.py`, `ux_audit.py`, `lighthouse_audit.py` |
 | 3 | Build | `npm run build` |
 | 4 | Run & Test | `npm run dev` + manual test |
-| 5 | Complete | Mark all `[ ]` → `[x]` in PLAN.md |
+| 5 | Complete | Mark all `[ ]` → `[x]` in the plan file |
 
 > 🔴 **Rule:** DO NOT mark `[x]` without actually running the check!
 
@@ -366,7 +370,7 @@ python .github/skills/webapp-testing/scripts/playwright_runner.py http://localho
 - Date: [Current Date]
 ```
 
-> 🔴 **EXIT GATE:** Phase X marker MUST be in PLAN.md before project is complete.
+> 🔴 **EXIT GATE:** Phase X marker MUST be in the plan file before project is complete.
 
 ---
 
@@ -398,7 +402,7 @@ python .github/skills/webapp-testing/scripts/playwright_runner.py http://localho
 | 5 | **Rollback** | Every task has recovery path | Tasks fail, prepare for it |
 | 6 | **Context** | Explain WHY not just WHAT | Better agent decisions |
 | 7 | **Risks** | Identify before they happen | Prepared responses |
-| 8 | **DYNAMIC NAMING** | `docs/PLAN-{task-slug}.md` | Easy to find, multiple plans OK |
+| 8 | **DYNAMIC NAMING** | `{task-slug}.md` | Easy to find, multiple plans OK |
 | 9 | **Milestones** | Each phase ends with working state | Continuous value |
 | 10 | **Phase X** | Verification is ALWAYS final | Definition of done |
 

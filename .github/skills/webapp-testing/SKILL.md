@@ -1,7 +1,13 @@
 ---
 name: webapp-testing
 description: Web application testing principles. E2E, Playwright, deep audit strategies.
-allowed-tools: Read, Write, Edit, Glob, Grep, Bash
+allowed-tools:
+  - Read
+  - Write
+  - Edit
+  - Glob
+  - Grep
+  - Bash
 ---
 
 # Web App Testing
@@ -14,9 +20,9 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 
 | Script | Purpose | Usage |
 |--------|---------|-------|
-| `scripts/playwright_runner.py` | Basic browser test | `python scripts/playwright_runner.py https://example.com` |
-| | With screenshot | `python scripts/playwright_runner.py <url> --screenshot` |
-| | Accessibility check | `python scripts/playwright_runner.py <url> --a11y` |
+| .github/skills/webapp-testing/scripts/playwright_runner.py` | Basic browser test | `python .github/skills/webapp-testing/scripts/playwright_runner.py https://example.com` |
+| | With screenshot | `python .github/skills/webapp-testing/scripts/playwright_runner.py <url> --screenshot` |
+| | Accessibility check | `python .github/skills/webapp-testing/scripts/playwright_runner.py <url> --a11y` |
 
 **Requires:** `pip install playwright && playwright install chromium`
 
@@ -185,3 +191,4 @@ tests/
 ---
 
 > **Remember:** E2E tests are expensive. Use them for critical paths only.
+

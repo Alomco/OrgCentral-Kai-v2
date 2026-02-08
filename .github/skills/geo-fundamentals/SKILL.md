@@ -1,7 +1,10 @@
 ---
 name: geo-fundamentals
 description: Generative Engine Optimization for AI search engines (ChatGPT, Claude, Perplexity).
-allowed-tools: Read, Glob, Grep
+allowed-tools:
+  - Read
+  - Glob
+  - Grep
 ---
 
 # GEO Fundamentals
@@ -152,5 +155,6 @@ How AI engines select content to cite:
 
 | Script | Purpose | Command |
 |--------|---------|---------|
-| `scripts/geo_checker.py` | GEO audit (AI citation readiness) | `python scripts/geo_checker.py <project_path>` |
+| .github/skills/geo-fundamentals/scripts/geo_checker.py` | GEO audit (AI citation readiness) | `python .github/skills/geo-fundamentals/scripts/geo_checker.py <project_path>` |
+
 

@@ -1,7 +1,13 @@
 ---
 name: frontend-design
 description: Design thinking and decision-making for web UI. Use when designing components, layouts, color schemes, typography, or creating aesthetic interfaces. Teaches principles, not fixed values.
-allowed-tools: Read, Write, Edit, Glob, Grep, Bash
+allowed-tools:
+  - Read
+  - Write
+  - Edit
+  - Glob
+  - Grep
+  - Bash
 ---
 
 # Frontend Design System
@@ -35,7 +41,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 
 | Script | Purpose | Usage |
 |--------|---------|-------|
-| `scripts/ux_audit.py` | UX Psychology & Accessibility Audit | `python scripts/ux_audit.py <project_path>` |
+| .github/skills/frontend-design/scripts/ux_audit.py` | UX Psychology & Accessibility Audit | `python .github/skills/frontend-design/scripts/ux_audit.py <project_path>` |
 
 ---
 
@@ -394,3 +400,4 @@ For deeper guidance on specific areas:
 ---
 
 > **Remember:** Design is THINKING, not copying. Every project deserves fresh consideration based on its unique context and users. **Avoid the Modern SaaS Safe Harbor!**
+

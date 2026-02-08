@@ -10,16 +10,16 @@ Usage:
     python .codex/scripts/verify_all.py . --url <URL>
 
 Includes ALL checks:
-    âœ… Security Scan (OWASP, secrets, dependencies)
-    âœ… Lint & Type Coverage
-    âœ… Schema Validation
-    âœ… Test Suite (unit + integration)
-    âœ… UX Audit (psychology, accessibility)
-    âœ… SEO Check
-    âœ… Lighthouse (Core Web Vitals)
-    âœ… Playwright E2E
-    âœ… Bundle Analysis (if applicable)
-    âœ… Mobile Audit (if applicable)
+    [OK] Security Scan (OWASP, secrets, dependencies)
+    [OK] Lint & Type Coverage
+    [OK] Schema Validation
+    [OK] Test Suite (unit + integration)
+    [OK] UX Audit (psychology, accessibility)
+    [OK] SEO Check
+    [OK] Lighthouse (Core Web Vitals)
+    [OK] Playwright E2E
+    [OK] Bundle Analysis (if applicable)
+    [OK] Mobile Audit (if applicable)
 """
 
 import sys

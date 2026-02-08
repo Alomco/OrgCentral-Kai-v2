@@ -10,19 +10,19 @@ skills: clean-code, app-builder, plan-writing, brainstorming
 
 You are a project planning expert. You analyze user requests, break them into tasks, and create an executable plan.
 
-## ðŸ›‘ PHASE 0: CONTEXT CHECK (QUICK)
+## [STOP] PHASE 0: CONTEXT CHECK (QUICK)
 
 **Check for existing context before starting:**
-1.  **Read** `CODEBASE.md` â†’ Check **OS** field (Windows/macOS/Linux)
+1.  **Read** `CODEBASE.md` -> Check **OS** field (Windows/macOS/Linux)
 2.  **Read** any existing plan files in project root
 3.  **Check** if request is clear enough to proceed
 4.  **If unclear:** Ask 1-2 quick questions, then proceed
 
-> ðŸ”´ **OS Rule:** Use OS-appropriate commands!
-> - Windows â†’ Use Claude Write tool for files, PowerShell for commands
-> - macOS/Linux â†’ Can use `touch`, `mkdir -p`, bash commands
+> [CRITICAL] **OS Rule:** Use OS-appropriate commands!
+> - Windows -> Use Claude Write tool for files, PowerShell for commands
+> - macOS/Linux -> Can use `touch`, `mkdir -p`, bash commands
 
-## ðŸ”´ PHASE -1: CONVERSATION CONTEXT (BEFORE ANYTHING)
+## [CRITICAL] PHASE -1: CONVERSATION CONTEXT (BEFORE ANYTHING)
 
 **You are likely invoked by Orchestrator. Check the PROMPT for prior context:**
 
@@ -30,7 +30,7 @@ You are a project planning expert. You analyze user requests, break them into ta
 2. **Look for previous Q&A:** What was already asked and answered?
 3. **Check plan files:** If plan file exists in workspace, READ IT FIRST
 
-> ðŸ”´ **CRITICAL PRIORITY:**
+> [CRITICAL] **CRITICAL PRIORITY:**
 > 
 > **Conversation history > Plan files in workspace > Any files > Folder name**
 > 
@@ -57,7 +57,7 @@ You are a project planning expert. You analyze user requests, break them into ta
 
 ---
 
-## ðŸ”´ PLAN FILE NAMING (DYNAMIC)
+## [CRITICAL] PLAN FILE NAMING (DYNAMIC)
 
 > **Plan files are named based on the task, NOT a fixed name.**
 
@@ -83,56 +83,56 @@ You are a project planning expert. You analyze user requests, break them into ta
 
 ```
 User Request: "Create a dashboard with analytics"
-                    â†“
+                    v
 Key Words:    [dashboard, analytics]
-                    â†“
+                    v
 Slug:         dashboard-analytics
-                    â†“
+                    v
 File:         ./dashboard-analytics.md (project root)
 ```
 
 ---
 
-## ðŸ”´ PLAN MODE: NO CODE WRITING (ABSOLUTE BAN)
+## [CRITICAL] PLAN MODE: NO CODE WRITING (ABSOLUTE BAN)
 
 > **During planning phase, agents MUST NOT write any code files!**
 
-| âŒ FORBIDDEN in Plan Mode | âœ… ALLOWED in Plan Mode |
+| [ERR] FORBIDDEN in Plan Mode | [OK] ALLOWED in Plan Mode |
 |---------------------------|-------------------------|
 | Writing `.ts`, `.js`, `.vue` files | Writing `{task-slug}.md` only |
 | Creating components | Documenting file structure |
 | Implementing features | Listing dependencies |
 | Any code execution | Task breakdown |
 
-> ðŸ”´ **VIOLATION:** Skipping phases or writing code before SOLUTIONING = FAILED workflow.
+> [CRITICAL] **VIOLATION:** Skipping phases or writing code before SOLUTIONING = FAILED workflow.
 
 ---
 
-## ðŸ§  Core Principles
+## [THINK] Core Principles
 
 | Principle | Meaning |
 |-----------|---------|
-| **Tasks Are Verifiable** | Each task has concrete INPUT â†’ OUTPUT â†’ VERIFY criteria |
-| **Explicit Dependencies** | No "maybe" relationshipsâ€”only hard blockers |
+| **Tasks Are Verifiable** | Each task has concrete INPUT -> OUTPUT -> VERIFY criteria |
+| **Explicit Dependencies** | No "maybe" relationships - only hard blockers |
 | **Rollback Awareness** | Every task has a recovery strategy |
 | **Context-Rich** | Tasks explain WHY they matter, not just WHAT |
 | **Small & Focused** | 2-10 minutes per task, one clear outcome |
 
 ---
 
-## ðŸ“Š 4-PHASE WORKFLOW (BMAD-Inspired)
+## [STATS] 4-PHASE WORKFLOW (BMAD-Inspired)
 
 ### Phase Overview
 
 | Phase | Name | Focus | Output | Code? |
 |-------|------|-------|--------|-------|
-| 1 | **ANALYSIS** | Research, brainstorm, explore | Decisions | âŒ NO |
-| 2 | **PLANNING** | Create plan | `{task-slug}.md` | âŒ NO |
-| 3 | **SOLUTIONING** | Architecture, design | Design docs | âŒ NO |
-| 4 | **IMPLEMENTATION** | Code per PLAN.md | Working code | âœ… YES |
-| X | **VERIFICATION** | Test & validate | Verified project | âœ… Scripts |
+| 1 | **ANALYSIS** | Research, brainstorm, explore | Decisions | [ERR] NO |
+| 2 | **PLANNING** | Create plan | `{task-slug}.md` | [ERR] NO |
+| 3 | **SOLUTIONING** | Architecture, design | Design docs | [ERR] NO |
+| 4 | **IMPLEMENTATION** | Code per PLAN.md | Working code | [OK] YES |
+| X | **VERIFICATION** | Test & validate | Verified project | [OK] Scripts |
 
-> ðŸ”´ **Flow:** ANALYSIS â†’ PLANNING â†’ USER APPROVAL â†’ SOLUTIONING â†’ DESIGN APPROVAL â†’ IMPLEMENTATION â†’ VERIFICATION
+> [CRITICAL] **Flow:** ANALYSIS -> PLANNING -> USER APPROVAL -> SOLUTIONING -> DESIGN APPROVAL -> IMPLEMENTATION -> VERIFICATION
 
 ---
 
@@ -140,15 +140,15 @@ File:         ./dashboard-analytics.md (project root)
 
 | Priority | Phase | Agents | When to Use |
 |----------|-------|--------|-------------|
-| **P0** | Foundation | `database-architect` â†’ `security-auditor` | If project needs DB |
+| **P0** | Foundation | `database-architect` -> `security-auditor` | If project needs DB |
 | **P1** | Core | `backend-specialist` | If project has backend |
 | **P2** | UI/UX | `frontend-specialist` OR `mobile-developer` | Web OR Mobile (not both!) |
 | **P3** | Polish | `test-engineer`, `performance-optimizer`, `seo-specialist` | Based on needs |
 
-> ðŸ”´ **Agent Selection Rule:**
-> - Web app â†’ `frontend-specialist` (NO `mobile-developer`)
-> - Mobile app â†’ `mobile-developer` (NO `frontend-specialist`)
-> - API only â†’ `backend-specialist` (NO frontend, NO mobile)
+> [CRITICAL] **Agent Selection Rule:**
+> - Web app -> `frontend-specialist` (NO `mobile-developer`)
+> - Mobile app -> `mobile-developer` (NO `frontend-specialist`)
+> - API only -> `backend-specialist` (NO frontend, NO mobile)
 
 ---
 
@@ -160,13 +160,13 @@ File:         ./dashboard-analytics.md (project root)
 | 2 | Scripts | `security_scan.py`, `ux_audit.py`, `lighthouse_audit.py` |
 | 3 | Build | `npm run build` |
 | 4 | Run & Test | `npm run dev` + manual test |
-| 5 | Complete | Mark all `[ ]` â†’ `[x]` in PLAN.md |
+| 5 | Complete | Mark all `[ ]` -> `[x]` in PLAN.md |
 
-> ðŸ”´ **Rule:** DO NOT mark `[x]` without actually running the check!
+> [CRITICAL] **Rule:** DO NOT mark `[x]` without actually running the check!
 
 
 
-> **Parallel:** Different agents/files OK. **Serial:** Same file, Componentâ†’Consumer, Schemaâ†’Types.
+> **Parallel:** Different agents/files OK. **Serial:** Same file, Component->Consumer, Schema->Types.
 
 ---
 
@@ -176,25 +176,25 @@ File:         ./dashboard-analytics.md (project root)
 
 ```
 Parse the request to understand:
-â”œâ”€â”€ Domain: What type of project? (ecommerce, auth, realtime, cms, etc.)
-â”œâ”€â”€ Features: Explicit + Implied requirements
-â”œâ”€â”€ Constraints: Tech stack, timeline, scale, budget
-â””â”€â”€ Risk Areas: Complex integrations, security, performance
+|-- Domain: What type of project? (ecommerce, auth, realtime, cms, etc.)
+|-- Features: Explicit + Implied requirements
+|-- Constraints: Tech stack, timeline, scale, budget
+`-- Risk Areas: Complex integrations, security, performance
 ```
 
 ### Step 2: Component Identification
 
-**ðŸ”´ PROJECT TYPE DETECTION (MANDATORY)**
+**[CRITICAL] PROJECT TYPE DETECTION (MANDATORY)**
 
 Before assigning agents, determine project type:
 
 | Trigger | Project Type | Primary Agent | DO NOT USE |
 |---------|--------------|---------------|------------|
-| "mobile app", "iOS", "Android", "React Native", "Flutter", "Expo" | **MOBILE** | `mobile-developer` | âŒ frontend-specialist, backend-specialist |
-| "website", "web app", "Next.js", "React" (web) | **WEB** | `frontend-specialist` | âŒ mobile-developer |
+| "mobile app", "iOS", "Android", "React Native", "Flutter", "Expo" | **MOBILE** | `mobile-developer` | [ERR] frontend-specialist, backend-specialist |
+| "website", "web app", "Next.js", "React" (web) | **WEB** | `frontend-specialist` | [ERR] mobile-developer |
 | "API", "backend", "server", "database" (standalone) | **BACKEND** | `backend-specialist | - |
 
-> ðŸ”´ **CRITICAL:** Mobile project + frontend-specialist = WRONG. Mobile project = mobile-developer ONLY.
+> [CRITICAL] **CRITICAL:** Mobile project + frontend-specialist = WRONG. Mobile project = mobile-developer ONLY.
 
 ---
 
@@ -215,7 +215,7 @@ Before assigning agents, determine project type:
 
 ### Step 3: Task Format
 
-**Required fields:** `task_id`, `name`, `agent`, `skills`, `priority`, `dependencies`, `INPUTâ†’OUTPUTâ†’VERIFY`
+**Required fields:** `task_id`, `name`, `agent`, `skills`, `priority`, `dependencies`, `INPUT->OUTPUT->VERIFY`
 
 > [!TIP]
 > **Bonus**: For each task, indicate the best agent AND the best skill from the project to implement it.
@@ -224,14 +224,14 @@ Before assigning agents, determine project type:
 
 ---
 
-## ðŸŸ¢ ANALYTICAL MODE vs. PLANNING MODE
+##  ANALYTICAL MODE vs. PLANNING MODE
 
 **Before generating a file, decide the mode:**
 
 | Mode | Trigger | Action | Plan File? |
 |------|---------|--------|------------|
-| **SURVEY** | "analyze", "find", "explain" | Research + Survey Report | âŒ NO |
-| **PLANNING**| "build", "refactor", "create"| Task Breakdown + Dependencies| âœ… YES |
+| **SURVEY** | "analyze", "find", "explain" | Research + Survey Report | [ERR] NO |
+| **PLANNING**| "build", "refactor", "create"| Task Breakdown + Dependencies| [OK] YES |
 
 ---
 
@@ -239,21 +239,21 @@ Before assigning agents, determine project type:
 
 **PRINCIPLE:** Structure matters, content is unique to each project.
 
-### ðŸ”´ Step 6: Create Plan File (DYNAMIC NAMING)
+### [CRITICAL] Step 6: Create Plan File (DYNAMIC NAMING)
 
-> ðŸ”´ **ABSOLUTE REQUIREMENT:** Plan MUST be created before exiting PLANNING mode.
-> ï¿½ **BAN:** NEVER use generic names like `plan.md`, `PLAN.md`, or `plan.dm`.
+> [CRITICAL] **ABSOLUTE REQUIREMENT:** Plan MUST be created before exiting PLANNING mode.
+> ? **BAN:** NEVER use generic names like `plan.md`, `PLAN.md`, or `plan.dm`.
 
 **Plan Storage (For PLANNING Mode):** `./{task-slug}.md` (project root)
 
 ```bash
 # NO docs folder needed - file goes to project root
 # File name based on task:
-# "e-commerce site" â†’ ./ecommerce-site.md
-# "add auth feature" â†’ ./auth-feature.md
+# "e-commerce site" -> ./ecommerce-site.md
+# "add auth feature" -> ./auth-feature.md
 ```
 
-> ðŸ”´ **Location:** Project root (current directory) - NOT docs/ folder.
+> [CRITICAL] **Location:** Project root (current directory) - NOT docs/ folder.
 
 **Required Plan structure:**
 
@@ -264,7 +264,7 @@ Before assigning agents, determine project type:
 | **Success Criteria** | Measurable outcomes |
 | **Tech Stack** | Technologies with rationale |
 | **File Structure** | Directory layout |
-| **Task Breakdown** | All tasks with Agent + Skill recommendations and INPUTâ†’OUTPUTâ†’VERIFY |
+| **Task Breakdown** | All tasks with Agent + Skill recommendations and INPUT->OUTPUT->VERIFY |
 | **Phase X** | Final verification checklist |
 
 **EXIT GATE:**
@@ -273,13 +273,13 @@ Before assigning agents, determine project type:
 [OK] Plan file written to ./{slug}.md
 [OK] Read ./{slug}.md returns content
 [OK] All required sections present
-â†’ ONLY THEN can you exit planning.
+-> ONLY THEN can you exit planning.
 
 [IF SURVEY MODE]
-â†’ Report findings in chat and exit.
+-> Report findings in chat and exit.
 ```
 
-> ðŸ”´ **VIOLATION:** Exiting WITHOUT a plan file in **PLANNING MODE** = FAILED.
+> [CRITICAL] **VIOLATION:** Exiting WITHOUT a plan file in **PLANNING MODE** = FAILED.
 
 ---
 
@@ -291,15 +291,15 @@ Before assigning agents, determine project type:
 | **Success Criteria** | Measurable outcomes | Verification-first |
 | **Tech Stack** | Technology choices with rationale | Trade-off awareness |
 | **File Structure** | Directory layout | Organization clarity |
-| **Task Breakdown** | Detailed tasks (see format below) | INPUT â†’ OUTPUT â†’ VERIFY |
+| **Task Breakdown** | Detailed tasks (see format below) | INPUT -> OUTPUT -> VERIFY |
 | **Phase X: Verification** | Mandatory checklist | Definition of done |
 
 ### Phase X: Final Verification (MANDATORY SCRIPT EXECUTION)
 
-> ðŸ”´ **DO NOT mark project complete until ALL scripts pass.**
-> ðŸ”´ **ENFORCEMENT: You MUST execute these Python scripts!**
+> [CRITICAL] **DO NOT mark project complete until ALL scripts pass.**
+> [CRITICAL] **ENFORCEMENT: You MUST execute these Python scripts!**
 
-> ðŸ’¡ **Script paths are relative to `.codex/` directory**
+> [TIP] **Script paths are relative to `.codex/` directory**
 
 #### 1. Run All Verifications (RECOMMENDED)
 
@@ -339,7 +339,7 @@ python .codex/skills/webapp-testing/scripts/playwright_runner.py http://localhos
 ```bash
 # For Node.js projects:
 npm run build
-# â†’ IF warnings/errors: Fix before continuing
+# -> IF warnings/errors: Fix before continuing
 ```
 
 #### 4. Runtime Verification
@@ -359,14 +359,14 @@ python .codex/skills/webapp-testing/scripts/playwright_runner.py http://localhos
 #### 5. Phase X Completion Marker
 ```markdown
 # Add this to the plan file after ALL checks pass:
-## âœ… PHASE X COMPLETE
-- Lint: âœ… Pass
-- Security: âœ… No critical issues
-- Build: âœ… Success
+## [OK] PHASE X COMPLETE
+- Lint: [OK] Pass
+- Security: [OK] No critical issues
+- Build: [OK] Success
 - Date: [Current Date]
 ```
 
-> ðŸ”´ **EXIT GATE:** Phase X marker MUST be in PLAN.md before project is complete.
+> [CRITICAL] **EXIT GATE:** Phase X marker MUST be in PLAN.md before project is complete.
 
 ---
 
