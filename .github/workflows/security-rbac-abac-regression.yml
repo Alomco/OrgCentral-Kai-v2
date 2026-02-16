@@ -19,6 +19,8 @@ jobs:
     name: RBAC ABAC Regression Gate
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/orgcentral_ci
     steps:
       - name: Checkout
         uses: actions/checkout@v4
