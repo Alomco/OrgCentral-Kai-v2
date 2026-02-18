@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto';
+
 import { AbstractBaseService } from '@/server/services/abstract-base-service';
 import type { ServiceExecutionContext } from '@/server/services/abstract-base-service';
 import { buildSystemServiceContext, buildTenantServiceContext } from '@/server/services/auth/service-context';
@@ -35,10 +37,11 @@ export class InvitationService extends AbstractBaseService {
 
     private async buildContext(token: string): Promise<ServiceExecutionContext> {
         const record = await this.safeLookupInvitation(token);
+        const tokenMetadata = buildTokenLogMetadata(token);
         if (!record) {
             return buildSystemServiceContext({
                 auditSource: AUDIT_SOURCE,
-                metadata: { token },
+                metadata: tokenMetadata,
             });
         }
 
@@ -52,7 +55,7 @@ export class InvitationService extends AbstractBaseService {
             dataResidency: organization?.dataResidency ?? 'UK_ONLY',
             dataClassification: organization?.dataClassification ?? 'OFFICIAL',
             auditSource: AUDIT_SOURCE,
-            metadata: { token, organizationId: record.organizationId },
+            metadata: { ...tokenMetadata, organizationId: record.organizationId },
         });
     }
 
@@ -60,10 +63,21 @@ export class InvitationService extends AbstractBaseService {
         try {
             return await this.dependencies.invitationRepository.findByToken(token);
         } catch (error) {
-            this.logger.warn('auth.invitation.lookup.failed', { token, reason: (error as Error).message });
+            this.logger.warn('auth.invitation.lookup.failed', {
+                ...buildTokenLogMetadata(token),
+                reason: error instanceof Error ? error.message : 'Unknown error',
+            });
             return null;
         }
     }
+}
+
+function buildTokenLogMetadata(token: string): { tokenHashPrefix: string; tokenLength: number } {
+    const tokenHashPrefix = createHash('sha256').update(token).digest('hex').slice(0, 12);
+    return {
+        tokenHashPrefix,
+        tokenLength: token.length,
+    };
 }
 
 let sharedService: InvitationService | null = null;

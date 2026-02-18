@@ -57,7 +57,7 @@ This guide tells AI agents how to explore and extend the HR domain without dupli
 - **Single Source of Truth** – Services own orchestration, repositories own persistence, domain helpers own calculations. Extend these layers instead of duplicating logic in controllers or actions.
 - **Generic, Typed Helpers** – Prefer reusable functions with explicit generics (e.g., `async function runHrMutation<TResult>(...)`) to share behavior without leaking `any`.
 - **Compliance-Ready Defaults** – Always propagate `orgId`, residency, classification, audit metadata, and cache tags. Treat cache scopes as classification boundaries.
-- **Library-First Implementations** – Use vetted packages already installed (`zod` for validation, `BullMQ` for workers, Resend/Novu adapters, etc.) before authoring custom utilities.
+- **Library-First Implementations** – Use vetted packages already installed (`zod` for validation, `BullMQ` for workers, notification adapters, etc.) before authoring custom utilities.
 - **Scalable Patterns** – Expect new tenants, regions, and policies. Keep business rules configuration-driven and store defaults centrally (`src/config`).
 
 ## Architecture Principles

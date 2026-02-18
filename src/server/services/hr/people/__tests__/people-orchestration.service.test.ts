@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
 import type { LeaveRequest } from '@/server/types/leave-types';
 import type { UnplannedAbsence } from '@/server/types/hr-ops-types';
+import type { EmployeeProfileDTO } from '@/server/types/hr/people';
 import type { CancelLeaveRequestResult, EnsureEmployeeBalancesResult } from '@/server/use-cases/hr/leave';
 import {
     authorization,
@@ -27,6 +28,18 @@ vi.mock('../helpers/people-orchestration.helpers', () => ({
 }));
 
 const TARGET_USER_ID = '33333333-3333-4333-8333-333333333333';
+
+const baseEmployeeProfile: EmployeeProfileDTO = {
+    id: PROFILE_ID,
+    orgId: authorization.orgId,
+    userId: TARGET_USER_ID,
+    employeeNumber: 'EMP-1',
+    employmentStatus: 'ACTIVE',
+    employmentType: 'FULL_TIME',
+    healthStatus: 'UNDEFINED',
+    createdAt: timestamp,
+    updatedAt: timestamp,
+};
 
 describe('PeopleOrchestrationService', () => {
     beforeEach(() => {
@@ -57,7 +70,15 @@ describe('PeopleOrchestrationService', () => {
     });
 
     it('updateEligibility updates profile and ensures balances with employee number', async () => {
-        const { service, deps } = createService();
+        const { service, deps } = createService({
+            peopleService: {
+                getEmployeeProfile: vi.fn(async () => ({
+                    profile: {
+                        ...baseEmployeeProfile,
+                    },
+                })),
+            },
+        });
 
         await service.updateEligibility({
             authorization,
@@ -80,6 +101,14 @@ describe('PeopleOrchestrationService', () => {
 
     it('terminateEmployee cancels pending leave and updates records', async () => {
         const { service, deps } = createService({
+            peopleService: {
+                getEmployeeProfile: vi.fn(async () => ({
+                    profile: {
+                        ...baseEmployeeProfile,
+                        id: '55555555-5555-4555-8555-555555555555',
+                    },
+                })),
+            },
             leaveService: {
                 listLeaveRequests: vi.fn(async () => ({
                     requests: [buildLeaveRequest({ id: 'req-1' })],

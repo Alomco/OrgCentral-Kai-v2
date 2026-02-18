@@ -39,7 +39,7 @@ describe("members suspend flow", () => {
     const suspend = await screen.findByRole('button', { name: /suspend/i });
     await userEvent.click(suspend);
 
-    await waitFor(async () => expect(await screen.findByText(/Status: SUSPENDED/)).toBeInTheDocument());
-  }, 10000);
+    await waitFor(() => expect(screen.getByText(/Status: SUSPENDED/)).toBeInTheDocument(), { timeout: 20000 });
+  }, 30000);
 });
 

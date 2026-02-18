@@ -72,10 +72,12 @@ function createPrismaClient(): PrismaClientInstance {
 
     if (enableQueryDebug) {
         client.$on('query', (event) => {
+            const paramsLength = typeof event.params === 'string' ? event.params.length : 0;
             appLogger.debug('prisma.query', {
                 target: event.target,
                 query: event.query,
-                params: event.params,
+                paramsRedacted: true,
+                paramsLength,
                 durationMs: event.duration,
                 timestamp: event.timestamp,
             });

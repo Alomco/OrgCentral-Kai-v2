@@ -33,6 +33,10 @@ function buildContentSecurityPolicy(nonce: string): string {
 }
 
 export function proxy(request: NextRequest) {
+    if (isMalformedPath(request.nextUrl.pathname)) {
+        return new NextResponse('Not Found', { status: 404 });
+    }
+
     const nonce = crypto.randomUUID();
     const requestHeaders = new Headers(request.headers);
     requestHeaders.set('x-nonce', nonce);
@@ -51,3 +55,20 @@ export function proxy(request: NextRequest) {
 export const config = {
     matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
 };
+
+function isMalformedPath(pathname: string): boolean {
+    if (!pathname.startsWith('/')) {
+        return true;
+    }
+
+    if (pathname.startsWith('//')) {
+        return true;
+    }
+
+    const lowered = pathname.toLowerCase();
+    if (lowered.includes('/.env') || lowered.includes('/..')) {
+        return true;
+    }
+
+    return false;
+}

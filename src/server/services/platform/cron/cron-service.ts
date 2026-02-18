@@ -1,7 +1,9 @@
 import type { OrgRoleKey } from '@/server/security/access-control';
 import type { DataClassificationLevel, DataResidencyZone } from '@/server/types/tenant';
 import { appLogger } from '@/server/logging/structured-logger';
+import { recordAuditEvent } from '@/server/logging/audit-logger';
 import type { ICronTenantRepository } from '@/server/repositories/contracts/platform/cron/cron-tenant-repository-contract';
+import { AbstractBaseService } from '@/server/services/abstract-base-service';
 
 export interface CronRequestOptions {
     orgIds?: string[];
@@ -40,16 +42,24 @@ export interface CronServiceDependencies {
     tenantRepository: ICronTenantRepository;
 }
 
-export class CronService {
+export interface CronAuditContext {
+    auditSource?: string;
+    correlationId?: string;
+    triggeredByUserId?: string;
+}
+
+export class CronService extends AbstractBaseService {
     private readonly tenantRepository: ICronTenantRepository;
 
     constructor(dependencies: CronServiceDependencies) {
+        super();
         this.tenantRepository = dependencies.tenantRepository;
     }
 
     async resolveOrgActors(
         orgIds: string[] | undefined,
         rolePriority: OrgRoleKey[],
+        auditContext?: CronAuditContext,
     ): Promise<OrgActorResolution> {
         const uniqueOrgIds = orgIds?.length ? Array.from(new Set(orgIds)) : undefined;
 
@@ -125,10 +135,53 @@ export class CronService {
             });
         }
 
+        await this.recordActorResolutionAudit(actors, skipped, auditContext);
+
         return { actors, skipped };
     }
 
     private isOrgRoleKey(value: string | null | undefined): value is OrgRoleKey {
         return value === 'owner' || value === 'orgAdmin' || value === 'compliance' || value === 'member';
+    }
+
+    private async recordActorResolutionAudit(
+        actors: OrgActor[],
+        skipped: OrgActorSkip[],
+        auditContext?: CronAuditContext,
+    ): Promise<void> {
+        const orgIds = new Set<string>([
+            ...actors.map((actor) => actor.orgId),
+            ...skipped.map((entry) => entry.orgId),
+        ]);
+
+        if (orgIds.size === 0) {
+            return;
+        }
+
+        const auditSource = auditContext?.auditSource ?? 'cron.resolve-org-actors';
+        const userId = auditContext?.triggeredByUserId ?? 'system:cron';
+
+        await Promise.all(Array.from(orgIds).map(async (orgId) => {
+            const skippedReasons = skipped
+                .filter((entry) => entry.orgId === orgId)
+                .map((entry) => entry.reason);
+            const selectedActor = actors.find((actor) => actor.orgId === orgId) ?? null;
+
+            await recordAuditEvent({
+                orgId,
+                userId,
+                eventType: 'SYSTEM',
+                action: 'cron.resolve-org-actors',
+                resource: 'cron.org.actor',
+                resourceId: orgId,
+                correlationId: auditContext?.correlationId,
+                auditSource,
+                payload: {
+                    selectedActorUserId: selectedActor?.userId ?? null,
+                    selectedRole: selectedActor?.role ?? null,
+                    skippedReasons,
+                },
+            });
+        }));
     }
 }

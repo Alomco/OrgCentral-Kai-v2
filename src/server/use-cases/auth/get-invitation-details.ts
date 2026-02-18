@@ -37,13 +37,14 @@ export async function getInvitationDetails(
     input: GetInvitationDetailsInput,
 ): Promise<GetInvitationDetailsResult> {
     const token = normalizeToken(input.token);
+    const tokenContext = buildTokenErrorContext(token);
 
     const record = await deps.invitationRepository.findByToken(token);
     if (!record) {
-        throw new EntityNotFoundError('Invitation', { token });
+        throw new EntityNotFoundError('Invitation', tokenContext);
     }
 
-    assertInvitationActive(record, token);
+    assertInvitationActive(record, tokenContext);
 
     const isExistingUser = deps.userRepository
         ? await deps.userRepository.userExistsByEmail(record.targetEmail)
@@ -70,7 +71,11 @@ function mapInvitationRecord(record: InvitationRecord): InvitationDetails {
     };
 }
 
-function assertInvitationActive(record: InvitationRecord, token: string): void {
-    assertStatus(record.status, 'pending', 'Invitation', { token });
-    assertNotExpired(record.expiresAt, 'Invitation', { token });
+function assertInvitationActive(record: InvitationRecord, tokenContext: { tokenLength: number }): void {
+    assertStatus(record.status, 'pending', 'Invitation', tokenContext);
+    assertNotExpired(record.expiresAt, 'Invitation', tokenContext);
+}
+
+function buildTokenErrorContext(token: string): { tokenLength: number } {
+    return { tokenLength: token.length };
 }

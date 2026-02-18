@@ -18,10 +18,10 @@ This .github folder is the source of truth for Copilot Chat alignment.
 ## Must-follow Principles
 
 ### VS Code Copilot Compatibility Baseline
-
+- Optimize tools usage and benefits for VS Code Copilot Chat on Windows.
+- If any guidance conflicts with Copilot Chat capabilities, prioritize Copilot Chat compatibility. use parallel file patching.
 - Store custom agents as `.github/agents/*.agent.md`.
 - Keep YAML front matter at the top of every agent file.
-- Treat subagents as stateless and delegate only scoped tasks.
 - Use PowerShell-compatible command examples for Windows-first workflows.
 
 

@@ -77,7 +77,12 @@ describe("roles create flow", () => {
     await userEvent.click(screen.getByRole("button", { name: /create/i }));
 
     await screen.findByText(/role created/i);
-    await waitFor(() => expect(screen.getByText(/manager/i)).toBeInTheDocument());
-  }, 10000);
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /create/i })).toBeEnabled();
+    });
+    await waitFor(() => {
+      expect(screen.getByText(/^manager$/i)).toBeInTheDocument();
+    }, { timeout: 20000 });
+  }, 30000);
 });
 

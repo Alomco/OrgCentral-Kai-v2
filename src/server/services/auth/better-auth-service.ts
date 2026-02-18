@@ -14,14 +14,17 @@ interface BetterAuthServiceOptions {
 
 function resolveBaseURLFromRequest(request: NextRequest, trustProxyHeaders: boolean): string {
     if (trustProxyHeaders) {
-        const forwardedProto = request.headers.get('x-forwarded-proto');
-        const forwardedHost = request.headers.get('x-forwarded-host');
+        const forwardedProto = normalizeProtocolHeader(request.headers.get('x-forwarded-proto'));
+        const forwardedHost = normalizeHostHeader(request.headers.get('x-forwarded-host'));
 
-        const host = forwardedHost ?? request.headers.get('host');
-        const proto = forwardedProto ?? request.nextUrl.protocol.replace(':', '');
+        const host = forwardedHost ?? normalizeHostHeader(request.headers.get('host'));
+        const proto = forwardedProto ?? normalizeProtocolHeader(request.nextUrl.protocol.replace(':', ''));
 
-        if (host) {
-            return `${proto}://${host}`;
+        if (host && proto) {
+            const resolved = normalizeOrigin(`${proto}://${host}`);
+            if (resolved) {
+                return resolved;
+            }
         }
     }
 
@@ -98,4 +101,37 @@ function pruneOldestAuthHandlers(
         }
         authByBaseURL.delete(oldest);
     }
+}
+
+function normalizeOrigin(value: string): string | null {
+    try {
+        const parsed = new URL(value);
+        if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+            return null;
+        }
+        return parsed.origin;
+    } catch {
+        return null;
+    }
+}
+
+function normalizeHostHeader(value: string | null): string | null {
+    if (!value) {
+        return null;
+    }
+
+    const trimmed = value.trim();
+    if (!trimmed || trimmed.includes('/') || trimmed.includes('\\') || trimmed.includes('@')) {
+        return null;
+    }
+
+    return trimmed;
+}
+
+function normalizeProtocolHeader(value: string | null): 'http' | 'https' | null {
+    const normalized = value?.trim().toLowerCase();
+    if (normalized === 'http' || normalized === 'https') {
+        return normalized;
+    }
+    return null;
 }

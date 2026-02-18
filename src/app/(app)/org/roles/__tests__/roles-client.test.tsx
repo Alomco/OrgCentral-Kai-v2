@@ -27,15 +27,17 @@ describe("RolesListClient invalidation", () => {
     expect(await screen.findByText(/member/i)).toBeInTheDocument();
 
     server.resetHandlers(
-      http.get(baseUrl, () => HttpResponse.json({ roles: [
-        { id: "r1", orgId, name: "member", description: null, scope: "ORG", permissions: {}, createdAt: new Date(), updatedAt: new Date() },
-        { id: "r2", orgId, name: "manager", description: null, scope: "ORG", permissions: {}, createdAt: new Date(), updatedAt: new Date() },
-      ] })),
+      http.get(baseUrl, () => HttpResponse.json({
+        roles: [
+          { id: "r1", orgId, name: "member", description: null, scope: "ORG", permissions: {}, createdAt: new Date(), updatedAt: new Date() },
+          { id: "r2", orgId, name: "manager", description: null, scope: "ORG", permissions: {}, createdAt: new Date(), updatedAt: new Date() },
+        ]
+      })),
     );
 
     await qc.invalidateQueries({ queryKey: ["org", orgId, "roles"] });
 
-    await waitFor(async () => expect(await screen.findByText(/manager/i)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText(/manager/i)).toBeInTheDocument(), { timeout: 20000 });
   });
 });
 

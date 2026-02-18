@@ -10,6 +10,7 @@ import {
 import { DATA_CLASSIFICATION_LEVELS, DATA_RESIDENCY_ZONES } from './tenant';
 import {
   addressSchema,
+  bankDetailsSchema,
   contactSchema,
   dateInputSchema,
   employmentPeriodSchema,
@@ -52,7 +53,7 @@ export const employeeProfileSchema = z.object({
   nextOfKin: contactSchema.nullable().optional(),
   healthStatus: z.enum(HEALTH_STATUS_VALUES),
   workPermit: jsonValueSchema.optional(),
-  bankDetails: jsonValueSchema.optional(),
+  bankDetails: bankDetailsSchema.nullable().optional(),
   metadata: jsonValueSchema.optional(),
   phone: phoneSchema.nullable().optional(),
   address: addressSchema.nullable().optional(),

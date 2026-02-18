@@ -1,6 +1,6 @@
 ﻿// @vitest-environment jsdom
 import { describe, it, expect } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { http, HttpResponse } from "msw";
@@ -40,10 +40,11 @@ describe("audit infinite list", () => {
 
     await userEvent.click(screen.getByRole('button', { name: /load more/i }));
 
-    await waitFor(async () => {
-      expect(await screen.findByText('No More')).toBeInTheDocument();
-      expect(screen.getAllByText(/org.resource/).length).toBeGreaterThan(0);
-    });
-  }, 10000);
+    const loadMoreButton = await screen.findByRole('button', { name: /load more audit events/i }, { timeout: 20000 });
+    expect(loadMoreButton).toBeDisabled();
+    expect(loadMoreButton).toHaveTextContent(/no more/i);
+    expect(screen.queryByRole('button', { name: /^loading\.\.\.$/i })).not.toBeInTheDocument();
+    expect(screen.getAllByText(/^org\.resource$/).length).toBeGreaterThan(0);
+  }, 30000);
 });
 

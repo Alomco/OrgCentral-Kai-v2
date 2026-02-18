@@ -2,12 +2,13 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { http, HttpResponse } from "msw";
 import { server } from "../../../../../../test/msw-setup";
 import { PermissionResourceManager } from "../_components/permission-resource-manager";
 import type { PermissionResourceCreateState } from "../permission-resource-form-utils";
 import type { PermissionResource } from "@/server/types/security-types";
+import { createPermissionsTestQueryClient } from "./permissions-test-utils";
 
 const { db, orgId } = vi.hoisted(() => {
   const orgId = "org-perm-create";
@@ -65,7 +66,7 @@ describe("permissions create flow", () => {
       })),
     );
 
-    const qc = new QueryClient();
+    const qc = createPermissionsTestQueryClient();
     render(
       <QueryClientProvider client={qc}>
         <PermissionResourceManager orgId={orgId} resources={db.resources} />
@@ -84,6 +85,6 @@ describe("permissions create flow", () => {
     await userEvent.click(within(createForm).getByRole("button", { name: /create resource/i }));
 
     await waitFor(() => expect(screen.getByText(/org\.new/)).toBeInTheDocument(), { timeout: 15000 });
-  }, 20000);
+  });
 });
 

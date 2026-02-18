@@ -46,3 +46,21 @@ next-env.d.ts
 # local test account artifacts
 .codex/test-accounts/*.local.json
 .codex/test-accounts/*.local.md
+
+# runtime test artifacts
+artifacts/test-runs/*.log
+artifacts/test-runs/*.errors.log
+artifacts/memory/*.txt
+artifacts/memory/*.log
+
+# generated runtime/output folders
+/artifacts/
+/tmp/
+/.tmp/
+/var/
+
+# temporary diagnostics and patch outputs
+tailwindcss-*.log
+temp_patch.diff
+tscFiles.txt
+tscOut.txt

@@ -4,6 +4,7 @@ import type { Span, Attributes, Context } from '@opentelemetry/api';
 import { trace, context, createContextKey } from '@opentelemetry/api';
 import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import pino, { type Logger } from 'pino';
+import { sanitizeLogMetadata, sanitizeLogText } from '@/server/logging/log-sanitizer';
 
 const TENANT_ID_KEY = createContextKey('tenantId');
 const CORRELATION_ID_KEY = createContextKey('correlationId');
@@ -60,9 +61,10 @@ export class StructuredLogger {
     const currentContext = context.active();
     const tenantId = this.getTenantIdFromContext(currentContext);
     const correlationId = this.getCorrelationIdFromContext(currentContext);
+    const sanitizedMetadata = sanitizeLogMetadata(metadata);
 
     const spanAttributes = {
-      ...metadata,
+      ...sanitizedMetadata,
       'service.name': this.serviceName,
       'tenant.id': tenantId,
       'correlation.id': correlationId,
@@ -84,9 +86,14 @@ export class StructuredLogger {
       span.setStatus({ code: 0 });
       return result;
     } catch (error) {
-      const typedError = error as Error;
-      span.setStatus({ code: 2, message: typedError.message });
-      span.recordException(typedError);
+      const typedError = error instanceof Error ? error : null;
+      const rawErrorMessage = typedError ? typedError.message : String(error);
+      const sanitizedErrorMessage = sanitizeLogText(rawErrorMessage);
+      span.setStatus({ code: 2, message: sanitizedErrorMessage });
+
+      const sanitizedError = new Error(sanitizedErrorMessage);
+      sanitizedError.name = typedError ? typedError.name : 'NonErrorThrown';
+      span.recordException(sanitizedError);
       throw error;
     } finally {
       span.end();
@@ -109,13 +116,13 @@ export class StructuredLogger {
     const correlationId = this.getCorrelationIdFromContext(currentContext);
 
     const entry = {
-      ...metadata,
+      ...sanitizeLogMetadata(metadata),
       tenantId,
       correlationId,
       service: this.serviceName,
     };
 
-    this.logger[level](entry, message);
+    this.logger[level](entry, sanitizeLogText(message));
   }
 
   private generateCorrelationId(): string {

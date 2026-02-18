@@ -13,7 +13,7 @@ export interface SecurityEventServiceDependencies {
     organizationRepository: IOrganizationRepository;
 }
 
-export class SecurityEventService extends AbstractBaseService {
+export class AuthSecurityEventService extends AbstractBaseService {
     constructor(private readonly dependencies: SecurityEventServiceDependencies) {
         super();
     }
@@ -38,11 +38,13 @@ export class SecurityEventService extends AbstractBaseService {
     }
 }
 
-let sharedService: SecurityEventService | null = null;
+export type SecurityEventService = AuthSecurityEventService;
+
+let sharedService: AuthSecurityEventService | null = null;
 
 export function getSecurityEventService(
     overrides?: Partial<SecurityEventServiceDependencies>,
-): SecurityEventService {
+): AuthSecurityEventService {
     if (!sharedService || overrides) {
         const baseDependencies = buildSecurityEventServiceDependencies();
         const dependencies: SecurityEventServiceDependencies = {
@@ -53,11 +55,11 @@ export function getSecurityEventService(
         };
 
         if (!overrides) {
-            sharedService = new SecurityEventService(dependencies);
+            sharedService = new AuthSecurityEventService(dependencies);
             return sharedService;
         }
 
-        return new SecurityEventService(dependencies);
+        return new AuthSecurityEventService(dependencies);
     }
 
     return sharedService;

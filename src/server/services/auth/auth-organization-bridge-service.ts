@@ -1,14 +1,16 @@
 import { randomUUID } from 'node:crypto';
 import type { PrismaClientInstance } from '@/server/types/prisma';
+import { AbstractBaseService } from '@/server/services/abstract-base-service';
 
 export interface AuthOrganizationBridgeServiceDependencies {
     prisma: PrismaClientInstance;
 }
 
-export class AuthOrganizationBridgeService {
+export class AuthOrganizationBridgeService extends AbstractBaseService {
     private readonly prisma: PrismaClientInstance;
 
     constructor(dependencies: AuthOrganizationBridgeServiceDependencies) {
+        super();
         this.prisma = dependencies.prisma;
     }
 

@@ -266,6 +266,17 @@ const eslintConfig = defineConfig([
       ],
     },
   },
+  {
+    files: ["src/server/use-cases/**/*.{ts,tsx,js,jsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: ["@/server/lib/prisma", "@/server/repositories/prisma/**"],
+        },
+      ],
+    },
+  },
   globalIgnores([
     "node_modules/**", // vendor libraries stay untouched
     ".agents/**",

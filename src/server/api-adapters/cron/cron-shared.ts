@@ -79,7 +79,10 @@ export async function resolveOrgActors(
     rolePriority: OrgRoleKey[],
 ): Promise<OrgActorResolution> {
     const cronService = getCronService();
-    return cronService.resolveOrgActors(orgIds, rolePriority);
+    return cronService.resolveOrgActors(orgIds, rolePriority, {
+        auditSource: 'api:cron:resolve-org-actors',
+        triggeredByUserId: 'system:cron',
+    });
 }
 
 function parseBooleanFlag(value: string | null): boolean {

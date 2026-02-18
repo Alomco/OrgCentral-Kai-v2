@@ -18,7 +18,6 @@ export interface RevokeSessionInput extends SessionAccessRequest {
 
 export interface RevokeSessionResult {
     success: true;
-    revokedSessionToken: string;
     authorization: RepositoryAuthorizationContext;
 }
 
@@ -56,7 +55,6 @@ export async function revokeSession(
 
     return {
         success: true,
-        revokedSessionToken: input.sessionToken,
         authorization,
     };
 }

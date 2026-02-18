@@ -1,11 +1,12 @@
 import { SessionStatus, type PrismaJsonValue } from '@/server/types/prisma';
 import { AuthorizationError } from '@/server/errors';
+import type { IAuthSessionRepository } from '@/server/repositories/contracts/auth/sessions/auth-session-repository-contract';
 import type { IUserSessionRepository } from '@/server/repositories/contracts/auth/sessions';
+import { createAuthSessionRepository } from '@/server/repositories/providers/auth/auth-session-repository-provider';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
 import type { SessionAccessRequest } from '@/server/security/authorization';
 import { requireSessionAuthorization } from '@/server/security/authorization';
 import { auth, type AuthSession } from '@/server/lib/auth';
-import { prisma } from '@/server/lib/prisma';
 import type { DataClassificationLevel, DataResidencyZone } from '@/server/types/tenant';
 import { buildMetadata as buildJsonMetadata } from '@/server/use-cases/shared';
 import { loadOrgSettings } from '@/server/services/org/settings/org-settings-store';
@@ -21,6 +22,7 @@ export type SessionRepositoryContract = Pick<
 
 export interface GetSessionDependencies {
     userSessionRepository?: SessionRepositoryContract;
+    authSessionRepository?: IAuthSessionRepository;
 }
 
 export interface GetSessionInput extends SessionAccessRequest {
@@ -74,6 +76,7 @@ export async function getSessionContext(
     } catch (error) {
         await revokeExpiredSession(
             deps.userSessionRepository,
+            deps.authSessionRepository,
             authorization.orgId,
             session,
             error,
@@ -184,6 +187,7 @@ function coalesceUpdateValue<TValue extends string | null | undefined>(
 }
 async function revokeExpiredSession(
     repository: SessionRepositoryContract | undefined,
+    authSessionRepository: IAuthSessionRepository | undefined,
     orgId: string,
     session: NonNullable<AuthSession>,
     error: unknown,
@@ -204,21 +208,17 @@ async function revokeExpiredSession(
     await logSessionExpiryEvent(orgId, session.session.userId, policy, ipAddress, userAgent);
 
     try {
-        await expireAuthSessionToken(token);
+        await expireAuthSessionToken(token, authSessionRepository);
         await repository?.invalidateUserSession(orgId, token);
     } catch {
         // Best-effort cleanup; authorization error will still be thrown.
     }
 }
-async function expireAuthSessionToken(token: string): Promise<void> {
-    const now = new Date();
-    await prisma.authSession.updateMany({
-        where: { token },
-        data: {
-            expiresAt: now,
-            updatedAt: now,
-        },
-    });
+async function expireAuthSessionToken(
+    token: string,
+    authSessionRepository: IAuthSessionRepository | undefined,
+): Promise<void> {
+    await (authSessionRepository ?? defaultAuthSessionRepository).expireSessionByToken(token);
 }
 async function logSessionExpiryEvent(
     orgId: string,
@@ -244,3 +244,5 @@ async function logSessionExpiryEvent(
         // Best-effort logging only.
     }
 }
+
+const defaultAuthSessionRepository = createAuthSessionRepository();

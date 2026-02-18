@@ -43,7 +43,7 @@ export class SessionService extends AbstractBaseService {
             auditSource: input.auditSource ?? REVOKE_OPERATION,
             orgId: input.orgId ?? 'unknown-org',
             metadata: {
-                sessionToken: input.sessionToken,
+                sessionTokenSuffix: extractTokenSuffix(input.sessionToken),
                 action: input.action ?? 'revoke',
             },
         });
@@ -52,6 +52,10 @@ export class SessionService extends AbstractBaseService {
             revokeSession(this.dependencies, input),
         );
     }
+}
+
+function extractTokenSuffix(token: string): string {
+    return token.length > 8 ? token.slice(-8) : token;
 }
 
 let sharedService: SessionService | null = null;

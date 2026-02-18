@@ -2,11 +2,12 @@
 import { describe, it, expect } from "vitest";
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { http, HttpResponse } from "msw";
 import { server } from "../../../../../../test/msw-setup";
 import { PermissionResourceManager } from "../_components/permission-resource-manager";
 import type { PermissionResource } from "@/server/types/security-types";
+import { createPermissionsTestQueryClient } from "./permissions-test-utils";
 
 const orgId = "org-perm-delete-rollback";
 const baseUrl = `/api/org/${orgId}/permissions`;
@@ -30,7 +31,7 @@ describe("permissions optimistic delete – rollback on error", () => {
       http.delete(`${baseUrl}/p2`, () => HttpResponse.json({ message: 'fail' }, { status: 500 }))
     );
 
-    const qc = new QueryClient();
+    const qc = createPermissionsTestQueryClient();
     render(
       <QueryClientProvider client={qc}>
         <PermissionResourceManager orgId={orgId} resources={db.resources} />
@@ -49,6 +50,9 @@ describe("permissions optimistic delete – rollback on error", () => {
     const confirm = await screen.findByRole('button', { name: /delete resource/i });
     await userEvent.click(confirm);
 
-    await waitFor(() => expect(screen.getByText(/org\.temp/)).toBeInTheDocument());
-  }, 10000);
+    await waitFor(() => {
+      expect(screen.queryByRole('button', { name: /delete resource/i })).not.toBeInTheDocument();
+      expect(screen.getByText(/org\.temp/)).toBeInTheDocument();
+    });
+  });
 });

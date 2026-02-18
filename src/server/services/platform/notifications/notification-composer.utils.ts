@@ -24,8 +24,10 @@ export function normalizeNotificationInput(
     retentionPolicyId: notification.retentionPolicyId ?? defaultRetentionPolicyId,
     // auditSource may be overridden by caller; fall back to tenant context when omitted
     auditSource: notification.auditSource ?? authorization.auditSource,
-    dataClassification: notification.dataClassification ?? authorization.dataClassification,
-    residencyTag: notification.residencyTag ?? authorization.dataResidency,
+    dataClassification: (notification.dataClassification
+      ?? authorization.dataClassification) as NotificationCreateInput['dataClassification'],
+    residencyTag: (notification.residencyTag
+      ?? authorization.dataResidency) as NotificationCreateInput['residencyTag'],
     createdByUserId: notification.createdByUserId ?? authorization.userId,
     correlationId: notification.correlationId ?? authorization.correlationId,
     schemaVersion: notification.schemaVersion ?? NOTIFICATION_SCHEMA_VERSION,
@@ -76,11 +78,16 @@ export async function dispatchNotificationDeliveries(
       : adapters.find((candidate) => candidate.channel === target.channel);
 
     if (!adapter) {
+      const missingProvider = target.provider?.trim();
       deliveries.push({
-        provider: target.channel.toLowerCase(),
+        provider: missingProvider && missingProvider.length > 0
+          ? missingProvider
+          : target.channel.toLowerCase(),
         channel: target.channel,
         status: 'skipped',
-        detail: 'no adapter configured',
+        detail: missingProvider && missingProvider.length > 0
+          ? `unsupported provider: ${missingProvider}`
+          : `unsupported channel: ${target.channel}`,
       });
       continue;
     }
@@ -126,8 +133,8 @@ export function makeStubNotification(
     priority: 'low',
     isRead: false,
     retentionPolicyId: defaultRetentionPolicyId,
-    dataClassification: authorization.dataClassification,
-    residencyTag: authorization.dataResidency,
+    dataClassification: authorization.dataClassification as NotificationRecord['dataClassification'],
+    residencyTag: authorization.dataResidency as NotificationRecord['residencyTag'],
     auditSource: authorization.auditSource,
     schemaVersion: 1,
     metadata: null,

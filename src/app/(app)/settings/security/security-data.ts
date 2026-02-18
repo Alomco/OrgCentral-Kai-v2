@@ -6,7 +6,7 @@ import { listUserSessions } from '@/server/use-cases/auth/sessions/list-user-ses
 import { getNotificationPreferencesAction } from '@/server/api-adapters/hr/notifications/get-notification-preferences';
 
 export interface SecuritySessionSummary {
-    sessionToken: string;
+    sessionId: string;
     status: UserSession['status'];
     ipAddress: string | null;
     userAgent: string | null;
@@ -24,7 +24,7 @@ export async function getSecuritySessionsForUi(
     const { sessions } = await listUserSessions({ userSessionRepository: repository }, { authorization });
 
     return sessions.map((session) => ({
-        sessionToken: session.sessionId,
+        sessionId: session.id,
         status: session.status,
         ipAddress: session.ipAddress ?? null,
         userAgent: session.userAgent ?? null,

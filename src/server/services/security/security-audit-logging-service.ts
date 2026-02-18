@@ -4,6 +4,7 @@ import type { EnhancedSecurityEvent, SecurityAuditTrail } from '@/server/types/e
 import type { RepositoryAuthorizationContext } from '@/server/types/repository-authorization';
 import type { JsonRecord } from '@/server/types/json';
 import { appLogger } from '@/server/logging/structured-logger';
+import { AbstractBaseService } from '@/server/services/abstract-base-service';
 import { SecurityEventService, type LogSecurityEventInput } from './security-event-service';
 
 const AUDIT_SOURCE = 'security-audit-service';
@@ -17,7 +18,7 @@ export interface SecurityAuditLoggingServiceOptions {
   notificationEnabled?: boolean;
 }
 
-export class SecurityAuditLoggingService {
+export class SecurityAuditLoggingService extends AbstractBaseService {
   private readonly notificationEnabled: boolean;
   private readonly securityEventService: SecurityEventService;
 
@@ -25,6 +26,7 @@ export class SecurityAuditLoggingService {
     private readonly dependencies: SecurityAuditLoggingServiceDependencies,
     options: SecurityAuditLoggingServiceOptions = {},
   ) {
+    super();
     this.notificationEnabled = options.notificationEnabled ?? true;
     this.securityEventService = new SecurityEventService({
       securityEventRepository: this.dependencies.securityEventRepository,

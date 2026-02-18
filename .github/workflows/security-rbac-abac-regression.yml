@@ -42,5 +42,14 @@ jobs:
       - name: Generate Prisma Client
         run: pnpm prisma generate
 
+      - name: Enforce no tracked runtime test artifacts
+        run: |
+          TRACKED_ARTIFACTS=$(git ls-files 'artifacts/test-runs/*.log' 'artifacts/test-runs/*.errors.log')
+          if [ -n "$TRACKED_ARTIFACTS" ]; then
+            echo "Tracked runtime test artifacts detected:";
+            echo "$TRACKED_ARTIFACTS";
+            exit 1;
+          fi
+
       - name: Run RBAC ABAC security regressions
         run: pnpm test:security:rbac-abac-regression

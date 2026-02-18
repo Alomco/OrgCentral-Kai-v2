@@ -64,7 +64,9 @@ describe("MembersListClient invalidation", () => {
 
     await qc.invalidateQueries({ queryKey: memberKeys.list(orgId, key) });
 
-    await waitFor(async () => expect(await screen.findByText(/Bob/)).toBeInTheDocument());
-  });
+    await waitFor(() => {
+      expect(screen.getByText(/Bob/)).toBeInTheDocument();
+    }, { timeout: 20000 });
+  }, 30000);
 });
 

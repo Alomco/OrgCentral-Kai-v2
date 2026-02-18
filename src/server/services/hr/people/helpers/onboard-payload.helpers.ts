@@ -4,6 +4,7 @@ import type {
     ContractMutationPayload,
     ProfileMutationPayload,
 } from '@/server/types/hr/people';
+import { bankDetailsSchema } from '@/server/types/hr-people-schemas.shared';
 import {
     normalizeCertifications,
     normalizeContractType,
@@ -73,6 +74,7 @@ export function normalizeProfileChanges(
 
     const normalizedEmploymentType = normalizeEmploymentType(employmentType);
     const normalizedEmploymentStatus = normalizeEmploymentStatus(employmentStatus);
+    const normalizedBankDetails = normalizeBankDetails(bankDetails);
 
     return {
         ...restProfile,
@@ -80,7 +82,7 @@ export function normalizeProfileChanges(
         employmentStatus: normalizedEmploymentStatus ?? employmentStatus,
         eligibleLeaveTypes: options?.eligibleLeaveTypes ?? profileDraft.eligibleLeaveTypes,
         location: normalizeJsonValue(location),
-        bankDetails: normalizeJsonValue(bankDetails),
+        bankDetails: normalizedBankDetails,
         workPermit: normalizeJsonValue(workPermit),
         metadata: normalizeJsonValue(metadata),
         salaryDetails: normalizeSalaryDetail(salaryDetails),
@@ -98,4 +100,17 @@ export function normalizeContractChanges(
         workingPattern: normalizeJsonValue(workingPattern),
         benefits: normalizeJsonValue(benefits),
     };
+}
+
+function normalizeBankDetails(value: unknown): ProfileMutationPayload['changes']['bankDetails'] {
+    if (value === undefined || value === null) {
+        return value;
+    }
+
+    const parsed = bankDetailsSchema.safeParse(value);
+    if (!parsed.success) {
+        return undefined;
+    }
+
+    return parsed.data;
 }

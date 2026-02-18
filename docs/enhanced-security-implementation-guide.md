@@ -184,3 +184,15 @@ The enhanced security architecture follows a layered approach:
 ## Conclusion
 
 The enhanced security implementation provides a robust foundation for ISO 27001 compliance while maintaining the highest level of type safety and SSOT principles. The modular architecture allows for easy extension and maintenance of security controls across the platform.
+
+## Addendum: Production Hardening Update (2026-02-17)
+
+The following controls were implemented to reduce information disclosure and data exposure risk:
+
+- **Log and span sanitization**: sensitive metadata and message text are sanitized before structured logs and telemetry spans are emitted.
+- **Exception leak reduction**: failure telemetry records sanitized error details and does not persist raw stack traces in security event metadata.
+- **Auth token handling hardening**: invitation-related diagnostics no longer store or log raw tokens.
+- **Error response hardening**: API error responses sanitize `details` recursively and suppress `details` entirely for 5xx responses.
+- **Policy hardening**: member ABAC profile access was tightened to self read/update semantics and legacy broad profile list/read exposure was removed.
+
+These updates align with ISO 27001 principles of data minimization, least privilege, and controlled disclosure during failure handling.

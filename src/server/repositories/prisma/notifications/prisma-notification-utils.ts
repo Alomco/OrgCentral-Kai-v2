@@ -20,8 +20,8 @@ import type { DataClassificationLevel, DataResidencyZone } from '@/server/types/
 import { RepositoryAuthorizationError } from '@/server/repositories/security/repository-errors';
 import {
     Prisma,
-    type NotificationPriority,
-    type NotificationTopic,
+    NotificationPriority,
+    NotificationTopic,
     type NotificationMessage,
     type PrismaInputJsonValue,
     type PrismaNullableJsonNullValueInput,
@@ -30,41 +30,41 @@ import {
 export class NotificationValidationError extends Error { }
 
 const topicToPrisma: Record<NotificationTopicCode, NotificationTopic> = {
-    broadcast: 'broadcast',
-    'compliance-reminder': 'compliance-reminder',
-    'document-expiry': 'document-expiry',
-    'leave-approval': 'leave-approval',
-    'leave-rejection': 'leave-rejection',
-    'performance-review': 'performance-review',
-    'policy-update': 'policy-update',
-    'system-announcement': 'system-announcement',
-    other: 'other',
+    broadcast: NotificationTopic.BROADCAST,
+    'compliance-reminder': NotificationTopic.COMPLIANCE_REMINDER,
+    'document-expiry': NotificationTopic.DOCUMENT_EXPIRY,
+    'leave-approval': NotificationTopic.LEAVE_APPROVAL,
+    'leave-rejection': NotificationTopic.LEAVE_REJECTION,
+    'performance-review': NotificationTopic.PERFORMANCE_REVIEW,
+    'policy-update': NotificationTopic.POLICY_UPDATE,
+    'system-announcement': NotificationTopic.SYSTEM_ANNOUNCEMENT,
+    other: NotificationTopic.OTHER,
 };
 
 const topicFromPrisma: Record<NotificationTopic, NotificationTopicCode> = {
-    broadcast: 'broadcast',
-    'compliance-reminder': 'compliance-reminder',
-    'document-expiry': 'document-expiry',
-    'leave-approval': 'leave-approval',
-    'leave-rejection': 'leave-rejection',
-    'performance-review': 'performance-review',
-    'policy-update': 'policy-update',
-    'system-announcement': 'system-announcement',
-    other: 'other',
+    [NotificationTopic.BROADCAST]: 'broadcast',
+    [NotificationTopic.COMPLIANCE_REMINDER]: 'compliance-reminder',
+    [NotificationTopic.DOCUMENT_EXPIRY]: 'document-expiry',
+    [NotificationTopic.LEAVE_APPROVAL]: 'leave-approval',
+    [NotificationTopic.LEAVE_REJECTION]: 'leave-rejection',
+    [NotificationTopic.PERFORMANCE_REVIEW]: 'performance-review',
+    [NotificationTopic.POLICY_UPDATE]: 'policy-update',
+    [NotificationTopic.SYSTEM_ANNOUNCEMENT]: 'system-announcement',
+    [NotificationTopic.OTHER]: 'other',
 };
 
 const priorityToPrisma: Record<NotificationPriorityCode, NotificationPriority> = {
-    high: 'high',
-    low: 'low',
-    medium: 'medium',
-    urgent: 'urgent',
+    high: NotificationPriority.HIGH,
+    low: NotificationPriority.LOW,
+    medium: NotificationPriority.MEDIUM,
+    urgent: NotificationPriority.URGENT,
 };
 
 const priorityFromPrisma: Record<NotificationPriority, NotificationPriorityCode> = {
-    high: 'high',
-    low: 'low',
-    medium: 'medium',
-    urgent: 'urgent',
+    [NotificationPriority.HIGH]: 'high',
+    [NotificationPriority.LOW]: 'low',
+    [NotificationPriority.MEDIUM]: 'medium',
+    [NotificationPriority.URGENT]: 'urgent',
 };
 
 export function normalizeCreateInput(

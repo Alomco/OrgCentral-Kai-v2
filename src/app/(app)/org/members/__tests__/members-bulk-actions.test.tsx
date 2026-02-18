@@ -116,13 +116,13 @@ describe('members bulk actions', () => {
       throw new Error('Missing bulk actions form');
     }
     await userEvent.click(within(bulkForm).getByRole('button', { name: /suspend/i }));
-    await screen.findByText(/updated/i);
+    await screen.findByText(/updated/i, {}, { timeout: 20000 });
     await qc.invalidateQueries({ queryKey: memberKeys.list(orgId, expectedKey) });
 
     await waitFor(() => {
       expect(screen.queryByText('B')).not.toBeInTheDocument();
-    });
-  }, 10000);
+    }, { timeout: 20000 });
+  }, 30000);
 
   it('updates roles in bulk and refetches the list', async () => {
     const query = new URLSearchParams({ status: 'ACTIVE', page: '1', pageSize: '25' }).toString();

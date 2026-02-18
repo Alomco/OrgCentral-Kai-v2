@@ -15,8 +15,11 @@ function resolveTwoFactorRedirectUrl(): string {
     const nextPath = currentUrl.searchParams.get("next");
     const orgSlug = currentUrl.searchParams.get("org");
 
-    if (typeof nextPath === "string" && nextPath.trim().startsWith("/")) {
-        params.set("next", nextPath.trim());
+    if (typeof nextPath === "string") {
+        const trimmed = nextPath.trim();
+        if (trimmed.startsWith("/") && !trimmed.startsWith("//") && !trimmed.includes("://")) {
+            params.set("next", trimmed);
+        }
     }
 
     if (typeof orgSlug === "string" && orgSlug.trim().length > 0) {

@@ -1,9 +1,10 @@
 import { context as otelContext } from '@opentelemetry/api';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
 import { appLogger } from '@/server/logging/structured-logger';
-import { getSecurityEventService } from './security/security-event-service.provider';
+import { sanitizeLogText } from '@/server/logging/log-sanitizer';
 import type { EnhancedSecurityContext } from '@/server/types/enhanced-security-types';
 import { recordAuditEvent } from '@/server/logging/audit-logger';
+import type { SecurityEventService } from '@/server/services/security/security-event-service';
 
 export interface AuditAccessInput {
     action: string;
@@ -138,7 +139,8 @@ export abstract class AbstractBaseService {
             context.authorization.dataClassification === 'SECRET' ||
             context.authorization.dataClassification === 'TOP_SECRET') {
 
-            await getSecurityEventService().logSecurityEvent({
+            const securityEventService = await resolveSecurityEventService();
+            await securityEventService.logSecurityEvent({
                 orgId: context.authorization.orgId,
                 eventType: 'service.operation.started',
                 severity: 'info',
@@ -169,7 +171,8 @@ export abstract class AbstractBaseService {
             context.authorization.dataClassification === 'SECRET' ||
             context.authorization.dataClassification === 'TOP_SECRET') {
 
-            await getSecurityEventService().logSecurityEvent({
+            const securityEventService = await resolveSecurityEventService();
+            await securityEventService.logSecurityEvent({
                 orgId: context.authorization.orgId,
                 eventType: 'service.operation.completed',
                 severity: 'info',
@@ -193,12 +196,21 @@ export abstract class AbstractBaseService {
     }
 
     private async logServiceOperationFailure(context: ServiceExecutionContext, operationName: string, error: unknown): Promise<void> {
+        const errorMetadata = error instanceof Error
+            ? {
+                name: error.name,
+                message: sanitizeLogText(error.message),
+                hasStack: typeof error.stack === 'string' && error.stack.length > 0,
+            }
+            : { value: sanitizeLogText(String(error)) };
+
         // Always log operation failures for security auditing
-        await getSecurityEventService().logSecurityEvent({
+        const securityEventService = await resolveSecurityEventService();
+        await securityEventService.logSecurityEvent({
             orgId: context.authorization.orgId,
             eventType: 'service.operation.failed',
             severity: 'high',
-            description: `Service operation failed: ${operationName} - ${error instanceof Error ? error.message : 'Unknown error'}`,
+            description: `Service operation failed: ${operationName}`,
             userId: context.authorization.userId,
             ipAddress: context.authorization.ipAddress,
             userAgent: context.authorization.userAgent,
@@ -212,12 +224,17 @@ export abstract class AbstractBaseService {
                 sessionId: context.authorization.sessionId ?? null,
                 role: context.authorization.roleKey,
                 mfaVerified: context.authorization.mfaVerified ?? null,
-                error: error instanceof Error ? {
-                    name: error.name,
-                    message: error.message,
-                    stack: error.stack,
-                } : { value: String(error) },
+                error: errorMetadata,
             },
         });
     }
+}
+
+let securityEventServicePromise: Promise<SecurityEventService> | null = null;
+
+async function resolveSecurityEventService(): Promise<SecurityEventService> {
+    securityEventServicePromise ??= import('./security/security-event-service.provider')
+        .then((module) => module.getSecurityEventService());
+
+    return securityEventServicePromise;
 }

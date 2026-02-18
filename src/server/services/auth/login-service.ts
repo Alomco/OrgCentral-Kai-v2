@@ -12,6 +12,7 @@ import {
     isOrganizationData,
     normalizeAuthError,
 } from './login-service.helpers';
+import { maskEmailForLog } from './login-service.logging';
 
 const LOGIN_OPERATION = 'auth.login.signInEmail';
 const LOGIN_ACTION = 'auth.login' as const;
@@ -115,6 +116,7 @@ export class LoginService extends AbstractBaseService {
         const callbackURL = buildPostLoginCallbackUrl(input.request.headers, orgSlug);
         const securityConfig = this.securityConfigProvider.getOrgConfig(orgId);
         const now = new Date();
+        const userEmailMasked = maskEmailForLog(input.credentials.email);
 
         const existingUser = await this.userRepository.findByEmail(input.credentials.email);
         if (existingUser?.lockedUntil && existingUser.lockedUntil > now) {
@@ -153,7 +155,7 @@ export class LoginService extends AbstractBaseService {
                     orgSlug,
                     orgId,
                     userId,
-                    userEmail: input.credentials.email,
+                    userEmailMasked,
                     residency: dataResidency,
                     classification: dataClassification,
                     ipAddress: input.request.ipAddress ?? undefined,
@@ -217,7 +219,7 @@ export class LoginService extends AbstractBaseService {
                     event: 'login_failure',
                     orgSlug,
                     orgId,
-                    userEmail: input.credentials.email,
+                    userEmailMasked,
                     residency: dataResidency,
                     classification: dataClassification,
                     ipAddress: input.request.ipAddress ?? undefined,

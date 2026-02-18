@@ -6,7 +6,7 @@ import type {
 } from '@/server/types/hr/notifications';
 import type { DataClassificationLevel, DataResidencyZone } from '@/server/types/tenant';
 import type { PrismaInputJsonValue } from '@/server/types/prisma';
-import { HRNotificationType, type NotificationPriority } from '@/server/types/prisma';
+import { HRNotificationType, NotificationPriority } from '@/server/types/prisma';
 
 const typeToPrisma: Record<HRNotificationTypeCode, HRNotificationType> = {
   'leave-approval': HRNotificationType.LEAVE_APPROVAL,
@@ -41,17 +41,17 @@ const typeFromPrisma: Record<HRNotificationType, HRNotificationTypeCode> = {
 };
 
 const priorityToPrisma: Record<HRNotificationPriorityCode, NotificationPriority> = {
-  low: 'low',
-  medium: 'medium',
-  high: 'high',
-  urgent: 'urgent',
+  low: NotificationPriority.LOW,
+  medium: NotificationPriority.MEDIUM,
+  high: NotificationPriority.HIGH,
+  urgent: NotificationPriority.URGENT,
 };
 
 const priorityFromPrisma: Record<NotificationPriority, HRNotificationPriorityCode> = {
-  low: 'low',
-  medium: 'medium',
-  high: 'high',
-  urgent: 'urgent',
+  [NotificationPriority.LOW]: 'low',
+  [NotificationPriority.MEDIUM]: 'medium',
+  [NotificationPriority.HIGH]: 'high',
+  [NotificationPriority.URGENT]: 'urgent',
 };
 
 export function toPrismaHRNotificationType(type: HRNotificationTypeCode): HRNotificationType {

@@ -11,6 +11,7 @@ import {
     type ErrorDetails,
 } from '@/server/errors';
 import { appLogger } from '@/server/logging/structured-logger';
+import { sanitizeLogMetadata } from '@/server/logging/log-sanitizer';
 import { throwIfNextPrerenderBailout } from '@/server/api-adapters/http/next-prerender-bailout';
 
 export interface ErrorResponseBody {
@@ -120,8 +121,8 @@ function buildAuthorizationDescriptor(error: AuthorizationError): ErrorDescripto
         reason === 'unauthenticated' ||
             reason === 'session_expired' ||
             reason === 'invalid_session_identity'
-        ? 401
-        : 403;
+            ? 401
+            : 403;
     return buildSimpleDescriptor(status, error);
 }
 
@@ -207,14 +208,25 @@ export function buildErrorResponse(error: unknown): NextResponse<ErrorResponseBo
         });
     }
 
+    const sanitizedDetails = descriptor.status < 500
+        ? sanitizeErrorDetails(descriptor.details)
+        : undefined;
+
     return NextResponse.json(
         {
             error: {
                 code: descriptor.code,
                 message: descriptor.message,
-                ...(descriptor.details ? { details: descriptor.details } : {}),
+                ...(sanitizedDetails ? { details: sanitizedDetails } : {}),
             },
         },
         { status: descriptor.status, headers: descriptor.headers },
     );
+}
+
+function sanitizeErrorDetails(details: ErrorDetails | undefined): ErrorDetails | undefined {
+    if (details === undefined) {
+        return undefined;
+    }
+    return sanitizeLogMetadata(details);
 }

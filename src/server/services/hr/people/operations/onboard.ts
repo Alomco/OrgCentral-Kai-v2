@@ -15,6 +15,8 @@ import type { OrganizationData } from '@/server/types/leave-types';
 import { INVITATION_KIND, withInvitationKind } from '@/server/invitations/invitation-kinds';
 import { buildMetadata } from '@/server/use-cases/shared/builders';
 
+type BuiltProfilePayload = ReturnType<typeof buildProfilePayload>;
+
 export async function onboardEmployeeOperation(
     runtime: PeopleOrchestrationRuntime,
     parsed: OnboardEmployeeInput,
@@ -131,9 +133,9 @@ async function issueOnboardingInvitation(params: {
 }
 
 function markPreboardingProfile(
-    profileData: OnboardEmployeeInput['profileDraft'],
+    profileData: BuiltProfilePayload,
     inviteEmail: string,
-): OnboardEmployeeInput['profileDraft'] {
+): BuiltProfilePayload {
     const metadata = isRecord(profileData.metadata) ? profileData.metadata : {};
     return {
         ...profileData,
@@ -142,7 +144,7 @@ function markPreboardingProfile(
             preboarding: true,
             inviteEmail,
         },
-    } satisfies OnboardEmployeeInput['profileDraft'];
+    };
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

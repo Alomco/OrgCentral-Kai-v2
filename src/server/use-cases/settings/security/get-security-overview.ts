@@ -45,7 +45,7 @@ export async function getSecurityOverview(
     );
 
     const sessionSummaries = sessions.map((session) => ({
-        sessionToken: session.sessionId,
+        sessionId: session.id,
         status: session.status,
         ipAddress: session.ipAddress ?? null,
         userAgent: session.userAgent ?? null,

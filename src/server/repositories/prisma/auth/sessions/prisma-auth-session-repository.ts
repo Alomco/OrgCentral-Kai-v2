@@ -5,12 +5,14 @@ import type {
     AuthSessionUpsertInput,
     IAuthSessionRepository,
 } from '@/server/repositories/contracts/auth/sessions/auth-session-repository-contract';
-import { BasePrismaRepository } from '@/server/repositories/prisma/base-prisma-repository';
-import type { PrismaClientInstance } from '@/server/types/prisma';
+import {
+    BasePrismaRepository,
+    type BasePrismaRepositoryOptions,
+} from '@/server/repositories/prisma/base-prisma-repository';
 
 export class PrismaAuthSessionRepository extends BasePrismaRepository implements IAuthSessionRepository {
-    constructor(options?: { prisma?: PrismaClientInstance }) {
-        super({ prisma: options?.prisma });
+    constructor(options: BasePrismaRepositoryOptions = {}) {
+        super(options);
     }
 
     async findByToken(token: string): Promise<AuthSessionRecord | null> {
@@ -64,5 +66,17 @@ export class PrismaAuthSessionRepository extends BasePrismaRepository implements
                 userAgent: true,
             },
         });
+    }
+
+    async expireSessionByToken(token: string, at: Date = new Date()): Promise<number> {
+        const result = await this.prisma.authSession.updateMany({
+            where: { token },
+            data: {
+                expiresAt: at,
+                updatedAt: at,
+            },
+        });
+
+        return result.count;
     }
 }

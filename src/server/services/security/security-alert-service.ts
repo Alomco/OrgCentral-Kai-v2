@@ -1,6 +1,7 @@
 import type { SecurityAlert } from '@/server/types/enhanced-security-types';
 import type { RepositoryAuthorizationContext } from '@/server/types/repository-authorization';
 import { assertOrgAccessWithAbac } from '@/server/security/guards';
+import { AbstractBaseService } from '@/server/services/abstract-base-service';
 import type {
   CreateSecurityAlertInput,
   ResolveSecurityAlertInput,
@@ -16,13 +17,14 @@ import {
   handleUpdateAlert,
 } from './security-alert-handlers';
 
-export class SecurityAlertService {
+export class SecurityAlertService extends AbstractBaseService {
   private readonly handlerContext: AlertHandlerContext;
 
   constructor(
     private readonly dependencies: SecurityAlertServiceDependencies,
     options: SecurityAlertServiceOptions = {},
   ) {
+    super();
     this.handlerContext = this.createAlertHandlerContext(options);
   }
 

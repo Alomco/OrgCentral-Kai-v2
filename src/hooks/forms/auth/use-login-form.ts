@@ -60,8 +60,11 @@ function resolveNextPathFromLocation(): string {
     try {
         const url = new URL(window.location.href);
         const next = url.searchParams.get("next");
-        if (typeof next === "string" && next.trim().startsWith("/")) {
-            return next.trim();
+        if (typeof next === "string") {
+            const trimmed = next.trim();
+            if (trimmed.startsWith("/") && !trimmed.startsWith("//") && !trimmed.includes("://")) {
+                return trimmed;
+            }
         }
     } catch {
         // ignore

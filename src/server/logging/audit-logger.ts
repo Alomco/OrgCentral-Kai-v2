@@ -3,6 +3,7 @@ import type { DataClassificationLevel, DataResidencyZone } from '@/server/types/
 import type { IAuditLogRepository } from '@/server/repositories/contracts/records/audit-log-repository-contract';
 import { PrismaAuditLogRepository } from '@/server/repositories/prisma/records/audit/prisma-audit-log-repository';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
+import { sanitizeLogMetadata } from '@/server/logging/log-sanitizer';
 
 export interface AuditEventPayload {
     orgId: string;
@@ -31,6 +32,7 @@ export async function recordAuditEvent(event: AuditEventPayload): Promise<void> 
     const activeSpan = trace.getSpan(context.active());
     const spanId = event.spanId ?? activeSpan?.spanContext().spanId;
     const authorization = buildAuditAuthorizationContext(event);
+    const sanitizedPayload = event.payload ? sanitizeLogMetadata(event.payload) : undefined;
 
     await auditLogRepository.create(authorization, {
         orgId: event.orgId,
@@ -41,7 +43,7 @@ export async function recordAuditEvent(event: AuditEventPayload): Promise<void> 
         resourceId: event.resourceId ?? null,
         immutable: event.immutable ?? true,
         payload: {
-            ...event.payload,
+            ...sanitizedPayload,
             correlationId: event.correlationId,
             residencyZone: event.residencyZone,
             classification: event.classification,

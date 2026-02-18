@@ -1,7 +1,6 @@
 import { NotificationComposerService, type NotificationComposerDependencies } from './notification-composer.service';
 import type { NotificationComposerContract } from '@/server/repositories/contracts/notifications/notification-composer-contract';
 import { buildNotificationComposerServiceDependencies, type NotificationComposerServiceDependencyOptions } from '@/server/repositories/providers/platform/notification-composer-service-dependencies';
-import { NovuNotificationAdapter } from './adapters/novu-notification-adapter';
 import { ResendNotificationAdapter } from './adapters/resend-notification-adapter';
 
 const defaultRetentionPolicyId =
@@ -11,10 +10,6 @@ const createDefaultDeliveryAdapters = () => [
   new ResendNotificationAdapter({
     apiKey: process.env.RESEND_API_KEY,
     fromAddress: process.env.NOTIFICATION_FROM_EMAIL ?? 'OrgCentral <no-reply@orgcentral.test>',
-  }),
-  new NovuNotificationAdapter({
-    apiKey: process.env.NOVU_API_KEY,
-    workflowId: process.env.NOVU_WORKFLOW_ID ?? 'notification',
   }),
 ];
 

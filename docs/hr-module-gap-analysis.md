@@ -474,7 +474,6 @@ src/app/(app)/hr/admin/
 | Component | Status | Notes |
 |-----------|--------|-------|
 | ResendNotificationAdapter | OK | `src/server/services/platform/notifications/adapters/resend-notification-adapter.ts` |
-| NovuNotificationAdapter | OK | Alternative delivery adapter |
 | SenderXEmailProvider | OK | `src/server/services/notifications/providers/senderx-email-provider.ts` |
 | NotificationService | OK | Queue-based dispatch via BullMQ |
 | NotificationComposerService | OK | Platform-level notification orchestration |

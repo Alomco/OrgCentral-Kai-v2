@@ -21,8 +21,11 @@ function resolveNextPath(): string {
     const url = new URL(window.location.href);
     const nextValue = url.searchParams.get("next");
 
-    if (typeof nextValue === "string" && nextValue.trim().startsWith("/")) {
-        return nextValue.trim();
+    if (typeof nextValue === "string") {
+        const trimmed = nextValue.trim();
+        if (trimmed.startsWith("/") && !trimmed.startsWith("//") && !trimmed.includes("://")) {
+            return trimmed;
+        }
     }
 
     return DEFAULT_NEXT_PATH;

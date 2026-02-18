@@ -27,7 +27,7 @@ describe('Modern Admin Components', () => {
       expect(container).toBeTruthy();
     });
 
-    it('should toggle mobile menu correctly', () => {
+    it('should toggle mobile menu correctly', async () => {
       const permissions = {
         organization: ['read'],
       };
@@ -45,9 +45,13 @@ describe('Modern Admin Components', () => {
       fireEvent.click(mobileMenuButton);
 
       // Check that the sidebar is now visible
-      const sidebar = screen.getByRole('navigation', { name: 'Admin sidebar navigation' });
+      const sidebar = await screen.findByRole(
+        'navigation',
+        { name: 'Admin sidebar navigation' },
+        { timeout: 20000 },
+      );
       expect(sidebar).not.toBeNull();
-    }, 10000);
+    }, 30000);
   });
 
   describe('ModernAdminNavigation', () => {

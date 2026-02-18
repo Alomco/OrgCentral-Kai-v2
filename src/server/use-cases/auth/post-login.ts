@@ -1,5 +1,4 @@
 import type { createAuth } from '@/server/lib/auth';
-import { prisma } from '@/server/lib/prisma';
 import { requireSessionAuthorization } from '@/server/security/authorization';
 import {
     getMembershipRoleSnapshot,
@@ -9,8 +8,15 @@ import {
     sanitizeNextPath,
 } from '@/server/ui/auth/role-redirect';
 import { getAuthOrganizationBridgeService } from '@/server/services/auth/auth-organization-bridge-service.provider';
-import { MembershipStatus } from '@/server/types/prisma';
+import type { IPostLoginMembershipRepository } from '@/server/repositories/contracts/auth/sessions/post-login-membership-repository-contract';
 import { resolveWorkspaceSetupState } from '@/server/use-cases/auth/sessions/workspace-setup-state';
+import {
+    hasInactiveMembership,
+    listMembershipsForUser,
+    resolveMembershipRepository,
+    selectLatestActiveMembershipOrgId,
+    type MembershipLookupRecord,
+} from './post-login.membership';
 
 const DEFAULT_NEXT_PATH = '/dashboard';
 const LOGIN_PATH = '/login';
@@ -18,19 +24,16 @@ const NOT_INVITED_PATH = '/not-invited';
 const ACCESS_DENIED_PATH = '/access-denied';
 const MFA_SETUP_PATH = '/two-factor/setup';
 const PROFILE_SETUP_PATH = '/hr/profile';
-const DEFAULT_MEMBERSHIP_DATE = new Date(0);
 
 interface SafeNextPath {
     path: string;
     isExplicit: boolean;
 }
 
-interface MembershipLookupRecord {
-    orgId: string;
-    status: MembershipStatus;
-    activatedAt: Date | null;
-    invitedAt: Date | null;
-}
+type PostLoginMembershipRepositoryContract = Pick<
+    IPostLoginMembershipRepository,
+    'listMembershipsForUser'
+>;
 
 export interface PostLoginDependencies {
     auth: ReturnType<typeof createAuth>;
@@ -38,6 +41,7 @@ export interface PostLoginDependencies {
 
 export interface PostLoginOverrides {
     auth: PostLoginDependencies['auth'];
+    membershipRepository?: PostLoginMembershipRepositoryContract;
 }
 
 export interface PostLoginInput {
@@ -53,6 +57,7 @@ export async function handlePostLogin(
     overrides: PostLoginOverrides,
     input: PostLoginInput,
 ): Promise<PostLoginResult> {
+    const membershipRepository = resolveMembershipRepository(overrides.membershipRepository);
     const session = await overrides.auth.api.getSession({ headers: input.headers });
     const { path: nextPath, isExplicit } = resolveSafeNextPath(input.requestUrl);
 
@@ -69,6 +74,7 @@ export async function handlePostLogin(
 
     if (desiredOrgSlug) {
         scopedMemberships = await listMembershipsForUser(
+            membershipRepository,
             session.user.id,
             desiredOrgSlug,
         );
@@ -81,7 +87,7 @@ export async function handlePostLogin(
         if (isInvitationAcceptancePath(nextPath)) {
             return { redirectUrl: new URL(nextPath, input.requestUrl.origin) };
         }
-        allMemberships = await listMembershipsForUser(session.user.id);
+        allMemberships = await listMembershipsForUser(membershipRepository, session.user.id);
         desiredOrgId = selectLatestActiveMembershipOrgId(allMemberships);
     }
 
@@ -164,7 +170,7 @@ function resolveSafeNextPath(requestUrl: URL): SafeNextPath {
 
 function resolveOptionalOrgSlug(requestUrl: URL): string | null {
     const candidate = requestUrl.searchParams.get('org');
-    if (typeof candidate !== 'string') {return null;}
+    if (typeof candidate !== 'string') { return null; }
     const trimmed = candidate.trim();
     return trimmed.length > 0 ? trimmed : null;
 }
@@ -197,52 +203,4 @@ function buildSetupRedirect(requestUrl: URL, path: string, nextPath: string): UR
     const redirectUrl = new URL(path, requestUrl.origin);
     redirectUrl.searchParams.set('next', nextPath);
     return redirectUrl;
-}
-
-async function listMembershipsForUser(
-    userId: string,
-    orgSlug?: string,
-): Promise<MembershipLookupRecord[]> {
-    return prisma.membership.findMany({
-        where: {
-            userId,
-            org: orgSlug ? { slug: orgSlug } : undefined,
-        },
-        select: {
-            orgId: true,
-            status: true,
-            activatedAt: true,
-            invitedAt: true,
-        },
-    });
-}
-
-function hasInactiveMembership(memberships: MembershipLookupRecord[]): boolean {
-    return memberships.some((membership) =>
-        membership.status === MembershipStatus.SUSPENDED
-        || membership.status === MembershipStatus.DEACTIVATED,
-    );
-}
-
-function selectLatestActiveMembershipOrgId(
-    memberships: MembershipLookupRecord[],
-): string | null {
-    const activeMemberships = memberships.filter((membership) => membership.status === MembershipStatus.ACTIVE);
-    if (activeMemberships.length === 0) {return null;}
-
-    let latest = activeMemberships[0];
-    let latestTimestamp = resolveMembershipTimestamp(latest);
-
-    for (const membership of activeMemberships.slice(1)) {
-        const timestamp = resolveMembershipTimestamp(membership);
-        if (timestamp > latestTimestamp) {
-            latest = membership;
-            latestTimestamp = timestamp;
-        }
-    }
-    return latest.orgId;
-}
-
-function resolveMembershipTimestamp(membership: MembershipLookupRecord): number {
-    return (membership.activatedAt ?? membership.invitedAt ?? DEFAULT_MEMBERSHIP_DATE).getTime();
 }

@@ -93,9 +93,9 @@ export function SessionDevicePanel({ sessions }: SessionDevicePanelProps) {
 
     const isPending = revokeSessionMutation.isPending || revokeOtherSessionsMutation.isPending;
 
-    const handleRevoke = (sessionToken: string) => {
+    const handleRevoke = (sessionId: string) => {
         revokeSessionMutation.mutate(
-            { sessionToken },
+            { sessionId },
             {
                 onSuccess: (result) => {
                     if (result.success) {
@@ -149,7 +149,7 @@ export function SessionDevicePanel({ sessions }: SessionDevicePanelProps) {
                     <div className="space-y-3">
                         {sortedSessions.map((session) => (
                             <div
-                                key={session.sessionToken}
+                                key={session.sessionId}
                                 className="flex flex-col gap-3 rounded-xl border border-border/60 bg-card/50 p-4 sm:flex-row sm:items-center sm:justify-between"
                             >
                                 <div className="flex items-start gap-3">
@@ -183,7 +183,7 @@ export function SessionDevicePanel({ sessions }: SessionDevicePanelProps) {
                                         <Button
                                             variant="ghost"
                                             size="sm"
-                                            onClick={() => handleRevoke(session.sessionToken)}
+                                            onClick={() => handleRevoke(session.sessionId)}
                                             disabled={isPending}
                                         >
                                             Sign out

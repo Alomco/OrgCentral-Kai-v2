@@ -40,7 +40,7 @@ Purpose: lift the mature Firebase + Cloud Functions backend that lives in `old/`
    - Translate Firebase scheduled jobs to BullMQ queues defined under `src/server/queues`. Abstract queue interactions via `AbstractQueueWorker`.
    - Provide workers for leave accrual recomputations, compliance audits, onboarding checklists.
 2. **Notification + email adapters**
-   - Rewrite `old/firebase/functions/src/lib/notifications.ts` as `NotificationService` implementing `NotificationPort`. Use Resend + Novu providers selectable via DI.
+   - Rewrite `old/firebase/functions/src/lib/notifications.ts` as `NotificationService` implementing `NotificationPort`.
    - All notifications log to `AuditLog` + Mongo `auditLogs` (dual write) following zero-trust guidance.
 3. **Guards + policy enforcement**
    - Port guard helpers (`guards.ts`) into `src/server/security/guards.ts`. Wrap DB-driven permission resolution plus Better Auth context resolvers.
@@ -89,7 +89,7 @@ Purpose: lift the mature Firebase + Cloud Functions backend that lives in `old/`
 
 ## Phase 6 – Notifications & AI Assistants
 1. **Notification center**
-   - Port `notifications-test.ts` and any message creation logic into `NotificationComposerService`. Wrap Novu + Resend senders.
+   - Port `notifications-test.ts` and any message creation logic into `NotificationComposerService`.
    - Provide Server Actions for preview/send/test, hooking into Cache Components to refresh inbox UI.
 2. **AI + Genkit replacements**
    - Replace Firebase Genkit triggers with Next server modules under `src/server/ai`. Use new `genkit.ts` wrappers already present in `src/ai/*`.

@@ -30,7 +30,13 @@ export function LoginForm({ initialOrgSlug }: LoginFormProps) {
                 try {
                     const url = new URL(window.location.href);
                     const next = url.searchParams.get("next");
-                    return typeof next === "string" && next.trim().startsWith("/") ? next.trim() : "/dashboard";
+                    if (typeof next === "string") {
+                        const trimmed = next.trim();
+                        if (trimmed.startsWith("/") && !trimmed.startsWith("//") && !trimmed.includes("://")) {
+                            return trimmed;
+                        }
+                    }
+                    return "/dashboard";
                 } catch {
                     return "/dashboard";
                 }

@@ -368,3 +368,16 @@ The OrgCentral HR software demonstrates a strong foundation with comprehensive s
 The system is well-positioned for enterprise HR software requirements but would benefit from additional compliance reporting features and more comprehensive vendor management capabilities to achieve full enterprise readiness.
 
 This comprehensive guide combines the best practices observed in the OrgCentral codebase with industry standards for HR software development. Following these practices will help ensure your HR software is secure, compliant, scalable, and user-friendly.
+
+## OrgCentral Security Hardening Status (2026-02-17)
+
+Recent production-readiness hardening work completed in this codebase includes:
+
+- **Telemetry and logging protections**: sanitization for metadata, free-text messages, and span attributes.
+- **Failure-path disclosure controls**: sanitized error metadata and no raw stack persistence in security event logs.
+- **API error safety**: recursive sanitization of error `details` and suppression of `details` for internal server errors.
+- **Sensitive auth data handling**: invitation token diagnostics moved to non-reversible metadata.
+- **Profile-access policy hardening**: member profile access constrained to self read/update semantics.
+- **Sensitive profile data validation**: stricter schema and normalization for contact and bank-related fields.
+
+These controls improve conformance with the privacy-by-design, least-privilege, and auditability requirements described in this guide.

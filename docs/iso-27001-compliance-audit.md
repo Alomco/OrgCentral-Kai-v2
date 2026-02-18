@@ -30,7 +30,7 @@ Based on my comprehensive analysis of the OrgCentral project, the application de
 
 ### A.5.19 - Management of Technical Vulnerabilities
 - **Gap**: Incomplete vulnerability management process
-- **Evidence**: Security assessment report shows known vulnerabilities (papaparse CSV injection, deprecated @novu/node package) that need systematic remediation
+- **Evidence**: Security assessment report shows known vulnerabilities (for example papaparse CSV injection) that need systematic remediation
 
 ### A.6.1.2 - Security Risk Assessment
 - **Gap**: No formal risk assessment process documented
@@ -144,7 +144,7 @@ Based on my comprehensive analysis of the OrgCentral project, the application de
 
 ### Immediate Actions (Critical)
 1. **Document Information Security Policy**: Create formal security policy documentation
-2. **Implement Vulnerability Management**: Address known vulnerabilities (papaparse, @novu/node)
+2. **Implement Vulnerability Management**: Address known vulnerabilities (for example papaparse)
 3. **Strengthen Access Controls**: Implement formal access review and periodic validation
 4. **Enhance Audit Logging**: Ensure all security-relevant events are logged
 5. **Implement Backup Procedures**: Add automated backup and recovery capabilities

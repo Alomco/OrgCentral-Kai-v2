@@ -7,6 +7,7 @@ import type { JsonRecord } from '@/server/types/json';
 import type { OrgAccessContext, OrgAccessInput } from '@/server/security/guards/core';
 import { assertOrgAccessWithAbac, toTenantScope } from '@/server/security/guards/core';
 import { appLogger } from '@/server/logging/structured-logger';
+import { AbstractBaseService } from '@/server/services/abstract-base-service';
 import { dispatchSecurityAlert } from './security-alert-dispatcher';
 
 export interface SecurityEventServiceDependencies {
@@ -36,10 +37,11 @@ export interface LogSecurityEventInput {
     requiresMfa?: boolean;
 }
 
-export class SecurityEventService {
+export class SecurityEventService extends AbstractBaseService {
     private readonly guard: (input: OrgAccessInput) => Promise<OrgAccessContext>;
 
     constructor(private readonly dependencies: SecurityEventServiceDependencies) {
+        super();
         this.guard = dependencies.guard ?? assertOrgAccessWithAbac;
     }
 

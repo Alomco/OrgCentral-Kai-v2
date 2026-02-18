@@ -1,6 +1,5 @@
 import { RoleScope } from '@/server/types/prisma';
-
-import { prisma } from '@/server/lib/prisma';
+import { createMembershipRoleSnapshotRepository } from '@/server/repositories/providers/auth/membership-role-snapshot-repository-provider';
 
 /**
  * Dashboard role determines which admin layout a user sees.
@@ -24,22 +23,15 @@ export async function getMembershipRoleSnapshot(
     orgId: string,
     userId: string,
 ): Promise<MembershipRoleSnapshot | null> {
-    const membership = await prisma.membership.findUnique({
-        where: { orgId_userId: { orgId, userId } },
-        select: {
-            role: { select: { name: true, scope: true } },
-            org: { select: { slug: true } },
-        },
-    });
-
+    const membership = await membershipRoleSnapshotRepository.getMembershipRoleSnapshot(orgId, userId);
     if (!membership) {
         return null;
     }
 
     return {
-        roleName: membership.role?.name ?? 'unknown',
-        roleScope: membership.role?.scope ?? RoleScope.ORG,
-        orgSlug: membership.org.slug,
+        roleName: membership.roleName,
+        roleScope: membership.roleScope,
+        orgSlug: membership.orgSlug,
     };
 }
 
@@ -96,3 +88,5 @@ function normalizePathname(nextPath: string): string {
         return nextPath;
     }
 }
+
+const membershipRoleSnapshotRepository = createMembershipRoleSnapshotRepository();

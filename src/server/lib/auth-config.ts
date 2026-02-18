@@ -20,6 +20,14 @@ export interface AuthConfigDependencies {
 }
 
 export function createAuth(baseURL: string, deps: AuthConfigDependencies = {}) {
+    const isProduction = process.env.NODE_ENV === 'production';
+    const microsoftClientId = process.env.MICROSOFT_CLIENT_ID;
+    const microsoftTenantId = process.env.MICROSOFT_TENANT_ID;
+
+    if (isProduction && microsoftClientId && !microsoftTenantId) {
+        throw new Error('MICROSOFT_TENANT_ID must be set in production when MICROSOFT_CLIENT_ID is configured.');
+    }
+
     const authSyncQueue = deps.authSyncQueueFactory
         ? getAuthSyncQueueClientOrNull(isAuthSyncEnabled(), deps.authSyncQueueFactory)
         : null;
@@ -57,10 +65,10 @@ export function createAuth(baseURL: string, deps: AuthConfigDependencies = {}) {
                 disableSignUp: true,
             },
             microsoft: {
-                clientId: process.env.MICROSOFT_CLIENT_ID ?? '',
+                clientId: microsoftClientId ?? '',
                 clientSecret: process.env.MICROSOFT_CLIENT_SECRET ?? '',
-                tenantId: process.env.MICROSOFT_TENANT_ID ?? 'common',
-                enabled: Boolean(process.env.MICROSOFT_CLIENT_ID),
+                tenantId: microsoftTenantId ?? 'common',
+                enabled: Boolean(microsoftClientId),
                 disableSignUp: true,
             },
         },

@@ -1,7 +1,7 @@
 import { AuthorizationError } from '@/server/errors';
-import { prisma } from '@/server/lib/prisma';
+import { createAuthAccountRepository } from '@/server/repositories/providers/auth/auth-account-repository-provider';
+import { buildPeopleServiceDependencies } from '@/server/repositories/providers/hr/people-service-dependencies';
 
-const CREDENTIAL_PROVIDER_ID = 'credential';
 const PASSWORD_SETUP_PATH_PREFIXES = ['/two-factor', '/two-factor/setup'] as const;
 const PROFILE_SETUP_PATH_PREFIXES = ['/hr/profile'] as const;
 const PROFILE_REQUIRED_FIELDS = ['firstName', 'lastName'] as const;
@@ -39,25 +39,23 @@ export interface EnforceWorkspaceSetupStateInput {
 
 const defaultWorkspaceSetupDependencies: WorkspaceSetupDependencies = {
     async hasCredentialPassword(authUserId) {
-        const count = await prisma.authAccount.count({
-            where: {
-                userId: authUserId,
-                providerId: CREDENTIAL_PROVIDER_ID,
-                password: { not: null },
-            },
-        });
-        return count > 0;
+        return defaultAuthAccountRepository.hasCredentialPassword(authUserId);
     },
     async getEmployeeProfile(orgId, userId) {
-        return prisma.employeeProfile.findUnique({
-            where: { orgId_userId: { orgId, userId } },
-            select: {
-                firstName: true,
-                lastName: true,
-            },
-        });
+        const profile = await defaultEmployeeProfileRepository.getEmployeeProfileByUser(orgId, userId);
+        if (!profile) {
+            return null;
+        }
+
+        return {
+            firstName: profile.firstName ?? null,
+            lastName: profile.lastName ?? null,
+        };
     },
 };
+
+const defaultAuthAccountRepository = createAuthAccountRepository();
+const defaultEmployeeProfileRepository = buildPeopleServiceDependencies().profileRepo;
 
 export async function resolveWorkspaceSetupState(
     subject: WorkspaceSetupSubject,

@@ -74,7 +74,7 @@ This document gives every contributor (human or agent) a shared understanding of
 
 ### Phase D – Notification + Email Pipelines
 1. **Notification fan-out queue**
-   - `src/server/workers/notifications/dispatcher-worker.ts` reads unified notification jobs and dispatches to Resend/Novu adapters.
+   - `src/server/workers/notifications/dispatcher-worker.ts` reads unified notification jobs and dispatches to configured notification adapters.
 2. **Template registry**
    - Store templates in Postgres (`NotificationTemplateRepository`), cache via tag `notifications:templates`, and hydrate payloads inside workers.
 3. **Governance hooks**

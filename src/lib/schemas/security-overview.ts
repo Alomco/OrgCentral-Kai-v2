@@ -18,7 +18,7 @@ const jsonValueSchema: z.ZodType<JsonValue> = z.lazy(() =>
 );
 
 const securitySessionSchema = z.object({
-    sessionToken: z.string().min(1),
+    sessionId: z.string().min(1),
     status: z.string().min(1),
     ipAddress: z.string().min(1).nullable(),
     userAgent: z.string().min(1).nullable(),

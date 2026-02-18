@@ -1,5 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { PrismaClient, NotificationMessage } from '@prisma/client';
+import {
+    NotificationTopic,
+    NotificationPriority,
+    type PrismaClient,
+    type NotificationMessage,
+} from '@prisma/client';
 import type { NotificationAuditWriter } from '@/server/repositories/contracts/notifications';
 import { PrismaNotificationRepository } from '@/server/repositories/prisma/notifications/prisma-notification-repository';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';
@@ -23,8 +28,8 @@ const baseRecord: NotificationMessage = {
     userId: USER_ID,
     title: 'Title',
     body: 'Body',
-    topic: 'other',
-    priority: 'medium',
+    topic: NotificationTopic.OTHER,
+    priority: NotificationPriority.MEDIUM,
     isRead: false,
     readAt: null,
     actionUrl: null,
@@ -176,7 +181,7 @@ describe('PrismaNotificationRepository', () => {
 
     it('registers cache tag when listing notifications', async () => {
         const { repo, model } = createRepository();
-        model.findMany.mockResolvedValue([{ ...baseRecord, priority: 'high' }]);
+        model.findMany.mockResolvedValue([{ ...baseRecord, priority: NotificationPriority.HIGH }]);
 
         const result = await repo.listNotifications(authorization, USER_ID, { priorities: ['high'] });
         const notifications = await result.match(

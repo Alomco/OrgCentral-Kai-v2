@@ -1,6 +1,7 @@
 import type { OrgPermissionMap } from '@/server/security/access-control';
 import type { IRoleRepository } from '@/server/repositories/contracts/org/roles/role-repository-contract';
 import type { GuardMembershipRecord } from '@/server/repositories/contracts/security/guard-membership-repository-contract';
+import { AbstractBaseService } from '@/server/services/abstract-base-service';
 
 export interface PermissionResolutionServiceDependencies {
     roleRepository: IRoleRepository;
@@ -19,7 +20,7 @@ interface CachedPermissions {
 const DEFAULT_CACHE_TTL_MS = 5 * 60 * 1000;
 const DEFAULT_CACHE_MAX_ENTRIES = 5_000;
 
-export class PermissionResolutionService {
+export class PermissionResolutionService extends AbstractBaseService {
     private readonly cache = new Map<string, CachedPermissions>();
     private readonly cacheTtlMs: number;
     private readonly cacheMaxEntries: number;
@@ -28,6 +29,7 @@ export class PermissionResolutionService {
         private readonly dependencies: PermissionResolutionServiceDependencies,
         options: PermissionResolutionOptions = {},
     ) {
+        super();
         this.cacheTtlMs = options.cacheTtlMs ?? DEFAULT_CACHE_TTL_MS;
         this.cacheMaxEntries = this.resolveCacheMaxEntries(options.cacheMaxEntries);
     }

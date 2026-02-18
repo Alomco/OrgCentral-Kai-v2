@@ -122,17 +122,51 @@ function coerceFieldErrors(value: unknown): LoginFieldErrors | undefined {
 }
 
 function resolveRequestOrigin(headers: Headers): string | null {
-    const origin = headers.get('origin');
-    if (origin?.startsWith('http')) {
+    const origin = normalizeOrigin(headers.get('origin'));
+    if (origin) {
         return origin;
     }
 
-    const forwardedHost = headers.get('x-forwarded-host') ?? headers.get('host');
-    const forwardedProto = headers.get('x-forwarded-proto') ?? 'https';
+    const forwardedHost = normalizeHostHeader(headers.get('x-forwarded-host') ?? headers.get('host'));
+    const forwardedProto = normalizeProtocolHeader(headers.get('x-forwarded-proto'));
 
     if (forwardedHost) {
-        return `${forwardedProto}://${forwardedHost}`;
+        return normalizeOrigin(`${forwardedProto}://${forwardedHost}`);
     }
 
     return null;
+}
+
+function normalizeOrigin(value: string | null): string | null {
+    if (!value) {
+        return null;
+    }
+
+    try {
+        const parsed = new URL(value);
+        if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+            return null;
+        }
+        return parsed.origin;
+    } catch {
+        return null;
+    }
+}
+
+function normalizeHostHeader(value: string | null): string | null {
+    if (!value) {
+        return null;
+    }
+
+    const trimmed = value.trim();
+    if (!trimmed || trimmed.includes('/') || trimmed.includes('\\') || trimmed.includes('@')) {
+        return null;
+    }
+
+    return trimmed;
+}
+
+function normalizeProtocolHeader(value: string | null): 'http' | 'https' {
+    const normalized = value?.trim().toLowerCase();
+    return normalized === 'http' ? 'http' : 'https';
 }

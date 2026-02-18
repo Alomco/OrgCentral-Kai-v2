@@ -15,5 +15,8 @@
   },
   "css.customData": [
     ".vscode/tailwindcss.custom-data.json"
-  ]
+  ],
+  "chat.agent.maxRequests": 50,
+  "chat.alternativeToolAction.enabled": true,
+  "chat.customAgentInSubagent.enabled": true
 }

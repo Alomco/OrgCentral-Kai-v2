@@ -158,3 +158,18 @@ Set the following environment variables for OpenTelemetry:
 4. Use correlation IDs to trace requests across service boundaries
 5. Validate tenant IDs using the provided validation method
 6. Use child spans for complex operations with multiple steps
+
+## Security Hardening Update (2026-02-17)
+
+The logging and telemetry pipeline now includes stronger default protections:
+
+1. **Centralized sanitization** is applied to structured log metadata, span attributes, and log message text before emission.
+2. **Exception telemetry sanitization** is applied to span error status messages, and only sanitized exception content is recorded.
+3. **Sensitive token handling** uses non-reversible diagnostics (e.g., hash prefix and token length) rather than raw token values.
+4. **Prisma query debug logging** no longer emits raw query parameters; it emits redaction metadata only.
+
+### Operational Guidance
+
+- Do not attach raw secrets, credentials, or full tokens to service metadata.
+- Prefer safe diagnostics such as lengths, prefixes, booleans, and classified error codes.
+- Keep `PRISMA_QUERY_DEBUG` disabled outside controlled debugging environments.

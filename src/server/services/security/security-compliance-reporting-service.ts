@@ -1,6 +1,7 @@
 import type { ISecurityComplianceRepository } from '@/server/repositories/contracts/security/enhanced-security-repository-contracts';
 import type { SecurityComplianceReport, SecurityFinding } from '@/server/types/enhanced-security-types';
 import type { RepositoryAuthorizationContext } from '@/server/types/repository-authorization';
+import { AbstractBaseService } from '@/server/services/abstract-base-service';
 import { getSecurityEventService } from './security-event-service.provider';
 
 export interface SecurityComplianceReportingServiceDependencies {
@@ -24,14 +25,14 @@ export interface SecurityComplianceReportingServiceOptions {
   notificationEnabled?: boolean;
 }
 
-export class SecurityComplianceReportingService {
+export class SecurityComplianceReportingService extends AbstractBaseService {
   private readonly autoGenerateFindings: boolean;
   private readonly notificationEnabled: boolean;
-
   constructor(
     private readonly dependencies: SecurityComplianceReportingServiceDependencies,
     options: SecurityComplianceReportingServiceOptions = {},
   ) {
+    super();
     this.autoGenerateFindings = options.autoGenerateFindings ?? true;
     this.notificationEnabled = options.notificationEnabled ?? true;
   }
@@ -117,7 +118,6 @@ export class SecurityComplianceReportingService {
     upcomingObligations: string[];
   }> {
     const latestReport = await this.getLatestComplianceReport(context);
-
     const totalFindings = latestReport?.findings.length ?? 0;
     const criticalFindings = latestReport?.findings.filter((finding) => finding.severity === 'critical').length ?? 0;
     const highFindings = latestReport?.findings.filter((finding) => finding.severity === 'high').length ?? 0;

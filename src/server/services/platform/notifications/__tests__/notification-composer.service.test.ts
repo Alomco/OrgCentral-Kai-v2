@@ -215,6 +215,88 @@ describe('NotificationComposerService', () => {
     expect(result.deliveries[0]?.status).toBe('skipped');
   });
 
+  it('returns explicit skipped result for unsupported provider', async () => {
+    const service = new NotificationComposerService({
+      notificationRepository: repo,
+      preferenceRepository: preferenceRepo,
+      deliveryAdapters: [adapter],
+      guard,
+      auditRecorder,
+      orgSettingsLoader,
+      defaultRetentionPolicyId: 'retain-1',
+    });
+
+    const result = await service.composeAndSend({
+      authorization,
+      notification: {
+        orgId: ORG_ID,
+        userId: USER_ID,
+        title: 'Test',
+        body: 'Body',
+        topic: 'other',
+        priority: 'medium',
+        retentionPolicyId: 'retain-1',
+        dataClassification: 'OFFICIAL',
+        residencyTag: 'UK_ONLY',
+        auditSource: 'tests',
+        schemaVersion: 1,
+        isRead: false,
+      },
+      targets: [{ channel: 'EMAIL', to: 'user@example.com', provider: 'legacy-email' }],
+    });
+
+    expect(adapterSend).not.toHaveBeenCalled();
+    expect(result.deliveries[0]).toEqual(
+      expect.objectContaining({
+        provider: 'legacy-email',
+        channel: 'EMAIL',
+        status: 'skipped',
+        detail: 'unsupported provider: legacy-email',
+      }),
+    );
+  });
+
+  it('returns explicit skipped result for unsupported channel', async () => {
+    const service = new NotificationComposerService({
+      notificationRepository: repo,
+      preferenceRepository: preferenceRepo,
+      deliveryAdapters: [adapter],
+      guard,
+      auditRecorder,
+      orgSettingsLoader,
+      defaultRetentionPolicyId: 'retain-1',
+    });
+
+    const result = await service.composeAndSend({
+      authorization,
+      notification: {
+        orgId: ORG_ID,
+        userId: USER_ID,
+        title: 'Test',
+        body: 'Body',
+        topic: 'other',
+        priority: 'medium',
+        retentionPolicyId: 'retain-1',
+        dataClassification: 'OFFICIAL',
+        residencyTag: 'UK_ONLY',
+        auditSource: 'tests',
+        schemaVersion: 1,
+        isRead: false,
+      },
+      targets: [{ channel: 'IN_APP', to: USER_ID }],
+    });
+
+    expect(adapterSend).not.toHaveBeenCalled();
+    expect(result.deliveries[0]).toEqual(
+      expect.objectContaining({
+        provider: 'in_app',
+        channel: 'IN_APP',
+        status: 'skipped',
+        detail: 'unsupported channel: IN_APP',
+      }),
+    );
+  });
+
   it('lists inbox and computes unread count', async () => {
     repo.listNotifications = vi.fn(() =>
       okAsync([

@@ -2,6 +2,7 @@ import type { ISecurityMetricsRepository } from '@/server/repositories/contracts
 import type { SecurityMetrics } from '@/server/types/enhanced-security-types';
 import type { RepositoryAuthorizationContext } from '@/server/types/repository-authorization';
 import { appLogger } from '@/server/logging/structured-logger';
+import { AbstractBaseService } from '@/server/services/abstract-base-service';
 import { getSecurityEventService } from './security-event-service.provider';
 export interface SecurityMetricsServiceDependencies {
   securityMetricsRepository: ISecurityMetricsRepository;
@@ -22,14 +23,14 @@ export interface SecurityMetricsServiceOptions {
   notificationEnabled?: boolean;
 }
 
-export class SecurityMetricsService {
+export class SecurityMetricsService extends AbstractBaseService {
   private readonly autoCalculateComplianceScore: boolean;
   private readonly notificationEnabled: boolean;
-
   constructor(
     private readonly dependencies: SecurityMetricsServiceDependencies,
     options: SecurityMetricsServiceOptions = {},
   ) {
+    super();
     this.autoCalculateComplianceScore = options.autoCalculateComplianceScore ?? true;
     this.notificationEnabled = options.notificationEnabled ?? true;
   }

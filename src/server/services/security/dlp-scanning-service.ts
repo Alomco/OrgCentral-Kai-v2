@@ -2,6 +2,7 @@ import type { IDlpPolicyRepository, IDlpScanResultRepository } from '@/server/re
 import type { DlpFinding, DlpPolicy, DlpRule, DlpScanResult, DlpScanType } from '@/server/types/enhanced-security-types';
 import type { RepositoryAuthorizationContext } from '@/server/types/repository-authorization';
 import { appLogger } from '@/server/logging/structured-logger';
+import { AbstractBaseService } from '@/server/services/abstract-base-service';
 import { getSecurityEventService } from './security-event-service.provider';
 export interface DlpScanningServiceDependencies {
   dlpPolicyRepository: IDlpPolicyRepository;
@@ -22,16 +23,16 @@ export interface DlpScanningServiceOptions {
 }
 type DlpAction = 'allowed' | 'blocked' | 'quarantined' | 'reported';
 
-export class DlpScanningService {
+export class DlpScanningService extends AbstractBaseService {
   private readonly enabled: boolean;
   private readonly logFindings: boolean;
   private readonly autoQuarantine: boolean;
   private readonly notificationEnabled: boolean;
-
   constructor(
     private readonly dependencies: DlpScanningServiceDependencies,
     options: DlpScanningServiceOptions = {},
   ) {
+    super();
     this.enabled = options.enabled ?? true;
     this.logFindings = options.logFindings ?? true;
     this.autoQuarantine = options.autoQuarantine ?? false;
@@ -167,7 +168,6 @@ export class DlpScanningService {
     if (findings.length === 0) {
       return 'allowed';
     }
-
     const actions = new Set(
       policies.flatMap((policy) => policy.rules.map((rule) => rule.action)),
     );

@@ -37,6 +37,9 @@ function normalizePathHeader(raw: string): string | null {
     }
 
     if (trimmed.startsWith('/')) {
+        if (trimmed.startsWith('//') || trimmed.includes('://')) {
+            return null;
+        }
         return trimmed;
     }
 

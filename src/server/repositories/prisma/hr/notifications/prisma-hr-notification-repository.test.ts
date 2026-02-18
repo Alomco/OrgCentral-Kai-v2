@@ -1,5 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import type { PrismaClient, HRNotification as PrismaNotification } from '@prisma/client';
+import {
+    HRNotificationType,
+    NotificationPriority,
+    type PrismaClient,
+    type HRNotification as PrismaNotification,
+} from '@prisma/client';
 import { AuthorizationError } from '@/server/errors';
 import { PrismaHRNotificationRepository } from './prisma-hr-notification-repository';
 
@@ -14,7 +19,7 @@ vi.mock('@/server/lib/cache-tags/hr-notifications', () => ({
 const ORG_ID = 'org-1';
 const USER_ID = 'user-1';
 const DOMAIN_APPROVAL_TYPE = 'leave-approval';
-const PRISMA_REJECTION_TYPE: PrismaNotification['type'] = 'leave-rejection';
+const PRISMA_REJECTION_TYPE: PrismaNotification['type'] = HRNotificationType.LEAVE_REJECTION;
 const DOMAIN_REJECTION_TYPE = 'leave-rejection';
 
 const baseRecord: PrismaNotification = {
@@ -23,8 +28,8 @@ const baseRecord: PrismaNotification = {
     userId: USER_ID,
     title: 'Title',
     message: 'Message',
-    type: 'leave-approval',
-    priority: 'medium',
+    type: HRNotificationType.LEAVE_APPROVAL,
+    priority: NotificationPriority.MEDIUM,
     isRead: false,
     readAt: null,
     actionUrl: null,
@@ -81,8 +86,8 @@ describe('PrismaHRNotificationRepository', () => {
 
         const expectedCreateArguments = {
             data: expect.objectContaining({
-                type: 'leave-approval',
-                priority: 'medium',
+                type: HRNotificationType.LEAVE_APPROVAL,
+                priority: NotificationPriority.MEDIUM,
                 isRead: false,
             }),
         } satisfies Record<string, unknown>;
@@ -122,7 +127,9 @@ describe('PrismaHRNotificationRepository', () => {
 
     it('lists notifications with filters and registers cache tag', async () => {
         const { repo, model } = createRepository();
-        model.findMany.mockResolvedValue([{ ...baseRecord, type: PRISMA_REJECTION_TYPE, priority: 'high' }]);
+        model.findMany.mockResolvedValue([
+            { ...baseRecord, type: PRISMA_REJECTION_TYPE, priority: NotificationPriority.HIGH },
+        ]);
 
         const listFilters = {
             unreadOnly: true,
@@ -139,7 +146,7 @@ describe('PrismaHRNotificationRepository', () => {
                 userId: USER_ID,
                 isRead: false,
                 type: { in: [PRISMA_REJECTION_TYPE] },
-                priority: { in: ['high'] },
+                priority: { in: [NotificationPriority.HIGH] },
             },
             orderBy: { createdAt: 'desc' },
             take: 10,

@@ -7,6 +7,9 @@ vi.mock('@/server/use-cases/auth/sessions/get-session', () => ({
             orgId: 'org-1',
             userId: 'actor-1',
             roleKey: 'member',
+            permissions: {
+                'hr.onboarding.checklist': ['read', 'list', 'update'],
+            },
             dataResidency: 'UK_ONLY',
             dataClassification: 'OFFICIAL',
         },
@@ -24,6 +27,11 @@ vi.mock('@/server/services/hr/onboarding/onboarding-controller-dependencies', ()
         listInstancesForEmployee,
         updateItems,
     }),
+}));
+
+vi.mock('@/server/security/authorization/hr-guards/onboarding', () => ({
+    assertOnboardingChecklistLister: vi.fn(() => Promise.resolve()),
+    assertOnboardingChecklistUpdater: vi.fn(() => Promise.resolve()),
 }));
 
 import { getEmployeeChecklistsController, updateChecklistInstanceController } from '../instances-controller';

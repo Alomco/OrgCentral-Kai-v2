@@ -19,7 +19,7 @@ import {
 } from './security-notification-helpers';
 
 const revokeSessionSchema = z.object({
-    sessionToken: z.string().min(1),
+    sessionId: z.string().min(1),
 });
 
 const updateSecurityNotificationsSchema = z.object({
@@ -56,6 +56,9 @@ export async function revokeSessionAction(
             headers: headerStore,
             auditSource: AUDIT_SOURCES.revokeSession,
         });
+        const repository = createUserSessionRepository();
+        let targetSessionToken = '';
+        let isCurrentSession = false;
 
         await withOrgContext(
             {
@@ -68,9 +71,20 @@ export async function revokeSessionAction(
                 resourceType: RESOURCE_TYPES.session,
             },
             async () => {
+                const sessions = await repository.getUserSessionsByUser(
+                    authorization.orgId,
+                    authorization.userId,
+                );
+                const targetSession = sessions.find((sessionItem) => sessionItem.id === parsed.sessionId);
+                if (!targetSession) {
+                    throw new Error('Session not found.');
+                }
+                targetSessionToken = targetSession.sessionId;
+                isCurrentSession = targetSessionToken === session.session.token;
+
                 await performSessionRevocation({
                     headers: headerStore,
-                    sessionToken: parsed.sessionToken,
+                    sessionToken: targetSessionToken,
                     orgId: authorization.orgId,
                     expectedClassification: authorization.dataClassification,
                     expectedResidency: authorization.dataResidency,
@@ -84,7 +98,7 @@ export async function revokeSessionAction(
         appLogger.info('User session revoked from security settings.', {
             orgId: authorization.orgId,
             action: ACTIONS.revoke,
-            isCurrentSession: parsed.sessionToken === session.session.token,
+            isCurrentSession,
         });
 
         return { revoked: true };

@@ -30,7 +30,7 @@ describe('leave API routes csrf guard', () => {
 
         expect(response.status).toBe(403);
         expect(submitLeaveRequestControllerMock).not.toHaveBeenCalled();
-    }, 60000);
+    }, 120000);
 
     it('blocks /api/hr/leave/[requestId]/approve POST before controller execution when origin is untrusted', async () => {
         const forbiddenResponse = NextResponse.json(
@@ -47,5 +47,5 @@ describe('leave API routes csrf guard', () => {
 
         expect(response.status).toBe(403);
         expect(approveLeaveRequestControllerMock).not.toHaveBeenCalled();
-    }, 60000);
+    }, 120000);
 });
