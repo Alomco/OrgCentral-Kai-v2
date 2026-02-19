@@ -99,6 +99,63 @@ model SecurityEvent {
   @@schema("auth")
 }
 
+model TenantSecurityEvent {
+  id                 String                  @id @default(uuid()) @db.Uuid
+  orgId              String                  @db.Uuid
+  userId             String?                 @db.Uuid
+  eventType          String
+  severity           String
+  description        String
+  ipAddress          String?
+  userAgent          String?
+  additionalInfo     Json?                   @db.JsonB
+  resolved           Boolean                 @default(false)
+  resolvedAt         DateTime?
+  resolvedBy         String?                 @db.Uuid
+  createdAt          DateTime                @default(now())
+  dataClassification DataClassificationLevel @default(OFFICIAL)
+  residencyTag       DataResidencyZone       @default(UK_ONLY)
+
+  org      Organization @relation("TenantSecurityEventOrganization", fields: [orgId], references: [id], onDelete: Cascade)
+  user     User?        @relation("TenantSecurityEventUser", fields: [userId], references: [id], onDelete: SetNull)
+  resolver User?        @relation("TenantSecurityEventResolver", fields: [resolvedBy], references: [id], onDelete: SetNull)
+
+  @@index([orgId, createdAt])
+  @@index([orgId, eventType])
+  @@index([orgId, severity])
+  @@index([orgId, resolved])
+  @@index([userId])
+  @@map("tenant_security_events")
+  @@schema("auth")
+}
+
+model GlobalSecurityEvent {
+  id             String   @id @default(uuid()) @db.Uuid
+  sourceOrgId    String?  @db.Uuid
+  userId         String?  @db.Uuid
+  eventType      String
+  severity       String
+  description    String
+  ipAddress      String?
+  userAgent      String?
+  additionalInfo Json?    @db.JsonB
+  resolved       Boolean  @default(false)
+  resolvedAt     DateTime?
+  resolvedBy     String?  @db.Uuid
+  createdAt      DateTime @default(now())
+
+  sourceOrg Organization? @relation("GlobalSecurityEventSourceOrg", fields: [sourceOrgId], references: [id], onDelete: SetNull)
+  user      User?         @relation("GlobalSecurityEventUser", fields: [userId], references: [id], onDelete: SetNull)
+  resolver  User?         @relation("GlobalSecurityEventResolver", fields: [resolvedBy], references: [id], onDelete: SetNull)
+
+  @@index([sourceOrgId, createdAt])
+  @@index([eventType])
+  @@index([severity])
+  @@index([resolved])
+  @@map("global_security_events")
+  @@schema("auth")
+}
+
 // Model for managing session information
 model UserSession {
   id         String        @id @default(uuid()) @db.Uuid

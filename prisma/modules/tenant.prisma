@@ -97,6 +97,8 @@ model Organization {
   outboxEvents            EventOutbox[]
   invitations             Invitation[]
   securityEvents          SecurityEvent[]
+  tenantSecurityEvents    TenantSecurityEvent[] @relation("TenantSecurityEventOrganization")
+  globalSecurityEvents    GlobalSecurityEvent[] @relation("GlobalSecurityEventSourceOrg")
   complianceRecords      ComplianceRecord[]
   statutoryReports       StatutoryReport[]
   dataSubjectRights      DataSubjectRight[]
@@ -170,6 +172,10 @@ model User {
   invitationsRevoked  Invitation[] @relation("InvitationRevokedBy")
   securityEvents      SecurityEvent[]
   resolvedSecurityEvents SecurityEvent[] @relation("SecurityEventResolver")
+  tenantSecurityEvents TenantSecurityEvent[] @relation("TenantSecurityEventUser")
+  resolvedTenantSecurityEvents TenantSecurityEvent[] @relation("TenantSecurityEventResolver")
+  globalSecurityEvents GlobalSecurityEvent[] @relation("GlobalSecurityEventUser")
+  resolvedGlobalSecurityEvents GlobalSecurityEvent[] @relation("GlobalSecurityEventResolver")
   sessions            UserSession[]
   // submitter relationships are modelled as Membership -> ComplianceRecord/StatutoryReport
   dsrRequests          DataSubjectRight[] @relation("DSRRequestor")
