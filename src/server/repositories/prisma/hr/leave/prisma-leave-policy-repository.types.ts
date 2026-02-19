@@ -4,7 +4,7 @@ import type {
     LeaveAccrualFrequency as PrismaLeaveAccrualFrequency,
     DataClassificationLevel,
     DataResidencyZone,
-} from '../../../../../generated/client';
+} from '@prisma/client';
 
 export interface LeavePolicyFilters {
     orgId?: string;

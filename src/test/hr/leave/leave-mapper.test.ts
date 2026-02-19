@@ -1,4 +1,4 @@
-import { Prisma } from '../../../generated/client';
+import { Prisma } from '@prisma/client';
 import { describe, expect, it } from 'vitest';
 
 import { mapPrismaLeaveRequestToDomain } from '@/server/repositories/mappers/hr/leave/leave-mapper';

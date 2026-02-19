@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { type PrismaClient } from '../../src/generated/client';
+import { type PrismaClient } from '@prisma/client';
 import type { PersonaSeedConfig, SeedRuntimeConfig, SeededOrgRecord } from './types';
 import { hashCredentialPassword } from './password';
 import { activatedAtByStatus, upsertEmployeeProfile } from './employee-profile-seeding';

@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { MembershipStatus, type PrismaClient } from '../../src/generated/client';
+import { MembershipStatus, type PrismaClient } from '@prisma/client';
 import type { SeededOrgRecord } from './types';
 
 interface UpsertEmployeeProfileInput {

@@ -1,4 +1,4 @@
-import type { Prisma, LeavePolicy as PrismaLeavePolicy, LeavePolicyType as PrismaLeavePolicyType, LeaveAccrualFrequency as PrismaLeaveAccrualFrequency } from '../../../../../generated/client';
+import type { Prisma, LeavePolicy as PrismaLeavePolicy, LeavePolicyType as PrismaLeavePolicyType, LeaveAccrualFrequency as PrismaLeaveAccrualFrequency } from '@prisma/client';
 import { BasePrismaRepository } from '@/server/repositories/prisma/base-prisma-repository';
 import type { ILeavePolicyRepository } from '@/server/repositories/contracts/hr/leave/leave-policy-repository-contract';
 import type { LeavePolicy } from '@/server/types/leave-types';

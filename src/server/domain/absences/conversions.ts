@@ -1,4 +1,4 @@
-import type { Prisma } from '../../../generated/client';
+import type { Prisma } from '@prisma/client';
 
 export function toNumber(value: number | { toNumber(): number } | undefined): number {
     if (typeof value === 'number') {

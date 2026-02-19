@@ -1,5 +1,5 @@
 import { stderr, stdout } from 'node:process';
-import type { Prisma } from '../src/generated/client';
+import type { Prisma } from '@prisma/client';
 import {
     MembershipStatus,
     RoleScope,
@@ -7,7 +7,7 @@ import {
     ComplianceTier,
     DataResidencyZone,
     DataClassificationLevel,
-} from '../src/generated/client';
+} from '@prisma/client';
 import { prisma } from '../src/server/lib/prisma';
 
 const OWNER_ROLE_PERMISSIONS: Record<string, string[]> = {

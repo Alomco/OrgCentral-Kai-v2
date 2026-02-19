@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { PrismaClient } from '../../../../../generated/client';
+import type { PrismaClient } from '@prisma/client';
 
 import { PrismaComplianceItemRepository } from './prisma-compliance-item-repository';
 

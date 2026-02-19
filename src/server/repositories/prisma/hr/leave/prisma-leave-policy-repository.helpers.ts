@@ -1,7 +1,7 @@
 import type {
   LeavePolicyType as PrismaLeavePolicyType,
   LeaveAccrualFrequency as PrismaLeaveAccrualFrequency,
-} from '../../../../../generated/client';
+} from '@prisma/client';
 
 import type { LeavePolicy } from '@/server/types/leave-types';
 import type { LeavePolicyUpdateData } from './prisma-leave-policy-repository.types';

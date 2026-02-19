@@ -1,4 +1,4 @@
-import { DataClassificationLevel, DataResidencyZone } from '../../../../../generated/client';
+import { DataClassificationLevel, DataResidencyZone } from '@prisma/client';
 import type { AbsenceAttachment, AbsenceTypeConfig, UnplannedAbsence } from '@/server/types/hr-ops-types';
 
 export const ORG_ID = '11111111-1111-4111-8111-111111111111';

@@ -1,6 +1,6 @@
 'use server';
 
-import type { Prisma } from '../../../../generated/client';
+import type { Prisma } from '@prisma/client';
 import {
     MembershipStatus,
     RoleScope,
@@ -8,7 +8,7 @@ import {
     ComplianceTier,
     DataResidencyZone,
     DataClassificationLevel,
-} from '../../../../generated/client';
+} from '@prisma/client';
 import { prisma } from '@/server/lib/prisma';
 import { AuthorizationError } from '@/server/errors';
 import { resolveRoleTemplate } from '@/server/security/role-templates';

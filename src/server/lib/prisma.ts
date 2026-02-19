@@ -1,4 +1,4 @@
-import { PrismaClient, type Prisma } from '../../generated/client';
+import { PrismaClient, type Prisma } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { appLogger } from '@/server/logging/structured-logger';
 import { getTenantScopedModelConfig, type TenantScopedModelConfig } from '@/server/lib/prisma-tenant-scope';

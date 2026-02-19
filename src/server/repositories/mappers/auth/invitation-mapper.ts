@@ -1,4 +1,4 @@
-import type { Invitation as PrismaInvitation } from '../../../../generated/client';
+import type { Invitation as PrismaInvitation } from '@prisma/client';
 import type { InvitationRecord } from '@/server/repositories/contracts/auth/invitations';
 import { coerceOnboardingData } from '@/server/invitations/onboarding-data';
 

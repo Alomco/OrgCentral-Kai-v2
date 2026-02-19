@@ -1,4 +1,4 @@
-import type { Prisma } from '../../../../generated/client';
+import type { Prisma } from '@prisma/client';
 import { getSessionContext } from '@/server/use-cases/auth/sessions/get-session';
 import { upsertComplianceCategory, type UpsertComplianceCategoryDependencies } from '@/server/use-cases/hr/compliance/upsert-compliance-category';
 import { upsertComplianceCategorySchema } from '@/server/types/hr-compliance-schemas';

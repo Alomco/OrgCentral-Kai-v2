@@ -1,4 +1,4 @@
-import type { TrainingRecord as PrismaTrainingRecord, Prisma } from '../../../../../generated/client';
+import type { TrainingRecord as PrismaTrainingRecord, Prisma } from '@prisma/client';
 import { BasePrismaRepository } from '@/server/repositories/prisma/base-prisma-repository';
 import type { ITrainingRecordRepository } from '@/server/repositories/contracts/hr/training/training-record-repository-contract';
 import { mapPrismaTrainingRecordToDomain, mapDomainTrainingRecordToPrisma, mapDomainTrainingUpdateToPrisma } from '@/server/repositories/mappers/hr/training/training-mapper';

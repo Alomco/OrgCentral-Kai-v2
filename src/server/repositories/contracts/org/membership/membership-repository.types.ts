@@ -1,4 +1,4 @@
-import type { EmploymentType, MembershipStatus, Prisma } from '../../../../../generated/client';
+import type { EmploymentType, MembershipStatus, Prisma } from '@prisma/client';
 import type { Membership } from '@/server/types/membership';
 import type { RepositoryAuthorizationContext } from '@/server/types/repository-authorization';
 

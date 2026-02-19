@@ -1,4 +1,4 @@
-import type { Prisma } from '../../generated/client';
+import type { Prisma } from '@prisma/client';
 import { DEFAULT_CLASSIFICATION, DEFAULT_RESIDENCY } from '@/server/lib/prisma-tenant-scope';
 import type { TenantScopedModelConfig } from '@/server/lib/prisma-tenant-scope';
 import type { PrismaInputRecord, PrismaInputValue, PrismaOperationArguments } from '@/server/lib/prisma';

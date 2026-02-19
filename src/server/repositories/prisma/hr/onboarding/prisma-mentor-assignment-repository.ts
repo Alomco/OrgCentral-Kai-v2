@@ -1,4 +1,4 @@
-import { Prisma, type PrismaClient, type MentorAssignment as PrismaMentorAssignment } from '../../../../../generated/client';
+import { Prisma, type PrismaClient, type MentorAssignment as PrismaMentorAssignment } from '@prisma/client';
 import { BasePrismaRepository } from '@/server/repositories/prisma/base-prisma-repository';
 import type {
     IMentorAssignmentRepository,

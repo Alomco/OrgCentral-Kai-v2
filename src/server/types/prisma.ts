@@ -23,7 +23,7 @@ import {
     SecurityClassification,
     SessionStatus,
     TimeEntryStatus,
-} from '../../generated/client';
+} from '@prisma/client';
 import type {
     ComplianceRecord as PrismaComplianceRecordModel,
     DataSubjectRight as PrismaDataSubjectRightModel,
@@ -39,7 +39,7 @@ import type {
     Role as PrismaRoleModel,
     StatutoryReport as PrismaStatutoryReportModel,
     User as PrismaUserModel,
-} from '../../generated/client';
+} from '@prisma/client';
 
 // Centralized Prisma surface to keep services and use-cases decoupled from the client import site.
 export { Prisma };

@@ -1,5 +1,5 @@
 import type { ComplianceTemplate, ComplianceTemplateItem } from '@/server/types/compliance-types';
-import type { Prisma } from '../../../../../generated/client';
+import type { Prisma } from '@prisma/client';
 
 export interface ComplianceTemplateCreateInput {
     orgId: string;

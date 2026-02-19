@@ -1,4 +1,4 @@
-import { Prisma } from '../../../../../generated/client';
+import { Prisma } from '@prisma/client';
 import { BasePrismaRepository } from '@/server/repositories/prisma/base-prisma-repository';
 import type { ILeaveRequestRepository, LeaveRequestCreateInput, LeaveRequestReadOptions } from '@/server/repositories/contracts/hr/leave/leave-request-repository-contract';
 import type { TenantScope } from '@/server/types/tenant';

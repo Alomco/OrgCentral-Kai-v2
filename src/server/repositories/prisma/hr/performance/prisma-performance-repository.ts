@@ -1,4 +1,4 @@
-import type { Prisma, PrismaClient } from '../../../../../generated/client';
+import type { Prisma, PrismaClient } from '@prisma/client';
 import { BasePrismaRepository, type BasePrismaRepositoryOptions } from '@/server/repositories/prisma/base-prisma-repository';
 import type {
     CreateGoalDTO,

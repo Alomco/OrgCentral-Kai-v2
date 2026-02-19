@@ -1,4 +1,4 @@
-import { Prisma, type PrismaClient, type EmailSequenceTemplate as PrismaEmailSequenceTemplate } from '../../../../../generated/client';
+import { Prisma, type PrismaClient, type EmailSequenceTemplate as PrismaEmailSequenceTemplate } from '@prisma/client';
 import { BasePrismaRepository } from '@/server/repositories/prisma/base-prisma-repository';
 import type {
     EmailSequenceTemplateListFilters,

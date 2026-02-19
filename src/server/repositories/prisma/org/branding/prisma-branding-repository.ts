@@ -1,4 +1,4 @@
-import type { Prisma, PrismaClient } from '../../../../../generated/client';
+import type { Prisma, PrismaClient } from '@prisma/client';
 import type { IBrandingRepository } from '@/server/repositories/contracts/org/branding/branding-repository-contract';
 import { BasePrismaRepository } from '@/server/repositories/prisma/base-prisma-repository';
 import { mapOrgBrandingRecordToDomain, mapOrgBrandingUpdateToRecord } from '@/server/repositories/mappers/org/branding/branding-mapper';

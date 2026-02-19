@@ -1,4 +1,4 @@
-import { Prisma, type PrismaClient, type ProvisioningTask as PrismaProvisioningTask } from '../../../../../generated/client';
+import { Prisma, type PrismaClient, type ProvisioningTask as PrismaProvisioningTask } from '@prisma/client';
 import { BasePrismaRepository } from '@/server/repositories/prisma/base-prisma-repository';
 import type {
     IProvisioningTaskRepository,

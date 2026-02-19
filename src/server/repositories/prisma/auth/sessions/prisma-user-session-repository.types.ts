@@ -1,4 +1,4 @@
-import type { Prisma, SessionStatus } from '../../../../../generated/client';
+import type { Prisma, SessionStatus } from '@prisma/client';
 
 export interface UserSessionFilters {
     userId?: string;

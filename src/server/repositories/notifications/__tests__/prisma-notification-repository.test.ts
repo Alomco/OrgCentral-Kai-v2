@@ -4,7 +4,7 @@ import {
     NotificationPriority,
     type PrismaClient,
     type NotificationMessage,
-} from '../../../../generated/client';
+} from '@prisma/client';
 import type { NotificationAuditWriter } from '@/server/repositories/contracts/notifications';
 import { PrismaNotificationRepository } from '@/server/repositories/prisma/notifications/prisma-notification-repository';
 import type { RepositoryAuthorizationContext } from '@/server/repositories/security';

@@ -1,4 +1,4 @@
-import { Prisma, type PrismaClient, type DocumentTemplate as PrismaDocumentTemplate } from '../../../../../generated/client';
+import { Prisma, type PrismaClient, type DocumentTemplate as PrismaDocumentTemplate } from '@prisma/client';
 import { BasePrismaRepository } from '@/server/repositories/prisma/base-prisma-repository';
 import type {
     DocumentTemplateListFilters,

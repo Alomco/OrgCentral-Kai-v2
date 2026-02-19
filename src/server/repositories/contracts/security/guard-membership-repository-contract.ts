@@ -4,7 +4,7 @@
  */
 import type { DataClassificationLevel, DataResidencyZone } from '@/server/types/tenant';
 import type { OrgPermissionMap } from '@/server/security/access-control';
-import type { MembershipStatus, RoleScope } from '../../../../generated/client';
+import type { MembershipStatus, RoleScope } from '@prisma/client';
 
 export interface GuardMembershipRecord {
     orgId: string;

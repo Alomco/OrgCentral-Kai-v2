@@ -1,4 +1,4 @@
-import { Prisma, type PrismaClient, type Invitation as PrismaInvitation } from '../../../../../generated/client';
+import { Prisma, type PrismaClient, type Invitation as PrismaInvitation } from '@prisma/client';
 import { randomUUID } from 'node:crypto';
 import { BasePrismaRepository, type BasePrismaRepositoryOptions } from '@/server/repositories/prisma/base-prisma-repository';
 import type {

@@ -1,5 +1,5 @@
-import type { Prisma } from '../../../../../generated/client';
-import { SessionStatus, type SessionStatus as PrismaSessionStatus } from '../../../../../generated/client';
+import type { Prisma } from '@prisma/client';
+import { SessionStatus, type SessionStatus as PrismaSessionStatus } from '@prisma/client';
 import type { UserSession as DomainUserSession } from '@/server/types/hr-types';
 import { mapPrismaUserSessionToDomain, mapDomainUserSessionToPrisma, toUserSessionMetadataInput } from '@/server/repositories/mappers/auth/sessions/user-session-mapper';
 import { BasePrismaRepository } from '@/server/repositories/prisma/base-prisma-repository';

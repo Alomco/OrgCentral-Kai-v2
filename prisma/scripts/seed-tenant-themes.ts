@@ -11,7 +11,7 @@
 
 /* eslint-disable no-console */
 
-import { PrismaClient } from '../../src/generated/client';
+import { PrismaClient } from '@prisma/client';
 import { themePresets, getPresetOptions } from '../../src/server/theme/theme-presets';
 
 const prisma = new PrismaClient();

@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { headers as nextHeaders } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { Suspense } from 'react';
-import { RoleScope } from '../../../generated/client';
+import { RoleScope } from '@prisma/client';
 
 import { Skeleton } from '@/components/ui/skeleton';
 import { getSessionContextOrRedirect } from '@/server/ui/auth/session-redirect';

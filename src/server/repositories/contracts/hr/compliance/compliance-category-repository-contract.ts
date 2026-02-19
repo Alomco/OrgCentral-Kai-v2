@@ -1,4 +1,4 @@
-import type { Prisma } from '../../../../../generated/client';
+import type { Prisma } from '@prisma/client';
 import type { ComplianceCategory } from '@/server/types/compliance-types';
 
 export interface ComplianceCategoryUpsertInput {

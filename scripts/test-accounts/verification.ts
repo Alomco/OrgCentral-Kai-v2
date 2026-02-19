@@ -1,4 +1,4 @@
-import type { PrismaClient } from '../../src/generated/client';
+import type { PrismaClient } from '@prisma/client';
 import type { PersonaCatalogRecord } from './types';
 import { readSeedCatalogFile } from './catalog-schema';
 import { buildAbacPolicyServiceDependencies } from '@/server/repositories/providers/org/abac-policy-service-dependencies';

@@ -1,4 +1,4 @@
-import { MembershipStatus, Prisma, SessionStatus } from '../../generated/client';
+import { MembershipStatus, Prisma, SessionStatus } from '@prisma/client';
 import { prisma } from '@/server/lib/prisma';
 import { appLogger } from '@/server/logging/structured-logger';
 

@@ -1,4 +1,4 @@
-import type { Prisma, EmployeeProfile as PrismaEmployeeProfile } from '../../../../../generated/client';
+import type { Prisma, EmployeeProfile as PrismaEmployeeProfile } from '@prisma/client';
 import type { EmployeeProfileDTO, PeopleListFilters } from '@/server/types/hr/people';
 import type { EmployeeProfileSortInput } from '@/server/repositories/contracts/hr/people/employee-profile-repository-contract';
 import {

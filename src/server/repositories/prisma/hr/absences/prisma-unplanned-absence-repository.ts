@@ -11,7 +11,7 @@ import type {
   ReturnToWorkRecordInput,
   UnplannedAbsence,
 } from '@/server/types/hr-ops-types';
-import type { Prisma, PrismaClient } from '../../../../../generated/client';
+import type { Prisma, PrismaClient } from '@prisma/client';
 import { EntityNotFoundError } from '@/server/errors';
 import type { RepositoryAuthorizationContext } from '@/server/types/repository-authorization';
 

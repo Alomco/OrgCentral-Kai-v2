@@ -1,4 +1,4 @@
-import { MembershipStatus, type PrismaClient } from '../../src/generated/client';
+import { MembershipStatus, type PrismaClient } from '@prisma/client';
 import type { PersonaCatalogRecord } from './types';
 
 export interface AuthUserSummary {

@@ -1,4 +1,4 @@
-import type { Prisma } from '../../../../../generated/client';
+import type { Prisma } from '@prisma/client';
 import { BasePrismaRepository } from '@/server/repositories/prisma/base-prisma-repository';
 import type { IAbsenceTypeConfigRepository } from '@/server/repositories/contracts/hr/absences/absence-type-config-repository-contract';
 import { mapDomainAbsenceTypeConfigToPrismaCreate, mapDomainAbsenceTypeConfigToPrismaUpdate, mapPrismaAbsenceTypeConfigToDomain } from '@/server/repositories/mappers/hr/absences/absences-mapper';

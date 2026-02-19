@@ -1,4 +1,4 @@
-import { Prisma, type PrismaClient, type ComplianceTemplate as PrismaComplianceTemplate } from '../../../../../generated/client';
+import { Prisma, type PrismaClient, type ComplianceTemplate as PrismaComplianceTemplate } from '@prisma/client';
 import { z } from 'zod';
 import { complianceTemplateItemSchema } from '@/server/validators/hr/compliance/compliance-validators';
 import type {

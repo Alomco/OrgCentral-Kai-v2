@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { Prisma } from '../../../../../../generated/client';
-import type { EmployeeProfile as PrismaEmployeeProfile } from '../../../../../../generated/client';
+import { Prisma } from '@prisma/client';
+import type { EmployeeProfile as PrismaEmployeeProfile } from '@prisma/client';
 import { mapPrismaEmployeeProfileToDomain, mapDomainEmployeeProfileToPrisma } from '../employee-profile-mapper';
 
 const baseRecord: PrismaEmployeeProfile = {

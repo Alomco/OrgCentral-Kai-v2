@@ -1,4 +1,4 @@
-import { Prisma, type PrismaClient, type OnboardingWorkflowTemplate as PrismaWorkflowTemplate } from '../../../../../generated/client';
+import { Prisma, type PrismaClient, type OnboardingWorkflowTemplate as PrismaWorkflowTemplate } from '@prisma/client';
 import { BasePrismaRepository } from '@/server/repositories/prisma/base-prisma-repository';
 import type {
     IOnboardingWorkflowTemplateRepository,

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import type { PrismaClient } from '../../../../../../generated/client';
+import type { PrismaClient } from '@prisma/client';
 import { PrismaEmployeeProfileRepository } from '@/server/repositories/prisma/hr/people/prisma-employee-profile-repository';
 import { HR_PEOPLE_CACHE_SCOPES } from '@/server/lib/cache-tags/hr-people';
 

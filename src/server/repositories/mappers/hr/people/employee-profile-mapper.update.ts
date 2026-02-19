@@ -1,4 +1,4 @@
-import type { Prisma } from '../../../../../generated/client';
+import type { Prisma } from '@prisma/client';
 import type { EmployeeProfileDTO } from '@/server/types/hr/people';
 import {
     hasLegacyProfileUpdates,

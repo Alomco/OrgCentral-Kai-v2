@@ -2,7 +2,7 @@
  * Repository contract for User Membership/Relationships
  * Following SOLID principles with clear separation of concerns
  */
-import type { MembershipStatus } from '../../../../../generated/client';
+import type { MembershipStatus } from '@prisma/client';
 import type { User } from '@/server/types/hr-types';
 import type { UserData } from '@/server/types/leave-types';
 import type { Membership } from '@/server/types/membership';

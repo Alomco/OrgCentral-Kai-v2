@@ -1,4 +1,4 @@
-import { Prisma, type SecurityEvent as PrismaSecurityEvent } from '../../../../../generated/client';
+import { Prisma, type SecurityEvent as PrismaSecurityEvent } from '@prisma/client';
 import type { SecurityEvent } from '@/server/types/hr-types';
 import type {
     SecurityEventCreationData,

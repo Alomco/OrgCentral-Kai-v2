@@ -1,4 +1,4 @@
-import type { Prisma } from '../../../../../generated/client';
+import type { Prisma } from '@prisma/client';
 import { BasePrismaRepository } from '@/server/repositories/prisma/base-prisma-repository';
 import type { ITimeEntryRepository } from '@/server/repositories/contracts/hr/time-tracking/time-entry-repository-contract';
 import { mapDomainTimeEntryToPrismaCreate, mapDomainTimeEntryToPrismaUpdate, mapPrismaTimeEntryToDomain } from '@/server/repositories/mappers/hr/time-tracking/time-entry-mapper';

@@ -1,5 +1,5 @@
 import type { ComplianceAttachmentInput, ComplianceItemStatus, ComplianceLogItem } from '@/server/types/compliance-types';
-import type { Prisma } from '../../../../../generated/client';
+import type { Prisma } from '@prisma/client';
 
 export interface ComplianceAssignmentInput {
     orgId: string;
