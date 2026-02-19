@@ -4,7 +4,7 @@ import {
     NotificationPriority,
     type PrismaClient,
     type HRNotification as PrismaNotification,
-} from '@prisma/client';
+} from '../../../../../generated/client';
 import { AuthorizationError } from '@/server/errors';
 import { PrismaHRNotificationRepository } from './prisma-hr-notification-repository';
 

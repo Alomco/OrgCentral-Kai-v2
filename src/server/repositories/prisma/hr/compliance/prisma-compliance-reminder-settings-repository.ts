@@ -1,4 +1,4 @@
-import type { PrismaClient } from '@prisma/client';
+import type { PrismaClient } from '../../../../../generated/client';
 
 import { BasePrismaRepository } from '@/server/repositories/prisma/base-prisma-repository';
 import type { IComplianceReminderSettingsRepository } from '@/server/repositories/contracts/hr/compliance/compliance-reminder-settings-repository-contract';

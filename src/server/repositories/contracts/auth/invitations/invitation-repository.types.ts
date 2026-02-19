@@ -1,5 +1,5 @@
 import type { InvitationData, InvitationStatus } from '@/server/types/auth-types';
-import type { Prisma } from '@prisma/client';
+import type { Prisma } from '../../../../../generated/client';
 
 export interface InvitationRecord extends InvitationData {
     invitedByUserId?: string;

@@ -1,4 +1,4 @@
-import { Prisma, type HRSettings as PrismaHRSettings } from '@prisma/client';
+import { Prisma, type HRSettings as PrismaHRSettings } from '../../../../../generated/client';
 import type { HRSettings } from '@/server/types/hr-ops-types';
 import type { PrismaJsonValue } from '@/server/types/prisma';
 

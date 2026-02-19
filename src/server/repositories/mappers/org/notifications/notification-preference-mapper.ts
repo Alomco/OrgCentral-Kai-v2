@@ -3,7 +3,7 @@ import type {
     NotificationPreferenceRecord,
 } from '@/server/types/hr-types';
 import { Prisma, type PrismaInputJsonValue, type PrismaNullableJsonNullValueInput } from '@/server/types/prisma';
-import type { Prisma as PrismaClient } from '@prisma/client';
+import type { Prisma as PrismaClient } from '../../../../../generated/client';
 
 type NotificationPreferenceCreateInput = PrismaClient.NotificationPreferenceUncheckedCreateInput;
 

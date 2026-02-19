@@ -2,7 +2,7 @@ import type { LeavePolicy as DomainLeavePolicy, LeaveAccrualFrequency, LeavePoli
 import type { LeavePolicyCreationData, LeavePolicyUpdateData } from '@/server/repositories/prisma/hr/leave/prisma-leave-policy-repository.types';
 import type { DataClassificationLevel, DataResidencyZone } from '@/server/types/tenant';
 import { Prisma as PrismaValue, type PrismaDecimal, type PrismaInputJsonValue } from '@/server/types/prisma';
-import type { Prisma } from '@prisma/client';
+import type { Prisma } from '../../../../../generated/client';
 import { toNumber } from '@/server/domain/absences/conversions';
 
 interface LeavePolicyRecord {

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { RoleScope } from '@prisma/client';
+import { RoleScope } from '../../../../generated/client';
 import { ValidationError } from '@/server/errors';
 import { getSessionContext } from '@/server/use-cases/auth/sessions/get-session';
 import { readJson } from '@/server/api-adapters/http/request-utils';

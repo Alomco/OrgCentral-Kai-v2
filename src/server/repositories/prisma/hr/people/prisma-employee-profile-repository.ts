@@ -1,4 +1,4 @@
-import type { EmployeeProfile as PrismaEmployeeProfile, Prisma } from '@prisma/client';
+import type { EmployeeProfile as PrismaEmployeeProfile, Prisma } from '../../../../../generated/client';
 import { BasePrismaRepository, type BasePrismaRepositoryOptions } from '@/server/repositories/prisma/base-prisma-repository';
 import type {
   EmployeeProfileListOptions,

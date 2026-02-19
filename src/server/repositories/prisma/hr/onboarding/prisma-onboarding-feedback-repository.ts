@@ -1,4 +1,4 @@
-import { Prisma, type PrismaClient } from '@prisma/client';
+import { Prisma, type PrismaClient } from '../../../../../generated/client';
 import { BasePrismaRepository } from '@/server/repositories/prisma/base-prisma-repository';
 import type {
     IOnboardingFeedbackRepository,

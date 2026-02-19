@@ -1,4 +1,4 @@
-import type { Prisma } from '@prisma/client';
+import type { Prisma } from '../../../generated/client';
 import type { DataClassificationLevel, DataResidencyZone } from '@/server/types/tenant';
 
 export type AbsenceDurationType = 'DAYS' | 'HOURS';

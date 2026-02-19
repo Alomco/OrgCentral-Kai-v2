@@ -1,4 +1,4 @@
-import type { Prisma } from '@prisma/client';
+import type { Prisma } from '../../../../../generated/client';
 import { BasePrismaRepository } from '@/server/repositories/prisma/base-prisma-repository';
 import type { IHRPolicyRepository } from '@/server/repositories/contracts/hr/policies/hr-policy-repository-contract';
 import { mapDomainHRPolicyToPrismaCreate, mapDomainHRPolicyToPrismaUpdate, mapPrismaHRPolicyToDomain } from '@/server/repositories/mappers/hr/policies/hr-policy-mapper';

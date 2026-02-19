@@ -1,4 +1,4 @@
-import { Prisma, type PrismaClient, type ChecklistTemplate as PrismaChecklistTemplate } from '@prisma/client';
+import { Prisma, type PrismaClient, type ChecklistTemplate as PrismaChecklistTemplate } from '../../../../../generated/client';
 import { z } from 'zod';
 import { checklistTemplateItemSchema } from '@/server/validators/hr/onboarding/checklist-validators';
 import type {

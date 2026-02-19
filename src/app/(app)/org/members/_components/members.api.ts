@@ -1,5 +1,5 @@
 ﻿import { queryOptions } from '@tanstack/react-query';
-import type { MembershipStatus } from '@prisma/client';
+import type { MembershipStatus } from '../../../../../generated/client';
 import type { UserData } from '@/server/types/leave-types';
 
 export const memberKeys = {

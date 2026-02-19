@@ -1,7 +1,7 @@
 'use server';
 
 import { z } from 'zod';
-import type { Prisma } from '@prisma/client';
+import type { Prisma } from '../../../../../generated/client';
 
 import { toActionState, type ActionState } from '@/server/actions/action-state';
 import { authAction } from '@/server/actions/auth-action';

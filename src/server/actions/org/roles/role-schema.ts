@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { RoleScope } from '@prisma/client';
+import { RoleScope } from '../../../../generated/client';
 
 const roleScopeValues = Object.values(RoleScope) as [RoleScope, ...RoleScope[]];
 

@@ -1,4 +1,4 @@
-import type { Prisma } from '@prisma/client';
+import type { Prisma } from '../../../../../generated/client';
 import type { ContractTypeCode } from '@/server/types/hr/people';
 
 export interface EmploymentContractFilters {

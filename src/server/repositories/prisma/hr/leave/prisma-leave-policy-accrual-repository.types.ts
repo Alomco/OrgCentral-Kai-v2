@@ -3,7 +3,7 @@ export interface LeavePolicyAccrualFilters {
     tenureMonths?: number;
 }
 
-import type { Prisma } from '@prisma/client';
+import type { Prisma } from '../../../../../generated/client';
 
 export type LeavePolicyAccrualCreationData = Prisma.LeavePolicyAccrualUncheckedCreateInput;
 

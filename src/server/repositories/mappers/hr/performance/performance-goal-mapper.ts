@@ -1,5 +1,5 @@
 import type { PerformanceGoal } from '@/server/domain/hr/performance/types';
-import type { PerformanceGoal as PrismaPerformanceGoal } from '@prisma/client';
+import type { PerformanceGoal as PrismaPerformanceGoal } from '../../../../../generated/client';
 
 type PrismaPerformanceGoalRecord = PrismaPerformanceGoal;
 

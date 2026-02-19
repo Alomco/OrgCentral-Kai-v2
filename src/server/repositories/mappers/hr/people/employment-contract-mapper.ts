@@ -1,4 +1,4 @@
-import type { Prisma, EmploymentContract as PrismaEmploymentContract } from '@prisma/client';
+import type { Prisma, EmploymentContract as PrismaEmploymentContract } from '../../../../../generated/client';
 import type { ContractTypeCode, EmploymentContractDTO } from '@/server/types/hr/people';
 import {
   toDateValue,

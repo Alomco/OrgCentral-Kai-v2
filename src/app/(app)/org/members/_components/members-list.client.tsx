@@ -3,7 +3,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import type { MembershipStatus } from '@prisma/client';
+import type { MembershipStatus } from '../../../../../generated/client';
 import { listMembersQuery } from './members.api';
 import type { UserData } from '@/server/types/leave-types';
 import { MemberActions } from './member-actions';

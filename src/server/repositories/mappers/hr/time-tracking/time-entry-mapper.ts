@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { Prisma } from '../../../../../generated/client';
 import type { TimeEntry as DomainTimeEntry } from '@/server/types/hr-ops-types';
 import type { PrismaJsonValue } from '@/server/types/prisma';
 

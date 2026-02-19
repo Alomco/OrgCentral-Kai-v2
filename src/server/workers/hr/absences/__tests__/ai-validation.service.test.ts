@@ -1,4 +1,4 @@
-import { DataClassificationLevel, DataResidencyZone } from '@prisma/client';
+import { DataClassificationLevel, DataResidencyZone } from '../../../../../generated/client';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { okAsync } from 'neverthrow';
 import type { AuditEventPayload } from '@/server/logging/audit-logger';

@@ -1,4 +1,4 @@
-import type { Prisma, EmploymentType, HealthStatus } from '@prisma/client';
+import type { Prisma, EmploymentType, HealthStatus } from '../../../../../generated/client';
 
 export interface EmployeeProfileFilters {
     orgId?: string;

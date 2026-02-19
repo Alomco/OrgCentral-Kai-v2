@@ -1,4 +1,4 @@
-import type { Prisma } from '@prisma/client';
+import type { Prisma } from '../../../../../generated/client';
 import type { AppPermission } from '@/server/types/platform-types';
 
 export interface AppPermissionCreateInput {

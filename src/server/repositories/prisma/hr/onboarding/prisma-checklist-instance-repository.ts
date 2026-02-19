@@ -1,4 +1,4 @@
-import { Prisma, type PrismaClient, type ChecklistInstance as PrismaChecklistInstance } from '@prisma/client';
+import { Prisma, type PrismaClient, type ChecklistInstance as PrismaChecklistInstance } from '../../../../../generated/client';
 import { z } from 'zod'; // Import z explicitly for array usage
 import { checklistInstanceItemSchema } from '@/server/validators/hr/onboarding/checklist-validators';
 import type {

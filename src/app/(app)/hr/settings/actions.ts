@@ -1,7 +1,7 @@
 'use server';
 
 import { headers } from 'next/headers';
-import type { Prisma } from '@prisma/client';
+import type { Prisma } from '../../../../generated/client';
 import { z } from 'zod';
 
 import { getSessionContext } from '@/server/use-cases/auth/sessions/get-session';

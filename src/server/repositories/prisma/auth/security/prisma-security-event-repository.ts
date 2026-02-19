@@ -1,4 +1,4 @@
-import type { SecurityEvent as PrismaSecurityEvent } from '@prisma/client';
+import type { SecurityEvent as PrismaSecurityEvent } from '../../../../../generated/client';
 import { BasePrismaRepository } from '@/server/repositories/prisma/base-prisma-repository';
 import { invalidateOrgCache, registerOrgCacheTag } from '@/server/lib/cache-tags';
 import { CACHE_SCOPE_SECURITY_EVENTS } from '@/server/repositories/cache-scopes';

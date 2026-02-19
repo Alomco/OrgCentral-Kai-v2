@@ -9,7 +9,7 @@ import { MembersListClient } from "../_components/members-list.client";
 import { OrgMembersBulkActions } from "../_components/org-members-bulk-actions";
 import { memberKeys, membersSearchKey } from "../_components/members.api";
 import type { UserData } from "@/server/types/leave-types";
-import type { MembershipStatus } from "@prisma/client";
+import type { MembershipStatus } from '../../../../../generated/client';
 
 
 const orgId = 'org-bulk';

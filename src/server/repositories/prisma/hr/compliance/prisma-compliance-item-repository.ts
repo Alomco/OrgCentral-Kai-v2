@@ -1,4 +1,4 @@
-import { Prisma, type PrismaClient, type ComplianceLogItem as PrismaComplianceLogItem } from '@prisma/client';
+import { Prisma, type PrismaClient, type ComplianceLogItem as PrismaComplianceLogItem } from '../../../../../generated/client';
 import type {
     ComplianceAssignmentInput,
     ComplianceItemUpdateInput,

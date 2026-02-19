@@ -1,4 +1,4 @@
-import { Prisma, type PrismaClient } from '@prisma/client';
+import { Prisma, type PrismaClient } from '../../../../../generated/client';
 import { BasePrismaRepository } from '@/server/repositories/prisma/base-prisma-repository';
 import { stampCreate, stampUpdate } from '@/server/repositories/prisma/helpers/timestamps';
 import { toPrismaInputJson } from '@/server/repositories/prisma/helpers/prisma-utils';

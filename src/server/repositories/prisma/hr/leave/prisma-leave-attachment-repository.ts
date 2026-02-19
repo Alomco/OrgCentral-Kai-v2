@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { Prisma } from '../../../../../generated/client';
 import { BasePrismaRepository } from '@/server/repositories/prisma/base-prisma-repository';
 import type { ILeaveAttachmentRepository } from '@/server/repositories/contracts/hr/leave/leave-attachment-repository-contract';
 import type { LeaveAttachment, LeaveAttachmentInput } from '@/server/types/leave-types';

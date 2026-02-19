@@ -1,4 +1,4 @@
-import { Prisma, type PrismaClient, type Offboarding as PrismaOffboarding } from '@prisma/client';
+import { Prisma, type PrismaClient, type Offboarding as PrismaOffboarding } from '../../../../../generated/client';
 import { BasePrismaRepository } from '@/server/repositories/prisma/base-prisma-repository';
 import type { IOffboardingRepository, OffboardingListFilters } from '@/server/repositories/contracts/hr/offboarding';
 import type { OffboardingCreateInput, OffboardingUpdateInput, OffboardingRecord } from '@/server/types/hr/offboarding-types';

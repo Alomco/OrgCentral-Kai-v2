@@ -11,7 +11,7 @@ import '@testing-library/jest-dom/vitest';
  * To keep unit tests fast and hermetic, we mock the Prisma singleton module.
  */
 
-import type { PrismaClient } from '@prisma/client';
+import type { PrismaClient } from '../generated/client';
 import { vi } from 'vitest';
 
 interface StorageLike {

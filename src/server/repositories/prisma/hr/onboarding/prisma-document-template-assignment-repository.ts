@@ -1,4 +1,4 @@
-import { Prisma, type PrismaClient, type DocumentTemplateAssignment as PrismaAssignment } from '@prisma/client';
+import { Prisma, type PrismaClient, type DocumentTemplateAssignment as PrismaAssignment } from '../../../../../generated/client';
 import { BasePrismaRepository } from '@/server/repositories/prisma/base-prisma-repository';
 import type {
     DocumentTemplateAssignmentListFilters,

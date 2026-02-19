@@ -1,5 +1,5 @@
 import type { UserSession } from '@/server/types/hr-types';
-import { Prisma, type UserSession as PrismaUserSession } from '@prisma/client';
+import { Prisma, type UserSession as PrismaUserSession } from '../../../../../generated/client';
 
 type JsonLike = Prisma.JsonValue | Prisma.InputJsonValue | typeof Prisma.DbNull | typeof Prisma.JsonNull | null | undefined;
 

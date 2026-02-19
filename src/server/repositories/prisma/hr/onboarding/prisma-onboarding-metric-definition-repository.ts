@@ -1,4 +1,4 @@
-import { Prisma, type PrismaClient, type OnboardingMetricDefinition as PrismaDefinition } from '@prisma/client';
+import { Prisma, type PrismaClient, type OnboardingMetricDefinition as PrismaDefinition } from '../../../../../generated/client';
 import { BasePrismaRepository } from '@/server/repositories/prisma/base-prisma-repository';
 import type {
     IOnboardingMetricDefinitionRepository,

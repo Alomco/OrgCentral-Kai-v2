@@ -1,7 +1,7 @@
 import type { HRPolicy, PolicyAcknowledgment } from '@/server/types/hr-ops-types';
 import type { PrismaJsonValue } from '@/server/types/prisma';
 import { toPrismaInputJson } from '@/server/repositories/prisma/helpers/prisma-utils';
-import type { Prisma } from '@prisma/client';
+import type { Prisma } from '../../../../../generated/client';
 
 type HRPolicyRecord = Omit<
     HRPolicy,

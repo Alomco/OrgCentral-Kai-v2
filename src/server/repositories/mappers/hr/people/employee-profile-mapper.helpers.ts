@@ -1,5 +1,5 @@
-import { Prisma } from '@prisma/client';
-import type { EmployeeProfile as PrismaEmployeeProfile } from '@prisma/client';
+import { Prisma } from '../../../../../generated/client';
+import type { EmployeeProfile as PrismaEmployeeProfile } from '../../../../../generated/client';
 import type { EmployeeProfileDTO, EmergencyContact, JsonValue as DomainJsonValue } from '@/server/types/hr/people';
 import { employeeProfileSchema } from '@/server/types/hr-people-schemas';
 

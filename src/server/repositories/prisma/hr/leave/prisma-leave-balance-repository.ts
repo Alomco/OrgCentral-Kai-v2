@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { Prisma } from '../../../../../generated/client';
 // No constructor required; use DI via BasePrismaRepository
 import type { ILeaveBalanceRepository, LeaveBalanceCreateInput } from '@/server/repositories/contracts/hr/leave/leave-balance-repository-contract';
 import type { TenantScope } from '@/server/types/tenant';

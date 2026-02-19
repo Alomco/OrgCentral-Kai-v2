@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { MembershipStatus } from '@prisma/client';
+import type { MembershipStatus } from '../../../../../generated/client';
 
 import { InfoButton } from '@/components/ui/info-button';
 import { updateMember, memberKeys, membersSearchKey, type MembersResponse } from './members.api';

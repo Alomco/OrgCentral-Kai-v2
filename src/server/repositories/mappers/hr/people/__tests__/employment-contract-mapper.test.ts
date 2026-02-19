@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { Prisma, type EmploymentContract as PrismaEmploymentContract } from '@prisma/client';
+import { Prisma, type EmploymentContract as PrismaEmploymentContract } from '../../../../../../generated/client';
 import {
   mapPrismaEmploymentContractToDomain,
   mapDomainEmploymentContractToPrisma,

@@ -3,7 +3,7 @@ import { getSessionContext } from '@/server/use-cases/auth/sessions/get-session'
 import { getMembershipService } from '@/server/services/org/membership/membership-service.provider';
 import { readJson } from '@/server/api-adapters/http/request-utils';
 import { ValidationError } from '@/server/errors';
-import { MembershipStatus } from '@prisma/client';
+import { MembershipStatus } from '../../../../generated/client';
 
 const AUDIT_SOURCE = 'api:org:membership:update';
 

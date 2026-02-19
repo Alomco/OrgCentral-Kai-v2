@@ -1,4 +1,4 @@
-import type { MembershipStatus } from '@prisma/client';
+import type { MembershipStatus } from '../../src/generated/client';
 import type { OrgRoleKey } from '@/server/security/access-control';
 import type { DataClassificationLevel, DataResidencyZone } from '@/server/types/tenant';
 

@@ -1,4 +1,4 @@
-import type { PrismaClient } from '@prisma/client';
+import type { PrismaClient } from '../../src/generated/client';
 import { buildSeederServiceDependencies } from '@/server/repositories/providers/seeder/seeder-service-dependencies';
 import { SEEDED_METADATA_KEY } from '@/server/services/seeder/utils';
 

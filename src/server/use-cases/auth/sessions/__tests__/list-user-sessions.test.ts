@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { MembershipStatus, SessionStatus } from '@prisma/client';
+import { MembershipStatus, SessionStatus } from '../../../../../generated/client';
 
 import { listUserSessions } from '@/server/use-cases/auth/sessions/list-user-sessions';
 import type { IUserSessionRepository } from '@/server/repositories/contracts/auth/sessions';

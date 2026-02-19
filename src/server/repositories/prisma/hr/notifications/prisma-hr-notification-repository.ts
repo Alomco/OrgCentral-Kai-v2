@@ -11,7 +11,7 @@ import type {
     HRNotificationDTO,
     HRNotificationListFilters,
 } from '@/server/types/hr/notifications';
-import type { Prisma, HRNotification, DataClassificationLevel, DataResidencyZone, $Enums } from '@prisma/client';
+import type { Prisma, HRNotification, DataClassificationLevel, DataResidencyZone, $Enums } from '../../../../../generated/client';
 import { AuthorizationError } from '@/server/errors';
 import { invalidateHrNotifications, registerHrNotificationTag } from '@/server/lib/cache-tags/hr-notifications';
 import type { RepositoryAuthorizationContext } from '@/server/types/repository-authorization';

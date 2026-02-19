@@ -1,4 +1,4 @@
-import type { PrismaClient } from '@prisma/client';
+import type { PrismaClient } from '../../src/generated/client';
 import { syncBetterAuthUserToPrisma } from '@/server/lib/auth-sync';
 import { PERSONA_SEEDS } from './personas';
 import { resolvePersonaEmail } from './config';

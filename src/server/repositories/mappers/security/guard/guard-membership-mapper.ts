@@ -1,7 +1,7 @@
 import type { GuardMembershipRecord } from '@/server/repositories/contracts/security';
 import { isJsonObject } from '@/server/repositories/prisma/helpers/prisma-utils';
 import type { OrgPermissionMap } from '@/server/security/access-control';
-import type { Prisma } from '@prisma/client';
+import type { Prisma } from '../../../../../generated/client';
 
 export const guardMembershipInclude = {
     org: {

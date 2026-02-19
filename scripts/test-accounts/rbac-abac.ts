@@ -1,4 +1,4 @@
-import { ComplianceTier, OrganizationStatus, type PrismaClient } from '@prisma/client';
+import { ComplianceTier, OrganizationStatus, type PrismaClient } from '../../src/generated/client';
 import { buildAuthorizationContext } from '@/server/use-cases/shared/builders';
 import type { Role } from '@/server/types/hr-types';
 import { ensureAbacPolicies, ensureBuiltinRoles } from '@/server/use-cases/org/organization/organization-bootstrap';

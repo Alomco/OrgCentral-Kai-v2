@@ -1,4 +1,4 @@
-import { Prisma, type EmploymentContract as PrismaEmploymentContract } from '@prisma/client';
+import { Prisma, type EmploymentContract as PrismaEmploymentContract } from '../../../../../generated/client';
 import { BasePrismaRepository, type BasePrismaRepositoryOptions } from '@/server/repositories/prisma/base-prisma-repository';
 import type { IEmploymentContractRepository } from '@/server/repositories/contracts/hr/people/employment-contract-repository-contract';
 import { mapPrismaEmploymentContractToDomain } from '@/server/repositories/mappers/hr/people/employment-contract-mapper';

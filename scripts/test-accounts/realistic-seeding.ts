@@ -3,7 +3,7 @@ import {
     MembershipStatus,
     NotificationChannel,
     type PrismaClient,
-} from '@prisma/client';
+} from '../../src/generated/client';
 import { seedFakeEmployeesInternal } from '@/server/services/seeder/seed-employees';
 import { seedFakeAbsencesInternal } from '@/server/services/seeder/seed-absences';
 import { seedFakeTimeEntriesInternal } from '@/server/services/seeder/seed-time-entries';
