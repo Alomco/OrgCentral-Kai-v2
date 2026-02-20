@@ -1,0 +1,10 @@
+{
+  "buildCommand": "pnpm db:generate && pnpm build",
+  "outputDirectory": ".next",
+  "framework": "nextjs",
+  "functions": {
+    "src/app/api/**/*.ts": {
+      "runtime": "@vercel/node"
+    }
+  }
+}
