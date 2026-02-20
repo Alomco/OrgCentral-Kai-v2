@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "pnpm db:generate && next build",
     "start": "next start",
     "lint:md": "node --max-old-space-size=3072 ./node_modules/eslint/bin/eslint.js --cache --cache-location .eslintcache --cache-strategy content --concurrency 2",
     "lint:balanced": "node --max-old-space-size=1024 ./node_modules/eslint/bin/eslint.js --cache --cache-location .eslintcache --cache-strategy content --concurrency 2",
