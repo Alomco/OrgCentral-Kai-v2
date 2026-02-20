@@ -21,8 +21,7 @@ enum InvitationStatus {
   accepted
   expired
   declined
-  revoked // Added for security
-
+  revoked  // Added for security
   @@schema("auth")
 }
 
@@ -30,8 +29,7 @@ enum SessionStatus {
   active
   inactive
   expired
-  revoked // Added for security
-
+  revoked  // Added for security
   @@schema("auth")
 }
 
@@ -47,13 +45,13 @@ model Invitation {
   metadata         Json?            @db.JsonB
   // Security fields
   securityContext  Json?            @db.JsonB // For audit trail
-  ipAddress        String? // For security monitoring
-  userAgent        String? // For security monitoring
+  ipAddress        String?          // For security monitoring
+  userAgent        String?          // For security monitoring
   // Time-based fields
   expiresAt        DateTime?
   acceptedAt       DateTime?
   acceptedByUserId String?          @db.Uuid
-  revokedAt        DateTime? // Added for security
+  revokedAt        DateTime?        // Added for security
   revokedByUserId  String?          @db.Uuid // Added for security
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
@@ -71,19 +69,19 @@ model Invitation {
 }
 
 model WaitlistEntry {
-  id               String   @id @default(uuid())
-  name             String
-  email            String   @db.Citext
-  industry         String
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @db.Citext
+  industry     String
   // UK compliance fields
-  organizationSize Json?    @db.JsonB // For service planning
-  region           String? // For regional service planning
+  organizationSize Json?  @db.JsonB // For service planning
+  region       String?  // For regional service planning
   // Security fields
-  ipAddress        String? // For security monitoring
-  userAgent        String? // For security monitoring
+  ipAddress    String?  // For security monitoring
+  userAgent    String?  // For security monitoring
   // For audit trail
-  metadata         Json?    @db.JsonB
-  createdAt        DateTime @default(now())
+  metadata     Json?    @db.JsonB
+  createdAt    DateTime @default(now())
 
   @@index([email])
   @@map("waitlist_entries")
@@ -92,19 +90,19 @@ model WaitlistEntry {
 
 // UK-specific model for security monitoring
 model SecurityEvent {
-  id             String    @id @default(uuid()) @db.Uuid
-  orgId          String?   @db.Uuid
-  userId         String?   @db.Uuid
-  eventType      String // "failed_login", "account_lockout", "suspicious_activity", etc.
-  severity       String // "low", "medium", "high", "critical"
+  id             String   @id @default(uuid()) @db.Uuid
+  orgId          String?  @db.Uuid
+  userId         String?  @db.Uuid
+  eventType      String   // "failed_login", "account_lockout", "suspicious_activity", etc.
+  severity       String   // "low", "medium", "high", "critical"
   description    String
   ipAddress      String?
   userAgent      String?
-  additionalInfo Json?     @db.JsonB
-  resolved       Boolean   @default(false)
+  additionalInfo Json?    @db.JsonB
+  resolved       Boolean  @default(false)
   resolvedAt     DateTime?
-  resolvedBy     String?   @db.Uuid
-  createdAt      DateTime  @default(now())
+  resolvedBy     String?  @db.Uuid
+  createdAt      DateTime @default(now())
 
   org      Organization? @relation(fields: [orgId], references: [id], onDelete: SetNull)
   user     User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
@@ -148,19 +146,19 @@ model TenantSecurityEvent {
 }
 
 model GlobalSecurityEvent {
-  id             String    @id @default(uuid()) @db.Uuid
-  sourceOrgId    String?   @db.Uuid
-  userId         String?   @db.Uuid
+  id             String   @id @default(uuid()) @db.Uuid
+  sourceOrgId    String?  @db.Uuid
+  userId         String?  @db.Uuid
   eventType      String
   severity       String
   description    String
   ipAddress      String?
   userAgent      String?
-  additionalInfo Json?     @db.JsonB
-  resolved       Boolean   @default(false)
+  additionalInfo Json?    @db.JsonB
+  resolved       Boolean  @default(false)
   resolvedAt     DateTime?
-  resolvedBy     String?   @db.Uuid
-  createdAt      DateTime  @default(now())
+  resolvedBy     String?  @db.Uuid
+  createdAt      DateTime @default(now())
 
   sourceOrg Organization? @relation("GlobalSecurityEventSourceOrg", fields: [sourceOrgId], references: [id], onDelete: SetNull)
   user      User?         @relation("GlobalSecurityEventUser", fields: [userId], references: [id], onDelete: SetNull)
@@ -178,7 +176,7 @@ model GlobalSecurityEvent {
 model UserSession {
   id         String        @id @default(uuid()) @db.Uuid
   userId     String        @db.Uuid
-  sessionId  String // Better Auth session ID
+  sessionId  String        // Better Auth session ID
   status     SessionStatus @default(active)
   ipAddress  String?
   userAgent  String?
@@ -201,12 +199,12 @@ model UserSession {
 
 // Stores verification tokens for Better Auth flows (email, MFA, domain checks)
 model Verification {
-  id         String   @id
-  identifier String
-  value      String
-  expiresAt  DateTime
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id          String   @id
+  identifier  String
+  value       String
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   @@index([identifier])
   @@map("verification")
@@ -218,13 +216,13 @@ model Verification {
 /// They live in the Postgres `auth` schema to keep auth data isolated.
 
 model AuthUser {
-  id            String   @id
-  name          String
-  email         String   @db.Citext
-  emailVerified Boolean  @default(false)
-  image         String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id               String   @id
+  name             String
+  email            String   @db.Citext
+  emailVerified    Boolean  @default(false)
+  image            String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   // username plugin
   username        String? @db.Citext
@@ -233,11 +231,11 @@ model AuthUser {
   // twoFactor plugin
   twoFactorEnabled Boolean? @default(false)
 
-  sessions    AuthSession[]
-  accounts    AuthAccount[]
-  members     AuthOrgMember[]
+  sessions  AuthSession[]
+  accounts  AuthAccount[]
+  members   AuthOrgMember[]
   invitations AuthOrgInvitation[]
-  twofactors  TwoFactor[]
+  twofactors TwoFactor[]
 
   oauthapplications OauthApplication[]
   oauthaccesstokens OauthAccessToken[]
@@ -285,8 +283,8 @@ model AuthAccount {
   refreshTokenExpiresAt DateTime?
   scope                 String?
   password              String?
-  createdAt             DateTime  @default(now())
-  updatedAt             DateTime  @updatedAt
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
 
   @@index([userId])
   @@map("account")
@@ -310,10 +308,10 @@ model AuthOrganization {
 }
 
 model AuthOrgMember {
-  id             String   @id
+  id             String @id
   organizationId String
   userId         String
-  role           String   @default("member")
+  role           String @default("member")
   createdAt      DateTime @default(now())
 
   organization AuthOrganization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
@@ -352,15 +350,15 @@ model TwoFactor {
 }
 
 model OauthApplication {
-  id           String    @id
+  id           String  @id
   name         String?
   icon         String?
   metadata     String?
-  clientId     String?   @db.Citext
+  clientId     String? @db.Citext
   clientSecret String?
   redirectURLs String?
   type         String?
-  disabled     Boolean?  @default(false)
+  disabled     Boolean? @default(false)
   userId       String?
   createdAt    DateTime? @default(now())
   updatedAt    DateTime? @updatedAt
@@ -376,12 +374,12 @@ model OauthApplication {
 }
 
 model OauthAccessToken {
-  id                    String    @id
+  id                    String  @id
   accessToken           String?
   refreshToken          String?
   accessTokenExpiresAt  DateTime?
   refreshTokenExpiresAt DateTime?
-  clientId              String?   @db.Citext
+  clientId              String? @db.Citext
   userId                String?
   scopes                String?
   createdAt             DateTime? @default(now())
@@ -397,8 +395,8 @@ model OauthAccessToken {
 }
 
 model OauthConsent {
-  id           String    @id
-  clientId     String?   @db.Citext
+  id           String  @id
+  clientId     String? @db.Citext
   userId       String?
   scopes       String?
   createdAt    DateTime? @default(now())
@@ -422,7 +420,6 @@ enum BillingSubscriptionStatus {
   CANCELED
   UNPAID
   PAUSED
-
   @@schema("hr")
 }
 
@@ -458,26 +455,25 @@ enum PaymentMethodType {
   CARD
   BACS_DEBIT
   SEPA_DEBIT
-
   @@schema("hr")
 }
 
 model PaymentMethod {
-  id                    String                  @id @default(uuid()) @db.Uuid
-  orgId                 String                  @db.Uuid
-  stripePaymentMethodId String                  @unique @db.Text
-  type                  PaymentMethodType
-  last4                 String
-  brand                 String?                 @db.Text
-  bankName              String?                 @db.Text
-  expiryMonth           Int?
-  expiryYear            Int?
-  isDefault             Boolean                 @default(false)
-  metadata              Json?                   @db.JsonB
-  dataClassification    DataClassificationLevel @default(OFFICIAL)
-  residencyTag          DataResidencyZone       @default(UK_ONLY)
-  createdAt             DateTime                @default(now())
-  updatedAt             DateTime                @updatedAt
+  id                     String                @id @default(uuid()) @db.Uuid
+  orgId                  String                @db.Uuid
+  stripePaymentMethodId  String                @unique @db.Text
+  type                   PaymentMethodType
+  last4                  String
+  brand                  String?               @db.Text
+  bankName               String?               @db.Text
+  expiryMonth            Int?
+  expiryYear             Int?
+  isDefault              Boolean               @default(false)
+  metadata               Json?                 @db.JsonB
+  dataClassification     DataClassificationLevel @default(OFFICIAL)
+  residencyTag           DataResidencyZone       @default(UK_ONLY)
+  createdAt              DateTime              @default(now())
+  updatedAt              DateTime              @updatedAt
 
   org Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
 
@@ -493,29 +489,28 @@ enum InvoiceStatus {
   PAID
   VOID
   UNCOLLECTIBLE
-
   @@schema("hr")
 }
 
 model BillingInvoice {
-  id                 String                  @id @default(uuid()) @db.Uuid
-  orgId              String                  @db.Uuid
-  stripeInvoiceId    String                  @unique @db.Text
-  status             InvoiceStatus
-  amountDue          Int
-  amountPaid         Int
-  currency           String                  @default("gbp")
-  periodStart        DateTime
-  periodEnd          DateTime
-  userCount          Int
-  invoiceUrl         String?                 @db.Text
-  invoicePdf         String?                 @db.Text
-  paidAt             DateTime?
-  metadata           Json?                   @db.JsonB
+  id                String                @id @default(uuid()) @db.Uuid
+  orgId             String                @db.Uuid
+  stripeInvoiceId   String                @unique @db.Text
+  status            InvoiceStatus
+  amountDue         Int
+  amountPaid        Int
+  currency          String                @default("gbp")
+  periodStart       DateTime
+  periodEnd         DateTime
+  userCount         Int
+  invoiceUrl        String?               @db.Text
+  invoicePdf        String?               @db.Text
+  paidAt            DateTime?
+  metadata          Json?                 @db.JsonB
   dataClassification DataClassificationLevel @default(OFFICIAL)
   residencyTag       DataResidencyZone       @default(UK_ONLY)
-  createdAt          DateTime                @default(now())
-  updatedAt          DateTime                @updatedAt
+  createdAt         DateTime              @default(now())
+  updatedAt         DateTime              @updatedAt
 
   org Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
 
@@ -528,20 +523,19 @@ model BillingInvoice {
 // HR notification models with tenant scoping and compliance metadata
 
 enum HRNotificationType {
-  LEAVE_APPROVAL      @map("leave-approval")
-  LEAVE_REJECTION     @map("leave-rejection")
-  DOCUMENT_EXPIRY     @map("document-expiry")
-  POLICY_UPDATE       @map("policy-update")
-  PERFORMANCE_REVIEW  @map("performance-review")
-  TIME_ENTRY          @map("time-entry")
-  TRAINING_ASSIGNED   @map("training-assigned")
-  TRAINING_DUE        @map("training-due")
-  TRAINING_COMPLETED  @map("training-completed")
-  TRAINING_OVERDUE    @map("training-overdue")
-  SYSTEM_ANNOUNCEMENT @map("system-announcement")
-  COMPLIANCE_REMINDER @map("compliance-reminder")
-  OTHER               @map("other")
-
+  LEAVE_APPROVAL       @map("leave-approval")
+  LEAVE_REJECTION      @map("leave-rejection")
+  DOCUMENT_EXPIRY      @map("document-expiry")
+  POLICY_UPDATE        @map("policy-update")
+  PERFORMANCE_REVIEW   @map("performance-review")
+  TIME_ENTRY           @map("time-entry")
+  TRAINING_ASSIGNED    @map("training-assigned")
+  TRAINING_DUE         @map("training-due")
+  TRAINING_COMPLETED   @map("training-completed")
+  TRAINING_OVERDUE     @map("training-overdue")
+  SYSTEM_ANNOUNCEMENT  @map("system-announcement")
+  COMPLIANCE_REMINDER  @map("compliance-reminder")
+  OTHER                @map("other")
   @@schema("hr")
 }
 
@@ -550,31 +544,30 @@ enum NotificationPriority {
   MEDIUM @map("medium")
   HIGH   @map("high")
   URGENT @map("urgent")
-
   @@schema("hr")
 }
 
 model HRNotification {
-  id                 String                  @id @default(uuid()) @db.Uuid
-  orgId              String                  @db.Uuid
-  userId             String                  @db.Uuid
-  title              String
-  message            String
-  type               HRNotificationType      @default(OTHER)
-  priority           NotificationPriority    @default(MEDIUM)
-  isRead             Boolean                 @default(false)
-  readAt             DateTime?
-  actionUrl          String?
-  actionLabel        String?
-  scheduledFor       DateTime?
-  expiresAt          DateTime?
-  correlationId      String?
-  createdByUserId    String?                 @db.Uuid
+  id               String                 @id @default(uuid()) @db.Uuid
+  orgId            String                 @db.Uuid
+  userId           String                 @db.Uuid
+  title            String
+  message          String
+  type             HRNotificationType     @default(OTHER)
+  priority         NotificationPriority   @default(MEDIUM)
+  isRead           Boolean                @default(false)
+  readAt           DateTime?
+  actionUrl        String?
+  actionLabel      String?
+  scheduledFor     DateTime?
+  expiresAt        DateTime?
+  correlationId    String?
+  createdByUserId  String?                @db.Uuid
   dataClassification DataClassificationLevel @default(OFFICIAL)
   residencyTag       DataResidencyZone       @default(UK_ONLY)
-  metadata           Json?                   @db.JsonB
-  createdAt          DateTime                @default(now())
-  updatedAt          DateTime                @updatedAt
+  metadata         Json?                  @db.JsonB
+  createdAt        DateTime               @default(now())
+  updatedAt        DateTime               @updatedAt
 
   org        Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
   membership Membership   @relation(fields: [orgId, userId], references: [orgId, userId], onDelete: Cascade)
@@ -597,7 +590,6 @@ enum EmploymentType {
   APPRENTICE
   FIXED_TERM
   CASUAL
-
   @@schema("hr")
 }
 
@@ -610,7 +602,6 @@ enum LeavePolicyType {
   UNPAID
   SPECIAL
   EMERGENCY
-
   @@schema("hr")
 }
 
@@ -619,7 +610,6 @@ enum LeaveAccrualFrequency {
   QUARTERLY
   YEARLY
   NONE
-
   @@schema("hr")
 }
 
@@ -631,7 +621,6 @@ enum LeaveRequestStatus {
   CANCELLED
   PENDING_APPROVAL
   AWAITING_MANAGER
-
   @@schema("hr")
 }
 
@@ -641,7 +630,6 @@ enum HealthStatus {
   PARTIALLY_FIT
   UNFIT_FOR_WORK
   RECOVERY_PLAN
-
   @@schema("hr")
 }
 
@@ -652,7 +640,6 @@ enum EmploymentStatus {
   ON_LEAVE
   OFFBOARDING
   ARCHIVED
-
   @@schema("hr")
 }
 
@@ -660,21 +647,18 @@ enum SalaryFrequency {
   HOURLY
   MONTHLY
   ANNUALLY
-
   @@schema("hr")
 }
 
 enum SalaryBasis {
   ANNUAL
   HOURLY
-
   @@schema("hr")
 }
 
 enum PaySchedule {
   MONTHLY
   BI_WEEKLY
-
   @@schema("hr")
 }
 
@@ -685,7 +669,6 @@ enum ContractType {
   CONSULTANT
   INTERNSHIP
   APPRENTICESHIP
-
   @@schema("hr")
 }
 
@@ -694,88 +677,87 @@ enum PerformanceGoalStatus {
   IN_PROGRESS
   COMPLETED
   CANCELLED
-
   @@schema("hr")
 }
 
 model EmployeeProfile {
-  id                 String                  @id @default(uuid()) @db.Uuid
-  orgId              String                  @db.Uuid
-  userId             String                  @db.Uuid
-  firstName          String?
-  lastName           String?
-  displayName        String?
-  photoUrl           String?
-  email              String?                 @db.Citext
-  personalEmail      String?                 @db.Citext
-  employeeNumber     String
-  jobTitle           String?
-  departmentId       String?                 @db.Uuid
-  employmentType     EmploymentType          @default(FULL_TIME)
-  employmentStatus   EmploymentStatus        @default(ACTIVE)
-  startDate          DateTime?
-  endDate            DateTime?
-  managerOrgId       String?                 @db.Uuid
-  managerUserId      String?                 @db.Uuid
-  phone              Json?                   @db.JsonB
-  address            Json?                   @db.JsonB
-  annualSalary       Int?
-  hourlyRate         Decimal?                @db.Decimal(8, 2) // For part-time/contract workers
-  salaryAmount       Decimal?                @db.Decimal(12, 2)
-  salaryCurrency     String?
-  salaryFrequency    SalaryFrequency?
-  salaryBasis        SalaryBasis?
-  paySchedule        PaySchedule?
-  costCenter         String?
-  location           Json?                   @db.JsonB
-  roles              String[]                @db.Text
-  eligibleLeaveTypes String[]                @db.Text
-  employmentPeriods  Json?                   @db.JsonB
-  salaryDetails      Json?                   @db.JsonB
-  skills             String[]                @db.Text
-  certifications     Json?                   @db.JsonB
+  id               String           @id @default(uuid()) @db.Uuid
+  orgId            String           @db.Uuid
+  userId           String           @db.Uuid
+  firstName        String?
+  lastName         String?
+  displayName      String?
+  photoUrl         String?
+  email            String?          @db.Citext
+  personalEmail    String?          @db.Citext
+  employeeNumber   String
+  jobTitle         String?
+  departmentId     String?          @db.Uuid
+  employmentType   EmploymentType   @default(FULL_TIME)
+  employmentStatus EmploymentStatus @default(ACTIVE)
+  startDate        DateTime?
+  endDate          DateTime?
+  managerOrgId     String?          @db.Uuid
+  managerUserId    String?          @db.Uuid
+  phone            Json?            @db.JsonB
+  address          Json?            @db.JsonB
+  annualSalary     Int?
+  hourlyRate       Decimal?         @db.Decimal(8, 2) // For part-time/contract workers
+  salaryAmount     Decimal?         @db.Decimal(12, 2)
+  salaryCurrency   String?
+  salaryFrequency  SalaryFrequency?
+  salaryBasis      SalaryBasis?
+  paySchedule      PaySchedule?
+  costCenter       String?
+  location         Json?            @db.JsonB
+  roles            String[]         @db.Text
+  eligibleLeaveTypes String[]       @db.Text
+  employmentPeriods Json?           @db.JsonB
+  salaryDetails    Json?            @db.JsonB
+  skills           String[]         @db.Text
+  certifications   Json?            @db.JsonB
   // UK-specific fields
-  niNumber           String?                 @db.Text // National Insurance number (encrypted at app layer)
-  emergencyContact   Json?                   @db.JsonB
-  nextOfKin          Json?                   @db.JsonB
-  healthStatus       HealthStatus            @default(UNDEFINED)
-  workPermit         Json?                   @db.JsonB // For visa/immigration compliance
-  bankDetails        Json?                   @db.JsonB // Encrypted at application layer
-  metadata           Json?                   @db.JsonB
+  niNumber         String?          @db.Text // National Insurance number (encrypted at app layer)
+  emergencyContact Json?            @db.JsonB
+  nextOfKin        Json?            @db.JsonB
+  healthStatus     HealthStatus     @default(UNDEFINED)
+  workPermit       Json?            @db.JsonB // For visa/immigration compliance
+  bankDetails      Json?            @db.JsonB // Encrypted at application layer
+  metadata         Json?            @db.JsonB
   // Compliance, audit, retention
   dataClassification DataClassificationLevel @default(OFFICIAL)
   residencyTag       DataResidencyZone       @default(UK_ONLY)
-  auditSource        String?
-  correlationId      String?
-  schemaVersion      Int                     @default(1)
-  createdBy          String?                 @db.Uuid
-  updatedBy          String?                 @db.Uuid
-  retentionPolicy    RetentionPolicy?
+  auditSource      String?
+  correlationId    String?
+  schemaVersion    Int              @default(1)
+  createdBy        String?          @db.Uuid
+  updatedBy        String?          @db.Uuid
+  retentionPolicy  RetentionPolicy?
   retentionExpiresAt DateTime?
   erasureRequestedAt DateTime?
   erasureCompletedAt DateTime?
-  erasureReason      String?
-  erasureActorOrgId  String?                 @db.Uuid
-  erasureActorUserId String?                 @db.Uuid
-  archivedAt         DateTime?
-  deletedAt          DateTime?
-  createdAt          DateTime                @default(now())
-  updatedAt          DateTime                @updatedAt
+  erasureReason    String?
+  erasureActorOrgId String?         @db.Uuid
+  erasureActorUserId String?        @db.Uuid
+  archivedAt       DateTime?
+  deletedAt        DateTime?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
 
-  membership                  Membership                   @relation(fields: [orgId, userId], references: [orgId, userId], onDelete: Cascade)
-  manager                     EmployeeProfile?             @relation("EmployeeManager", fields: [managerOrgId, managerUserId], references: [orgId, userId])
-  reports                     EmployeeProfile[]            @relation("EmployeeManager")
-  leaveBalances               LeaveBalance[]               @relation("ProfileLeaveBalances")
-  checklistInstances          ChecklistInstance[]          @relation("EmployeeChecklistInstances")
-  offboardingRecords          Offboarding[]
-  mentorAssignments           MentorAssignment[]
-  provisioningTasks           ProvisioningTask[]
-  onboardingWorkflowRuns      OnboardingWorkflowRun[]
-  emailSequenceEnrollments    EmailSequenceEnrollment[]
-  onboardingMetricResults     OnboardingMetricResult[]
-  onboardingFeedback          OnboardingFeedback[]
+  membership    Membership        @relation(fields: [orgId, userId], references: [orgId, userId], onDelete: Cascade)
+  manager       EmployeeProfile?  @relation("EmployeeManager", fields: [managerOrgId, managerUserId], references: [orgId, userId])
+  reports       EmployeeProfile[] @relation("EmployeeManager")
+  leaveBalances LeaveBalance[]    @relation("ProfileLeaveBalances")
+  checklistInstances ChecklistInstance[] @relation("EmployeeChecklistInstances")
+  offboardingRecords Offboarding[]
+  mentorAssignments MentorAssignment[]
+  provisioningTasks ProvisioningTask[]
+  onboardingWorkflowRuns OnboardingWorkflowRun[]
+  emailSequenceEnrollments EmailSequenceEnrollment[]
+  onboardingMetricResults OnboardingMetricResult[]
+  onboardingFeedback OnboardingFeedback[]
   documentTemplateAssignments DocumentTemplateAssignment[]
-  department                  Department?                  @relation("DepartmentProfiles", fields: [departmentId], references: [id], onDelete: SetNull)
+  department    Department?       @relation("DepartmentProfiles", fields: [departmentId], references: [id], onDelete: SetNull)
 
   @@unique([orgId, userId])
   @@unique([orgId, employeeNumber])
@@ -789,45 +771,45 @@ model EmployeeProfile {
 }
 
 model EmploymentContract {
-  id                 String                  @id @default(uuid()) @db.Uuid
-  orgId              String                  @db.Uuid
-  userId             String                  @db.Uuid
-  contractType       ContractType            @default(PERMANENT)
-  startDate          DateTime
-  endDate            DateTime?
-  jobTitle           String
-  departmentId       String?                 @db.Uuid
-  location           String?
-  probationEndDate   DateTime?
+  id               String        @id @default(uuid()) @db.Uuid
+  orgId            String        @db.Uuid
+  userId           String        @db.Uuid
+  contractType     ContractType  @default(PERMANENT)
+  startDate        DateTime
+  endDate          DateTime?
+  jobTitle         String
+  departmentId     String?       @db.Uuid
+  location         String?
+  probationEndDate DateTime?
   // UK-specific fields
-  furloughStartDate  DateTime? // For UK furlough schemes
-  furloughEndDate    DateTime?
-  workingPattern     Json?                   @db.JsonB // Hours, flexible work arrangements
-  benefits           Json?                   @db.JsonB
-  terminationReason  String?
-  terminationNotes   String?
-  archivedAt         DateTime?
-  deletedAt          DateTime?
+  furloughStartDate DateTime?    // For UK furlough schemes
+  furloughEndDate   DateTime?
+  workingPattern    Json?        @db.JsonB // Hours, flexible work arrangements
+  benefits          Json?        @db.JsonB
+  terminationReason String?
+  terminationNotes  String?
+  archivedAt        DateTime?
+  deletedAt        DateTime?
   // Compliance, audit, retention
   dataClassification DataClassificationLevel @default(OFFICIAL)
   residencyTag       DataResidencyZone       @default(UK_ONLY)
-  auditSource        String?
-  correlationId      String?
-  schemaVersion      Int                     @default(1)
-  createdBy          String?                 @db.Uuid
-  updatedBy          String?                 @db.Uuid
-  retentionPolicy    RetentionPolicy?
+  auditSource      String?
+  correlationId    String?
+  schemaVersion    Int              @default(1)
+  createdBy        String?          @db.Uuid
+  updatedBy        String?          @db.Uuid
+  retentionPolicy  RetentionPolicy?
   retentionExpiresAt DateTime?
   erasureRequestedAt DateTime?
   erasureCompletedAt DateTime?
-  erasureReason      String?
-  erasureActorOrgId  String?                 @db.Uuid
-  erasureActorUserId String?                 @db.Uuid
-  createdAt          DateTime                @default(now())
-  updatedAt          DateTime                @updatedAt
+  erasureReason    String?
+  erasureActorOrgId String?         @db.Uuid
+  erasureActorUserId String?        @db.Uuid
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
 
-  membership Membership  @relation(fields: [orgId, userId], references: [orgId, userId], onDelete: Cascade)
-  department Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  membership  Membership     @relation(fields: [orgId, userId], references: [orgId, userId], onDelete: Cascade)
+  department  Department?    @relation(fields: [departmentId], references: [id], onDelete: SetNull)
 
   @@index([orgId, userId])
   @@index([orgId, dataClassification, residencyTag])
@@ -836,27 +818,27 @@ model EmploymentContract {
 }
 
 model LeavePolicy {
-  id                   String                  @id @default(uuid()) @db.Uuid
-  orgId                String                  @db.Uuid
-  departmentId         String?                 @db.Uuid
-  name                 String
-  policyType           LeavePolicyType
-  accrualFrequency     LeaveAccrualFrequency   @default(NONE)
-  accrualAmount        Decimal?                @db.Decimal(5, 2)
-  carryOverLimit       Int?
-  requiresApproval     Boolean                 @default(true)
-  isDefault            Boolean                 @default(false)
-  activeFrom           DateTime                @default(now())
-  activeTo             DateTime?
+  id               String                @id @default(uuid()) @db.Uuid
+  orgId            String                @db.Uuid
+  departmentId     String?               @db.Uuid
+  name             String
+  policyType       LeavePolicyType
+  accrualFrequency LeaveAccrualFrequency @default(NONE)
+  accrualAmount    Decimal?              @db.Decimal(5, 2)
+  carryOverLimit   Int?
+  requiresApproval Boolean               @default(true)
+  isDefault        Boolean               @default(false)
+  activeFrom       DateTime              @default(now())
+  activeTo         DateTime?
   // UK-specific compliance fields
-  statutoryCompliance  Boolean                 @default(false) // For statutory leave (sick, maternity, etc.)
-  maxConsecutiveDays   Int? // For policy enforcement
-  allowNegativeBalance Boolean                 @default(false) // For emergency leave
-  dataClassification   DataClassificationLevel @default(OFFICIAL)
-  residencyTag         DataResidencyZone       @default(UK_ONLY)
-  auditSource          String?
-  auditBatchId         String?
-  metadata             Json?                   @db.JsonB
+  statutoryCompliance Boolean             @default(false) // For statutory leave (sick, maternity, etc.)
+  maxConsecutiveDays Int?                 // For policy enforcement
+  allowNegativeBalance Boolean           @default(false) // For emergency leave
+  dataClassification DataClassificationLevel @default(OFFICIAL)
+  residencyTag       DataResidencyZone       @default(UK_ONLY)
+  auditSource      String?
+  auditBatchId     String?
+  metadata         Json?                 @db.JsonB
 
   org          Organization         @relation(fields: [orgId], references: [id], onDelete: Cascade)
   department   Department?          @relation(fields: [departmentId], references: [id], onDelete: SetNull)
@@ -885,25 +867,25 @@ model LeavePolicyAccrual {
 }
 
 model LeaveBalance {
-  id                 String                  @id @default(uuid()) @db.Uuid
-  orgId              String                  @db.Uuid
-  userId             String                  @db.Uuid
-  policyId           String                  @db.Uuid
-  periodStart        DateTime
-  periodEnd          DateTime
-  accruedHours       Decimal                 @default(0) @db.Decimal(6, 2)
-  usedHours          Decimal                 @default(0) @db.Decimal(6, 2)
-  carriedHours       Decimal                 @default(0) @db.Decimal(6, 2)
+  id           String   @id @default(uuid()) @db.Uuid
+  orgId        String   @db.Uuid
+  userId       String   @db.Uuid
+  policyId     String   @db.Uuid
+  periodStart  DateTime
+  periodEnd    DateTime
+  accruedHours Decimal  @db.Decimal(6, 2) @default(0)
+  usedHours    Decimal  @db.Decimal(6, 2) @default(0)
+  carriedHours Decimal  @db.Decimal(6, 2) @default(0)
   // For UK compliance tracking
-  approvedAt         DateTime? // When the balance was last approved
-  approvedBy         String?                 @db.Uuid
+  approvedAt   DateTime? // When the balance was last approved
+  approvedBy   String?   @db.Uuid
   // For audit trail
   dataClassification DataClassificationLevel @default(OFFICIAL)
   residencyTag       DataResidencyZone       @default(UK_ONLY)
-  auditSource        String?
-  auditBatchId       String?
-  metadata           Json?                   @db.JsonB
-  updatedAt          DateTime                @updatedAt
+  auditSource      String?
+  auditBatchId     String?
+  metadata     Json?    @db.JsonB
+  updatedAt    DateTime @updatedAt
 
   membership Membership      @relation("MembershipLeaveBalances", fields: [orgId, userId], references: [orgId, userId], onDelete: Cascade, map: "leave_balance_membership_fk")
   profile    EmployeeProfile @relation("ProfileLeaveBalances", fields: [orgId, userId], references: [orgId, userId], onDelete: Cascade, map: "leave_balance_profile_fk")
@@ -917,36 +899,36 @@ model LeaveBalance {
 }
 
 model LeaveRequest {
-  id                    String                  @id @default(uuid()) @db.Uuid
-  orgId                 String                  @db.Uuid
-  userId                String                  @db.Uuid
-  policyId              String                  @db.Uuid
-  status                LeaveRequestStatus      @default(DRAFT)
-  startDate             DateTime
-  endDate               DateTime
-  hours                 Decimal                 @db.Decimal(6, 2)
-  reason                String?
-  approverOrgId         String?                 @db.Uuid
-  approverUserId        String?                 @db.Uuid
-  submittedAt           DateTime?
-  decidedAt             DateTime?
+  id             String             @id @default(uuid()) @db.Uuid
+  orgId          String             @db.Uuid
+  userId         String             @db.Uuid
+  policyId       String             @db.Uuid
+  status         LeaveRequestStatus @default(DRAFT)
+  startDate      DateTime
+  endDate        DateTime
+  hours          Decimal            @db.Decimal(6, 2)
+  reason         String?
+  approverOrgId  String?            @db.Uuid
+  approverUserId String?            @db.Uuid
+  submittedAt    DateTime?
+  decidedAt      DateTime?
   // UK-specific fields
-  approvedByLineManager Boolean                 @default(false) // For statutory requirements
-  sickNoteRequired      Boolean                 @default(false) // For sick leave
-  sickNoteReceived      Boolean                 @default(false)
-  returnToWorkDate      DateTime? // For health monitoring
+  approvedByLineManager Boolean @default(false) // For statutory requirements
+  sickNoteRequired  Boolean   @default(false) // For sick leave
+  sickNoteReceived  Boolean   @default(false)
+  returnToWorkDate  DateTime? // For health monitoring
   // For audit trail
-  dataClassification    DataClassificationLevel @default(OFFICIAL)
-  residencyTag          DataResidencyZone       @default(UK_ONLY)
-  auditSource           String?
-  auditBatchId          String?
-  metadata              Json?                   @db.JsonB
-  createdAt             DateTime                @default(now())
-  updatedAt             DateTime                @updatedAt
+  dataClassification DataClassificationLevel @default(OFFICIAL)
+  residencyTag       DataResidencyZone       @default(UK_ONLY)
+  auditSource      String?
+  auditBatchId     String?
+  metadata       Json?              @db.JsonB
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
 
-  membership  Membership        @relation(fields: [orgId, userId], references: [orgId, userId], onDelete: Cascade)
-  policy      LeavePolicy       @relation(fields: [policyId], references: [id], onDelete: Cascade)
-  approver    Membership?       @relation("LeaveApprover", fields: [approverOrgId, approverUserId], references: [orgId, userId], onDelete: SetNull)
+  membership Membership  @relation(fields: [orgId, userId], references: [orgId, userId], onDelete: Cascade)
+  policy     LeavePolicy @relation(fields: [policyId], references: [id], onDelete: Cascade)
+  approver   Membership? @relation("LeaveApprover", fields: [approverOrgId, approverUserId], references: [orgId, userId], onDelete: SetNull)
   attachments LeaveAttachment[]
 
   @@index([orgId, status])
@@ -957,23 +939,23 @@ model LeaveRequest {
 }
 
 model LeaveAttachment {
-  id                 String                  @id @default(uuid()) @db.Uuid
-  orgId              String                  @db.Uuid
-  requestId          String                  @db.Uuid
-  fileName           String
-  storageKey         String
-  contentType        String
-  fileSize           Int
-  checksum           String?
-  uploadedByUserId   String                  @db.Uuid
-  uploadedAt         DateTime                @default(now())
-  metadata           Json?                   @db.JsonB
+  id               String                 @id @default(uuid()) @db.Uuid
+  orgId            String                 @db.Uuid
+  requestId        String                 @db.Uuid
+  fileName         String
+  storageKey       String
+  contentType      String
+  fileSize         Int
+  checksum         String?
+  uploadedByUserId String                 @db.Uuid
+  uploadedAt       DateTime               @default(now())
+  metadata         Json?                  @db.JsonB
   dataClassification DataClassificationLevel @default(OFFICIAL)
   residencyTag       DataResidencyZone       @default(UK_ONLY)
-  auditSource        String?
-  auditBatchId       String?
-  createdAt          DateTime                @default(now())
-  updatedAt          DateTime                @updatedAt
+  auditSource      String?
+  auditBatchId     String?
+  createdAt        DateTime               @default(now())
+  updatedAt        DateTime               @updatedAt
 
   request LeaveRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
 
@@ -985,30 +967,30 @@ model LeaveAttachment {
 
 // UK-specific performance and appraisal model
 model PerformanceReview {
-  id                  String    @id @default(uuid()) @db.Uuid
-  orgId               String    @db.Uuid
-  userId              String    @db.Uuid
-  reviewerOrgId       String    @db.Uuid
-  reviewerUserId      String    @db.Uuid
-  periodStartDate     DateTime
-  periodEndDate       DateTime
-  scheduledDate       DateTime
-  completedDate       DateTime?
-  status              String    @default("scheduled")
-  overallRating       Int? // 1-5 scale
-  strengths           String?
+  id               String   @id @default(uuid()) @db.Uuid
+  orgId            String   @db.Uuid
+  userId           String   @db.Uuid
+  reviewerOrgId    String   @db.Uuid
+  reviewerUserId   String   @db.Uuid
+  periodStartDate  DateTime
+  periodEndDate    DateTime
+  scheduledDate    DateTime
+  completedDate    DateTime?
+  status           String   @default("scheduled")
+  overallRating    Int?     // 1-5 scale
+  strengths        String?
   areasForImprovement String?
-  developmentPlan     Json?     @db.JsonB
-  reviewerNotes       String?
-  employeeResponse    String?
-  metadata            Json?     @db.JsonB
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
+  developmentPlan  Json?    @db.JsonB
+  reviewerNotes    String?
+  employeeResponse String?
+  metadata         Json?    @db.JsonB
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   goals PerformanceGoal[]
 
-  reviewedMembership Membership @relation("RevieweeMembership", fields: [orgId, userId], references: [orgId, userId], onDelete: Cascade)
-  reviewerMembership Membership @relation("ReviewerMembership", fields: [reviewerOrgId, reviewerUserId], references: [orgId, userId], onDelete: Cascade)
+  reviewedMembership   Membership @relation("RevieweeMembership", fields: [orgId, userId], references: [orgId, userId], onDelete: Cascade)
+  reviewerMembership   Membership @relation("ReviewerMembership", fields: [reviewerOrgId, reviewerUserId], references: [orgId, userId], onDelete: Cascade)
 
   @@index([orgId, userId])
   @@index([periodStartDate])
@@ -1039,27 +1021,27 @@ model PerformanceGoal {
 
 // UK-specific training and development model
 model TrainingRecord {
-  id          String    @id @default(uuid()) @db.Uuid
-  orgId       String    @db.Uuid
-  userId      String    @db.Uuid
-  courseName  String
-  provider    String
-  startDate   DateTime
-  endDate     DateTime?
-  expiryDate  DateTime?
-  renewalDate DateTime?
-  status      String    @default("in_progress")
-  certificate String? // Path to certificate document
-  competency  Json?     @db.JsonB // Skills gained
-  cost        Decimal?  @db.Decimal(10, 2)
-  approved    Boolean   @default(false)
-  approvedAt  DateTime?
-  approvedBy  String?   @db.Uuid
-  metadata    Json?     @db.JsonB
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id            String   @id @default(uuid()) @db.Uuid
+  orgId         String   @db.Uuid
+  userId        String   @db.Uuid
+  courseName    String
+  provider      String
+  startDate     DateTime
+  endDate       DateTime?
+  expiryDate    DateTime?
+  renewalDate   DateTime?
+  status        String   @default("in_progress")
+  certificate   String?  // Path to certificate document
+  competency    Json?    @db.JsonB // Skills gained
+  cost          Decimal? @db.Decimal(10, 2)
+  approved      Boolean  @default(false)
+  approvedAt    DateTime?
+  approvedBy    String?  @db.Uuid
+  metadata      Json?    @db.JsonB
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  membership Membership @relation(fields: [orgId, userId], references: [orgId, userId], onDelete: Cascade)
+  membership    Membership @relation(fields: [orgId, userId], references: [orgId, userId], onDelete: Cascade)
 
   @@index([orgId, userId])
   @@map("training_records")
@@ -1074,7 +1056,6 @@ enum AbsenceStatus {
   REJECTED
   CANCELLED
   CLOSED
-
   @@schema("hr")
 }
 
@@ -1083,7 +1064,6 @@ enum TimeEntryStatus {
   COMPLETED
   APPROVED
   REJECTED
-
   @@schema("hr")
 }
 
@@ -1096,7 +1076,6 @@ enum PolicyCategory {
   PROCEDURES
   COMPLIANCE
   OTHER
-
   @@schema("hr")
 }
 
@@ -1104,7 +1083,6 @@ enum ChecklistTemplateType {
   onboarding
   offboarding
   custom
-
   @@schema("hr")
 }
 
@@ -1112,7 +1090,6 @@ enum ChecklistInstanceStatus {
   IN_PROGRESS
   COMPLETED
   CANCELLED
-
   @@schema("hr")
 }
 
@@ -1120,14 +1097,12 @@ enum OffboardingStatus {
   IN_PROGRESS
   COMPLETED
   CANCELLED
-
   @@schema("hr")
 }
 
 enum MentorAssignmentStatus {
   ACTIVE
   ENDED
-
   @@schema("hr")
 }
 
@@ -1137,7 +1112,6 @@ enum ProvisioningTaskType {
   ACCESS
   LICENSE
   SOFTWARE
-
   @@schema("hr")
 }
 
@@ -1147,14 +1121,12 @@ enum ProvisioningTaskStatus {
   COMPLETED
   FAILED
   CANCELLED
-
   @@schema("hr")
 }
 
 enum WorkflowTemplateType {
   ONBOARDING
   OFFBOARDING
-
   @@schema("hr")
 }
 
@@ -1162,7 +1134,6 @@ enum WorkflowRunStatus {
   IN_PROGRESS
   COMPLETED
   CANCELLED
-
   @@schema("hr")
 }
 
@@ -1170,7 +1141,6 @@ enum EmailSequenceTrigger {
   ONBOARDING_INVITE
   ONBOARDING_ACCEPTED
   OFFBOARDING_STARTED
-
   @@schema("hr")
 }
 
@@ -1179,7 +1149,6 @@ enum EmailSequenceStatus {
   PAUSED
   COMPLETED
   CANCELLED
-
   @@schema("hr")
 }
 
@@ -1188,7 +1157,6 @@ enum EmailSequenceDeliveryStatus {
   SENT
   FAILED
   SKIPPED
-
   @@schema("hr")
 }
 
@@ -1196,7 +1164,6 @@ enum OnboardingMetricSource {
   SYSTEM
   SURVEY
   MANUAL
-
   @@schema("hr")
 }
 
@@ -1204,7 +1171,6 @@ enum DocumentAssignmentStatus {
   PENDING
   COMPLETED
   WAIVED
-
   @@schema("hr")
 }
 
@@ -1215,7 +1181,6 @@ enum ComplianceItemStatus {
   PENDING_REVIEW
   NOT_APPLICABLE
   EXPIRED
-
   @@schema("hr")
 }
 
@@ -1230,8 +1195,8 @@ model AbsenceTypeConfig {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  org      Organization       @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  absences UnplannedAbsence[]
+  org       Organization      @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  absences  UnplannedAbsence[]
 
   @@unique([orgId, key])
   @@map("absence_type_configs")
@@ -1240,7 +1205,7 @@ model AbsenceTypeConfig {
 
 model AbsenceSettings {
   orgId          String   @id @db.Uuid
-  hoursInWorkDay Decimal  @default(8) @db.Decimal(5, 2)
+  hoursInWorkDay Decimal  @db.Decimal(5, 2) @default(8)
   roundingRule   String?
   metadata       Json?    @db.JsonB
   createdAt      DateTime @default(now())
@@ -1253,16 +1218,16 @@ model AbsenceSettings {
 }
 
 model HRSettings {
-  orgId              String                  @id @db.Uuid
-  leaveTypes         Json?                   @db.JsonB // Array of { type, displayName, entitlement, maxCarryOver, requiresApproval, autoApprovalThreshold }
-  workingHours       Json?                   @db.JsonB // { standardHoursPerDay, standardDaysPerWeek, overtimeThreshold }
-  approvalWorkflows  Json?                   @db.JsonB // { leaveRequests: {...}, documents: {...}, policies: {...} }
-  overtimePolicy     Json?                   @db.JsonB // { enableOvertime, roundingRule, approvalRequired }
+  orgId             String   @id @db.Uuid
+  leaveTypes        Json?    @db.JsonB // Array of { type, displayName, entitlement, maxCarryOver, requiresApproval, autoApprovalThreshold }
+  workingHours      Json?    @db.JsonB // { standardHoursPerDay, standardDaysPerWeek, overtimeThreshold }
+  approvalWorkflows Json?    @db.JsonB // { leaveRequests: {...}, documents: {...}, policies: {...} }
+  overtimePolicy    Json?    @db.JsonB // { enableOvertime, roundingRule, approvalRequired }
   dataClassification DataClassificationLevel @default(OFFICIAL)
   residencyTag       DataResidencyZone       @default(UK_ONLY)
-  metadata           Json?                   @db.JsonB
-  createdAt          DateTime                @default(now())
-  updatedAt          DateTime                @updatedAt
+  metadata          Json?    @db.JsonB
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
   org Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
 
@@ -1271,31 +1236,31 @@ model HRSettings {
 }
 
 model UnplannedAbsence {
-  id                 String                  @id @default(uuid()) @db.Uuid
-  orgId              String                  @db.Uuid
-  userId             String                  @db.Uuid
-  typeId             String                  @db.Uuid
-  startDate          DateTime
-  endDate            DateTime
-  hours              Decimal                 @db.Decimal(6, 2)
-  reason             String?
-  status             AbsenceStatus           @default(REPORTED)
-  healthStatus       HealthStatus?
-  approverOrgId      String?                 @db.Uuid
-  approverUserId     String?                 @db.Uuid
+  id             String         @id @default(uuid()) @db.Uuid
+  orgId          String         @db.Uuid
+  userId         String         @db.Uuid
+  typeId         String         @db.Uuid
+  startDate      DateTime
+  endDate        DateTime
+  hours          Decimal        @db.Decimal(6, 2)
+  reason         String?
+  status         AbsenceStatus  @default(REPORTED)
+  healthStatus   HealthStatus?
+  approverOrgId  String?        @db.Uuid
+  approverUserId String?        @db.Uuid
   dataClassification DataClassificationLevel @default(OFFICIAL)
   residencyTag       DataResidencyZone       @default(UK_ONLY)
-  metadata           Json?                   @db.JsonB
-  deletionReason     String?
-  deletedAt          DateTime?
-  deletedByUserId    String?                 @db.Uuid
-  createdAt          DateTime                @default(now())
-  updatedAt          DateTime                @updatedAt
+  metadata       Json?          @db.JsonB
+  deletionReason String?
+  deletedAt      DateTime?
+  deletedByUserId String?       @db.Uuid
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
 
-  org           Organization          @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  member        Membership            @relation("MemberAbsences", fields: [orgId, userId], references: [orgId, userId], onDelete: Cascade)
-  type          AbsenceTypeConfig     @relation(fields: [typeId], references: [id], onDelete: Restrict)
-  approver      Membership?           @relation("AbsenceApprover", fields: [approverOrgId, approverUserId], references: [orgId, userId], onDelete: SetNull)
+  org      Organization      @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  member   Membership        @relation("MemberAbsences", fields: [orgId, userId], references: [orgId, userId], onDelete: Cascade)
+  type     AbsenceTypeConfig @relation(fields: [typeId], references: [id], onDelete: Restrict)
+  approver Membership?       @relation("AbsenceApprover", fields: [approverOrgId, approverUserId], references: [orgId, userId], onDelete: SetNull)
   attachments   AbsenceAttachment[]
   returnRecord  AbsenceReturnRecord?
   deletionAudit AbsenceDeletionAudit?
@@ -1307,89 +1272,86 @@ model UnplannedAbsence {
 }
 
 model AbsenceAttachment {
-  id                 String                  @id @default(uuid()) @db.Uuid
-  orgId              String                  @db.Uuid
-  absenceId          String                  @db.Uuid
-  fileName           String
-  storageKey         String
-  contentType        String
-  fileSize           Int
-  checksum           String?
-  uploadedByUserId   String                  @db.Uuid
-  uploadedAt         DateTime                @default(now())
-  metadata           Json?                   @db.JsonB
+  id               String                 @id @default(uuid()) @db.Uuid
+  orgId            String                 @db.Uuid
+  absenceId        String                 @db.Uuid
+  fileName         String
+  storageKey       String
+  contentType      String
+  fileSize         Int
+  checksum         String?
+  uploadedByUserId String                 @db.Uuid
+  uploadedAt       DateTime               @default(now())
+  metadata         Json?                  @db.JsonB
   dataClassification DataClassificationLevel @default(OFFICIAL)
   residencyTag       DataResidencyZone       @default(UK_ONLY)
 
-  absence UnplannedAbsence @relation(fields: [absenceId], references: [id], onDelete: Cascade)
-
+  absence  UnplannedAbsence @relation(fields: [absenceId], references: [id], onDelete: Cascade)
   @@index([orgId, absenceId])
   @@map("unplanned_absence_attachments")
   @@schema("hr")
 }
 
 model AbsenceReturnRecord {
-  id                 String                  @id @default(uuid()) @db.Uuid
-  orgId              String                  @db.Uuid
-  absenceId          String                  @unique @db.Uuid
-  returnDate         DateTime
-  comments           String?
-  submittedByUserId  String                  @db.Uuid
-  submittedAt        DateTime                @default(now())
-  metadata           Json?                   @db.JsonB
+  id                String                 @id @default(uuid()) @db.Uuid
+  orgId             String                 @db.Uuid
+  absenceId         String                 @db.Uuid @unique
+  returnDate        DateTime
+  comments          String?
+  submittedByUserId String                 @db.Uuid
+  submittedAt       DateTime               @default(now())
+  metadata          Json?                  @db.JsonB
   dataClassification DataClassificationLevel @default(OFFICIAL)
   residencyTag       DataResidencyZone       @default(UK_ONLY)
 
-  absence UnplannedAbsence @relation(fields: [absenceId], references: [id], onDelete: Cascade)
-
+  absence  UnplannedAbsence @relation(fields: [absenceId], references: [id], onDelete: Cascade)
   @@index([orgId])
   @@map("unplanned_absence_returns")
   @@schema("hr")
 }
 
 model AbsenceDeletionAudit {
-  id                 String                  @id @default(uuid()) @db.Uuid
-  orgId              String                  @db.Uuid
-  absenceId          String                  @unique @db.Uuid
-  reason             String
-  deletedByUserId    String                  @db.Uuid
-  deletedAt          DateTime                @default(now())
-  metadata           Json?                   @db.JsonB
+  id               String                 @id @default(uuid()) @db.Uuid
+  orgId            String                 @db.Uuid
+  absenceId        String                 @db.Uuid @unique
+  reason           String
+  deletedByUserId  String                 @db.Uuid
+  deletedAt        DateTime               @default(now())
+  metadata         Json?                  @db.JsonB
   dataClassification DataClassificationLevel @default(OFFICIAL)
   residencyTag       DataResidencyZone       @default(UK_ONLY)
 
-  absence UnplannedAbsence @relation(fields: [absenceId], references: [id], onDelete: Cascade)
-
+  absence   UnplannedAbsence @relation(fields: [absenceId], references: [id], onDelete: Cascade)
   @@index([orgId])
   @@map("unplanned_absence_deletions")
   @@schema("hr")
 }
 
 model TimeEntry {
-  id                 String                  @id @default(uuid()) @db.Uuid
-  orgId              String                  @db.Uuid
-  userId             String                  @db.Uuid
-  date               DateTime
-  clockIn            DateTime
-  clockOut           DateTime?
-  totalHours         Decimal?                @db.Decimal(6, 2)
-  breakDuration      Decimal?                @db.Decimal(5, 2)
-  project            String?
-  tasks              Json?                   @db.JsonB
-  notes              String?
-  status             TimeEntryStatus         @default(ACTIVE)
-  approvedByOrgId    String?                 @db.Uuid
-  approvedByUserId   String?                 @db.Uuid
-  approvedAt         DateTime?
+  id               String          @id @default(uuid()) @db.Uuid
+  orgId            String          @db.Uuid
+  userId           String          @db.Uuid
+  date             DateTime
+  clockIn          DateTime
+  clockOut         DateTime?
+  totalHours       Decimal?        @db.Decimal(6, 2)
+  breakDuration    Decimal?        @db.Decimal(5, 2)
+  project          String?
+  tasks            Json?           @db.JsonB
+  notes            String?
+  status           TimeEntryStatus @default(ACTIVE)
+  approvedByOrgId  String?         @db.Uuid
+  approvedByUserId String?         @db.Uuid
+  approvedAt       DateTime?
   dataClassification DataClassificationLevel @default(OFFICIAL)
   residencyTag       DataResidencyZone       @default(UK_ONLY)
-  metadata           Json?                   @db.JsonB
-  createdAt          DateTime                @default(now())
-  updatedAt          DateTime                @updatedAt
+  metadata         Json?           @db.JsonB
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
 
-  org        Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  membership Membership   @relation("MemberTimeEntries", fields: [orgId, userId], references: [orgId, userId], onDelete: Cascade)
-  approver   Membership?  @relation("TimeEntryApprover", fields: [approvedByOrgId, approvedByUserId], references: [orgId, userId], onDelete: SetNull)
+  org        Organization     @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  membership Membership      @relation("MemberTimeEntries", fields: [orgId, userId], references: [orgId, userId], onDelete: Cascade)
+  approver   Membership?     @relation("TimeEntryApprover", fields: [approvedByOrgId, approvedByUserId], references: [orgId, userId], onDelete: SetNull)
 
   @@index([orgId, userId])
   @@index([orgId, status])
@@ -1398,25 +1360,25 @@ model TimeEntry {
 }
 
 model HRPolicy {
-  id                     String                  @id @default(uuid()) @db.Uuid
-  orgId                  String                  @db.Uuid
+  id                     String          @id @default(uuid()) @db.Uuid
+  orgId                  String          @db.Uuid
   title                  String
   content                String
-  category               PolicyCategory          @default(HR_POLICIES)
-  version                String                  @default("v1")
+  category               PolicyCategory  @default(HR_POLICIES)
+  version                String          @default("v1")
   effectiveDate          DateTime
   expiryDate             DateTime?
-  applicableRoles        Json?                   @db.JsonB
-  applicableDepartments  Json?                   @db.JsonB
-  requiresAcknowledgment Boolean                 @default(false)
-  status                 String                  @default("draft")
+  applicableRoles        Json?           @db.JsonB
+  applicableDepartments  Json?           @db.JsonB
+  requiresAcknowledgment Boolean         @default(false)
+  status                 String          @default("draft")
   dataClassification     DataClassificationLevel @default(OFFICIAL)
   residencyTag           DataResidencyZone       @default(UK_ONLY)
-  metadata               Json?                   @db.JsonB
-  createdAt              DateTime                @default(now())
-  updatedAt              DateTime                @updatedAt
+  metadata               Json?           @db.JsonB
+  createdAt              DateTime        @default(now())
+  updatedAt              DateTime        @updatedAt
 
-  org             Organization           @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  org             Organization          @relation(fields: [orgId], references: [id], onDelete: Cascade)
   acknowledgments PolicyAcknowledgment[]
 
   @@index([orgId, status])
@@ -1434,8 +1396,8 @@ model PolicyAcknowledgment {
   ipAddress      String?
   metadata       Json?    @db.JsonB
 
-  policy     HRPolicy   @relation(fields: [policyId], references: [id], onDelete: Cascade)
-  membership Membership @relation(fields: [orgId, userId], references: [orgId, userId], onDelete: Cascade)
+  policy     HRPolicy    @relation(fields: [policyId], references: [id], onDelete: Cascade)
+  membership Membership  @relation(fields: [orgId, userId], references: [orgId, userId], onDelete: Cascade)
 
   @@unique([policyId, orgId, userId, version])
   @@map("policy_acknowledgments")
@@ -1452,7 +1414,7 @@ model ChecklistTemplate {
   createdAt DateTime              @default(now())
   updatedAt DateTime              @updatedAt
 
-  org       Organization        @relation("OrgChecklistTemplates", fields: [orgId], references: [id], onDelete: Cascade)
+  org Organization @relation("OrgChecklistTemplates", fields: [orgId], references: [id], onDelete: Cascade)
   instances ChecklistInstance[] @relation("ChecklistTemplateInstances")
 
   @@index([orgId, type])
@@ -1461,22 +1423,22 @@ model ChecklistTemplate {
 }
 
 model ChecklistInstance {
-  id           String                  @id @default(uuid()) @db.Uuid
-  orgId        String                  @db.Uuid
-  employeeId   String                  @db.Uuid
-  templateId   String                  @db.Uuid
+  id           String                   @id @default(uuid()) @db.Uuid
+  orgId        String                   @db.Uuid
+  employeeId   String                   @db.Uuid
+  templateId   String                   @db.Uuid
   templateName String?
-  status       ChecklistInstanceStatus @default(IN_PROGRESS)
-  items        Json                    @db.JsonB
-  startedAt    DateTime                @default(now())
+  status       ChecklistInstanceStatus  @default(IN_PROGRESS)
+  items        Json                     @db.JsonB
+  startedAt    DateTime                 @default(now())
   completedAt  DateTime?
-  metadata     Json?                   @db.JsonB
-  createdAt    DateTime                @default(now())
-  updatedAt    DateTime                @updatedAt
+  metadata     Json?                    @db.JsonB
+  createdAt    DateTime                 @default(now())
+  updatedAt    DateTime                 @updatedAt
 
-  org         Organization      @relation("OrgChecklistInstances", fields: [orgId], references: [id], onDelete: Cascade)
-  template    ChecklistTemplate @relation("ChecklistTemplateInstances", fields: [templateId], references: [id], onDelete: Cascade)
-  employee    EmployeeProfile   @relation("EmployeeChecklistInstances", fields: [employeeId], references: [id], onDelete: Cascade)
+  org        Organization       @relation("OrgChecklistInstances", fields: [orgId], references: [id], onDelete: Cascade)
+  template   ChecklistTemplate  @relation("ChecklistTemplateInstances", fields: [templateId], references: [id], onDelete: Cascade)
+  employee   EmployeeProfile    @relation("EmployeeChecklistInstances", fields: [employeeId], references: [id], onDelete: Cascade)
   offboarding Offboarding?      @relation("OffboardingChecklistInstance")
 
   @@index([orgId, employeeId])
@@ -1486,29 +1448,29 @@ model ChecklistInstance {
 }
 
 model Offboarding {
-  id                  String                  @id @default(uuid()) @db.Uuid
-  orgId               String                  @db.Uuid
-  employeeId          String                  @db.Uuid
-  initiatedByUserId   String                  @db.Uuid
-  checklistInstanceId String?                 @unique @db.Uuid
-  reason              String
-  status              OffboardingStatus       @default(IN_PROGRESS)
-  startedAt           DateTime                @default(now())
-  completedAt         DateTime?
-  canceledAt          DateTime?
-  metadata            Json?                   @db.JsonB
-  dataClassification  DataClassificationLevel @default(OFFICIAL)
-  residencyTag        DataResidencyZone       @default(UK_ONLY)
-  auditSource         String?
-  correlationId       String?
-  createdBy           String?                 @db.Uuid
-  updatedBy           String?                 @db.Uuid
-  createdAt           DateTime                @default(now())
-  updatedAt           DateTime                @updatedAt
+  id             String             @id @default(uuid()) @db.Uuid
+  orgId          String             @db.Uuid
+  employeeId     String             @db.Uuid
+  initiatedByUserId String          @db.Uuid
+  checklistInstanceId String?       @unique @db.Uuid
+  reason         String
+  status         OffboardingStatus  @default(IN_PROGRESS)
+  startedAt      DateTime           @default(now())
+  completedAt    DateTime?
+  canceledAt     DateTime?
+  metadata       Json?              @db.JsonB
+  dataClassification DataClassificationLevel @default(OFFICIAL)
+  residencyTag       DataResidencyZone       @default(UK_ONLY)
+  auditSource     String?
+  correlationId   String?
+  createdBy       String?           @db.Uuid
+  updatedBy       String?           @db.Uuid
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
 
-  org               Organization            @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  employee          EmployeeProfile         @relation(fields: [employeeId], references: [id], onDelete: Cascade)
-  checklistInstance ChecklistInstance?      @relation("OffboardingChecklistInstance", fields: [checklistInstanceId], references: [id], onDelete: SetNull)
+  org       Organization   @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  employee  EmployeeProfile @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  checklistInstance ChecklistInstance? @relation("OffboardingChecklistInstance", fields: [checklistInstanceId], references: [id], onDelete: SetNull)
   provisioningTasks ProvisioningTask[]
   workflowRuns      OnboardingWorkflowRun[]
 
@@ -1519,28 +1481,28 @@ model Offboarding {
 }
 
 model MentorAssignment {
-  id                 String                  @id @default(uuid()) @db.Uuid
-  orgId              String                  @db.Uuid
-  employeeId         String                  @db.Uuid
-  mentorOrgId        String                  @db.Uuid
-  mentorUserId       String                  @db.Uuid
-  status             MentorAssignmentStatus  @default(ACTIVE)
-  assignedAt         DateTime                @default(now())
-  endedAt            DateTime?
-  reason             String?
-  metadata           Json?                   @db.JsonB
+  id                String                 @id @default(uuid()) @db.Uuid
+  orgId             String                 @db.Uuid
+  employeeId        String                 @db.Uuid
+  mentorOrgId       String                 @db.Uuid
+  mentorUserId      String                 @db.Uuid
+  status            MentorAssignmentStatus @default(ACTIVE)
+  assignedAt        DateTime               @default(now())
+  endedAt           DateTime?
+  reason            String?
+  metadata          Json?                  @db.JsonB
   dataClassification DataClassificationLevel @default(OFFICIAL)
-  residencyTag       DataResidencyZone       @default(UK_ONLY)
+  residencyTag        DataResidencyZone       @default(UK_ONLY)
   auditSource        String?
   correlationId      String?
-  createdBy          String?                 @db.Uuid
-  updatedBy          String?                 @db.Uuid
-  createdAt          DateTime                @default(now())
-  updatedAt          DateTime                @updatedAt
+  createdBy         String?                @db.Uuid
+  updatedBy         String?                @db.Uuid
+  createdAt         DateTime               @default(now())
+  updatedAt         DateTime               @updatedAt
 
-  org      Organization    @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  org      Organization   @relation(fields: [orgId], references: [id], onDelete: Cascade)
   employee EmployeeProfile @relation(fields: [employeeId], references: [id], onDelete: Cascade)
-  mentor   Membership      @relation("MentorAssignmentMentor", fields: [mentorOrgId, mentorUserId], references: [orgId, userId], onDelete: Cascade)
+  mentor   Membership     @relation("MentorAssignmentMentor", fields: [mentorOrgId, mentorUserId], references: [orgId, userId], onDelete: Cascade)
 
   @@index([orgId, employeeId])
   @@index([mentorOrgId, mentorUserId])
@@ -1549,13 +1511,13 @@ model MentorAssignment {
 }
 
 model ProvisioningTask {
-  id                 String                  @id @default(uuid()) @db.Uuid
-  orgId              String                  @db.Uuid
-  employeeId         String                  @db.Uuid
-  requestedByUserId  String                  @db.Uuid
-  offboardingId      String?                 @db.Uuid
+  id                 String                 @id @default(uuid()) @db.Uuid
+  orgId              String                 @db.Uuid
+  employeeId         String                 @db.Uuid
+  requestedByUserId  String                 @db.Uuid
+  offboardingId      String?                @db.Uuid
   taskType           ProvisioningTaskType
-  status             ProvisioningTaskStatus  @default(PENDING)
+  status             ProvisioningTaskStatus @default(PENDING)
   systemKey          String?
   accountIdentifier  String?
   assetTag           String?
@@ -1564,20 +1526,20 @@ model ProvisioningTask {
   dueAt              DateTime?
   completedAt        DateTime?
   errorMessage       String?
-  metadata           Json?                   @db.JsonB
+  metadata           Json?                  @db.JsonB
   dataClassification DataClassificationLevel @default(OFFICIAL)
   residencyTag       DataResidencyZone       @default(UK_ONLY)
   auditSource        String?
   correlationId      String?
-  createdBy          String?                 @db.Uuid
-  updatedBy          String?                 @db.Uuid
-  createdAt          DateTime                @default(now())
-  updatedAt          DateTime                @updatedAt
+  createdBy          String?                @db.Uuid
+  updatedBy          String?                @db.Uuid
+  createdAt          DateTime               @default(now())
+  updatedAt          DateTime               @updatedAt
 
-  org         Organization    @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  employee    EmployeeProfile @relation(fields: [employeeId], references: [id], onDelete: Cascade)
-  requester   Membership      @relation("ProvisioningRequester", fields: [orgId, requestedByUserId], references: [orgId, userId], onDelete: Cascade)
-  offboarding Offboarding?    @relation(fields: [offboardingId], references: [id], onDelete: SetNull)
+  org        Organization   @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  employee   EmployeeProfile @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  requester  Membership     @relation("ProvisioningRequester", fields: [orgId, requestedByUserId], references: [orgId, userId], onDelete: Cascade)
+  offboarding Offboarding?  @relation(fields: [offboardingId], references: [id], onDelete: SetNull)
 
   @@index([orgId, employeeId])
   @@index([orgId, status])
@@ -1587,26 +1549,26 @@ model ProvisioningTask {
 }
 
 model OnboardingWorkflowTemplate {
-  id                 String                  @id @default(uuid()) @db.Uuid
-  orgId              String                  @db.Uuid
+  id                 String               @id @default(uuid()) @db.Uuid
+  orgId              String               @db.Uuid
   name               String
   description        String?
-  templateType       WorkflowTemplateType    @default(ONBOARDING)
-  version            Int                     @default(1)
-  isActive           Boolean                 @default(true)
-  definition         Json                    @db.JsonB
-  metadata           Json?                   @db.JsonB
+  templateType       WorkflowTemplateType @default(ONBOARDING)
+  version            Int                  @default(1)
+  isActive           Boolean              @default(true)
+  definition         Json                 @db.JsonB
+  metadata           Json?                @db.JsonB
   dataClassification DataClassificationLevel @default(OFFICIAL)
   residencyTag       DataResidencyZone       @default(UK_ONLY)
   auditSource        String?
   correlationId      String?
-  createdBy          String?                 @db.Uuid
-  updatedBy          String?                 @db.Uuid
-  createdAt          DateTime                @default(now())
-  updatedAt          DateTime                @updatedAt
+  createdBy          String?              @db.Uuid
+  updatedBy          String?              @db.Uuid
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
 
-  org  Organization            @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  runs OnboardingWorkflowRun[]
+  org   Organization            @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  runs  OnboardingWorkflowRun[]
 
   @@index([orgId, templateType, isActive])
   @@map("onboarding_workflow_templates")
@@ -1614,30 +1576,30 @@ model OnboardingWorkflowTemplate {
 }
 
 model OnboardingWorkflowRun {
-  id                 String                  @id @default(uuid()) @db.Uuid
-  orgId              String                  @db.Uuid
-  employeeId         String                  @db.Uuid
-  templateId         String                  @db.Uuid
-  offboardingId      String?                 @db.Uuid
-  status             WorkflowRunStatus       @default(IN_PROGRESS)
+  id                 String             @id @default(uuid()) @db.Uuid
+  orgId              String             @db.Uuid
+  employeeId         String             @db.Uuid
+  templateId         String             @db.Uuid
+  offboardingId      String?            @db.Uuid
+  status             WorkflowRunStatus  @default(IN_PROGRESS)
   currentStepKey     String?
-  startedAt          DateTime                @default(now())
+  startedAt          DateTime           @default(now())
   completedAt        DateTime?
   canceledAt         DateTime?
-  metadata           Json?                   @db.JsonB
+  metadata           Json?              @db.JsonB
   dataClassification DataClassificationLevel @default(OFFICIAL)
   residencyTag       DataResidencyZone       @default(UK_ONLY)
   auditSource        String?
   correlationId      String?
-  createdBy          String?                 @db.Uuid
-  updatedBy          String?                 @db.Uuid
-  createdAt          DateTime                @default(now())
-  updatedAt          DateTime                @updatedAt
+  createdBy          String?            @db.Uuid
+  updatedBy          String?            @db.Uuid
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
 
-  org         Organization               @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  employee    EmployeeProfile            @relation(fields: [employeeId], references: [id], onDelete: Cascade)
-  template    OnboardingWorkflowTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
-  offboarding Offboarding?               @relation(fields: [offboardingId], references: [id], onDelete: SetNull)
+  org        Organization            @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  employee   EmployeeProfile         @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  template   OnboardingWorkflowTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  offboarding Offboarding?           @relation(fields: [offboardingId], references: [id], onDelete: SetNull)
 
   @@index([orgId, employeeId])
   @@index([templateId])
@@ -1647,24 +1609,24 @@ model OnboardingWorkflowRun {
 }
 
 model EmailSequenceTemplate {
-  id                 String                  @id @default(uuid()) @db.Uuid
-  orgId              String                  @db.Uuid
+  id                 String              @id @default(uuid()) @db.Uuid
+  orgId              String              @db.Uuid
   name               String
   description        String?
   trigger            EmailSequenceTrigger
-  isActive           Boolean                 @default(true)
-  steps              Json                    @db.JsonB
-  metadata           Json?                   @db.JsonB
+  isActive           Boolean             @default(true)
+  steps              Json                @db.JsonB
+  metadata           Json?               @db.JsonB
   dataClassification DataClassificationLevel @default(OFFICIAL)
   residencyTag       DataResidencyZone       @default(UK_ONLY)
   auditSource        String?
   correlationId      String?
-  createdBy          String?                 @db.Uuid
-  updatedBy          String?                 @db.Uuid
-  createdAt          DateTime                @default(now())
-  updatedAt          DateTime                @updatedAt
+  createdBy          String?             @db.Uuid
+  updatedBy          String?             @db.Uuid
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
 
-  org         Organization              @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  org         Organization             @relation(fields: [orgId], references: [id], onDelete: Cascade)
   enrollments EmailSequenceEnrollment[]
 
   @@index([orgId, trigger, isActive])
@@ -1673,29 +1635,29 @@ model EmailSequenceTemplate {
 }
 
 model EmailSequenceEnrollment {
-  id                 String                  @id @default(uuid()) @db.Uuid
-  orgId              String                  @db.Uuid
-  templateId         String                  @db.Uuid
-  employeeId         String?                 @db.Uuid
+  id                 String              @id @default(uuid()) @db.Uuid
+  orgId              String              @db.Uuid
+  templateId         String              @db.Uuid
+  employeeId         String?             @db.Uuid
   invitationToken    String?
-  targetEmail        String                  @db.Citext
-  status             EmailSequenceStatus     @default(ACTIVE)
-  startedAt          DateTime                @default(now())
+  targetEmail        String              @db.Citext
+  status             EmailSequenceStatus @default(ACTIVE)
+  startedAt          DateTime            @default(now())
   pausedAt           DateTime?
   completedAt        DateTime?
-  metadata           Json?                   @db.JsonB
+  metadata           Json?               @db.JsonB
   dataClassification DataClassificationLevel @default(OFFICIAL)
   residencyTag       DataResidencyZone       @default(UK_ONLY)
   auditSource        String?
   correlationId      String?
-  createdBy          String?                 @db.Uuid
-  updatedBy          String?                 @db.Uuid
-  createdAt          DateTime                @default(now())
-  updatedAt          DateTime                @updatedAt
+  createdBy          String?             @db.Uuid
+  updatedBy          String?             @db.Uuid
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
 
-  org        Organization            @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  template   EmailSequenceTemplate   @relation(fields: [templateId], references: [id], onDelete: Cascade)
-  employee   EmployeeProfile?        @relation(fields: [employeeId], references: [id], onDelete: SetNull)
+  org        Organization         @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  template   EmailSequenceTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  employee   EmployeeProfile?     @relation(fields: [employeeId], references: [id], onDelete: SetNull)
   deliveries EmailSequenceDelivery[]
 
   @@index([orgId, employeeId])
@@ -1706,26 +1668,26 @@ model EmailSequenceEnrollment {
 }
 
 model EmailSequenceDelivery {
-  id                 String                      @id @default(uuid()) @db.Uuid
-  orgId              String                      @db.Uuid
-  enrollmentId       String                      @db.Uuid
+  id                 String                    @id @default(uuid()) @db.Uuid
+  orgId              String                    @db.Uuid
+  enrollmentId       String                    @db.Uuid
   stepKey            String
   scheduledAt        DateTime
   sentAt             DateTime?
   status             EmailSequenceDeliveryStatus @default(QUEUED)
   provider           String?
   errorMessage       String?
-  metadata           Json?                       @db.JsonB
-  dataClassification DataClassificationLevel     @default(OFFICIAL)
-  residencyTag       DataResidencyZone           @default(UK_ONLY)
+  metadata           Json?                     @db.JsonB
+  dataClassification DataClassificationLevel @default(OFFICIAL)
+  residencyTag       DataResidencyZone       @default(UK_ONLY)
   auditSource        String?
   correlationId      String?
-  createdBy          String?                     @db.Uuid
-  updatedBy          String?                     @db.Uuid
-  createdAt          DateTime                    @default(now())
-  updatedAt          DateTime                    @updatedAt
+  createdBy          String?                   @db.Uuid
+  updatedBy          String?                   @db.Uuid
+  createdAt          DateTime                  @default(now())
+  updatedAt          DateTime                  @updatedAt
 
-  org        Organization            @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  org        Organization             @relation(fields: [orgId], references: [id], onDelete: Cascade)
   enrollment EmailSequenceEnrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
 
   @@index([orgId, status, scheduledAt])
@@ -1735,25 +1697,25 @@ model EmailSequenceDelivery {
 }
 
 model OnboardingMetricDefinition {
-  id                 String                  @id @default(uuid()) @db.Uuid
-  orgId              String                  @db.Uuid
+  id                 String               @id @default(uuid()) @db.Uuid
+  orgId              String               @db.Uuid
   key                String
   label              String
   unit               String?
-  targetValue        Decimal?                @db.Decimal(12, 2)
-  thresholds         Json?                   @db.JsonB
-  isActive           Boolean                 @default(true)
-  metadata           Json?                   @db.JsonB
+  targetValue        Decimal?             @db.Decimal(12, 2)
+  thresholds         Json?                @db.JsonB
+  isActive           Boolean              @default(true)
+  metadata           Json?                @db.JsonB
   dataClassification DataClassificationLevel @default(OFFICIAL)
   residencyTag       DataResidencyZone       @default(UK_ONLY)
   auditSource        String?
   correlationId      String?
-  createdBy          String?                 @db.Uuid
-  updatedBy          String?                 @db.Uuid
-  createdAt          DateTime                @default(now())
-  updatedAt          DateTime                @updatedAt
+  createdBy          String?              @db.Uuid
+  updatedBy          String?              @db.Uuid
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
 
-  org     Organization             @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  org     Organization              @relation(fields: [orgId], references: [id], onDelete: Cascade)
   results OnboardingMetricResult[]
 
   @@unique([orgId, key])
@@ -1763,26 +1725,26 @@ model OnboardingMetricDefinition {
 }
 
 model OnboardingMetricResult {
-  id                 String                  @id @default(uuid()) @db.Uuid
-  orgId              String                  @db.Uuid
-  employeeId         String                  @db.Uuid
-  metricId           String                  @db.Uuid
-  value              Decimal?                @db.Decimal(12, 2)
+  id                 String                @id @default(uuid()) @db.Uuid
+  orgId              String                @db.Uuid
+  employeeId         String                @db.Uuid
+  metricId           String                @db.Uuid
+  value              Decimal?              @db.Decimal(12, 2)
   valueText          String?
-  source             OnboardingMetricSource  @default(SYSTEM)
-  measuredAt         DateTime                @default(now())
-  metadata           Json?                   @db.JsonB
+  source             OnboardingMetricSource @default(SYSTEM)
+  measuredAt         DateTime              @default(now())
+  metadata           Json?                 @db.JsonB
   dataClassification DataClassificationLevel @default(OFFICIAL)
   residencyTag       DataResidencyZone       @default(UK_ONLY)
   auditSource        String?
   correlationId      String?
-  createdBy          String?                 @db.Uuid
-  updatedBy          String?                 @db.Uuid
-  createdAt          DateTime                @default(now())
-  updatedAt          DateTime                @updatedAt
+  createdBy          String?               @db.Uuid
+  updatedBy          String?               @db.Uuid
+  createdAt          DateTime              @default(now())
+  updatedAt          DateTime              @updatedAt
 
-  org      Organization               @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  employee EmployeeProfile            @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  org      Organization            @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  employee EmployeeProfile         @relation(fields: [employeeId], references: [id], onDelete: Cascade)
   metric   OnboardingMetricDefinition @relation(fields: [metricId], references: [id], onDelete: Cascade)
 
   @@index([orgId, employeeId])
@@ -1792,22 +1754,22 @@ model OnboardingMetricResult {
 }
 
 model OnboardingFeedback {
-  id                 String                  @id @default(uuid()) @db.Uuid
-  orgId              String                  @db.Uuid
-  employeeId         String                  @db.Uuid
+  id                 String   @id @default(uuid()) @db.Uuid
+  orgId              String   @db.Uuid
+  employeeId         String   @db.Uuid
   rating             Int
   summary            String?
   comments           String?
-  submittedAt        DateTime                @default(now())
-  metadata           Json?                   @db.JsonB
+  submittedAt        DateTime @default(now())
+  metadata           Json?    @db.JsonB
   dataClassification DataClassificationLevel @default(OFFICIAL)
   residencyTag       DataResidencyZone       @default(UK_ONLY)
   auditSource        String?
   correlationId      String?
-  createdBy          String?                 @db.Uuid
-  updatedBy          String?                 @db.Uuid
-  createdAt          DateTime                @default(now())
-  updatedAt          DateTime                @updatedAt
+  createdBy          String?  @db.Uuid
+  updatedBy          String?  @db.Uuid
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 
   org      Organization    @relation(fields: [orgId], references: [id], onDelete: Cascade)
   employee EmployeeProfile @relation(fields: [employeeId], references: [id], onDelete: Cascade)
@@ -1818,28 +1780,28 @@ model OnboardingFeedback {
 }
 
 model DocumentTemplateAssignment {
-  id                 String                   @id @default(uuid()) @db.Uuid
-  orgId              String                   @db.Uuid
-  employeeId         String                   @db.Uuid
-  templateId         String                   @db.Uuid
-  documentId         String?                  @db.Uuid
+  id                 String   @id @default(uuid()) @db.Uuid
+  orgId              String   @db.Uuid
+  employeeId         String   @db.Uuid
+  templateId         String   @db.Uuid
+  documentId         String?  @db.Uuid
   status             DocumentAssignmentStatus @default(PENDING)
-  assignedAt         DateTime                 @default(now())
+  assignedAt         DateTime @default(now())
   completedAt        DateTime?
   signatureProvider  String?
   externalEnvelopeId String?
-  metadata           Json?                    @db.JsonB
-  dataClassification DataClassificationLevel  @default(OFFICIAL)
-  residencyTag       DataResidencyZone        @default(UK_ONLY)
+  metadata           Json?    @db.JsonB
+  dataClassification DataClassificationLevel @default(OFFICIAL)
+  residencyTag       DataResidencyZone       @default(UK_ONLY)
   auditSource        String?
   correlationId      String?
-  createdBy          String?                  @db.Uuid
-  updatedBy          String?                  @db.Uuid
-  createdAt          DateTime                 @default(now())
-  updatedAt          DateTime                 @updatedAt
+  createdBy          String?  @db.Uuid
+  updatedBy          String?  @db.Uuid
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 
   org      Organization     @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  employee EmployeeProfile  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  employee EmployeeProfile @relation(fields: [employeeId], references: [id], onDelete: Cascade)
   template DocumentTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
   document DocumentVault?   @relation(fields: [documentId], references: [id], onDelete: SetNull)
 
@@ -1869,15 +1831,15 @@ model ComplianceTemplate {
 }
 
 model ComplianceReminderSettings {
-  orgId              String                  @id @db.Uuid
-  windowDays         Int                     @default(30)
-  escalationDays     Int[]                   @default([])
-  notifyOnComplete   Boolean                 @default(false)
-  dataClassification DataClassificationLevel @default(OFFICIAL)
-  residencyTag       DataResidencyZone       @default(UK_ONLY)
-  metadata           Json?                   @db.JsonB
-  createdAt          DateTime                @default(now())
-  updatedAt          DateTime                @updatedAt
+  orgId               String                   @id @db.Uuid
+  windowDays          Int                      @default(30)
+  escalationDays      Int[]                    @default([])
+  notifyOnComplete    Boolean                  @default(false)
+  dataClassification  DataClassificationLevel  @default(OFFICIAL)
+  residencyTag        DataResidencyZone        @default(UK_ONLY)
+  metadata            Json?                    @db.JsonB
+  createdAt           DateTime                 @default(now())
+  updatedAt           DateTime                 @updatedAt
 
   org Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
 
@@ -1904,21 +1866,21 @@ model ComplianceCategory {
 }
 
 model ComplianceLogItem {
-  id             String               @id @default(uuid()) @db.Uuid
-  orgId          String               @db.Uuid
-  userId         String               @db.Uuid
+  id            String                @id @default(uuid()) @db.Uuid
+  orgId         String                @db.Uuid
+  userId        String                @db.Uuid
   templateItemId String
-  categoryKey    String?
-  status         ComplianceItemStatus @default(PENDING)
-  dueDate        DateTime?
-  completedAt    DateTime?
-  reviewedBy     String?
-  reviewedAt     DateTime?
-  notes          String?
-  attachments    Json?                @db.JsonB
-  metadata       Json?                @db.JsonB
-  createdAt      DateTime             @default(now())
-  updatedAt      DateTime             @updatedAt
+  categoryKey   String?
+  status        ComplianceItemStatus  @default(PENDING)
+  dueDate       DateTime?
+  completedAt   DateTime?
+  reviewedBy    String?
+  reviewedAt    DateTime?
+  notes         String?
+  attachments   Json?                 @db.JsonB
+  metadata      Json?                 @db.JsonB
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
 
   org        Organization @relation("OrgComplianceLogItems", fields: [orgId], references: [id], onDelete: Cascade)
   membership Membership   @relation("MembershipComplianceLogItems", fields: [orgId, userId], references: [orgId, userId], onDelete: Cascade)
@@ -1932,16 +1894,15 @@ model ComplianceLogItem {
 // Notification center models with compliance metadata and retention controls
 
 enum NotificationTopic {
-  LEAVE_APPROVAL      @map("leave-approval")
-  LEAVE_REJECTION     @map("leave-rejection")
-  DOCUMENT_EXPIRY     @map("document-expiry")
-  POLICY_UPDATE       @map("policy-update")
-  PERFORMANCE_REVIEW  @map("performance-review")
-  SYSTEM_ANNOUNCEMENT @map("system-announcement")
-  COMPLIANCE_REMINDER @map("compliance-reminder")
-  BROADCAST           @map("broadcast")
-  OTHER               @map("other")
-
+  LEAVE_APPROVAL       @map("leave-approval")
+  LEAVE_REJECTION      @map("leave-rejection")
+  DOCUMENT_EXPIRY      @map("document-expiry")
+  POLICY_UPDATE        @map("policy-update")
+  PERFORMANCE_REVIEW   @map("performance-review")
+  SYSTEM_ANNOUNCEMENT  @map("system-announcement")
+  COMPLIANCE_REMINDER  @map("compliance-reminder")
+  BROADCAST            @map("broadcast")
+  OTHER                @map("other")
   @@schema("org")
 }
 
@@ -1950,19 +1911,18 @@ enum NotificationUrgency {
   MEDIUM @map("medium")
   HIGH   @map("high")
   URGENT @map("urgent")
-
   @@schema("org")
 }
 
 model NotificationMessage {
-  id                 String                  @id @default(uuid()) @db.Uuid
-  orgId              String                  @db.Uuid
-  userId             String                  @db.Uuid
+  id                 String                 @id @default(uuid()) @db.Uuid
+  orgId              String                 @db.Uuid
+  userId             String                 @db.Uuid
   title              String
   body               String
-  topic              NotificationTopic       @default(OTHER)
-  priority           NotificationUrgency     @default(MEDIUM)
-  isRead             Boolean                 @default(false)
+  topic              NotificationTopic      @default(OTHER)
+  priority           NotificationUrgency    @default(MEDIUM)
+  isRead             Boolean                @default(false)
   readAt             DateTime?
   actionUrl          String?
   actionLabel        String?
@@ -1971,14 +1931,14 @@ model NotificationMessage {
   retentionPolicyId  String
   dataClassification DataClassificationLevel @default(OFFICIAL)
   residencyTag       DataResidencyZone       @default(UK_ONLY)
-  schemaVersion      Int                     @default(1)
+  schemaVersion      Int                    @default(1)
   correlationId      String?
-  createdByUserId    String?                 @db.Uuid
-  auditSource        String                  @default("notification-service")
-  metadata           Json?                   @db.JsonB
-  auditTrail         Json?                   @db.JsonB
-  createdAt          DateTime                @default(now())
-  updatedAt          DateTime                @updatedAt
+  createdByUserId    String?                @db.Uuid
+  auditSource        String                 @default("notification-service")
+  metadata           Json?                  @db.JsonB
+  auditTrail         Json?                  @db.JsonB
+  createdAt          DateTime               @default(now())
+  updatedAt          DateTime               @updatedAt
 
   org        Organization @relation("OrgNotificationMessages", fields: [orgId], references: [id], onDelete: Cascade)
   membership Membership   @relation("MembershipNotificationMessages", fields: [orgId, userId], references: [orgId, userId], onDelete: Cascade)
@@ -2030,7 +1990,7 @@ model ManagedOrganization {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  admin        User         @relation("ManagedAdmin", fields: [adminUserId], references: [id], onDelete: Cascade)
+  admin        User          @relation("ManagedAdmin", fields: [adminUserId], references: [id], onDelete: Cascade)
   organization Organization @relation("ManagedOrgOrganization", fields: [orgId], references: [id], onDelete: Cascade)
 
   @@index([adminUserId])
@@ -2053,7 +2013,6 @@ enum DocumentType {
   FINANCIAL
   SECURITY
   OTHER
-
   @@schema("compliance")
 }
 
@@ -2068,7 +2027,6 @@ enum AuditEventType {
   DOCUMENT
   LEAVE_REQUEST
   PAYROLL
-
   @@schema("compliance")
 }
 
@@ -2079,7 +2037,6 @@ enum RetentionPolicy {
   SEVEN_YEARS
   PERMANENT
   LEGAL_HOLD
-
   @@schema("compliance")
 }
 
@@ -2089,39 +2046,38 @@ enum SecurityClassification {
   OFFICIAL_SENSITIVE
   SECRET
   TOP_SECRET
-
   @@schema("compliance")
 }
 
 model DocumentVault {
-  id               String                 @id @default(uuid()) @db.Uuid
-  orgId            String                 @db.Uuid
-  ownerOrgId       String?                @db.Uuid
-  ownerUserId      String?                @db.Uuid
-  type             DocumentType           @default(OTHER)
-  classification   SecurityClassification @default(UNCLASSIFIED)
-  retentionPolicy  RetentionPolicy        @default(THREE_YEARS)
-  retentionExpires DateTime? // Calculated based on retention policy
-  blobPointer      String
-  checksum         String
-  mimeType         String?
-  sizeBytes        Int?
-  fileName         String // Original filename for audit trail
-  version          Int                    @default(1)
-  latestVersionId  String?                @db.Uuid // For version chains
-  encrypted        Boolean                @default(false) // Field-level encryption
-  encryptedKeyRef  String? // Reference to KMS key
+  id                String              @id @default(uuid()) @db.Uuid
+  orgId             String              @db.Uuid
+  ownerOrgId        String?             @db.Uuid
+  ownerUserId       String?             @db.Uuid
+  type              DocumentType        @default(OTHER)
+  classification    SecurityClassification @default(UNCLASSIFIED)
+  retentionPolicy   RetentionPolicy     @default(THREE_YEARS)
+  retentionExpires  DateTime?           // Calculated based on retention policy
+  blobPointer       String
+  checksum          String
+  mimeType          String?
+  sizeBytes         Int?
+  fileName          String              // Original filename for audit trail
+  version           Int                 @default(1)
+  latestVersionId   String?             @db.Uuid // For version chains
+  encrypted         Boolean             @default(false) // Field-level encryption
+  encryptedKeyRef   String?             // Reference to KMS key
   // UK compliance fields
-  sensitivityLevel Int                    @default(0) // 0-4 scale for sensitivity
-  dataCategory     String? // Personal, financial, health, etc.
-  lawfulBasis      String? // For GDPR compliance
-  dataSubject      Json?                  @db.JsonB // For data subject rights
+  sensitivityLevel  Int                 @default(0) // 0-4 scale for sensitivity
+  dataCategory      String?             // Personal, financial, health, etc.
+  lawfulBasis       String?             // For GDPR compliance
+  dataSubject       Json?               @db.JsonB   // For data subject rights
   // Audit trail
-  metadata         Json?                  @db.JsonB
-  createdAt        DateTime               @default(now())
+  metadata          Json?               @db.JsonB
+  createdAt         DateTime            @default(now())
 
-  org                         Organization                 @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  owner                       Membership?                  @relation("DocumentOwner", fields: [ownerOrgId, ownerUserId], references: [orgId, userId])
+  org         Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  owner       Membership?  @relation("DocumentOwner", fields: [ownerOrgId, ownerUserId], references: [orgId, userId])
   documentTemplateAssignments DocumentTemplateAssignment[]
 
   @@index([orgId])
@@ -2132,21 +2088,21 @@ model DocumentVault {
 }
 
 model DocumentTemplate {
-  id                 String                  @id @default(uuid()) @db.Uuid
-  orgId              String                  @db.Uuid
+  id                 String                 @id @default(uuid()) @db.Uuid
+  orgId              String                 @db.Uuid
   name               String
-  type               DocumentType            @default(OTHER)
+  type               DocumentType           @default(OTHER)
   templateBody       String
-  templateSchema     Json?                   @db.JsonB
-  version            Int                     @default(1)
-  isActive           Boolean                 @default(true)
-  metadata           Json?                   @db.JsonB
+  templateSchema     Json?                  @db.JsonB
+  version            Int                    @default(1)
+  isActive           Boolean                @default(true)
+  metadata           Json?                  @db.JsonB
   dataClassification DataClassificationLevel @default(OFFICIAL)
   residencyTag       DataResidencyZone       @default(UK_ONLY)
-  createdAt          DateTime                @default(now())
-  updatedAt          DateTime                @updatedAt
+  createdAt          DateTime               @default(now())
+  updatedAt          DateTime               @updatedAt
 
-  org         Organization                 @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  org Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
   assignments DocumentTemplateAssignment[]
 
   @@index([orgId, type, isActive])
@@ -2155,25 +2111,25 @@ model DocumentTemplate {
 }
 
 model AuditLog {
-  id               String         @id @default(uuid()) @db.Uuid
-  orgId            String         @db.Uuid
-  userId           String?        @db.Uuid
-  eventType        AuditEventType
-  action           String
-  resource         String
-  resourceId       String?
-  ipAddress        String?
-  userAgent        String?
+  id         String         @id @default(uuid()) @db.Uuid
+  orgId      String         @db.Uuid
+  userId     String?        @db.Uuid
+  eventType  AuditEventType
+  action     String
+  resource   String
+  resourceId String?
+  ipAddress  String?
+  userAgent  String?
   // UK compliance fields
-  sessionTokenHash String? // For audit verification
-  securityLevel    Int? // For security event classification
+  sessionTokenHash String?  // For audit verification
+  securityLevel      Int?   // For security event classification
   // For GDPR compliance
-  dataSubjectId    String? // Reference to the data owner
-  immutable        Boolean        @default(true)
-  deletedAt        DateTime?
+  dataSubjectId String?     // Reference to the data owner
+  immutable  Boolean        @default(true)
+  deletedAt  DateTime?
   // Payload for audit trail
-  payload          Json?          @db.JsonB
-  createdAt        DateTime       @default(now())
+  payload    Json?          @db.JsonB
+  createdAt  DateTime       @default(now())
 
   org        Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
   membership Membership?  @relation(fields: [orgId, userId], references: [orgId, userId])
@@ -2186,18 +2142,18 @@ model AuditLog {
 }
 
 model EventOutbox {
-  id          String    @id @default(uuid()) @db.Uuid
-  orgId       String    @db.Uuid
+  id          String   @id @default(uuid()) @db.Uuid
+  orgId       String   @db.Uuid
   eventType   String
-  payload     Json      @db.JsonB
-  status      String    @default("pending")
-  error       Json?     @db.JsonB
-  availableAt DateTime  @default(now())
+  payload     Json     @db.JsonB
+  status      String   @default("pending")
+  error       Json?    @db.JsonB
+  availableAt DateTime @default(now())
   processedAt DateTime?
-  maxRetries  Int       @default(3)
-  retryCount  Int       @default(0)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  maxRetries  Int      @default(3)
+  retryCount  Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   org Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
 
@@ -2209,31 +2165,31 @@ model EventOutbox {
 
 // UK-specific compliance model
 model ComplianceRecord {
-  id                String    @id @default(uuid()) @db.Uuid
-  orgId             String    @db.Uuid
-  complianceType    String // e.g., "SAR", "GDPR", "FOI", "DSEAR"
-  referenceNumber   String // For tracking
-  status            String    @default("open")
-  title             String
-  description       String
-  assignedToOrgId   String?   @db.Uuid
-  assignedToUserId  String?   @db.Uuid
-  priority          Int       @default(2) // 1-5 scale
-  dueDate           DateTime?
-  completedAt       DateTime?
+  id               String   @id @default(uuid()) @db.Uuid
+  orgId            String   @db.Uuid
+  complianceType   String   // e.g., "SAR", "GDPR", "FOI", "DSEAR"
+  referenceNumber  String   // For tracking
+  status           String   @default("open")
+  title            String
+  description      String
+  assignedToOrgId  String?  @db.Uuid
+  assignedToUserId String?  @db.Uuid
+  priority         Int      @default(2) // 1-5 scale
+  dueDate          DateTime?
+  completedAt      DateTime?
   // UK compliance fields
-  submittedByOrgId  String?   @db.Uuid
-  submittedByUserId String?   @db.Uuid
-  submittedAt       DateTime?
-  responseDate      DateTime?
-  escalationDate    DateTime?
-  metadata          Json?     @db.JsonB
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+  submittedByOrgId  String?  @db.Uuid
+  submittedByUserId String?  @db.Uuid
+  submittedAt      DateTime?
+  responseDate     DateTime?
+  escalationDate   DateTime?
+  metadata         Json?    @db.JsonB
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
-  org       Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  assignee  Membership?  @relation("ComplianceAssignee", fields: [assignedToOrgId, assignedToUserId], references: [orgId, userId])
-  submitter Membership?  @relation("ComplianceSubmitter", fields: [submittedByOrgId, submittedByUserId], references: [orgId, userId])
+  org    Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  assignee Membership? @relation("ComplianceAssignee", fields: [assignedToOrgId, assignedToUserId], references: [orgId, userId])
+  submitter Membership? @relation("ComplianceSubmitter", fields: [submittedByOrgId, submittedByUserId], references: [orgId, userId])
 
   @@unique([orgId, referenceNumber])
   @@index([orgId, status])
@@ -2243,24 +2199,24 @@ model ComplianceRecord {
 
 // UK-specific statutory reporting model
 model StatutoryReport {
-  id                String    @id @default(uuid()) @db.Uuid
-  orgId             String    @db.Uuid
-  reportType        String // "PAYE", "NI", "P60", "P11D", "AutoEnrolment", etc.
-  period            String // e.g., "2023-04", "2023-Q1"
-  dueDate           DateTime
-  submittedAt       DateTime?
-  submittedByOrgId  String?   @db.Uuid
-  submittedByUserId String?   @db.Uuid
-  status            String    @default("pending")
-  fileName          String? // Generated report filename
-  fileSize          Int? // Size in bytes
-  checksum          String? // For data integrity
-  metadata          Json?     @db.JsonB
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+  id               String   @id @default(uuid()) @db.Uuid
+  orgId            String   @db.Uuid
+  reportType       String   // "PAYE", "NI", "P60", "P11D", "AutoEnrolment", etc.
+  period           String   // e.g., "2023-04", "2023-Q1"
+  dueDate          DateTime
+  submittedAt      DateTime?
+  submittedByOrgId  String?  @db.Uuid
+  submittedByUserId String?  @db.Uuid
+  status           String   @default("pending")
+  fileName         String?  // Generated report filename
+  fileSize         Int?     // Size in bytes
+  checksum         String?  // For data integrity
+  metadata         Json?    @db.JsonB
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
-  org       Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  submitter Membership?  @relation("ReportSubmitter", fields: [submittedByOrgId, submittedByUserId], references: [orgId, userId])
+  org    Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  submitter Membership? @relation("ReportSubmitter", fields: [submittedByOrgId, submittedByUserId], references: [orgId, userId])
 
   @@index([orgId, reportType, period])
   @@index([dueDate])
@@ -2270,27 +2226,27 @@ model StatutoryReport {
 
 // For GDPR data subject rights
 model DataSubjectRight {
-  id              String    @id @default(uuid()) @db.Uuid
-  orgId           String    @db.Uuid
-  userId          String?   @db.Uuid // Nullable for non-user data subjects
-  rightType       String // "access", "rectification", "erasure", "portability", "objection", "restriction"
-  status          String    @default("pending")
-  requestDate     DateTime  @default(now())
-  dueDate         DateTime // Deadline based on regulation
-  completedAt     DateTime?
-  responseDate    DateTime?
+  id            String   @id @default(uuid()) @db.Uuid
+  orgId         String   @db.Uuid
+  userId        String?  @db.Uuid // Nullable for non-user data subjects
+  rightType     String   // "access", "rectification", "erasure", "portability", "objection", "restriction"
+  status        String   @default("pending")
+  requestDate   DateTime @default(now())
+  dueDate       DateTime // Deadline based on regulation
+  completedAt   DateTime?
+  responseDate  DateTime?
   // For non-user data subjects
-  dataSubjectInfo Json?     @db.JsonB
-  response        String?
-  responseFrom    String?   @db.Uuid
-  notes           String?
-  metadata        Json?     @db.JsonB
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  dataSubjectInfo Json? @db.JsonB
+  response      String?
+  responseFrom  String?  @db.Uuid
+  notes         String?
+  metadata      Json?    @db.JsonB
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  org       Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  requestor User?        @relation("DSRRequestor", fields: [userId], references: [id])
-  responder User?        @relation("DSRResponder", fields: [responseFrom], references: [id])
+  org         Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  requestor   User?  @relation("DSRRequestor", fields: [userId], references: [id])
+  responder   User?  @relation("DSRResponder", fields: [responseFrom], references: [id])
 
   @@index([orgId, rightType])
   @@index([status])
@@ -2303,152 +2259,137 @@ enum OrganizationStatus {
   ACTIVE
   SUSPENDED
   DECOMMISSIONED
-
   @@schema("hr")
 }
-
 enum ComplianceTier {
   STANDARD
   REGULATED
   GOV_SECURE
-
   @@schema("hr")
 }
-
 enum DataResidencyZone {
   UK_ONLY
   UK_AND_EEA
   GLOBAL_RESTRICTED
-
   @@schema("hr")
 }
-
 enum DataClassificationLevel {
   OFFICIAL
   OFFICIAL_SENSITIVE
   SECRET
   TOP_SECRET
-
   @@schema("hr")
 }
-
 enum RoleScope {
   ORG
   DEPARTMENT
   GLOBAL
-
   @@schema("hr")
 }
-
 enum MembershipStatus {
   INVITED
   ACTIVE
   SUSPENDED
   DEACTIVATED
-
   @@schema("hr")
 }
-
 enum NotificationChannel {
   EMAIL
   IN_APP
   SMS
-
   @@schema("hr")
 }
-
 model Organization {
-  id                 String                  @id @default(uuid()) @db.Uuid
-  slug               String                  @unique @db.Citext
-  name               String
-  status             OrganizationStatus      @default(ACTIVE)
-  complianceTier     ComplianceTier          @default(STANDARD)
-  dataResidency      DataResidencyZone       @default(UK_ONLY)
-  dataClassification DataClassificationLevel @default(OFFICIAL)
-  regionCode         String
+  id                   String                  @id @default(uuid()) @db.Uuid
+  slug                 String                  @unique @db.Citext
+  name                 String
+  status               OrganizationStatus      @default(ACTIVE)
+  complianceTier       ComplianceTier          @default(STANDARD)
+  dataResidency        DataResidencyZone       @default(UK_ONLY)
+  dataClassification   DataClassificationLevel @default(OFFICIAL)
+  regionCode           String
 
   // Organization profile + legacy fields (migrated from the old Firebase shape)
-  address                 String?
-  phone                   String?
-  website                 String?
-  companyType             String?
-  industry                String?
-  employeeCountRange      String?
-  incorporationDate       DateTime?
+  address               String?
+  phone                 String?
+  website               String?
+  companyType           String?
+  industry              String?
+  employeeCountRange    String?
+  incorporationDate     DateTime?
   registeredOfficeAddress String?
-  contactDetails          Json?     @db.JsonB
+  contactDetails        Json?                   @db.JsonB
 
   // Leave settings legacy columns
-  primaryLeaveType   String?
-  leaveYearStartDate DateTime?
+  primaryLeaveType      String?
+  leaveYearStartDate    DateTime?
 
   // Admin + subscription legacy fields
-  ownerUid             String? @db.Uuid
-  ownerEmail           String? @db.Citext
-  ownerName            String?
-  subscriptionPlan     String?
-  subscriptionStatus   String?
-  userCount            Int?
-  availablePermissions Json?   @db.JsonB
+  ownerUid              String?                 @db.Uuid
+  ownerEmail            String?                 @db.Citext
+  ownerName             String?
+  subscriptionPlan      String?
+  subscriptionStatus    String?
+  userCount             Int?
+  availablePermissions  Json?                   @db.JsonB
 
-  settings         Json     @default("{}") @db.JsonB
-  governanceTags   Json?    @db.JsonB
-  securityControls Json?    @db.JsonB // Security configuration per UK standards
-  encryptionKey    String?  @db.Text // For field-level encryption
-  tenantId         String // For multi-tenancy isolation
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  settings             Json                    @default("{}") @db.JsonB
+  governanceTags       Json?                   @db.JsonB
+  securityControls     Json?                   @db.JsonB // Security configuration per UK standards
+  encryptionKey        String?                 @db.Text // For field-level encryption
+  tenantId             String                  // For multi-tenancy isolation
+  createdAt            DateTime                @default(now())
+  updatedAt            DateTime                @updatedAt
 
-  locations                   Location[]
-  memberships                 Membership[]
-  roles                       Role[]
-  departments                 Department[]
-  leavePolicies               LeavePolicy[]
-  documents                   DocumentVault[]
-  auditLogs                   AuditLog[]
-  notificationPreferences     NotificationPreference[]
-  integrations                IntegrationConfig[]
-  outboxEvents                EventOutbox[]
-  invitations                 Invitation[]
-  securityEvents              SecurityEvent[]
-  tenantSecurityEvents        TenantSecurityEvent[]        @relation("TenantSecurityEventOrganization")
-  globalSecurityEvents        GlobalSecurityEvent[]        @relation("GlobalSecurityEventSourceOrg")
-  complianceRecords           ComplianceRecord[]
-  statutoryReports            StatutoryReport[]
-  dataSubjectRights           DataSubjectRight[]
-  absenceTypes                AbsenceTypeConfig[]
-  absenceSettings             AbsenceSettings?
-  unplannedAbsences           UnplannedAbsence[]
-  timeEntries                 TimeEntry[]
-  hrPolicies                  HRPolicy[]
-  hrNotifications             HRNotification[]
-  notificationMessages        NotificationMessage[]        @relation("OrgNotificationMessages")
-  permissionResources         PermissionResource[]
-  hrSettings                  HRSettings?
-  checklistTemplates          ChecklistTemplate[]          @relation("OrgChecklistTemplates")
-  checklistInstances          ChecklistInstance[]          @relation("OrgChecklistInstances")
-  offboardingRecords          Offboarding[]
-  mentorAssignments           MentorAssignment[]
-  provisioningTasks           ProvisioningTask[]
+  locations             Location[]
+  memberships             Membership[]
+  roles                   Role[]
+  departments             Department[]
+  leavePolicies           LeavePolicy[]
+  documents               DocumentVault[]
+  auditLogs               AuditLog[]
+  notificationPreferences NotificationPreference[]
+  integrations            IntegrationConfig[]
+  outboxEvents            EventOutbox[]
+  invitations             Invitation[]
+  securityEvents          SecurityEvent[]
+  tenantSecurityEvents    TenantSecurityEvent[] @relation("TenantSecurityEventOrganization")
+  globalSecurityEvents    GlobalSecurityEvent[] @relation("GlobalSecurityEventSourceOrg")
+  complianceRecords      ComplianceRecord[]
+  statutoryReports       StatutoryReport[]
+  dataSubjectRights      DataSubjectRight[]
+  absenceTypes           AbsenceTypeConfig[]
+  absenceSettings        AbsenceSettings?
+  unplannedAbsences      UnplannedAbsence[]
+  timeEntries            TimeEntry[]
+  hrPolicies             HRPolicy[]
+  hrNotifications        HRNotification[]
+  notificationMessages   NotificationMessage[] @relation("OrgNotificationMessages")
+  permissionResources    PermissionResource[]
+  hrSettings             HRSettings?
+  checklistTemplates     ChecklistTemplate[] @relation("OrgChecklistTemplates")
+  checklistInstances     ChecklistInstance[] @relation("OrgChecklistInstances")
+  offboardingRecords     Offboarding[]
+  mentorAssignments      MentorAssignment[]
+  provisioningTasks      ProvisioningTask[]
   onboardingWorkflowTemplates OnboardingWorkflowTemplate[]
-  onboardingWorkflowRuns      OnboardingWorkflowRun[]
-  emailSequenceTemplates      EmailSequenceTemplate[]
-  emailSequenceEnrollments    EmailSequenceEnrollment[]
-  emailSequenceDeliveries     EmailSequenceDelivery[]
+  onboardingWorkflowRuns OnboardingWorkflowRun[]
+  emailSequenceTemplates EmailSequenceTemplate[]
+  emailSequenceEnrollments EmailSequenceEnrollment[]
+  emailSequenceDeliveries EmailSequenceDelivery[]
   onboardingMetricDefinitions OnboardingMetricDefinition[]
-  onboardingMetricResults     OnboardingMetricResult[]
-  onboardingFeedback          OnboardingFeedback[]
-  documentTemplates           DocumentTemplate[]
+  onboardingMetricResults OnboardingMetricResult[]
+  onboardingFeedback     OnboardingFeedback[]
+  documentTemplates      DocumentTemplate[]
   documentTemplateAssignments DocumentTemplateAssignment[]
-  complianceTemplates         ComplianceTemplate[]         @relation("OrgComplianceTemplates")
-  complianceReminderSettings  ComplianceReminderSettings?
-  complianceCategories        ComplianceCategory[]         @relation("OrgComplianceCategories")
-  complianceLogItems          ComplianceLogItem[]          @relation("OrgComplianceLogItems")
-  managedOrganizations        ManagedOrganization[]        @relation("ManagedOrgOrganization")
-  subscriptions               OrganizationSubscription[]
-  paymentMethods              PaymentMethod[]
-  billingInvoices             BillingInvoice[]
-
+  complianceTemplates    ComplianceTemplate[] @relation("OrgComplianceTemplates")
+  complianceReminderSettings ComplianceReminderSettings?
+  complianceCategories   ComplianceCategory[] @relation("OrgComplianceCategories")
+  complianceLogItems     ComplianceLogItem[] @relation("OrgComplianceLogItems")
+  managedOrganizations   ManagedOrganization[] @relation("ManagedOrgOrganization")
+  subscriptions          OrganizationSubscription[]
+  paymentMethods         PaymentMethod[]
+  billingInvoices        BillingInvoice[]
   @@index([tenantId]) // For tenant isolation
   @@map("organizations") // PostgreSQL schema mapping
   @@schema("hr")
@@ -2469,59 +2410,54 @@ model Location {
   @@map("locations")
   @@schema("hr")
 }
-
 model User {
-  id                           String                @id @default(uuid()) @db.Uuid
-  email                        String                @unique @db.Citext
-  displayName                  String?
-  status                       MembershipStatus      @default(INVITED)
-  authProvider                 String                @default("better-auth")
-  lastLoginAt                  DateTime?
-  failedLoginCount             Int                   @default(0) // For security monitoring
-  lockedUntil                  DateTime? // Account lockout for security
-  lastPasswordChange           DateTime              @default(now()) // For password policy compliance
-  createdAt                    DateTime              @default(now())
-  updatedAt                    DateTime              @updatedAt
-  memberships                  Membership[]
-  invitationsSent              Invitation[]          @relation("InvitationInvitedBy")
-  invitationsAccepted          Invitation[]          @relation("InvitationAcceptedBy")
-  invitationsRevoked           Invitation[]          @relation("InvitationRevokedBy")
-  securityEvents               SecurityEvent[]
-  resolvedSecurityEvents       SecurityEvent[]       @relation("SecurityEventResolver")
-  tenantSecurityEvents         TenantSecurityEvent[] @relation("TenantSecurityEventUser")
+  id               String           @id @default(uuid()) @db.Uuid
+  email            String           @unique @db.Citext
+  displayName      String?
+  status           MembershipStatus @default(INVITED)
+  authProvider     String           @default("better-auth")
+  lastLoginAt      DateTime?
+  failedLoginCount Int              @default(0) // For security monitoring
+  lockedUntil      DateTime?        // Account lockout for security
+  lastPasswordChange DateTime       @default(now()) // For password policy compliance
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  memberships         Membership[]
+  invitationsSent     Invitation[] @relation("InvitationInvitedBy")
+  invitationsAccepted Invitation[] @relation("InvitationAcceptedBy")
+  invitationsRevoked  Invitation[] @relation("InvitationRevokedBy")
+  securityEvents      SecurityEvent[]
+  resolvedSecurityEvents SecurityEvent[] @relation("SecurityEventResolver")
+  tenantSecurityEvents TenantSecurityEvent[] @relation("TenantSecurityEventUser")
   resolvedTenantSecurityEvents TenantSecurityEvent[] @relation("TenantSecurityEventResolver")
-  globalSecurityEvents         GlobalSecurityEvent[] @relation("GlobalSecurityEventUser")
+  globalSecurityEvents GlobalSecurityEvent[] @relation("GlobalSecurityEventUser")
   resolvedGlobalSecurityEvents GlobalSecurityEvent[] @relation("GlobalSecurityEventResolver")
-  sessions                     UserSession[]
+  sessions            UserSession[]
   // submitter relationships are modelled as Membership -> ComplianceRecord/StatutoryReport
-  dsrRequests                  DataSubjectRight[]    @relation("DSRRequestor")
-  dsrResponses                 DataSubjectRight[]    @relation("DSRResponder")
-  managedOrganizations         ManagedOrganization[] @relation("ManagedAdmin")
-
+  dsrRequests          DataSubjectRight[] @relation("DSRRequestor")
+  dsrResponses         DataSubjectRight[] @relation("DSRResponder")
+  managedOrganizations ManagedOrganization[] @relation("ManagedAdmin")
   @@index([email])
   @@schema("hr")
 }
-
 model Role {
-  id              String       @id @default(uuid()) @db.Uuid
-  orgId           String       @db.Uuid
-  name            String
-  description     String?
-  scope           RoleScope    @default(ORG)
-  permissions     Json         @default("{}") @db.JsonB
-  inheritsRoleIds String[]     @default([]) @db.Text
-  isSystem        Boolean      @default(false)
-  isDefault       Boolean      @default(false)
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
-  org             Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  memberships     Membership[]
-
+  id          String    @id @default(uuid()) @db.Uuid
+  orgId       String    @db.Uuid
+  name        String
+  description String?
+  scope       RoleScope @default(ORG)
+  permissions Json      @default("{}") @db.JsonB
+  inheritsRoleIds String[] @default([]) @db.Text
+  isSystem    Boolean   @default(false)
+  isDefault   Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  org         Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  memberships Membership[]
   @@unique([orgId, name])
   @@map("roles")
   @@schema("hr")
 }
-
 model PermissionResource {
   id          String   @id @default(uuid()) @db.Uuid
   orgId       String   @db.Uuid
@@ -2539,82 +2475,77 @@ model PermissionResource {
   @@map("permission_resources")
   @@schema("hr")
 }
-
 model Department {
-  id                  String               @id @default(uuid()) @db.Uuid
-  orgId               String               @db.Uuid
-  name                String
-  path                String? // For hierarchical department structures
-  leaderOrgId         String?              @db.Uuid
-  leaderUserId        String?              @db.Uuid
-  businessUnit        String? // For organizational hierarchy
-  costCenter          String? // For financial tracking
-  createdAt           DateTime             @default(now())
-  updatedAt           DateTime             @updatedAt
-  org                 Organization         @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  leader              Membership?          @relation("DepartmentLead", fields: [leaderOrgId, leaderUserId], references: [orgId, userId])
-  memberships         Membership[]
-  leavePolicies       LeavePolicy[]
+  id           String   @id @default(uuid()) @db.Uuid
+  orgId        String   @db.Uuid
+  name         String
+  path         String?  // For hierarchical department structures
+  leaderOrgId  String?  @db.Uuid
+  leaderUserId String?  @db.Uuid
+  businessUnit String?  // For organizational hierarchy
+  costCenter   String?  // For financial tracking
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  org           Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  leader        Membership?   @relation("DepartmentLead", fields: [leaderOrgId, leaderUserId], references: [orgId, userId])
+  memberships   Membership[]
+  leavePolicies LeavePolicy[]
   employmentContracts EmploymentContract[]
-  employeeProfiles    EmployeeProfile[]    @relation("DepartmentProfiles")
-
+  employeeProfiles EmployeeProfile[] @relation("DepartmentProfiles")
   @@unique([orgId, name])
   @@map("departments")
   @@schema("hr")
 }
-
 model Membership {
-  orgId                      String                   @db.Uuid
-  userId                     String                   @db.Uuid
-  roleId                     String?                  @db.Uuid
-  departmentId               String?                  @db.Uuid
-  status                     MembershipStatus         @default(INVITED)
-  invitedBy                  String?                  @db.Uuid
-  invitedAt                  DateTime?
-  activatedAt                DateTime?
-  deactivatedAt              DateTime?
-  lastAccessedAt             DateTime? // For access compliance tracking
-  metadata                   Json?                    @db.JsonB
+  orgId         String           @db.Uuid
+  userId        String           @db.Uuid
+  roleId        String?          @db.Uuid
+  departmentId  String?          @db.Uuid
+  status        MembershipStatus @default(INVITED)
+  invitedBy     String?          @db.Uuid
+  invitedAt     DateTime?
+  activatedAt   DateTime?
+  deactivatedAt DateTime?
+  lastAccessedAt DateTime?        // For access compliance tracking
+  metadata      Json?            @db.JsonB
   // Required for UK compliance audit trails
-  createdBy                  String                   @db.Uuid
-  updatedBy                  String?                  @db.Uuid
-  org                        Organization             @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  user                       User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  role                       Role?                    @relation(fields: [roleId], references: [id], onDelete: SetNull)
-  department                 Department?              @relation(fields: [departmentId], references: [id], onDelete: SetNull)
-  profile                    EmployeeProfile?
-  balances                   LeaveBalance[]           @relation("MembershipLeaveBalances")
-  leaveRequests              LeaveRequest[]
-  auditLogs                  AuditLog[]
-  ledDepartments             Department[]             @relation("DepartmentLead")
-  leaveApprovals             LeaveRequest[]           @relation("LeaveApprover")
-  documentsOwned             DocumentVault[]          @relation("DocumentOwner")
-  notificationPreferences    NotificationPreference[]
-  employmentContracts        EmploymentContract[]
-  reviewsAsReviewee          PerformanceReview[]      @relation("RevieweeMembership")
-  reviewsAsReviewer          PerformanceReview[]      @relation("ReviewerMembership")
-  trainingRecords            TrainingRecord[]
-  reportedAbsences           UnplannedAbsence[]       @relation("MemberAbsences")
-  approvedAbsences           UnplannedAbsence[]       @relation("AbsenceApprover")
-  timeEntries                TimeEntry[]              @relation("MemberTimeEntries")
-  approvedTimeEntries        TimeEntry[]              @relation("TimeEntryApprover")
-  policyAcknowledgments      PolicyAcknowledgment[]
-  notifications              HRNotification[]
-  notificationMessages       NotificationMessage[]    @relation("MembershipNotificationMessages")
-  assignedComplianceRecords  ComplianceRecord[]       @relation("ComplianceAssignee")
-  submittedComplianceRecords ComplianceRecord[]       @relation("ComplianceSubmitter")
-  submittedStatutoryReports  StatutoryReport[]        @relation("ReportSubmitter")
-  complianceLogItems         ComplianceLogItem[]      @relation("MembershipComplianceLogItems")
-  mentorAssignments          MentorAssignment[]       @relation("MentorAssignmentMentor")
-  provisioningRequests       ProvisioningTask[]       @relation("ProvisioningRequester")
-
+  createdBy     String           @db.Uuid
+  updatedBy     String?          @db.Uuid
+  org                     Organization             @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  user                    User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role                    Role?                    @relation(fields: [roleId], references: [id], onDelete: SetNull)
+  department              Department?              @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  profile                 EmployeeProfile?
+  balances                LeaveBalance[]           @relation("MembershipLeaveBalances")
+  leaveRequests           LeaveRequest[]
+  auditLogs               AuditLog[]
+  ledDepartments          Department[]             @relation("DepartmentLead")
+  leaveApprovals          LeaveRequest[]           @relation("LeaveApprover")
+  documentsOwned          DocumentVault[]          @relation("DocumentOwner")
+  notificationPreferences NotificationPreference[]
+  employmentContracts     EmploymentContract[]
+  reviewsAsReviewee       PerformanceReview[] @relation("RevieweeMembership")
+  reviewsAsReviewer      PerformanceReview[] @relation("ReviewerMembership")
+  trainingRecords        TrainingRecord[]
+  reportedAbsences       UnplannedAbsence[] @relation("MemberAbsences")
+  approvedAbsences       UnplannedAbsence[] @relation("AbsenceApprover")
+  timeEntries            TimeEntry[] @relation("MemberTimeEntries")
+  approvedTimeEntries    TimeEntry[] @relation("TimeEntryApprover")
+  policyAcknowledgments  PolicyAcknowledgment[]
+  notifications          HRNotification[]
+  notificationMessages   NotificationMessage[] @relation("MembershipNotificationMessages")
+  assignedComplianceRecords ComplianceRecord[] @relation("ComplianceAssignee")
+  submittedComplianceRecords  ComplianceRecord[] @relation("ComplianceSubmitter")
+  submittedStatutoryReports   StatutoryReport[]  @relation("ReportSubmitter")
+  complianceLogItems     ComplianceLogItem[] @relation("MembershipComplianceLogItems")
+  mentorAssignments      MentorAssignment[] @relation("MentorAssignmentMentor")
+  provisioningRequests   ProvisioningTask[] @relation("ProvisioningRequester")
   @@id([orgId, userId])
   @@index([userId])
   @@index([orgId, status])
   @@map("memberships")
   @@schema("hr")
 }
-
 model NotificationPreference {
   id         String              @id @default(uuid()) @db.Uuid
   orgId      String              @db.Uuid
@@ -2624,26 +2555,23 @@ model NotificationPreference {
   quietHours Json?               @db.JsonB
   metadata   Json?               @db.JsonB
   updatedAt  DateTime            @updatedAt
-  org        Organization        @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  membership Membership          @relation(fields: [orgId, userId], references: [orgId, userId], onDelete: Cascade)
-
+  org        Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  membership Membership   @relation(fields: [orgId, userId], references: [orgId, userId], onDelete: Cascade)
   @@unique([orgId, userId, channel])
   @@map("notification_preferences")
   @@schema("hr")
 }
-
 model IntegrationConfig {
-  id          String       @id @default(uuid()) @db.Uuid
-  orgId       String       @db.Uuid
+  id          String   @id @default(uuid()) @db.Uuid
+  orgId       String   @db.Uuid
   provider    String
-  credentials Json         @db.JsonB // Encrypted at application layer
-  settings    Json         @db.JsonB
-  active      Boolean      @default(true)
-  compliance  Json?        @db.JsonB // Integration compliance settings
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  org         Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
-
+  credentials Json     @db.JsonB // Encrypted at application layer
+  settings    Json     @db.JsonB
+  active      Boolean  @default(true)
+  compliance  Json?    @db.JsonB // Integration compliance settings
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  org Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
   @@unique([orgId, provider])
   @@map("integration_configs")
   @@schema("hr")
