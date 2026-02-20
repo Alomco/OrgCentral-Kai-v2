@@ -171,7 +171,7 @@ export class LoginService extends AbstractBaseService {
                     result: {
                         ok: true,
                         message: 'Login successful. Redirecting you now…',
-                        redirectUrl: payload.url ?? '/app',
+                        redirectUrl: `/api/auth/post-login?org=${encodeURIComponent(input.tenant.orgSlug)}`,
                     } satisfies LoginActionResult,
                     headers,
                 } satisfies LoginServiceWithCookiesResult;

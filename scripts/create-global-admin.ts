@@ -9,6 +9,9 @@ import {
     DataClassificationLevel,
 } from '@prisma/client';
 import { prisma } from '../src/server/lib/prisma';
+import { hashCredentialPassword } from './test-accounts/password';
+import { randomUUID } from 'node:crypto';
+import { getAuthOrganizationBridgeService } from '../src/server/services/auth/auth-organization-bridge-service.provider';
 
 const OWNER_ROLE_PERMISSIONS: Record<string, string[]> = {
     organization: ['read', 'update', 'governance'],
@@ -26,6 +29,7 @@ const SCRIPT_METADATA = {
 interface CliConfig {
     email: string;
     displayName: string;
+    password: string;
     platformOrgSlug: string;
     platformOrgName: string;
     platformTenantId: string;
@@ -34,9 +38,12 @@ interface CliConfig {
 }
 
 function resolveCliConfig(): CliConfig {
-    const [, , emailArgument, displayNameArgument] = process.argv;
+    const [, , emailArgument, displayNameArgument, passwordArgument] = process.argv;
     if (!emailArgument || emailArgument === '--help') {
-        stderr.write('Usage: pnpm tsx scripts/create-global-admin.ts <email> [displayName]\n');
+        stderr.write('Usage: pnpm tsx scripts/create-global-admin.ts <email> [displayName] [password]\n');
+        stderr.write('  email: Email address for the admin user\n');
+        stderr.write('  displayName: Display name (optional, defaults to email prefix)\n');
+        stderr.write('  password: Password for login (optional, defaults to TestPass!234567)\n');
         process.exit(1);
     }
     const normalizedEmail = emailArgument.trim().toLowerCase();
@@ -48,9 +55,14 @@ function resolveCliConfig(): CliConfig {
         typeof displayNameArgument === 'string' && displayNameArgument.trim().length > 0
             ? displayNameArgument.trim()
             : undefined;
+    const password = passwordArgument && passwordArgument.trim().length > 0
+        ? passwordArgument.trim()
+        : 'TestPass!234567';
+    
     return {
         email: normalizedEmail,
         displayName: (trimmedDisplayName ?? normalizedEmail.split('@')[0]).replace(/\s+/g, ' ').trim(),
+        password,
         platformOrgSlug: process.env.PLATFORM_ORG_SLUG ?? 'orgcentral-platform',
         platformOrgName: process.env.PLATFORM_ORG_NAME ?? 'OrgCentral Platform',
         platformTenantId: process.env.PLATFORM_TENANT_ID ?? 'orgcentral-platform',
@@ -113,6 +125,44 @@ async function main(): Promise<void> {
         },
     });
 
+    // Create auth user and account for login
+    const authUser = await prisma.authUser.upsert({
+        where: { email: config.email },
+        update: {
+            name: config.displayName,
+            emailVerified: true,
+        },
+        create: {
+            id: randomUUID(),
+            email: config.email,
+            name: config.displayName,
+            emailVerified: true,
+        },
+    });
+
+    const hashedPassword = await hashCredentialPassword(config.password);
+    const existingAuthAccount = await prisma.authAccount.findFirst({
+        where: { userId: authUser.id, providerId: 'credential' },
+        select: { id: true },
+    });
+
+    if (!existingAuthAccount) {
+        await prisma.authAccount.create({
+            data: {
+                id: randomUUID(),
+                userId: authUser.id,
+                accountId: authUser.id,
+                providerId: 'credential',
+                password: hashedPassword,
+            },
+        });
+    } else {
+        await prisma.authAccount.update({
+            where: { id: existingAuthAccount.id },
+            data: { password: hashedPassword },
+        });
+    }
+
     const timestamp = new Date();
     const membership = await prisma.membership.upsert({
         where: { orgId_userId: { orgId: organization.id, userId: user.id } },
@@ -144,8 +194,19 @@ async function main(): Promise<void> {
         },
     });
 
+    // Create Better Auth organization and membership
+    const authBridgeService = getAuthOrganizationBridgeService({ prisma });
+    await authBridgeService.ensureAuthOrganizationBridge(
+        organization.id,
+        authUser.id,
+        'owner', // Use 'owner' role for global admin
+    );
+
     stdout.write(`\nGlobal admin ready:\n`);
     stdout.write(`  User ID: ${user.id}\n`);
+    stdout.write(`  Auth User ID: ${authUser.id}\n`);
+    stdout.write(`  Email: ${config.email}\n`);
+    stdout.write(`  Password: ${config.password}\n`);
     stdout.write(`  Organization: ${organization.name} (${organization.id})\n`);
     stdout.write(`  Role: ${role.name} (${role.id})\n`);
     stdout.write(`  Membership: org=${membership.orgId}, user=${membership.userId}\n`);

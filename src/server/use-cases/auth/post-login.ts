@@ -47,6 +47,7 @@ export interface PostLoginOverrides {
 export interface PostLoginInput {
     headers: Headers;
     requestUrl: URL;
+    baseURL: string;
 }
 export interface PostLoginResult {
     redirectUrl: URL;
@@ -62,7 +63,7 @@ export async function handlePostLogin(
     const { path: nextPath, isExplicit } = resolveSafeNextPath(input.requestUrl);
 
     if (!session?.session) {
-        return { redirectUrl: buildLoginRedirect(input.requestUrl, nextPath) };
+        return { redirectUrl: buildLoginRedirect(input.baseURL, nextPath) };
     }
 
     const desiredOrgSlug = resolveOptionalOrgSlug(input.requestUrl);
@@ -85,7 +86,7 @@ export async function handlePostLogin(
 
     if (desiredOrgId === null) {
         if (isInvitationAcceptancePath(nextPath)) {
-            return { redirectUrl: new URL(nextPath, input.requestUrl.origin) };
+            return { redirectUrl: new URL(nextPath, input.baseURL) };
         }
         allMemberships = await listMembershipsForUser(membershipRepository, session.user.id);
         desiredOrgId = selectLatestActiveMembershipOrgId(allMemberships);
@@ -94,14 +95,14 @@ export async function handlePostLogin(
     if (desiredOrgId === null) {
         const membershipsForStatus = scopedMemberships ?? allMemberships ?? [];
         if (hasInactiveMembership(membershipsForStatus)) {
-            return { redirectUrl: buildMembershipInactiveRedirect(input.requestUrl, nextPath) };
+            return { redirectUrl: buildMembershipInactiveRedirect(input.baseURL, nextPath) };
         }
-        return { redirectUrl: buildNotInvitedRedirect(input.requestUrl, nextPath) };
+        return { redirectUrl: buildNotInvitedRedirect(input.baseURL, nextPath) };
     }
 
     const membershipSnapshot = await getMembershipRoleSnapshot(desiredOrgId, session.user.id);
     if (!membershipSnapshot) {
-        return { redirectUrl: buildNotInvitedRedirect(input.requestUrl, nextPath) };
+        return { redirectUrl: buildNotInvitedRedirect(input.baseURL, nextPath) };
     }
 
     await requireSessionAuthorization(session, {
@@ -118,11 +119,11 @@ export async function handlePostLogin(
     });
 
     if (workspaceSetup.requiresPasswordSetup) {
-        return { redirectUrl: buildSetupRedirect(input.requestUrl, MFA_SETUP_PATH, nextPath) };
+        return { redirectUrl: buildSetupRedirect(input.baseURL, MFA_SETUP_PATH, nextPath) };
     }
 
     if (workspaceSetup.requiresProfileSetup) {
-        return { redirectUrl: buildSetupRedirect(input.requestUrl, PROFILE_SETUP_PATH, nextPath) };
+        return { redirectUrl: buildSetupRedirect(input.baseURL, PROFILE_SETUP_PATH, nextPath) };
     }
 
     const redirectPath = isExplicit
@@ -142,7 +143,7 @@ export async function handlePostLogin(
     });
 
     return {
-        redirectUrl: new URL(redirectPath, input.requestUrl.origin),
+        redirectUrl: new URL(redirectPath, input.baseURL),
         setActiveHeaders,
     };
 }
@@ -184,23 +185,23 @@ async function ensureAuthOrganizationBridge(
     await authBridgeService.ensureAuthOrganizationBridge(orgId, userId, roleNameOverride);
 }
 
-function buildLoginRedirect(requestUrl: URL, nextPath: string): URL {
-    return new URL(`${LOGIN_PATH}?next=${encodeURIComponent(nextPath)}`, requestUrl.origin);
+function buildLoginRedirect(baseURL: string, nextPath: string): URL {
+    return new URL(`${LOGIN_PATH}?next=${encodeURIComponent(nextPath)}`, baseURL);
 }
 
-function buildNotInvitedRedirect(requestUrl: URL, nextPath: string): URL {
-    return new URL(`${NOT_INVITED_PATH}?next=${encodeURIComponent(nextPath)}`, requestUrl.origin);
+function buildNotInvitedRedirect(baseURL: string, nextPath: string): URL {
+    return new URL(`${NOT_INVITED_PATH}?next=${encodeURIComponent(nextPath)}`, baseURL);
 }
 
-function buildMembershipInactiveRedirect(requestUrl: URL, nextPath: string): URL {
-    const redirectUrl = new URL(ACCESS_DENIED_PATH, requestUrl.origin);
+function buildMembershipInactiveRedirect(baseURL: string, nextPath: string): URL {
+    const redirectUrl = new URL(ACCESS_DENIED_PATH, baseURL);
     redirectUrl.searchParams.set('reason', 'membership_inactive');
     redirectUrl.searchParams.set('next', nextPath);
     return redirectUrl;
 }
 
-function buildSetupRedirect(requestUrl: URL, path: string, nextPath: string): URL {
-    const redirectUrl = new URL(path, requestUrl.origin);
+function buildSetupRedirect(baseURL: string, path: string, nextPath: string): URL {
+    const redirectUrl = new URL(path, baseURL);
     redirectUrl.searchParams.set('next', nextPath);
     return redirectUrl;
 }
